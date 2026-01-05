@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+</head>
+<div>
+      <!-- Breadcrumb -->
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">Home</li>
+        <!-- <li class="breadcrumb-item active">Dashboard</li> -->
+
+        <!-- Breadcrumb Menu-->
+        <!-- <li class="breadcrumb-menu d-md-down-none">
+          <div class="btn-group" role="group" aria-label="Button group">
+            <a class="btn" data-ng-click="doTheBack()"><i class="icon-arrow-left-circle"></i> &nbsp;Back</a>
+          </div>
+        </li> -->
+      </ol>
+
+      <div class="container-fluid">
+
+        <div class="animated fadeIn">
+        	<div class="row">
+            <div class="col-sm-6 col-lg-3">
+              <div class="card">
+                <div class="count-box">
+                  <div class="icon bg-primary">
+                    <i class="fa fa-folder-open"></i>
+                  </div>
+                  <div>
+                    <h4>567</h4>
+                    <p class="mb-0">Total Visits</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--/.col-->
+
+            <div class="col-sm-6 col-lg-3">
+              <div class="card">
+                <div class="count-box">
+                  <div class="icon bg-warning">
+                    <i class="fa fa-files-o"></i>
+                  </div>
+                  <div>
+                    <h4>558</h4>
+                    <p class="mb-0">Page Views</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--/.col-->
+
+            <div class="col-sm-6 col-lg-3">
+               <div class="card">
+                <div class="count-box">
+                  <div class="icon bg-info">
+                    <i class="fa fa-inr"></i>
+                  </div>
+                  <div>
+                    <h4>564</h4>
+                    <p class="mb-0">Total Fund</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--/.col-->
+
+            <div class="col-sm-6 col-lg-3">
+               <div class="card">
+                <div class="count-box">
+                  <div class="icon bg-danger">
+                    <i class="fa fa-list-ul"></i>
+                  </div>
+                  <div>
+                    <h4>9980</h4>
+                    <p class="mb-0">Total Tasks</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--/.col-->
+          </div>
+
+          <!-- <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                 <i class="fa fa-folder-open-o"></i> Reports
+                </div>
+                <div class="card-body">
+                  form
+                  <div class="row">
+                    <div class="form-group col-sm-4">
+                      <label for="company">Company</label>
+                      <input type="text" class="form-control" id="company" placeholder="Enter your company name"/>
+                    </div>
+
+                    <div class="form-group col-sm-4">
+                      <label for="vat">Place</label>
+                      <input type="text" class="form-control" id="Place" placeholder="Enter Place"/>
+                    </div>
+
+                    <div class="form-group col-sm-4">
+                      <label for="street">Street</label>
+                      <input type="text" class="form-control" id="street" placeholder="Enter street name"/>
+                    </div>
+
+                    <div class="col-md-12 text-right mb-3">
+                      <a href="" class="btn btn-success">Submit</a>
+                    </div>
+
+                  </div>
+                  table
+                  <div class="table-responsive">
+                  <table class="table table-hover table-outline">
+                    <thead class="thead-default">
+                      <tr>
+                        <th>#</th>
+                        <th>Header</th>
+                        <th>Header</th>
+                        <th>Header</th>
+                        <th>Header</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1,002</td>
+                        <td>amet</td>
+                        <td>consectetur</td>
+                        <td>adipiscing</td>
+                        <td>
+                          <a href="" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="Delete">
+                            <i class="fa fa-trash-o"></i>
+                          </a>
+                          <a href="" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Edit">
+                            <i class="fa fa-pencil"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>1,003</td>
+                        <td>Integer</td>
+                        <td>nec</td>
+                        <td>odio</td>
+                        <td>
+                          <a href="" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="Delete">
+                            <i class="fa fa-trash-o"></i>
+                          </a>
+                          <a href="" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Edit">
+                            <i class="fa fa-pencil"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>1,003</td>
+                        <td>libero</td>
+                        <td>Sed</td>
+                        <td>cursus</td>
+                        <td>
+                          <a href="" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="Delete">
+                            <i class="fa fa-trash-o"></i>
+                          </a>
+                          <a href="" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Edit">
+                            <i class="fa fa-pencil"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>1,004</td>
+                        <td>dapibus</td>
+                        <td>diam</td>
+                        <td>Sed</td>
+                        <td>
+                          <a href="" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="Delete">
+                            <i class="fa fa-trash-o"></i>
+                          </a>
+                          <a href="" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Edit">
+                            <i class="fa fa-pencil"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>1,005</td>
+                        <td>Nulla</td>
+                        <td>quis</td>
+                        <td>sem</td>
+                        <td>
+                          <a href="" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="Delete">
+                            <i class="fa fa-trash-o"></i>
+                          </a>
+                          <a href="" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Edit">
+                            <i class="fa fa-pencil"></i>
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>1,006</td>
+                        <td>nibh</td>
+                        <td>elementum</td>
+                        <td>imperdiet</td>
+                        <td>
+                          <a href="" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="Delete">
+                            <i class="fa fa-trash-o"></i>
+                          </a>
+                          <a href="" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title="Edit">
+                            <i class="fa fa-pencil"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  </div>
+                  <ul class="pagination float-right">
+                    <li class="page-item"><a class="page-link" href="#">Prev</a></li>
+                    <li class="page-item active">
+                      <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            /.col
+          </div> -->
+          <!--/.row-->
+          <!-- <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-files-o"></i> Form
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="form-group col-sm-4">
+                      <label for="company">Company</label>
+                      <input type="text" class="form-control" id="company" placeholder="Enter your company name"/>
+                    </div>
+
+                    <div class="form-group col-sm-4">
+                      <label for="Place">Place</label>
+                      <input type="text" class="form-control" id="Place" placeholder="Place"/>
+                    </div>
+
+                    <div class="form-group col-sm-4">
+                      <label for="street">Street</label>
+                      <input type="text" class="form-control" id="street" placeholder="Enter street name"/>
+                    </div>
+                  </div>
+                  <div class="row">
+
+                    <div class="form-group col-sm-8">
+                      <label for="city">City</label>
+                      <input type="text" class="form-control" id="city" placeholder="Enter your city"/>
+                    </div>
+
+                    <div class="form-group col-sm-4">
+                      <label for="postal-code">Postal Code</label>
+                      <input type="text" class="form-control" id="postal-code" placeholder="Postal Code"/>
+                    </div>
+
+                  </div>
+                  /.row
+
+                  <div class="form-group">
+                    <label for="country">Country</label>
+                    <input type="text" class="form-control" id="country" placeholder="Country name"/>
+                  </div>
+                  <div class="form-group">
+                      <label for="">State</label>
+                      <select class="form-control">
+                        <option>Madhya Pradesh</option>
+                        <option>Gujarat</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Select District</label>
+                    <div>
+                      <div class="form-check form-check-inline">
+                        <input id="inlineCheckbox1" value="option1" type="checkbox"/>
+                        <label for="inlineCheckbox1">Betul</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input id="inlineCheckbox2" value="option2" type="checkbox"/>
+                        <label for="inlineCheckbox2">Bhopal</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input id="inlineCheckbox3" value="option3" type="checkbox"/>
+                        <label for="inlineCheckbox3">Rewa</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-sm btn-primary">Submit</button>
+                  <button type="reset" class="btn btn-sm btn-danger">Reset</button>
+                </div>
+              </div>
+            </div>
+            /.col
+          </div> -->
+          <!--/.row-->
+          <!-- tabs -->
+          <!-- <div class="mb-4">
+              <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" data-toggle="tab" href="#home3" role="tab" aria-controls="home"><i class="icon-calculator"></i> Tab1</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="tab" href="#profile3" role="tab" aria-controls="profile"><i class="icon-list"></i> Tab2</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="tab" href="#messages3" role="tab" aria-controls="messages"><i class="icon-pie-chart"></i> Tab3</a>
+                </li>
+              </ul>
+
+              <div class="tab-content">
+                <div class="tab-pane active" id="home3" role="tabpanel">
+                  1. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                </div>
+                <div class="tab-pane" id="profile3" role="tabpanel">
+                  2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                  dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </div>
+                <div class="tab-pane" id="messages3" role="tabpanel">
+                  3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                  dolor in reprehenderit in voluptate velit esse cillum...
+                </div>
+              </div>
+            </div> -->
+        </div>
+
+      </div>
+      <!-- /.container-fluid -->
+    
+    </div>
+</html>

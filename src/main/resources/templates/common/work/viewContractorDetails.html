@@ -1,0 +1,196 @@
+<div th:fragment="view_ContractorDetails">
+	<form name="workFormContractor" id="workFormContractor"
+		novalidate="novalidate">
+
+		<div class="card"
+			data-ng-hide="workDataTender.workStatus=='notTenderIssued'">
+			<div class="card-header">
+				<span>Contractor’s Details</span>
+			</div>
+			<div class="card-body">
+				<div class="row">
+
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{contractorName}">Contractor
+								Name </span><span class="aestrick">&#42;</span></label> <input
+							disabled="disabled" type="text" class="form-control" id="name"
+							required="required" data-ng-model="workDataContractor.name"
+							name="name" /> <input type="hidden"
+							data-ng-model="workDataContractor.workId" />
+
+						<div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.name.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsDispatchNumber}"> Name of the Contractor</span>
+							</p>
+						</div>
+					</div>
+
+
+
+					<div class="form-group col-sm-4">
+						<label><span>Mobile No.</span></label> <input disabled="disabled"
+							required="required" class="form-control digits-only" type="text"
+							data-ng-model="workDataContractor.contactNo" name="contactNo"
+							data-ng-pattern="/^(\+\d{1,3}[- ]?)?\d{10}$/" maxlength="10" />
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.contactNo.$error.required">
+								<span>Please enter Mobile No.</span>
+							</p>
+						</div> -->
+						<p class="help-block" style="color: red;"
+							data-ng-show="workFormContractor.contactNo.$error.pattern">
+							<span>Please enter valid Mobile No.</span>
+						</p>
+
+					</div>
+
+
+
+
+
+
+
+					<div class="form-group col-sm-4">
+						<label><span>Email Id</span></label> <input disabled="disabled"
+							required="required" class="form-control" type="email"
+							id="emailId" data-ng-model="workDataContractor.emailId"
+							name="emailId" maxlength="50" />
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.emailId.$error.required">
+								<span>Please enter Email Id</span>
+							</p>
+						</div> -->
+						<p class="help-block" style="color: red;"
+							data-ng-show="workFormContractor.emailId.$error.email">
+							<span>Please enter valid Email Id</span>
+						</p>
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<label><span>Contractor’s Firm Name and Address</span><span
+							class="aestrick">&#42;</span></label>
+						<textarea disabled="disabled" class="form-control"
+							id="firmNameAddress" required="required"
+							data-ng-model="workDataContractor.firmNameAddress"
+							name="firmNameAddress"></textarea>
+						<div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.firmNameAddress.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Contractor’s
+									Firm Name and Address</span>
+							</p>
+						</div>
+					</div>
+
+
+
+
+
+
+					<div class="form-group col-sm-4">
+
+						<label><span> Pan Number</span> </label> <input type="text"
+							class="form-control alpha-numeric-only"
+							data-ng-blur="validatePanConsultant(workDataContractor.pan);"
+							id="pan" data-ng-model="workDataContractor.pan" name="pan"
+							autocomplete="off" maxlength="10" disabled="disabled" />
+
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.pan.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									>PAN</span>
+							</p>
+						</div> -->
+
+						<div data-ng-show="panError">
+							<p class="help-block" style="color: red;">
+								<span>Please Enter Correct Pan Number</span>
+							</p>
+						</div>
+
+					</div>
+
+					<div class="form-group col-sm-4">
+
+						<label><span>GSTIN No.</span> </label> <input type="text"
+							class="form-control alpha-numeric-only" id="gstin"
+							autocomplete="off"
+							data-ng-blur="validateGstinConsultant(workDataContractor.gstin)"
+							data-ng-model="workDataContractor.gstin" name="gstin"
+							maxlength="15" disabled="disabled" />
+
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.gstin.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									>GSTIN No.</span>
+							</p>
+						</div> -->
+
+						<div data-ng-show="gstinError">
+							<p class="help-block" style="color: red;">
+								<span>Please Enter Correct GSTIN Number</span>
+							</p>
+						</div>
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span>Remarks</span></label>
+						<textarea disabled="disabled" class="form-control" id="Remarks"
+							required="required" data-ng-model="workDataContractor.remarks"
+							name="Remarks"></textarea>
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.Remarks.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Remarks</span>
+							</p>
+						</div> -->
+					</div>
+
+				</div>
+			</div>
+			<!--/.row-->
+
+
+			<!-- 2nd Row start -->
+
+
+
+
+
+
+
+
+
+			<!-- 	<div class="card-footer text-right">
+								<button type="submit" class="btn btn-sm btn-primary" id="submit">
+									<span th:text="#{submit}">Submit</span>
+								</button>
+								<button type="reset" class="btn btn-sm btn-danger">Reset</button>
+							</div> -->
+
+		</div>
+		<div class="tab-footer text-right" hidden="hidden"
+			data-ng-hide="workDataTender.workStatus=='notTenderIssued'"
+			th:if="${roleName=='ROLE_SAU' ||roleName=='ROLE_DEPARTMENT'}">
+			<button type="submit" class="btn  btn-success  next-button"
+				id="draftCobtn"
+				data-ng-click="finalSubmit=false;saveCoDraft=true;saveCoNext=false;">
+				<i class="las la-file-alt"></i> Save As Draft
+			</button>
+			<button type="submit" class="btn btn-primary next-button nexxt"
+				id="finalCotbtn"
+				data-ng-click="finalSubmit=false;saveCoDraft=true;saveCoNext=true;">
+				Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
+			</button>
+		</div>
+
+	</form>
+</div>

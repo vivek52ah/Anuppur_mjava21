@@ -1,0 +1,37 @@
+<Development_Monitoring_Legacy_Work
+	id="build_DMF_1524226597">
+	<page1>
+		<district />
+		<block />
+		<gramPanchayat />
+		<village />
+		<parliamentaryConstituency />
+		<legislativeConstituency />
+		<workNo />
+		<workName />
+		<workType />
+		<year />
+		<scheme />
+		<workPriority />
+		<workHead />
+		<implementationAgency />
+		<subEngineerName />
+		<estimatedAmount />
+		<amountReleased />
+		<performanceGrant />
+		<tsDate />
+		<tsNo />
+		<asDate />
+		<asNo />
+		<status />
+	</page1>
+	<page2>
+		<stage3Pic1 />
+		<stage3Pic2 />
+		<stage3Pic3 />
+		<stage3Pic4 />
+	</page2>
+	<meta>
+		<instanceID />
+	</meta>
+</Development_Monitoring_Legacy_Work>

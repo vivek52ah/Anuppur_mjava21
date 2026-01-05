@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+<script th:src="@{/js/bootstrap-select.min.js}"></script>
+
+<script th:src="@{/js/bootstrap-select.js}"></script>
+
+<script th:src="@{/js/jquery-2.2.3.min.js}"></script>
+<script th:src="@{/js/jquery-gmaps-latlon-picker.js}"></script>
+<script th:src="@{/js/wizard.js}"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+
+
+<style>
+.table-head {
+	padding: 5px 10px !important;
+	border-top-color: rgb(255, 255, 255) !important;
+	border-right-color: rgb(255, 255, 255) !important;
+	background: rgb(224, 229, 238);
+	border-radius: 7px;
+}
+
+.table-head>div {
+	white-space: nowrap;
+	display: inline-block;
+	font-size: 19px;
+	color: rgb(0, 108, 182);
+	font-weight: 500;
+}
+
+.tbl1 td:first-child {
+	max-width: 50px;
+}
+
+.plus {
+	float: right;
+	background: rgb(73, 112, 176);
+	height: 28px;
+	width: 28px;
+	color: rgb(255, 255, 255);
+	text-align: center;
+	border-radius: 50%;
+	font-size: 12px;
+	line-height: 29px;
+	margin-left: 10px;
+	cursor: pointer;
+}
+
+.plus .fa {
+	transition: all .3s ease;
+}
+
+.plus.active .fa {
+	transform: rotate(-90deg);
+}
+
+.tbody-content {
+	/*  display: none; */
+	
+}
+
+.tbl-lg tr td input[type="text"] {
+	min-width: 100px;
+	height: 37px;
+	font-size: 13px;
+	/* padding: 2px 5px; */
+	text-align: center;
+}
+
+.datePickerTimeSplit1 .bootstrap-datetimepicker-widget {
+	position: absolute;
+	top: -10em !important;
+}
+
+.first-table-div {
+	height: 30vh;
+}
+
+.nav-justified .nav-link {
+	color: #f57f17;
+	font-weight: 600;
+	border: 1px solid #eaeaea;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+li.nav-item a {
+	padding: 6px 5px;
+	min-height: 60px;
+	background: #f5f2f2;
+	font-size: 14px;
+}
+
+li.nav-item a .fa {
+	font-size: 20px;
+	margin-right: 5px
+}
+
+.wizard-inner {
+	width: 1236px;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+.nav-justified {
+	background: #f6f6f6;
+	width: 1400px;
+}
+
+.card-header {
+	border-bottom: 0px solid #e4e4e4;
+}
+
+a.nav-link.active {
+	background: #1a2942 !important;
+	color: #fff !important;
+}
+
+a.nav-link:hover {
+	background: #f57f17;
+	color: #fff;
+}
+
+textarea#workStatus {
+	display: block;
+}
+
+textarea#workStatusNew {
+	display: block;
+}
+
+.display-block {
+	display: block;
+}
+</style>
+<style>
+#multistepsform {
+	width: 660px;
+	margin: 50px auto;
+	text-align: center;
+	position: relative;
+}
+
+#multistepsform fieldset {
+	background: white;
+	border: 0 none;
+	border-radius: 3px;
+	box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+	padding: 20px 30px;
+	box-sizing: border-box;
+	width: 80%;
+	margin: 0 10%;
+	position: relative;
+}
+
+#multistepsform fieldset:not(:first-of-type) {
+	display: none;
+}
+
+#multistepsform input, #multistepsform textarea {
+	padding: 15px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	margin-bottom: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	font-family: montserrat;
+	color: #2c3e50;
+	font-size: 13px;
+}
+
+#multistepsform input:focus, #multistepsform textarea:focus {
+	border-color: #679b9b;
+	outline: none;
+	color: #637373;
+}
+
+#multistepsform .action-button {
+	width: 100px;
+	background: #ff9a76;
+	font-weight: bold;
+	color: #fff;
+	transition: 150ms;
+	border: 0 none;
+	border-radius: 1px;
+	cursor: pointer;
+	padding: 10px 5px;
+	margin: 10px 5px;
+}
+
+#multistepsform .action-button:hover, #multistepsform .action-button:focus
+	{
+	box-shadow: 0 0 0 2px #f08a5d, 0 0 0 3px #ff976;
+	color: #fff;
+}
+
+#multistepsform .fs-title {
+	font-size: 15px;
+	text-transform: uppercase;
+	color: #2c3e50;
+	margin-bottom: 10px;
+}
+
+#multistepsform .fs-subtitle {
+	font-weight: normal;
+	font-size: 13px;
+	color: #666;
+	margin-bottom: 20px;
+}
+
+#multistepsform #progressbar {
+	margin-bottom: 30px;
+	overflow: hidden;
+	counter-reset: step;
+}
+
+#multistepsform #progressbar li {
+	list-style-type: none;
+	color: #679b9b;
+	text-transform: uppercase;
+	font-size: 9px;
+	width: 15%;
+	float: left;
+	position: relative;
+}
+
+#multistepsform #progressbar li:before {
+	content: counter(step);
+	counter-increment: step;
+	width: 20px;
+	line-height: 20px;
+	display: block;
+	font-size: 10px;
+	color: #fff;
+	background: #679b9b;
+	border-radius: 3px;
+	margin: 0 auto 5px auto;
+}
+
+#multistepsform #progressbar li:after {
+	content: "";
+	width: 100%;
+	height: 2px;
+	background: #679b9b;
+	position: absolute;
+	left: -50%;
+	top: 9px;
+	z-index: -1;
+}
+
+#multistepsform #progressbar li:first-child:after {
+	content: none;
+}
+
+#multistepsform #progressbar li.active {
+	color: #ff9a76;
+}
+
+#multistepsform #progressbar li.active:before, #multistepsform #progressbar li.active:after
+	{
+	background: #ff9a76;
+	color: white;
+}
+
+li.nav-item span.fa {
+	border: 1px solid #fff;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	border-radius: 50%;
+	color: #fff;
+	display: block;
+	margin: 0 auto;
+	margin-bottom: 15px;
+}
+
+li.nav-item a.nav-link {
+	display: block
+}
+
+.wizard-inner li.nav-item a span:last-child {
+	background: #1a2942;
+	width: 100% !important;
+	color: #fff;
+	display: block;
+	padding: 10px;
+	border-radius: 5px;
+}
+
+li.nav-item a {
+	padding: 6px 5px;
+	min-height: auto !important;
+	background: #f5f2f2;
+	font-size: 14px;
+}
+
+.wizard-inner a.nav-link {
+	background: #fff !important;
+	color: #fff !important;
+}
+
+a.nav-link.active {
+	background: #fff !important
+}
+
+a.nav-link.active span {
+	background: #1d9220 !important
+}
+
+.tab-footer .btn-success {
+	color: #fff;
+	background-color: #11c15b;
+	border-color: #11c15b;
+	background: -webkit-linear-gradient(top, rgba(163, 255, 206, 1) 0%,
+		rgba(100, 209, 128, 1) 4%, #11c15b 100%);
+	padding: 15px 25px;
+	font-weight: 900;
+	font-size: 16px;
+	box-shadow: 0px 0px 7px rgb(0 0 0/ 10%);
+}
+
+.tab-footer .btn-primary {
+	color: #fff;
+	background-color: #11c15b;
+	border-color: #11c15b;
+	background: -webkit-linear-gradient(top, #536dfe 0%, #536dfe 4%, #536dfe 100%);
+	padding: 15px 25px;
+	font-weight: 900;
+	font-size: 16px;
+	box-shadow: 0px 0px 7px rgb(0 0 0/ 10%);
+}
+
+.card {
+	margin-bottom: 1.5rem;
+	box-shadow: 0 0 7px rgb(0 0 0/ 70%);
+	border-radius: 7px
+}
+
+ul.nav.nav-tabs.nav-justified.border-0.bg-white li a, ul.nav.nav-tabs.nav-justified.border-0.bg-white li
+	{
+	width: auto;
+	border: none;
+}
+
+button#drafTtbtn {
+	margin: 5px;
+}
+
+button#finalTtbtn {
+	margin: 5px;
+}
+
+button#draftCobtn {
+	margin: 5px;
+}
+
+button#finalCotbtn {
+	margin: 5px;
+}
+
+button#drafProbtn {
+	margin: 5px;
+}
+
+button#finalProtbtn {
+	margin: 5px;
+}
+
+.wizard-inner {
+	width: 100% !important;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.wizard .tab-content {
+	border: none;
+}
+
+.dataTables_length {
+	display: none;
+}
+
+ul.pagination {
+	display: none;
+}
+
+th {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+td {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+</style>
+
+</head>
+<script type="text/javascript">
+	$(function() {
+
+		$('#datetimepicker4').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+		$('#datetimepicker7').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+		$('#datetimepicker3').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		$('#datetimepicker2').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		var date1;
+		$("#datetimepicker2").on("change.datetimepicker", function(e) {
+			date1 = e.date;
+
+		});
+
+		$('#datetimepicker6').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			// minDate : moment().isSameOrBefore('#datetimepicker2' ,'DD/MM/YYYY'),
+			// minDate: moment( $('input#tenderOpeningDate').val(), 'DD/MM/YYYY' ),
+			//initialdate = moment( $('input#start_date').val(), 'DD/MM/YYYY' );
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		$("#datetimepicker6").on("change.datetimepicker", function(e) {
+			$('#datetimepicker6').datetimepicker('minDate', date1);
+		});
+
+		$('#datetimepicker10').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		$('#datetimepicker5').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		$('#datetimepicker8').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		$('#datetimepicker9').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		$('#datetimepicker11').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+		$('#datetimepicker12').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		$('#datetimepicker13').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+		$('#datetimepicker14').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		var date2;
+		$("#datetimepicker14").on("change.datetimepicker", function(e) {
+			date2 = e.date;
+
+		});
+
+		$('#datetimepicker15').datetimepicker({
+			//viewMode : 'days',
+			//maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		$("#datetimepicker15").on("change.datetimepicker", function(e) {
+			$('#datetimepicker15').datetimepicker('minDate', date2);
+		});
+
+	});
+
+	/*  $( function() {
+		  
+		  var todaydt = new Date();
+		    $("#workOrderDate").datepicker({
+		                autoclose: true,
+		                    dateFormat: "DD/MM/YYYY",
+		                    endDate: todaydt,
+		                onSelect: function (date) {
+		                   //Get selected date 
+		                    var date2 = $('#workOrderDate').datepicker('getDate');
+		                    //sets minDate to txt_date_to
+		                    $('#txt_date_to').datepicker('option', 'minDate', date2);
+		                }
+		            });
+		            $('#tenderOpeningDate').datepicker({
+		                dateFormat: "DD/MM/YYYY",
+		                
+		            });
+	} ); */
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+	//<![CDATA[
+	/* jQuery.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings) {
+	 return {
+	 "iStart" : oSettings._iDisplayStart,
+	 "iEnd" : oSettings.fnDisplayEnd(),
+	 "iLength" : oSettings._iDisplayLength,
+	 "iTotal" : oSettings.fnRecordsTotal(),
+	 //"iFilteredTotal" : oSettings.fnRecordsDisplay(),
+	 "iPage" : oSettings._iDisplayLength === -1 ? 0 : Math
+	 .ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+	 "iTotalPages" : oSettings._iDisplayLength === -1 ? 0 : Math
+	 .ceil(oSettings.fnRecordsDisplay()
+	 / oSettings._iDisplayLength)
+	 };
+	 }; */
+
+	function fetchTSASRevisedList(workId) {
+
+		t = $("#dynamic-ts-table")
+				.DataTable(
+						{
+							"processing" : true,
+							"serverSide" : true,
+							"sort" : "position",
+							//bStateSave variable you can use to save state on client cookies: set value "true" 
+							"bStateSave" : false,
+							//Default: Page display length
+							"iDisplayLength" : 10,
+							"bInfo" : false,
+							"searching" : false,
+							"iPage" : false,
+							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+							"iDisplayStart" : 0,
+							"pagingType" : "full_numbers",
+							"aaSorting" : [],
+							/* "dom" : 'Blrtip', */
+							/* 	"dom" : "<'row'<'col-12 datatbl-top'lB>>"
+										+ "<'row'<'col-md-6'r><'col-md-6'>>"
+										+ "<'row'<'col-md-12't>><'row'<'col-md-6'i><'col-md-6'p>>", */
+							/* "buttons" : [
+									{
+										extend : 'excelHtml5',
+										title : 'Work_data',
+										text : '<span class="fa fa-file-excel-o"></span> Excel Export',
+										exportOptions : {
+											columns : [0, 1, 2, 3, 4, 5, 6, 7]
+										}
+									}, ], */
+							/* "lengthMenu" : [ [ 10, 25, 50, 100000 ],
+									[ 10, 25, 50, "All" ] ], */
+
+							/* "fnDrawCallback" : function() {
+
+								angular.element('#StartOrFinishSpinnerId')
+										.scope().startOrStopSpinner(false);
+
+								 
+							}, */
+							/* "fnServerParams" : function(aoData) {
+							//aoData.push( { "name": "districtName", "value": $('#districtId').val()});
+							aoData.push({
+								"name" : "searchBoxVal",
+								"value" : $('#searchBox').val().trim()
+							});
+							
+							
+								
+							}, */
+
+							/* "language" : {
+								searchPlaceholder : "rvOrderNo"
+							},  */
+							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
+
+								$('td:eq(5)', nRow)
+										.html(
+												'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFile('
+														+ (aData.rvFileId)
+														+ '); "><i class="fa fa-download"></i></a>');
+
+							},
+							"sAjaxSource" : "fetchTSASRevisedList/" + workId,
+
+							"columns" : [ {
+								"data" : "index",
+								"bSortable" : false
+							}, {
+								"data" : "typeDoc",
+								"bSortable" : false
+							}, {
+								"data" : "rvOrderNo",
+								"bSortable" : false
+							}, {
+								"data" : "rvOrderDate",
+								"bSortable" : false
+							}, {
+								"data" : "rvAmt",
+								"bSortable" : false
+							}, {
+								"data" : null,
+								"bSortable" : false
+							}, {
+								"data" : "rvRemarks",
+								"bSortable" : false
+							} ],
+						});
+	}
+
+	function downloadFile(fileId) {
+		return $('#page-ts-div').scope().downloadDocumentTSRevised(fileId);
+	}
+
+	////Work Progress 
+	var responseIndex = null;
+	function fetchProgressImagesList(workId) {
+		//	console.log("fetchProgressImagesList==== " + fetchProgressImagesList)
+		t = $("#dynamic-wp-table")
+				.DataTable(
+						{
+							"processing" : true,
+							"serverSide" : true,
+							"sort" : "position",
+							//bStateSave variable you can use to save state on client cookies: set value "true" 
+							"bStateSave" : false,
+							//Default: Page display length
+							"iDisplayLength" : 10,
+							"bInfo" : false,
+							"searching" : false,
+							"iPage" : false,
+							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+							"iDisplayStart" : 0,
+							"pagingType" : "full_numbers",
+							"aaSorting" : [],
+
+							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
+								if (aData.workStatusId == 10) {
+									$('td:eq(7)', nRow)
+											.html(
+													'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileWS('
+															+ (aData.documentId)
+															+ '); "><i class="fa fa-download"></i></a>');
+								}
+								if (aData.workStatusId == 9) {
+									$('td:eq(7)', nRow).html('<span >-</span>');
+								}
+							},
+							"sAjaxSource" : "fetchProgressImagesList/" + workId,
+
+							"columns" : [ {
+								"data" : "indexWS",
+								"bSortable" : false
+
+							}, {
+								"data" : "workStatusNameE",
+								"bSortable" : false
+							}, {
+								"data" : "workSubStatusNameE",
+								"bSortable" : false
+							}, {
+								"data" : "reasonDelay",
+								"bSortable" : false
+							}, /* {
+																									"data" : "workSubDelayReason",
+																									"bSortable" : false
+																								}, */{
+								"data" : "actionTakenDelay",
+								"bSortable" : false
+							}, {
+								"data" : "remarks",
+								"bSortable" : false
+							}, {
+								"data" : "createdDate",
+								"bSortable" : false
+							}, {
+								"data" : null,
+								"bSortable" : false
+							} ],
+						});
+	}
+
+	function downloadFileWS(fileId) {
+		return $('#page-wp-div').scope().downloadDocumentWSPro(fileId);
+	}
+
+	////Work Expenses
+	var ex = null;
+	function fetchExpensesDataList(workId) {
+
+		ex = $("#dynamic-ex-table").DataTable({
+			"processing" : true,
+			"serverSide" : true,
+			"sort" : "position",
+			//bStateSave variable you can use to save state on client cookies: set value "true" 
+			"bStateSave" : false,
+			//Default: Page display length
+			"iDisplayLength" : 10,
+			"bInfo" : false,
+			"searching" : false,
+			"iPage" : true,
+			//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+			"iDisplayStart" : 0,
+			"pagingType" : "full_numbers",
+			"aaSorting" : [],
+
+			/* "fnCreatedRow" : function(nRow, aData, iDataIndex) {
+				
+				$('td:eq(3)', nRow).html('<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileWS('+(aData.documentId)+'); "><i class="fa fa-download"></i></a>');
+				
+			}, */
+			"fnServerParams" : function(aoData) {
+
+				aoData.push({
+					"name" : "year",
+					"value" : $('#year').val()
+				});
+				/* aoData.push( { "name": "financialYear", "value": $('#financialYear').val()}); */
+
+			},
+			"sAjaxSource" : "fetchExpensesDataList/" + workId,
+
+			"columns" : [ {
+				"data" : "index",
+				"bSortable" : false
+
+			}, {
+				"data" : "totalExpensess",
+				"bSortable" : false
+			}, {
+				"data" : "expensessUptoMarch",
+				"bSortable" : false
+			}, {
+				"data" : "expensessCurrentFy",
+				"bSortable" : false
+			}, {
+				"data" : "year",
+				"bSortable" : false
+			}, {
+				"data" : "createdDate",
+				"bSortable" : false
+			} ],
+		});
+	}
+	function exDraw() {
+		ex.draw();
+	}
+	
+	
+	////Work Expenses
+	var ex = null;
+	function fetchExpensesDataList(workId) {
+		//	console.log("fetchExpensesDataList===========")
+
+		ex = $("#dynamic-ex-table").DataTable({
+			"processing" : true,
+			"serverSide" : true,
+			"sort" : "position",
+			//bStateSave variable you can use to save state on client cookies: set value "true" 
+			"bStateSave" : false,
+			//Default: Page display length
+			"iDisplayLength" : 10,
+			"bInfo" : false,
+			"searching" : false,
+			"iPage" : true,
+			//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+			"iDisplayStart" : 0,
+			"pagingType" : "full_numbers",
+			"aaSorting" : [],
+
+			/* "fnCreatedRow" : function(nRow, aData, iDataIndex) {
+				
+				$('td:eq(3)', nRow).html('<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileWS('+(aData.documentId)+'); "><i class="fa fa-download"></i></a>');
+				
+			}, */
+			"fnServerParams" : function(aoData) {
+
+				aoData.push({
+					"name" : "year",
+					"value" : $('#year').val()
+				});
+				/* aoData.push( { "name": "financialYear", "value": $('#financialYear').val()}); */
+
+			},
+			"sAjaxSource" : "fetchExpensesDataList/" + workId,
+
+			"columns" : [ {
+				"data" : "index",
+				"bSortable" : false
+
+			}, {
+				"data" : "totalExpensess",
+				"bSortable" : false
+			}, {
+				"data" : "expensessUptoMarch",
+				"bSortable" : false
+			}, {
+				"data" : "expensessCurrentFy",
+				"bSortable" : false
+			}, {
+				"data" : "year",
+				"bSortable" : false
+			}, {
+				"data" : "createdDate",
+				"bSortable" : false
+			} ],
+		});
+	}
+	function exDraw() {
+		ex.draw();
+	}
+
+	//]]>
+</script>
+<div>
+	<ol class="breadcrumb">
+		<!-- 	<li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li> -->
+
+
+		<li class="breadcrumb-item"><a href="#manageOngoingWorks"><span>Manage
+					Works</span></a></li>
+
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row" data-ng-init="loadWorkDetails('first');">
+				<div class="col-md-12">
+					<!-- 	<form id="multistepsform">
+  progressbar
+  <ul id="progressbar">
+    <li class="active">Account Setup</li>
+    <li>Personal Details</li>
+    <li>Social Profiles</li>
+    <li>Dummy-1</li>
+    <li>Dummy-2</li>
+    <li>Dummy-3</li>
+
+  </ul>
+  <fieldset>
+     
+    <input type="button" name="next" class="next action-button" value="Next" />
+  </fieldset>
+    </form>
+   -->
+
+					<div class="card">
+						<div class="card-header top-header">
+
+							<!-- <span style="float: right;">Work No.: {{workData.workNo}}</span>
+ -->
+							<!-- <i class="fa fa-wpforms"></i> <span>Update Work</span>
+							<li  class="breadcrumb-item"><a href="#dashboard"><span
+				             th:text="${roleName}"></span></a></li> -->
+						</div>
+						<div class="col-md-12">
+							<div data-ng-if="responseObject.errorMessage != null"
+								class="text-danger">
+								<strong>Error!</strong>
+								<p>{{responseObject.errorMessage}}</p>
+							</div>
+						</div>
+
+						<div class="wizard bg-white mb-3">
+							<div class="wizard-inner">
+
+
+								<ul class="nav nav-tabs nav-justified border-0 bg-white"
+									role="tablist">
+
+
+									<li role="presentation" class="nav-item"><a href=".step1"
+										data-toggle="tab" aria-controls="step1" role="tab"
+										title="Step 1" class="nav-link active"> <span
+											class="fa fa-file-text-o"></span> <span>Work Details <em
+												class="count"></em>
+										</span>
+
+									</a></li>
+
+									
+
+
+									<li data-ng-show="workData.dmStatus == 1 " role="presentation"
+										class="nav-item"><a href=".step3" data-toggle="tab"
+										aria-controls="step3" role="tab" title="Step 3"
+										class="nav-link   stopVald"> <span class="fa fa-map-o"></span>
+											<span>Tender Details <em class="count"></em>
+										</span>
+									</a></li>
+
+									<li data-ng-show="workData.dmStatus == 1 " role="presentation"
+										class="nav-item"><a href=".step4" data-toggle="tab"
+										aria-controls="step4" role="tab" title="Step 4"
+										class="nav-link  stopVald"> <span
+											class="fa fa-credit-card"></span> <span>Contractor
+												Details <em class="count"></em>
+										</span>
+									</a></li>
+
+									<li data-ng-show="workData.dmStatus == 1 " role="presentation"
+										class="nav-item"><a href=".step5" data-toggle="tab"
+										aria-controls="step5" role="tab" title="Step 5"
+										class="nav-link  stopVald"> <span
+											class="fa fa-credit-card"></span> <span>Work Progress
+												Details<em class="count"></em>
+										</span>
+									</a></li>
+
+									<li data-ng-show="workData.dmStatus == 1 " role="presentation"
+										class="nav-item"><a href=".step6" data-toggle="tab"
+										aria-controls="step6" role="tab" title="Step 6"
+										class="nav-link  stopVald"> <span
+											class="fa fa-credit-card"></span> <span> Completion
+												Certificate<em class="count"></em>
+										</span>
+									</a></li>
+									<li role="presentation" class="nav-item"><a href=".step2"
+																			data-toggle="tab" aria-controls="step2" role="tab"
+																			title="Step 2" class="nav-link  "> <span
+																				class="fa fa-road"></span> <span>DM Remarks<em
+																					class="count"></em>
+																			</span>
+																		</a></li>
+								</ul>
+							</div>
+
+
+							<!-- <div class="d-flex flex-wrap justify-content-center">
+									<div class="wp">
+										<strong>Total Work Completion Percentage:</strong> <span>{{workData.totalWorkCompletionPercentage}}</span>
+									</div>
+									<div class="wp" data-ng-show="workData.workTypeBean.workTypeId=='1'">
+										<strong>Total Work Sanctioned (In KM):</strong> <span>{{workData.totalLengthSanctionedInKm}}</span>
+									</div>
+									<div class="wp" data-ng-show="workData.workTypeBean.workTypeId=='1'">
+										<strong>Total Work Completed (In KM):</strong> <span>{{workData.totalWorkProgressInKm}}</span>
+									</div>
+								</div> -->
+
+							<div class="tab-content">
+								<!-- /tab1 -->
+								<div class="tab-pane active step1" role="tabpanel" id="step1">
+									<div
+										th:replace="common/work/viewWorkDetails:: view_workDetails"></div>
+
+								</div>
+
+								<!-- /tab2 -->
+								 
+
+
+								<!-- /tab3 -->
+								<div class="tab-pane  step3" role="tabpanel" id="step3">
+									<div
+										th:replace="common/work/viewTenderDetails :: view_TenderDetails"></div>
+								</div>
+
+								<!-- /tab4 -->
+								<div class="tab-pane  step4" role="tabpanel" id="step4">
+									<div
+										th:replace="common/work/viewContractorDetails :: view_ContractorDetails"></div>
+								</div>
+
+
+								<!-- /tab5 -->
+								<div class="tab-pane  step5" role="tabpanel" id="step5">
+									<div
+										th:replace="common/work/viewWorkProgressDetails :: view_WorkProgressDetails"></div>
+								</div>
+
+								<!-- /tab6 -->
+								<div class="tab-pane  step6" role="tabpanel" id="step6">
+
+									<div th:replace="common/work/viewCCDetails :: view_CCDetails"></div>
+
+								</div>
+								<div class="tab-pane  step2" role="tabpanel" id="step2">
+																
+																<div
+																	 >
+																	<div
+																		th:replace="common/work/viewDmRemarks :: view_dmRemark"></div>
+																</div>
+															</div>
+
+							</div>
+
+						</div>
+
+
+					</div>
+
+
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+
+</div>
+
+
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+<script>
+	var current_fs, next_fs, previous_fs;
+	var left, opacity, scale;
+	var animating;
+	$(".next").click(
+			function() {
+				if (animating)
+					return false;
+				animating = true;
+
+				current_fs = $(this).parent();
+				next_fs = $(this).parent().next();
+				$("#progressbar li").eq($("fieldset").index(next_fs)).addClass(
+						"active");
+				next_fs.show();
+				current_fs.animate({
+					opacity : 0
+				}, {
+					step : function(now, mx) {
+						scale = 1 - (1 - now) * 0.2;
+						left = now * 50 + "%";
+						opacity = 1 - now;
+						current_fs.css({
+							transform : "scale(" + scale + ")",
+							position : "absolute"
+						});
+						next_fs.css({
+							left : left,
+							opacity : opacity
+						});
+					},
+					duration : 800,
+					complete : function() {
+						current_fs.hide();
+						animating = false;
+					},
+					easing : "easeInOutBack"
+				});
+			});
+
+	$(".previous").click(
+			function() {
+				if (animating)
+					return false;
+				animating = true;
+
+				current_fs = $(this).parent();
+				previous_fs = $(this).parent().prev();
+				$("#progressbar li").eq($("fieldset").index(current_fs))
+						.removeClass("active");
+
+				previous_fs.show();
+				current_fs.animate({
+					opacity : 0
+				}, {
+					step : function(now, mx) {
+						scale = 0.8 + (1 - now) * 0.2;
+						left = (1 - now) * 50 + "%";
+						opacity = 1 - now;
+						current_fs.css({
+							left : left
+						});
+						previous_fs.css({
+							transform : "scale(" + scale + ")",
+							opacity : opacity
+						});
+					},
+					duration : 800,
+					complete : function() {
+						current_fs.hide();
+						animating = false;
+					},
+					easing : "easeInOutBack"
+				});
+			});
+
+	$(".submit").click(function() {
+		return false;
+	});
+</script>
+
+</html>

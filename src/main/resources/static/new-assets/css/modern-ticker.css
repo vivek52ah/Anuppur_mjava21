@@ -1,0 +1,188 @@
+@charset "utf-8";
+.modern-ticker {
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    overflow: hidden;
+}
+
+.modern-ticker a {
+    text-decoration: none
+}
+
+.modern-ticker ul {
+    margin: 0;
+    padding: 0;
+    list-style: none
+}
+
+.mt-round {
+    border-radius: 0px;
+}
+
+.mt-body {
+    position: relative
+}
+
+.mt-label {
+    /* margin-right: 2px; */
+    position: absolute;
+    left: 0;
+}
+
+.mt-round .mt-label {
+    background: #e83a15;
+    color: #fff;
+    padding: 0 10px;
+    text-transform: capitalize;
+    font-size: 14px;
+}
+.mt-label:after {
+    content: '';
+    position: absolute;
+    border-left: 6px solid #e83a15;
+    border-top: 6px solid rgba(0, 0, 0, 0);
+    border-bottom: 6px solid rgba(0, 0, 0, 0);
+    left: 99%;
+    top: 12px;
+    z-index: 1;
+}
+.mt-news {
+    overflow: hidden;
+    position: absolute
+}
+
+.mt-scroll .mt-news {
+    background-color: transparent;
+}
+
+.mt-news ul {
+    background-repeat: no-repeat;
+    background-position: -1000px
+}
+
+.mt-news li {
+    float: left
+}
+
+.mt-round .mt-news:first-child,
+.mt-round .mt-news:first-child a {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px
+}
+
+.mt-round .mt-news:last-child,
+.mt-round .mt-news:last-child a {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px
+}
+
+.mt-news a {
+    padding: 0 5px 0 25px;
+    margin-right: 2px;
+    background-repeat: no-repeat;
+    background-position: 7px center;
+    display: block;
+    white-space: nowrap;
+}
+
+.mt-scroll.mt-round .mt-news a {
+    border-radius: 0
+}
+
+.mt-hide {
+    display: none
+}
+
+.mt-controls {
+    margin-left: 2px;
+    position: absolute;
+    right: 0;
+    background-repeat: no-repeat;
+    background-position: -1000px;
+    top: 4px;
+}
+
+.mt-next,
+.mt-play,
+.mt-prev {
+    width: 25px;
+    height: 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+    float: left;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 4px;
+    margin-left: 2px;
+    background-color: rgba(255, 255, 255, 0.8);
+    background-size: 6px;
+}
+
+.mt-round .mt-next {}
+
+.modern-ticker {
+    color: #383838;border-bottom:solid 1px #e83a15;border-top:solid 1px #e83a15;
+}
+
+.mt-label {}
+
+.mt-news {
+    background-color: #fff;
+}
+
+.mt-preloader {
+    background: url(../img/preloader.gif) no-repeat center
+}
+
+.mt-news ul {
+    background-image: url(../img/bullet-over.png)
+}
+
+/*.mt-news a {
+    color: #fff;
+    background-image: url(../img/bullet.png);
+}
+*/
+/*.mt-news a:hover {
+    color: #fff;
+    background-image: url(../img/bullet-over.png);
+}*/
+
+.mt-news a:active {}
+
+.mt-controls {
+    background-image: url(../img/pause1.png)
+}
+
+.mt-next,
+.mt-prev {}
+
+.mt-prev {
+    background-image: url(../img/arrow-prev.png)
+}
+
+.mt-next {
+    background-image: url(../img/arrow-next.png)
+}
+
+.mt-play {
+   
+    background-image: url(../img/play1.png);
+}
+
+.mt-pause {
+    background-image: url(../img/pause1.png)
+}
+
+.mt-next:hover,
+.mt-play:hover,
+.mt-prev:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.mt-next:active,
+.mt-play:active,
+.mt-prev:active {
+    background-color: rgba(255, 255, 255, 0.329);
+}

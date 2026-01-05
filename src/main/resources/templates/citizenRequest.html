@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" data-ng-app="dms">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}"
+	type="image/x-icon" />
+<link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon" />
+
+<title>Citizen Request Form</title>
+<link th:href="@{/css/font-awesome.min.css}" rel="stylesheet" />
+<link th:href="@{/css/simple-line-icons.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/fonts/fonts.css}" />
+<link th:href="@{/css/style.css}" rel="stylesheet" />
+<link th:href="@{/css/custom.css}" rel="stylesheet" />
+
+<link th:href="@{/css/angular-loading.css}" rel="stylesheet"
+	type="text/css" />
+<!-- Custom CSS -->
+<link rel="stylesheet" th:href="@{/assets/css/main.css}" />
+<!-- <script type="text/javascript">
+	//<![CDATA[
+	function check_pass() {
+		if (document.getElementById('password').value
+				&& document.getElementById('confirmPassword').value) {
+			if (document.getElementById('password').value == document
+					.getElementById('confirmPassword').value) {
+				document.getElementById('submit').disabled = false;
+				document.getElementById('passwordError').style.display = 'none';
+			} else {
+				document.getElementById('submit').disabled = true;
+				document.getElementById('passwordError').style.display = 'block';
+			}
+		}
+	}
+	//]]>
+</script> -->
+<!-- <script th:src="@{/angular/customdirective.js}"></script> -->
+<script type="text/javascript">
+	//<![CDATA[
+
+	function readURL(input, id) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+
+			reader.onload = function(e) {
+				$('#' + id).attr('src', e.target.result);
+			}
+
+			reader.readAsDataURL(input.files[0]);
+		}
+	}
+	//]]>
+</script>
+
+</head>
+
+<body data-ng-controller="CitizenController" dw-loading="sample-1"
+	dw-loading-options="{text: 'Loading....'}" class="bgimage">
+	<div class="main">
+		<div class="main-content">
+			<div class="main-header">
+				<div class="logo-wrapper">
+					<div class="container">
+						<div class="row">
+							<div class="col-12  col-lg-8 pr">
+								<div class="logo-holder d-flex align-items-center">
+									<div class="">
+										<a href="#" title="MLALADS - Monitoring System">
+											<img alt="MLALADS - Monitoring System"
+											th:src="@{/assets/img/mplogo.png}" />
+										</a>
+									</div>
+									<div class="logo-title">
+										<h1>MLALADS - Monitoring System</h1>
+										<p>Government of Madhya Pradesh</p>
+									</div>
+								</div>
+							</div>
+
+							<div
+								class="col-12 col-lg-4 text-right d-flex flex-wrap flex-lg-nowrap justify-content-end align-items-center user-manual">
+								<a class="btn btn-danger" th:href="@{/login}"> <em
+									class="fa fa-home"></em> Back to Home
+								</a>
+							</div>
+						</div>
+						<!-- /.row -->
+					</div>
+				</div>
+			</div>
+			<div class="ptop">
+				<div class="container">
+					<div class="row">
+
+						<div class="col-md-12">
+							<div class="card mt-2">
+								<div class="card-header">जनकार्य हेतु आवेदन फ़ॉर्म</div>
+								<div class="card-body">
+
+									<div>
+										<div data-ng-if="responseObject.errorMessage != null"
+											class="alert-danger">
+											<strong></strong>
+											<p>{{responseObject.errorMessage}}</p>
+										</div>
+									</div>
+									<div>
+										<div data-ng-if="responseObject.successMessage != null"
+											class="alert alert-success">
+											<strong></strong>
+											<p>{{responseObject.successMessage}}</p>
+										</div>
+									</div>
+
+
+									<form
+										data-ng-submit="citizenRequest(citizenForm.$valid,imageCitizen)"
+										name="citizenForm">
+										<!-- <form th:action="@{/doSignUp}"
+									th:object="${signUpBean}" method="post"> -->
+										<!-- <div class="col-md-12"> -->
+										<!-- <div class="col-md-12">
+										<div data-ng-if="responseObject.errorMessage != null"
+											class="text-danger">
+											<strong>Error!</strong>
+											<p>{{responseObject.errorMessage}}</p>
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div data-ng-if="responseObject.successMessage != null"
+											class="text-danger">
+											<strong>Success!</strong>
+											<p>{{responseObject.successMessage}}</p>
+										</div>
+									</div> -->
+										<!-- </div> -->
+										<!-- <div class="text-success" th:if="${message != null}">
+										<strong>Success!</strong>
+										<p th:text="${message}">Success message!</p>
+									</div>
+
+									<div class="text-danger" th:if="${error != null}">
+										<strong>Error!</strong>
+										<p th:text="${error}">Error message!</p>
+									</div> -->
+										<div class="row">
+											<div class="form-group col-sm-4">
+												<label><span>नाम</span><span class="aestrick">&#42;</span></label>
+												<input type="text" class="form-control alpha-only-space-dot"
+													id="authorizePersonName" required="required"
+													data-ng-model="citizenData.name" name="name"
+													maxlength="100" />
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.name.$error.required">
+														<span th:text="#{pleaseEnter}">Please enter</span> <span>
+															Name</span>
+													</p>
+												</div>
+											</div>
+											<div class="form-group col-sm-4">
+												<label><span>मोबाइल नंबर</span> <span
+													class="aestrick">&#42;</span> </label> <input required="required"
+													class="form-control digits-only" type="text" id="mobileNo"
+													data-ng-model="citizenData.mobNo" name="mobileNo"
+													data-ng-pattern="/^(\+\d{1,3}[- ]?)?\d{10}$/"
+													maxlength="10" />
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.mobileNo.$error.required">
+														<span>Please enter Mobile No.</span>
+													</p>
+												</div>
+												<p class="help-block" style="color: red;"
+													data-ng-show="citizenForm.mobileNo.$error.pattern">
+													<span>Please enter valid Mobile No.</span>
+												</p>
+
+											</div>
+
+											<div class="form-group mb-3 col-sm-4">
+												<label><span>ईमेल </span> <span class="aestrick">&#42;</span></label>
+												<input type="email" class="form-control" placeholder="Email"
+													id="email" data-ng-model="citizenData.emailId" name="email"
+													data-ng-pattern="/^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/"
+													maxlength="45" required="required" />
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.email.$error.required">
+														<span th:text="#{pleaseEnter}">Please enter</span> <span
+															th:text="#{email}">Email</span>
+													</p>
+												</div>
+												<p class="help-block" style="color: red;"
+													data-ng-show="citizenForm.email.$error.pattern">
+													<span th:text="#{pleaseEnter}">Please enter</span> <span
+														th:text="#{valid}">valid</span> <span th:text="#{email}">Email</span>
+												</p>
+											</div>
+											<!-- <div class="form-group col-sm-4">
+											<label><span>Designation</span><span class="aestrick">*</span></label> <input class="form-control " id="" type="text" maxlength="" autocomplete="off" required="required" name="" />
+										</div>
+										<div class="form-group col-sm-4">
+											<label><span>Captcha</span><span class="aestrick">*</span></label> <input class="form-control " id="" type="text" maxlength="" autocomplete="off" required="required" name="" />
+										</div> -->
+
+										</div>
+										<h6 class="title-sm">
+											<strong>पता</strong>
+										</h6>
+										<div class="row">
+											<div class="form-group col-sm-4">
+												<label><span> पता पंक्ति 1 </span><span
+													class="aestrick">&#42;</span></label> <input class=" form-control"
+													id="addressLine1" type="text" maxlength="100"
+													autocomplete="off" required="required"
+													data-ng-model="citizenData.addressLine1"
+													name="addressLine1" />
+
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.addressLine1.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span
+															th:text="#{addressLine1}">Address Line 1</span>
+													</p>
+												</div>
+											</div>
+											<div class="form-group col-sm-4">
+												<label><span>पता पंक्ति 2 </span><span
+													class="aestrick">&#42;</span></label> <input class=" form-control"
+													id="addressLine2" type="text" maxlength="100"
+													autocomplete="off" required="required"
+													data-ng-model="citizenData.addressLine2"
+													name="addressLine2" />
+
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.addressLine2.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span
+															th:text="#{addressLine2}">Address Line 2</span>
+													</p>
+												</div>
+											</div>
+											<!-- <div class="form-group col-sm-4">
+											<label><span>District</span><span class="aestrick">*</span></label> <input class="form-control " id="" type="text" maxlength="" autocomplete="off" required="required" name="" />
+										</div> -->
+											<div class="form-group col-sm-4">
+												<label><span>पिन कोड </span> <!-- <span
+												class="aestrick">&#42;</span> --></label> <input
+													class="form-control digits-only" id="pinCode"
+													data-ng-model="citizenData.pinCode" name="pinCode"
+													maxlength="6" />
+												<div data-ng-show="userRegForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.pinCode.$error.required">
+														<span th:text="#{pleaseEnter}">Please enter</span> <span
+															th:text="#{pinCode}">Pin Code</span>
+													</p>
+												</div>
+
+											</div>
+
+										</div>
+
+
+										<h6 class="title-sm">
+											<strong>काम करने की जगह</strong>
+										</h6>
+										<div class="row">
+											<!-- <div class="form-group col-sm-3" data-ng-init="loadWorkForm()">
+										<label><span>District</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" id="district"
+											required="required" data-ng-model="citizenData.districtName"
+											name="district" data-ng-readonly="true" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.district.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span
+													th:text="#{district}">District</span>
+											</p>
+										</div>
+									</div> -->
+
+											<div class="mb-4 col-sm-4" data-ng-init="loadDistricts();">
+												<label><span>जिला</span><span class="aestrick">&#42;</span></label>
+												<select class="form-control"
+													data-ng-model="citizenData.districtId" name="district"
+													data-ng-change="loadULBById(citizenData.districtId);loadPCsByDistrictId(citizenData.districtId);loadLCsByDistrict(citizenData.districtId);loadBlocksByDistrictId(citizenData.districtId);
+											citizenData.ulb=null;citizenData.lcId='';citizenData.mlaName='';citizenData.blockId='';citizenData.gpId='';citizenData.villageId='';citizenData.ward='';citizenData.ward=null;
+											wards='';mlas='';gramPanchayats='';villages='';"
+													id="district">
+													<option value="" disabled="disabled">--Select--</option>
+													<option
+														data-ng-repeat="district in districts | orderBy : 'districtName'"
+														value="{{district.districtId}}">{{district.districtName}}</option>
+												</select>
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.district.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span
+															th:text="#{district}">District</span>
+													</p>
+												</div>
+											</div>
+											<div class="mb-4 col-sm-4">
+												<label><span>&nbsp;</span></label><br /> <label
+													class="radio-inline" style="padding-right: 5px;"><input
+													type="radio" name="rural" checked="checked"
+													data-ng-model="citizenData.rural" value="1"
+													required="required"
+													data-ng-change="citizenData.ulb='';citizenData.ward='';citizenData.blockId='';citizenData.gpId='';citizenData.villageId=''" />
+													<span>ग्रामीण</span><span class="aestrick">&#42;</span></label> <label
+													class="radio-inline"><input type="radio"
+													name="rural" data-ng-model="citizenData.rural" value="0"
+													data-ng-change="citizenData.ulb='';citizenData.ward='';citizenData.blockId='';citizenData.gpId='';citizenData.villageId=''"
+													required="required" /> <span>शहरी</span><span
+													class="aestrick">&#42;</span></label>
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.rural.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span></span>
+													</p>
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="mb-4 col-sm-4"
+												data-ng-show="citizenData.rural=='0'">
+												<label><span>यूएलबी</span><span class="aestrick">&#42;</span></label>
+												<select class="form-control" id="ulb"
+													data-ng-required="citizenData.rural=='0'"
+													data-ng-model="citizenData.ulb"
+													data-ng-change="loadWard(citizenData.ulb);citizenData.ward='';citizenData.ward=null;wards=null;"
+													name="ulb">
+													<option value="" disabled="disabled">--Select--</option>
+													<option data-ng-repeat="ulb in ulbs | orderBy : 'ulbName'"
+														value="{{ulb.ulbCode}}">{{ulb.ulbName}}</option>
+												</select>
+												<div data-ng-show="workForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.ulb.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span>ULB</span>
+													</p>
+												</div>
+											</div>
+
+											<div class="mb-4 col-sm-4"
+												data-ng-show="citizenData.rural=='0'">
+												<label><span>वार्ड </span><span class="aestrick">&#42;</span></label>
+												<select class="form-control" id="ward"
+													data-ng-required="citizenData.rural=='0'"
+													data-ng-model="citizenData.ward" name="ward">
+													<option value="" disabled="disabled">--Select--</option>
+													<option data-ng-repeat="ward in wards"
+														value="{{ward.wardCode}}">{{ward.wardName}}</option>
+												</select>
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.ward.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span>Ward</span>
+													</p>
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="mb-4 col-sm-4"
+												data-ng-show="citizenData.rural=='1'">
+												<label><span>ब्लॉक </span><span class="aestrick">&#42;</span></label>
+												<select class="form-control" id="block"
+													data-ng-required="citizenData.rural=='1'"
+													data-ng-model="citizenData.blockId"
+													data-ng-change="loadGramPanchayatByBlockId(citizenData.blockId);citizenData.gpId='';citizenData.villageId='';villages='';"
+													name="block">
+													<option value="" disabled="disabled">--Select--</option>
+													<option
+														data-ng-repeat="block in blocks | orderBy : 'blockName'"
+														value="{{block.blockId}}">{{block.blockName}}</option>
+												</select>
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.block.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span>Block</span>
+													</p>
+												</div>
+											</div>
+
+
+											<div class="mb-4 col-sm-4"
+												data-ng-show="citizenData.rural=='1'">
+												<label><span>ग्राम पंचायत </span><span
+													class="aestrick">&#42;</span></label> <select class="form-control"
+													id="gramPanchayat" data-ng-model="citizenData.gpId"
+													name="gramPanchayat"
+													data-ng-required="citizenData.rural=='1'"
+													data-ng-change="loadVillageByGPId(citizenData.gpId);citizenData.villageId=''">
+													<option value="" disabled="disabled">--Select--</option>
+													<option
+														data-ng-repeat="gp in gramPanchayats | orderBy : 'gpName'"
+														value="{{gp.gramPanchayatId}}">{{gp.gpName}}</option>
+													<!-- <option value="Chitrangi">Chitrangi</option>	 -->
+												</select>
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.gramPanchayat.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span>Gram
+															Panchayat</span>
+													</p>
+												</div>
+											</div>
+
+											<div class="mb-4 col-sm-4"
+												data-ng-show="citizenData.rural=='1'">
+												<label><span>गाँव </span><span class="aestrick">&#42;</span></label>
+												<select class="form-control" id="village"
+													data-ng-model="citizenData.villageId" name="village"
+													data-ng-required="citizenData.rural=='1'">
+													<option value="" disabled="disabled">--Select--</option>
+													<option
+														data-ng-repeat="village in villages | orderBy : 'villageName'"
+														value="{{village.villageId}}">{{village.villageName}}</option>
+													<!-- <option value="Chitrangi">Chitrangi</option>	 -->
+												</select>
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.village.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span>Village</span>
+													</p>
+												</div>
+											</div>
+										</div>
+
+
+										<div class="row">
+											<!-- <div class="form-group col-sm-6 col-lg-4">
+										<label><span>संसदीय  क्षेत्र</span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="pc" required="required" data-ng-model="citizenData.pcId"
+											name="pc">
+											<option value="" disabled="disabled">Select</option>
+											<option data-ng-repeat="pc in pcs" value="{{pc.pcId}}">{{pc.pcName}}</option>
+										</select>
+										<div data-ng-show="citizenForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="citizenForm.pc.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Parliamentary
+													Constituency</span>
+											</p>
+										</div>
+									</div> -->
+
+											<div class="form-group col-sm-6 col-lg-4">
+												<label><span>विधान सभा क्षेत्र </span><span
+													class="aestrick">&#42;</span></label> <select class="form-control"
+													id="lc" required="required"
+													data-ng-model="citizenData.lcId"
+													data-ng-change="loadMLAs(citizenData.lcId);workData.mla='';citizenData.mlaName='';"
+													name="lc">
+													<option value="" disabled="disabled">--Select--</option>
+													<option data-ng-repeat="lc in lcs | orderBy : 'lcName'"
+														value="{{lc.lcId}}">{{lc.lcName}}</option>
+													<!-- <option value="SIDHI">Sidhi</option> -->
+												</select>
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.lc.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span>Legislative
+															Constituency</span>
+													</p>
+												</div>
+											</div>
+
+											<div class="form-group col-sm-4">
+												<label><span>विधायक का नाम </span><span
+													class="aestrick">&#42;</span></label> <select class="form-control"
+													id="mlaName" required="required"
+													data-ng-model="citizenData.mlaName" name="mlaName">
+													<option value="" disabled="disabled">--Select--</option>
+													<option data-ng-repeat="mla in mlas"
+														value="{{mla.mlaName}}">{{mla.mlaName}}</option>
+												</select>
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.mlaName.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span>MLA
+															name</span>
+													</p>
+												</div>
+											</div>
+
+											<!-- <div class="form-group col-sm-3"
+										data-ng-show="citizenData.schemeId==8">
+										<label><span>Name of MLA</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="mla"
+											data-ng-required="citizenData.schemeId==8"
+											data-ng-model="citizenData.mla" name="mla">
+											<option value="" disabled="disabled">Select</option>
+											<option data-ng-repeat="mla in mlas" value="{{mla.mlaName}}">{{mla.mlaName}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.mla.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>MLA
+													name</span>
+											</p>
+										</div>
+									</div> -->
+
+
+											<div class="form-group col-sm-6 col-lg-4">
+												<label><span>खसरा नंबर </span> <!-- <span class="aestrick">&#42;</span> --></label>
+												<input type="text" class="form-control" id="khasraNo"
+													data-ng-model="citizenData.khasraNo" name="khasraNo"
+													maxlength="45" />
+												<div data-ng-show="citizenForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="citizenForm.khasraNo.$error.required">
+														<span th:text="#{pleaseEnter}">Please enter</span> <span>Khasra
+															No.</span>
+													</p>
+												</div>
+											</div>
+
+											<div class="form-group col-sm-6 col-lg-4">
+												<label><span>फोटो अपलोड</span></label> <input
+													id="imageCitizen" name="imageCitizen" type='file'
+													class="form-control" accept=".png, .jpg"
+													file-model="imageCitizen" />
+												<p class="help-block" style="color: red; font-size: 14px"
+													data-ng-show="fileExtentionErrorForImageCitizen">
+													<span>Only .png, .jpg files allowed.</span>
+												</p>
+												<p class="help-block" style="color: red; font-size: 14px"
+													data-ng-show="maxSizeErrorForImageCitizen">
+													<span>Allowed file size max upto 1 MB.</span>
+												</p>
+											</div>
+										</div>
+
+										<div class="row">
+											<div class="form-group col-sm-12">
+												<div class="form-group">
+													<label><span>कार्य का विवरण</span><span
+														class="aestrick">&#42;</span></label>
+													<textarea class="form-control" style="min-height: 120px;"
+														data-ng-model="citizenData.remarks" name="remarkName"
+														required="required" maxlength="1500" autocomplete="off"></textarea>
+													<div>
+														<p class="help-block" style="color: red;">
+															<span th:text="#{*(characterLimitIs}">* (
+																character limit is</span> <span th:text="#{1500}">1500 )</span>
+
+														</p>
+													</div>
+												</div>
+
+
+											</div>
+
+										</div>
+
+										<div class="text-center">
+											<!-- <div class="col-6">
+											<button type="button" class="btn btn-main px-4">Submit</button>
+											<input type="submit" class="btn btn-main px-4"
+												value="Submit" id="submit" />
+										</div> -->
+											<button type="submit" class="btn px-3 mt-2 btn-success">
+												<span th:text="#{submit}">Submit</span>
+											</button>
+										</div>
+
+									</form>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <div th:replace="fragments/loginfooter :: footer" /> -->
+		<!-- footer -->
+		<footer class="footer">
+			<div class="footer-bottom">
+				<div class="container text-center">
+					Copyright © 2021. All Rights Reserved.<br /> Designed &amp;
+					developed by Center of Excellence (CoE), MAP_IT.
+				</div>
+			</div>
+		</footer>
+	</div>
+	<!-- Bootstrap and necessary plugins -->
+	<script th:src="@{/js/jquery.min.js}"></script>
+	<script th:src="@{/js/popper.min.js}"></script>
+	<script th:src="@{/js/bootstrap.min.js}"></script>
+	<script th:src="@{/js/common.js}"></script>
+	<script th:src="@{/angular/angular.min.js}"></script>
+	<script th:src="@{/angular/angular-route.min.js}"></script>
+	<script th:src="@{/angular/angular-idle.min.js}"></script>
+	<script th:src="@{/js/ui-bootstrap-tpls-2.5.0.min.js}"></script>
+	<script th:src="@{/js/spin.js}"></script>
+	<script th:src="@{/angular/angular-loading.js}"></script>
+
+	<script th:src="@{/angular/CitizenController.js}"></script>
+	<script th:src="@{/js/sha256.js}"></script>
+	<script type="text/javascript" th:inline="javascript">
+		function hash(val) {
+	
+			var hashObj = new jsSHA("SHA-256", "TEXT", "1");
+			hashObj.update(val);
+			return hashObj.getHash("HEX");
+		}
+	</script>
+</body>
+</html>

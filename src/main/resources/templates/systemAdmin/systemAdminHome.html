@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" data-ng-app="dms">
+<head>
+
+<meta charset="utf-8" />
+<meta name="Referrer-Policy" value="no-referrer | same-origin" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Content-Security-Policy"
+	content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.canvasjs.com; frame-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; media-src 'none'; connect-src 'self'" />
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}"
+	type="image/x-icon" />
+<link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon" />
+
+<div th:replace="fragments/header :: header-css" />
+</head>
+<body
+	class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+	<div dw-loading="sample-1" dw-loading-options="{text: 'Loading....'}"
+		class="controller">
+		<!-- <div id="wrapper"> -->
+		<div th:replace="fragments/header :: header_after_login" />
+		<div class="app-body">
+			<div class="sidebar">
+				<nav class="sidebar-nav">
+					<ul class="nav">
+
+						<!-- <li
+							th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DEPARTMENT' ||  roleName=='ROLE_DEPT_DISTRICT' || roleName=='ROLE_SU'} "
+							class="nav-item active navigation"><a class="nav-link"  href="https://app.powerbi.com/view?r=eyJrIjoiNDU1NzFiN2UtY2VmZC00ZThiLWFiZDQtNTVjNThhZjMwNGFhIiwidCI6IjFmZGY3ODQyLTQ2NzgtNDZhZS1hMjc0LWMwM2UyYzY0MDk4ZCJ9" > <i
+								class="fa fa-tachometer" aria-hidden="true" ></i> <span
+								th:text="#{dashboard}"> Dashboard (Beta)</span></a></li> -->
+						<!-- <li
+							th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DEPARTMENT' ||  roleName=='ROLE_DEPT_DISTRICT' || roleName=='ROLE_SU'} "
+							class="nav-item active navigation"><a class="nav-link"
+							href="https://app.powerbi.com/view?r=eyJrIjoiNDU1NzFiN2UtY2VmZC00ZThiLWFiZDQtNTVjNThhZjMwNGFhIiwidCI6IjFmZGY3ODQyLTQ2NzgtNDZhZS1hMjc0LWMwM2UyYzY0MDk4ZCJ9"
+							target="_blank"> <i class="fa fa-tachometer"
+								aria-hidden="true"></i> <span> Dashboard </span></a></li>
+ -->
+
+
+
+						<li id="a2" class="nav-item nav-dropdown nav-dropdownnew2"
+							th:if="${ roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM'||roleName=='ROLE_SYSTEM_ADMIN'||roleName=='ROLE_CEO'}"><a
+							class="nav-link nav-dropdown-toggle" href="#"> <i
+								class="fa fa-pencil-square-o" aria-hidden="true"></i>Work
+								Management
+						</a>
+
+							<ul class="nav-dropdown-items openbox2">
+								<li
+									th:if="${ roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' || roleName=='ROLE_SYSTEM_ADMIN'||roleName=='ROLE_CEO' }"
+									class="nav-item navigation"><a class="nav-link"
+									href="#manageOngoingWorks"><i class="fa fa-pencil"
+										aria-hidden="true"></i><span>Manage Works </span></a></li>
+
+
+								<li th:if="${ roleName=='ROLE_DEPARTMENT'}"
+									class="nav-item navigation"><a class="nav-link"
+									href="#addNewWork"> <i class="fa fa-pencil-square-o"
+										aria-hidden="true"></i><span> Add New Work</span>
+								</a></li>
+
+
+
+							</ul></li>
+						<li id="a2" class="nav-item nav-dropdown nav-dropdownnew2"
+							th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM'}"><a
+							class="nav-link nav-dropdown-toggle" href="#"> <i
+								class="fa fa-user" aria-hidden="true"></i><span
+								>Manage User </span>
+						</a>
+
+							<ul class="nav-dropdown-items openbox2">
+
+
+								<li th:if="${roleName=='ROLE_SYSTEM_ADMIN' } "
+									class="nav-item navigation"><a class="nav-link"
+									href="#manageDepartmentUser"><i class="fa fa-user"></i><span>
+											All Users</span></a></li>
+								<li th:if="${roleName=='ROLE_DEPARTMENT'} "
+									class="nav-item navigation"><a class="nav-link"
+									href="#manageusers"><i class="fa fa-user"></i><span>
+											View All Users</span></a></li>
+								<li th:if="${ roleName=='ROLE_DM' } "
+									class="nav-item navigation"><a class="nav-link"
+									href="#managePendingUsers"><i class="fa fa-user"></i><span>
+											View All Area Officer</span></a></li>
+								<li th:if="${roleName=='ROLE_DEPARTMENT' } "
+									class="nav-item navigation"><a class="nav-link"
+									href="#addUserForm"><i class="fa fa-user"></i><span>
+											Add Area Officer</span></a></li>
+								<!-- <li th:if="${roleName=='ROLE_DEPARTMENT' } "
+									class="nav-item navigation"><a class="nav-link"
+									href="#manageusers"><i class="fa fa-user"></i><span>
+											Area Office</span></a></li> -->
+
+
+							</ul></li>
+
+						<li th:if="${roleName=='ROLE_SU' } " class="nav-item navigation"><a
+							class="nav-link" href="#manageusers"><i class="fa fa-user"></i><span
+								th:text="#{manageUsers}">Manage Users</span></a></li>
+						<li
+							th:if="${roleName=='ROLE_SU' || roleName == 'ROLE_ADMIN_OFFICER'} "
+							class="nav-item navigation"><a class="nav-link"
+							href="#manageDepartmentUser"><i class="fa fa-user"></i><span>Manage
+									Department Users</span></a></li>
+
+
+						<li
+							th:if="${roleName=='ROLE_AGENCY_ADMIN'|| roleName=='ROLE_SAU' } "
+							class="nav-item navigation"><a class="nav-link"
+							href="#manageAgencyUsers"><i class="fa fa-user"></i><span
+								th:text="#{manageUsers}">Manage Users</span></a></li>
+
+
+						<li th:if="${  roleName=='ROLE_SU' || roleName==''}"
+							class="nav-item navigation"><a class="nav-link"
+							href="#addNewWork"> <i class="fa fa-pencil-square-o"
+								aria-hidden="true"></i> <span th:text="#{createWork}">
+									Create Work</span>
+						</a></li>
+
+						<li th:if="${roleName=='ROLE_SU' || roleName==''}"
+							class="nav-item navigation"><a class="nav-link"
+							href="#manageOngoingWorks"><i class="fa fa-pencil"
+								aria-hidden="true"></i><span th:text="#{manageWorks}">Manage
+									Work </span></a></li>
+
+
+						<li th:if="${roleName==''}" class="nav-item navigation"><a
+							class="nav-link" href="#manageWorkFacility"><i
+								class="fa fa-pencil" aria-hidden="true"></i><span>Manage
+									Work Facility </span></a></li>
+
+						<li th:if="${roleName==''}" class="nav-item navigation"><a
+							class="nav-link" href="#manageWorkSubtype"><i
+								class="fa fa-pencil" aria-hidden="true"></i><span>Manage
+									Work Type</span></a></li>
+
+						<li th:if="${roleName==''}" class="nav-item navigation"><a
+							class="nav-link" href="#manageImplAgencyy"><i
+								class="fa fa-pencil" aria-hidden="true"></i><span>Manage
+									Imp Agency</span></a></li>
+
+
+						<li id="a1" class="nav-item nav-dropdown nav-dropdownnew"
+							th:if="${roleName=='ROLE_SYSTEM_ADMIN'}"><a
+							class="nav-link nav-dropdown-toggle" href="#"><i
+								class="fa fa-folder-open" aria-hidden="true"></i><span>
+									Manage Master </span></a>
+							<ul class="nav-dropdown-items openbox">
+								<li class="nav-item "><a class="nav-link"
+									href="#manageWorkType"><i class="icon-arrow-right-circle"></i><span>Work
+											Type</span></a></li>
+
+								<li class="nav-item "><a class="nav-link"
+									href="#manageWorkSubTypes"><i
+										class="icon-arrow-right-circle"></i><span>Work Sub Type</span></a></li>
+
+								<li class="nav-item "><a class="nav-link"
+									href="#manageImplAgencyy"><i
+										class="icon-arrow-right-circle"></i><span>Implementation
+											Agency</span></a></li>
+								<li class="nav-item "><a class="nav-link"
+									href="#addFinancialYear"><i class="icon-arrow-right-circle"></i><span>
+											Add Financial Year </span></a></li>
+								<li class="nav-item "><a class="nav-link"
+									href="#manageDistricts"><i class="icon-arrow-right-circle"></i><span>District</span></a></li>
+								<li class="nav-item "><a class="nav-link"
+									href="#manageBlock"><i class="icon-arrow-right-circle"></i><span>Block</span></a></li>
+								<li class="nav-item "><a class="nav-link"
+									href="#manageGrampanchayat"><i
+										class="icon-arrow-right-circle"></i><span>Gram
+											Panchayat</span></a></li>
+								<!--
+								<li class="nav-item "><a class="nav-link"
+									href="#manageHead"><i class="icon-arrow-right-circle"></i><span>Segment
+											Master</span></a></li>
+
+							 	<li class="nav-item "><a class="nav-link"
+									href="#manageScheme"><i class="icon-arrow-right-circle"></i><span>Scheme
+											Master</span></a></li>
+
+								<li class="nav-item "><a class="nav-link" href="#manageSor"><i
+										class="icon-arrow-right-circle"></i><span>SOR Master</span></a></li>
+
+								<li class="nav-item "><a class="nav-link" href="#manageSdr"><i
+										class="icon-arrow-right-circle"></i><span>Delay Reason
+											Master</span></a></li>
+ -->
+							</ul></li>
+
+						<li id="a2" class="nav-item nav-dropdown nav-dropdownnew2"
+							th:if="${roleName=='ROLE_DM' || roleName=='ROLE_SYSTEM_ADMIN' }"><a
+							class="nav-link nav-dropdown-toggle" href="#"> <i
+								class="fa fa-file-word-o" aria-hidden="true"></i><span
+								>Reports</span></a>
+
+							<ul class="nav-dropdown-items openbox2">
+								<!--	<li class="nav-item"
+									th:if="${roleName=='' } "><a
+									class="nav-link" href="#agencyWiseReport"><i
+										class="icon-arrow-right-circle"></i><span>Construction
+											Agency Wise Report</span></a></li>
+											
+								<li class="nav-item"
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN'} "><a
+									class="nav-link" href="#divisionReport"><i
+										class="icon-arrow-right-circle"></i><span>Department  Wise
+											Report</span></a></li>
+								
+								<li class="nav-item"
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' } "><a
+									class="nav-link" href="#schemeWiseReport"><i
+										class="icon-arrow-right-circle"></i><span>Scheme Wise
+											Report</span></a></li>
+ -->
+								<!-- <li class="nav-item"
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' } "><a
+									class="nav-link" href="#yearWiseReport"><i
+										class="icon-arrow-right-circle"></i><span>Works Report</span></a></li> -->
+
+								<li class="nav-item"
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' } "><a
+									class="nav-link" href="#reports"><i
+										class="icon-arrow-right-circle"></i><span> Works Report</span></a></li>
+										
+										<li class="nav-item"
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' } "><a
+									class="nav-link" href="#inspectionReport"><i
+										class="icon-arrow-right-circle"></i><span>Inspection Report</span></a></li>
+
+
+									<li class="nav-item"
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' } "><a
+									class="nav-link" href="#workExpenditureReport"><i
+										class="icon-arrow-right-circle"></i><span>Work Expenditure Report</span></a></li>
+
+								<!-- <li class="nav-item"
+									th:if="${roleName=='' } "><a
+									class="nav-link" href="#segmentWiseRport"><i
+										class="icon-arrow-right-circle"></i><span>Segment Wise
+											Report</span></a></li>
+
+
+								<li class="nav-item"
+									th:if="${roleName=='' }"><a
+									class="nav-link" href="#schemeYearWiseReport"><i
+										class="icon-arrow-right-circle"></i><span>Scheme/Year
+											Wise Report</span></a></li>
+
+								
+								<li class="nav-item"
+									th:if="${roleName=='' } "><a
+									class="nav-link" href="#drawingStatusReport"><i
+										class="icon-arrow-right-circle"></i><span>Pending Work
+											Report</span></a></li>
+								<li class="nav-item"
+									th:if="${roleName=='' } "><a
+									class="nav-link" href="#asIssuedReport"><i
+										class="icon-arrow-right-circle"></i><span>AS Issued
+											Report</span></a></li>
+								<li class="nav-item"
+									th:if="${roleName=='' } "><a
+									class="nav-link" href="#physicalPercentageWiseReport"><i
+										class="icon-arrow-right-circle"></i><span>Work Physical
+											&amp; Financial Report</span></a></li>
+								<li class="nav-item"
+									th:if="${roleName=='' } "><a
+									class="nav-link" href="#generatePptReports"><i
+										class="icon-arrow-right-circle"></i><span>Generate PPT</span></a></li> -->
+							</ul></li>
+
+
+						<li class="nav-item navigation" th:if="${roleName ==''}"><a
+							class="nav-link" href="#viewCompletedWork"><i
+								class="fa fa-thumbs-up" aria-hidden="true"></i><span>Completed
+									And Handed Over Works </span></a></li>
+
+
+						
+
+						<!-- 
+									
+						<li class="nav-item"><a class="nav-link"
+							href="#manageMLA"><i class="fa fa-circle"></i><span>Manage
+									MLA</span></a></li>
+						<li class="nav-item"><a class="nav-link"
+							href="#addMLAForm"><i class="fa fa-circle"></i><span>Add MLA</span></a></li> -->
+
+
+						<!--<li class="nav-item"><a class="nav-link"
+							href="#manageWorkStages"><i class="fa fa-circle"></i><span>Manage
+									Work Stages</span></a></li>-->
+					</ul>
+					<ul class="nav">
+						<!-- <li class="nav-item"><a class="nav-link"
+							href="#reports"><i class="fa fa-circle"></i><span>Reports</span></a></li> -->
+
+						<!-- Reports -->
+						<!-- <li class="nav-item"><a class="nav-link"
+							href="http://PBIRS_DHS:Test%40123@analytics.mp.gov.in:8080/reports/powerbi/PBIRS_DHS/MLA%20Lads%20Dashboard%20MIS%20Report?rs:Command=Render&amp;rc:Toolbar=false"><i class="fa fa-circle"></i><span>Reports</span></a></li> -->
+					</ul>
+				</nav>
+			</div>
+			<!-- <div data-ng-hide="true">
+                <p id = "key" th:text="${key}"></p>
+            </div> -->
+			<!-- Main content -->
+			<main class="main">
+				<!-- <div class="formstyle1"> -->
+				<div data-ng-view=""></div>
+				<!-- </div> -->
+			</main>
+		</div>
+		<!-- </div> -->
+
+		<footer class="app-footer">
+			<span>ANUPPUR - Monitoring System &copy; 2024. All rights
+				reserved.</span> <span class="ml-auto">Designed &amp; Developed by <a
+				target="_blank"
+				href="http://www.mapit.gov.in/?page=7vG6I3NGGec1YPQRwT3nWQ%3D%3D">Center
+					of Excellence (CoE)</a>, <a target="_blank"
+				href="http://www.mapit.gov.in">MAP_IT</a>.
+			</span>
+		</footer>
+
+		<div th:replace="fragments/footer :: footer" />
+		<script th:src="@{/angular/systemAdmin/SystemAdminRouting.js}"></script>
+		<script th:src="@{/angular/systemAdmin/SystemAdminController.js}"></script>
+		<script th:src="@{/angular/common/CommonRouting.js}"></script>
+		<script th:src="@{/angular/common/CommonController.js}"></script>
+		<script th:src="@{/angular/customdirective.js}"></script>
+	</div>
+</body>
+
+</html>

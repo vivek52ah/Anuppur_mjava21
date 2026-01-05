@@ -1,0 +1,45 @@
+<Development_Monitoring_New_Work
+	id="build_DMF_1523226597">
+	<page1>
+		<district />
+		<block />
+		<gramPanchayat />
+		<village />
+		<parliamentaryConstituency />
+		<legislativeConstituency />
+		<workNo />
+		<workName />
+		<workType />
+		<year />
+		<scheme />
+		<workPriority />
+		<workHead />
+		<implementationAgency />
+		<subEngineerName />
+		<estimatedAmount />
+		<amountReleased />
+		<performanceGrant />
+		<tsDate />
+		<tsNo />
+		<asDate />
+		<asNo />
+		<status />
+	</page1>
+	<page2>
+		<stage1Pic1 />
+		<stage1Pic2 />
+		<stage1Pic3 />
+		<stage1Pic4 />
+		<stage2Pic1 />
+		<stage2Pic2 />
+		<stage2Pic3 />
+		<stage2Pic4 />
+		<stage3Pic1 />
+		<stage3Pic2 />
+		<stage3Pic3 />
+		<stage3Pic4 />
+	</page2>
+	<meta>
+		<instanceID />
+	</meta>
+</Development_Monitoring_New_Work>

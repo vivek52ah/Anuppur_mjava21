@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+
+<style>
+table {
+	font-family: arial, sans-serif;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+td, th {
+	border: 1px solid #dddddd;
+	text-align: left;
+	padding: 8px;
+}
+</style>
+
+<style>
+td {
+	font-family: Arial;
+}
+
+.report {
+	background: rgb(255, 255, 255);
+	border-radius: 6px;
+	padding: 20px;
+	max-width: 1000px;
+	margin: 20px auto;
+	font-family: 'Arial Unicode MS';
+}
+
+.bt-print {
+	border: 0;
+	background: rgb(229, 237, 242);
+	line-height: 1;
+	padding: 8px 12px 5px;
+	display: inline-block;
+}
+
+h3 {
+	text-align: center;
+	text-align: center;
+	font-size: 25px;
+	margin: 0;
+	padding-bottom: 10px;
+}
+
+@media print {
+	@page {
+		size: portrait;
+	}
+	.app-header, .sidebar, .card-header, .app-footer, .bt-print {
+		display: none;
+	}
+	.header-fixed .app-body, .pt-4 {
+		margin: 0;
+		padding: 0 !important;
+	}
+	.report {
+		border-radius: 0;
+		padding: 0;
+		max-width: 100%;
+		margin: 0;
+	}
+}
+
+/* header, footer, .btn, .sidebar, .printBtn, .pace, .bt-print {
+        display: none !important;
+    } */
+</style>
+<script type="text/javascript" th:inline="javascript">
+	$('#unlockButtonId').click(
+			function(event) {
+
+				var workIds = document.getElementById("unlockButtonId").value;
+				if (workIds != "") {
+					console.log(workIds);
+					$(".load-data").fadeIn();
+					/*  if (window.confirm("Are you sure to Generate Administrative Sanction file?")) { */
+					$('#page-div').scope()
+							.displayPreviewSelectedAdministrativeSanction(
+									workIds);
+
+					$(".load-data").fadeOut();
+					/*  } */
+				}
+
+			});
+</script>
+</head>
+
+<body>
+	<div class="container-fluid">
+		<div id="page-div">
+			<!-- Breadcrumb -->
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="#dashboard"><span
+						th:text="#{home}">Home</span></a></li>
+				<li class="breadcrumb-item active"><span>Preview Of
+						Administrative Sanction File</span></li>
+
+				<!-- Breadcrumb Menu-->
+				<li class="breadcrumb-menu d-md-down-none">
+					<div class="btn-group" role="group" aria-label="Button group">
+						<a class="btn" data-ng-click="doTheBack()"><i
+							class="icon-arrow-left-circle"></i> &nbsp;Back</a>
+					</div>
+				</li>
+			</ol>
+			<div class="card">
+
+				<div class="card-body">
+
+					<div class="print report"
+						data-ng-init="loadPrintDataForAsMain();loadPrintPreviewGenerateASDataForAsMain();">
+
+
+						<p
+							style="font-size: 20px; padding: 15px 0; line-height: 24px; text-align: center">
+							&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; क्रमांक:
+							{{workList.asNo}} दिनांक: {{workList.asDate}}</p>
+
+						<div data-ng-repeat="work in workList track by $index">
+							<p>क्रमांक-{{$index+1}}</p>
+
+							<table>
+								<tbody>
+									<tr>
+										<th>1-विधानसभा क्षेत्र:</th>
+										<td>{{work.lcName}}</td>
+										<th>2-माननीय विधायक</th>
+										<td>{{work.mla}}</td>
+									</tr>
+								</tbody>
+							</table>
+							<br />
+							<table>
+								<tbody>
+									<tr>
+										<th>3-अनुशंसा क्रमांक/दिनांक:</th>
+										<td>{{work.recommendationNo}} /
+											{{work.recommendationDate}}</td>
+										<th rowspan="2">4-क्षेत्र का विवरण:</th>
+										<td rowspan="2">{{work.workLocation}}</td>
+									</tr>
+									<tr>
+										<th>5-वर्क आईडी</th>
+										<td>{{work.workNo}}</td>
+									</tr>
+								</tbody>
+							</table>
+
+							<br />
+
+							<table>
+								<tbody>
+									<tr>
+										<th>6-प्रस्तावित कार्य का विवरण:</th>
+										<td colspan="6">{{work.workName}}</td>
+									</tr>
+									<tr>
+										<th>7-तकनीकी स्वीकृती का क्रमांक एवं दिनांक:</th>
+										<td colspan="6">{{work.tsNo}} / {{work.tsDate}}</td>
+									</tr>
+									<tr>
+										<th>8-प्रशासकीय स्वीकृती की राशि :</th>
+										<td colspan="2">{{work.asAmt}}</td>
+										<th>9-प्रथम किस्त की राशि</th>
+										<td colspan="2">{{work.firstInstallAmt}}</td>
+									</tr>
+									<tr>
+										<th>10-क्रियान्वयन एजेंसी</th>
+										<td colspan="6">{{work.implementationAgency}}</td>
+									</tr>
+									<tr>
+										<th>11-स्वीकृति जारी दिनांक:</th>
+										<td>{{work.asDate}}</td>
+										<th>12-अपेक्षित पूर्णता का दिनांक:</th>
+										<td>{{work.completionDate}}</td>
+										<th>13-अवधि दिनों में</th>
+										<td>{{work.durationInDays}}</td>
+									</tr>
+									<tr data-ng-show="work.addAmt!=null">
+										<th colspan="3">14- आंशिक रूप से किसी अन्य मद से जारी
+											राशी एवं उसका संक्षित विवरण (ऑप्शनल):</th>
+										<td colspan="3">{{work.addAmt}},
+											{{work.additionalAmtRemark}}</td>
+									</tr>
+								</tbody>
+							</table>
+							<br />
+						</div>
+
+					</div>
+					<form
+						data-ng-submit="displayPreviewSelectedAdministrativeSanction(workForm.$valid)"
+						name="workForm" id="workForm" novalidate="novalidate">
+
+						<div class="card">
+							<div class="card-header">
+								<span>Details Of Administrative Sanction Authority</span>
+							</div>
+
+							<div class="card-body">
+								<div class="row">
+
+									<div class="form-group col-md-3">
+										<div class="form-group">
+											<label><span>AS Issuing Authority </span><span
+												class="aestrick">&#42;</span></label> <select class="form-control"
+												id="asIssuingAuthority"
+												data-ng-init="loadIssuingAuthority()" required="required"
+												data-ng-model="workData.asIssuingAuthorityId"
+												name="asIssuingAuthorityName">
+												<option value="" disabled="disabled">--Select--</option>
+												<option
+													data-ng-repeat="issuingAuthority in issuingAuthorities | orderBy : 'designation'"
+													value="{{issuingAuthority.id}}">{{issuingAuthority.designation}}</option>
+											</select>
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.asIssuingAuthorityName.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Administrative
+													Sanction Issuing Authority</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-md-3">
+										<div class="form-group">
+											<label><span>Name of Issuing Authority</span> <span
+												class="aestrick">&#42;</span></label> <input type="text"
+												class="form-control" id="asIssuingAuthorityName"
+												data-ng-model="workData.asIssuingAuthorityName"
+												required="required" name="asIssuingAuthorityName" />
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.asIssuingAuthorityName.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Administrative
+													Sanction Issuing Authority Name</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-md-3">
+										<div class="form-group">
+											<label><span>AS Endorsement Authority </span> <span
+												class="aestrick">&#42;</span></label> <select class="form-control"
+												id="asEndorsementAuthority"
+												data-ng-init="loadEndorsementAuthority()"
+												required="required"
+												data-ng-model="workData.asEndorsementAuthorityId"
+												name="asEndorsementAuthority">
+												<option value="" disabled="disabled">--Select--</option>
+												<option
+													data-ng-repeat="endorsementAuthority in endorsementAuthorities | orderBy : 'designation'"
+													value="{{endorsementAuthority.id}}">{{endorsementAuthority.designation}}</option>
+											</select>
+
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.asEndorsementAuthority.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Administrative
+													Sanction Endorsement Authority</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-md-3">
+										<label><span>Name of Endorsement Authority</span> <span
+											class="aestrick">&#42;</span></label> <input type="text"
+											class="form-control" id="asEndorsementAuthorityName"
+											data-ng-model="workData.asEndorsementAuthorityName"
+											required="required" name="asEndorsementAuthorityName" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.asEndorsementAuthorityName.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Administrative
+													Sanction Endorsement Authority Name</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-12">
+										<label><span>Any Special Condition For AS</span> <!-- <span
+											class="aestrick">&#42;</span> --></label>
+										<textarea class="form-control" id="specialCondition"
+											data-ng-model="workData.specialCondition"
+											name="specialCondition" maxlength="2000"></textarea>
+
+									</div>
+									<input type="hidden" data-ng-model="workData.workIds" /> <input
+										type="hidden" data-ng-model="workData.parentAdminSanctionId" />
+
+								</div>
+							</div>
+						</div>
+						<div class="card-footer text-right" style="padding-right: 100px">
+
+							<button type="submit" class="btn  btn-primary"
+								data-ng-click="saveAsDraft=true;finalSubmit=false">
+								<span>Submit and Generate Preview</span>
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

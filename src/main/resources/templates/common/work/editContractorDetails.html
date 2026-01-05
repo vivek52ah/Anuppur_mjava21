@@ -1,0 +1,447 @@
+<div th:fragment="edit_contractorDetails">
+	<form
+		data-ng-submit="createContractorDetails(workFormContractor.$valid)"
+		name="workFormContractor" id="workFormContractor"
+		novalidate="novalidate">
+
+
+		<div class="container" align="center"
+			data-ng-hide="workDataTender.workStatusId=='8' ||workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'">
+
+		</div>
+
+		<div class="card"
+			data-ng-hide="workDataTender.workStatus=='notTenderIssued'"
+			data-ng-show="workDataTender.workStatusId=='8' ||workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'">
+			<div class="card-header">
+				<span>Contractor’s Details</span>
+			</div>
+			<div class="card-body">
+				<div class="row">
+
+					<!-- <input type="text" value="workDataContractor.workIdCount" data-ng-model="workDataContractor.workIdCount"/> -->
+
+				<!-- 	<div class="form-group col-sm-12">
+						<label class="orangelabel">Recommended Agency</label>
+						<label class="radio-inline" style="padding-right: 5px;"><input
+							type="radio" name="recommendedAgency" checked="checked"
+							data-ng-model="workData.isRecommendedAgency" value="1"
+							required="required"
+							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT'"
+							data-ng-change="workData.agency.implAgencyTypeId=''; workData.agency.implementationAgencyId='';" />
+							<span>DHS Agency</span><span class="aestrick">&#42;</span></label> <label
+							class="radio-inline"><input type="radio"
+							name="recommendedAgency"
+							data-ng-model="workData.isRecommendedAgency" value="0"
+							data-ng-change="workData.agency.implAgencyTypeId='';workData.agency.implementationAgencyId='';"
+							required="required" /> <span>Other</span><span class="aestrick">&#42;</span></label>
+						<div data-ng-show="workForm.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workForm.isRecommendedAgency.$error.required">
+								<span th:text="#{pleaseSelect}">Please select Recommended
+									Agency </span> <span></span>
+							</p>
+						</div>
+					</div> -->
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
+						<label><span th:text="#{contractorName}"></span><span data-ng-show="workData.isTenders == 1"
+							class="aestrick">&#42;</span></label> <input type="text"
+							class="form-control" id="name" required="required"
+							data-ng-model="workDataContractor.name" name="name"
+							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT' " />
+						<input type="hidden" data-ng-model="workDataContractor.workId" />
+
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.name.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{contractorName}"></span>
+							</p>
+						</div> -->
+					</div>
+
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
+						<label><span th:text="#{contractorName}"></span><span data-ng-show="workData.isTenders == 1"
+							class="aestrick">&#42;</span></label> <input type="text"
+							class="form-control" id="name" required="required"
+							data-ng-model="workDataContractor.name" name="name"
+							data-ng-disabled="workData.role == 'ROLE_DEPARTMENT' || workData.role =='ROLE_DEPT_DISTRICT' || workData.role=='ROLE_SYSTEM_ADMIN' || workData.role=='ROLE_SU' || isDisabled " />
+						<input type="hidden" data-ng-model="workDataContractor.workId" />
+
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.name.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{contractorName}"></span>
+							</p>
+						</div> -->
+					</div>
+
+
+
+
+
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
+						<label><span>Mobile No.</span></label> <input required="required"
+							class="form-control digits-only" type="text"
+							data-ng-model="workDataContractor.contactNo" name="contactNo"
+							data-ng-pattern="/^[6-9][0-9]{9}$/" maxlength="10"
+							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT' " />
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.contactNo.$error.required">
+								<span>Please enter Mobile No.</span>
+							</p>
+						</div> -->
+						<p class="help-block" style="color: red;"
+							data-ng-show="workFormContractor.contactNo.$error.pattern">
+							<span>Please enter valid Mobile No.</span>
+						</p>
+
+					</div>
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
+						<label><span>Mobile No.</span></label> <input required="required"
+							class="form-control digits-only" type="text"
+							data-ng-model="workDataContractor.contactNo" name="contactNo"
+							data-ng-pattern="/^[6-9][0-9]{9}$/" maxlength="10"
+							data-ng-disabled="workData.role == 'ROLE_DEPARTMENT' || workData.role =='ROLE_DEPT_DISTRICT' || workData.role=='ROLE_SYSTEM_ADMIN' || workData.role=='ROLE_SU' || isDisabled" />
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.contactNo.$error.required">
+								<span>Please enter Mobile No.</span>
+							</p>
+						</div> -->
+						<p class="help-block" style="color: red;"
+							data-ng-show="workFormContractor.contactNo.$error.pattern">
+							<span>Please enter valid Mobile No.</span>
+						</p>
+
+					</div>
+
+
+
+
+
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
+						<label><span>Email Id</span></label> <input required="required"
+							class="form-control" type="email" id="emailId"
+							data-ng-model="workDataContractor.emailId" name="emailId"
+							maxlength="50"
+							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT' " />
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.emailId.$error.required">
+								<span>Please enter Email Id</span>
+							</p>
+						</div> -->
+						<p class="help-block" style="color: red;"
+							data-ng-show="workFormContractor.emailId.$error.email">
+							<span>Please enter valid Email Id</span>
+						</p>
+					</div>
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
+						<label><span>Email Id</span></label> <input required="required"
+							class="form-control" type="email" id="emailId"
+							data-ng-model="workDataContractor.emailId" name="emailId"
+							maxlength="50"
+							data-ng-disabled="workData.role == 'ROLE_DEPARTMENT' || workData.role =='ROLE_DEPT_DISTRICT' || workData.role=='ROLE_SYSTEM_ADMIN' || workData.role=='ROLE_SU' || isDisabled" />
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.emailId.$error.required">
+								<span>Please enter Email Id</span>
+							</p>
+						</div> -->
+						<p class="help-block" style="color: red;"
+							data-ng-show="workFormContractor.emailId.$error.email">
+							<span>Please enter valid Email Id</span>
+						</p>
+					</div>
+
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
+						<label><span>Contractor’s Firm Name and Address</span><span data-ng-show="workData.isTenders == 1"
+							class="aestrick">&#42;</span></label>
+						<textarea class="form-control" id="firmNameAddress"
+							required="required"
+							data-ng-model="workDataContractor.firmNameAddress"
+							name="firmNameAddress"
+							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT' "></textarea>
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.firmNameAddress.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Contractor’s
+									Firm Name and Address</span>
+							</p>
+						</div> -->
+					</div>
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
+						<label><span>Contractor’s Firm Name and Address</span><span data-ng-show="workData.isTenders == 1"
+							class="aestrick">&#42;</span></label>
+						<textarea class="form-control" id="firmNameAddress"
+							required="required"
+							data-ng-model="workDataContractor.firmNameAddress"
+							name="firmNameAddress"
+							data-ng-disabled="workData.role == 'ROLE_DEPARTMENT' || workData.role =='ROLE_DEPT_DISTRICT' || workData.role=='ROLE_SYSTEM_ADMIN' || workData.role=='ROLE_SU' || isDisabled"></textarea>
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.firmNameAddress.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Contractor’s
+									Firm Name and Address</span>
+							</p>
+						</div> -->
+					</div>
+
+
+
+					<!-- <div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
+						<label><span>Remarks</span></label>
+						<textarea class="form-control" id="Remarks" required="required"
+							data-ng-model="workDataContractor.remarks" name="Remarks"
+							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT' "></textarea>
+							<div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.Remarks.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Remarks</span>
+							</p>
+						</div>
+					</div> -->
+
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
+
+						<label><span> Pan Number</span> 
+						</label> <input type="text" class="form-control alpha-numeric-only"
+							data-ng-blur="validatePanConsultant(workDataContractor.pan);"
+							id="pan" data-ng-model="workDataContractor.pan" name="pan"
+							autocomplete="off" maxlength="10"
+							data-ng-change="capsPan(workDataContractor.pan);"
+							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT' " />
+
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.pan.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									>PAN</span>
+							</p>
+						</div> -->
+
+						<div data-ng-show="panError">
+							<p class="help-block" style="color: red;">
+								<span>Please Enter Correct Pan Number</span>
+							</p>
+						</div>
+
+					</div>
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
+
+						<label><span> Pan Number</span> 
+						</label> <input type="text" class="form-control alpha-numeric-only"
+							data-ng-blur="validatePanConsultant(workDataContractor.pan);"
+							id="pan" data-ng-model="workDataContractor.pan" name="pan"
+							autocomplete="off" maxlength="10"
+							data-ng-change="capsPan(workDataContractor.pan);"
+							data-ng-disabled="workData.role == 'ROLE_DEPARTMENT' || workData.role =='ROLE_DEPT_DISTRICT' || workData.role=='ROLE_SYSTEM_ADMIN' || workData.role=='ROLE_SU' || isDisabled" />
+
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.pan.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									>PAN</span>
+							</p>
+						</div> -->
+
+						<div data-ng-show="panError">
+							<p class="help-block" style="color: red;">
+								<span>Please Enter Correct Pan Number</span>
+							</p>
+						</div>
+
+					</div>
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
+
+						<label><span >GSTIN No.</span>  </label> <input type="text"
+							class="form-control alpha-numeric-only" id="gstin"
+							 autocomplete="off"
+							data-ng-blur="validateGstinConsultant(workDataContractor.gstin)"
+							data-ng-model="workDataContractor.gstin" name="gstin" maxlength="15"
+							data-ng-change="capsGSTIN(workDataContractor.gstin);"
+							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT' " />
+
+						<!-- <div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.gstin.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									>GSTIN No.</span>
+							</p>
+						</div> -->
+
+						<div data-ng-show="gstinError">
+							<p class="help-block" style="color: red;">
+								<span>Please Enter Correct GSTIN Number</span>
+							</p>
+						</div>
+					</div>
+
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
+
+						<label><span >GSTIN No.</span>  </label> <input type="text"
+							class="form-control alpha-numeric-only" id="gstin"
+							autocomplete="off"
+							data-ng-blur="validateGstinConsultant(workDataContractor.gstin)"
+							data-ng-model="workDataContractor.gstin" name="gstin" maxlength="15"
+							data-ng-change="capsGSTIN(workDataContractor.gstin);"
+							data-ng-disabled="workData.role == 'ROLE_DEPARTMENT' || workData.role =='ROLE_DEPT_DISTRICT' || workData.role=='ROLE_SYSTEM_ADMIN' || workData.role=='ROLE_SU' || isDisabled" />
+
+					<!-- 	<div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.gstin.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									>GSTIN No.</span>
+							</p>
+						</div> -->
+
+						<div data-ng-show="gstinError">
+							<p class="help-block" style="color: red;">
+								<span>Please Enter Correct GSTIN Number</span>
+							</p>
+						</div>
+					</div>
+
+
+
+
+					<div class="form-group col-sm-4" data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
+						<label><span>Remarks</span></label>
+						<textarea class="form-control" id="Remarks" 
+							data-ng-model="workDataContractor.remarks" name="Remarks"
+							maxlength="1001"
+							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT' "></textarea>
+						<div
+							data-ng-show="workFormContractor.$submitted || workFormContractor.Remarks.$touched || workDataContractor.remarks.length > 1000">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.Remarks.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Remarks</span>
+							</p>
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.Remarks.$error.maxLength">
+								<span>Remarks cannot exceed 1000 characters</span>
+							</p>
+						</div>
+					</div>
+
+             <div class="form-group col-sm-4" data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
+						<label><span>Remarks</span></label>
+						<textarea class="form-control" id="Remarks" 
+							data-ng-model="workDataContractor.remarks" name="Remarks"
+							maxlength="1001"
+							data-ng-disabled="workData.role == 'ROLE_DEPARTMENT' || workData.role =='ROLE_DEPT_DISTRICT' || workData.role=='ROLE_SYSTEM_ADMIN' || workData.role=='ROLE_SU' || isDisabled"></textarea>
+						<div
+							data-ng-show="workFormContractor.$submitted || workFormContractor.Remarks.$touched || workDataContractor.Remarks.length > 1000">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.Remarks.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Remarks</span>
+							</p>
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.Remarks.$error.maxLength">
+								<span>Remarks cannot exceed 1000 characters</span>
+							</p>
+						</div>
+					</div>
+					<!-- <div class="form-group col-sm-4"
+						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
+						<label><span>Remarks</span></label>
+						<textarea class="form-control" id="Remarks" required="required"
+							data-ng-model="workDataContractor.remarks" name="Remarks"
+							data-ng-disabled="workData.role == 'ROLE_DEPARTMENT' || workData.role =='ROLE_DEPT_DISTRICT' || workData.role=='ROLE_SYSTEM_ADMIN' || workData.role=='ROLE_SU' || isDisabled"></textarea>
+							<div data-ng-show="workFormContractor.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormContractor.Remarks.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Remarks</span>
+							</p>
+						</div>
+					</div> -->
+
+
+
+				</div>
+			</div>
+
+
+		</div>
+
+
+
+		<!-- th:if="${roleName=='ROLE_SAU' ||roleName=='ROLE_DISTRICT'}" -->
+
+		<!-- <div class="tab-footer text-right" 
+			data-ng-hide="workDataTender.workStatus=='notTenderIssued'|| workDataProgress.workStatusId=='12'||workDataProgress.workStatusId=='13'||workDataProgress.workStatusId=='9'||workDataProgress.workStatusId=='10'||workDataProgress.workStatusId=='11' "
+			data-ng-show="workDataTender.workStatusId=='8' ||workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13' ">
+			<button type="submit" class="btn  btn-success  next-button"
+				id="draftCobtn"
+				data-ng-click="finalSubmit=false;saveCoDraft=true;saveCoNext=false;">
+				<i class="las la-file-alt"></i> Save As Draft
+			</button>
+			<button type="submit" class="btn btn-primary next-button nexxt"
+				id="finalCotbtn"
+				data-ng-click="finalSubmit=false;saveCoDraft=true;saveCoNext=true;">
+				Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
+			</button>
+		</div> -->
+
+
+		<div class="tab-footer text-right"
+			data-ng-hide="workDataTender.workStatus == 'notTenderIssued' || workDataProgress.workStatusId == '12' || workDataProgress.workStatusId == '13' || workDataProgress.workStatusId == '9' || workDataProgress.workStatusId == '10' || workDataProgress.workStatusId == '11'"
+			data-ng-show="workDataTender.workStatusId == '8' || workDataTender.workStatusId == '9' || workDataTender.workStatusId == '10' || workDataTender.workStatusId == '11' || workDataTender.workStatusId == '12' || workDataTender.workStatusId == '13'">
+
+			<!-- <button type="submit" class="btn btn-success next-button"
+				id="draftCobtn"
+				data-ng-click="finalSubmit = false; saveCoDraft = true; saveCoNext = false;"
+				data-ng-disabled="(workData.role == 'ROLE_DEPARTMENT' || workData.role == 'ROLE_DEPT_DISTRICT' || workData.role == 'ROLE_SYSTEM_ADMIN' || workData.role == 'ROLE_SU') &amp;&amp; workData.isRecommendedAgency == 0">
+				<i class="las la-file-alt"></i> Save As Draft
+			</button> -->
+
+			<button type="submit" class="btn btn-primary next-button nexxt"
+				id="finalCotbtn"
+				data-ng-click="finalSubmit = false; saveCoDraft = true; saveCoNext = true;"
+				data-ng-disabled="(workData.role == 'ROLE_DEPARTMENT' || workData.role == 'ROLE_DEPT_DISTRICT' || workData.role == 'ROLE_SYSTEM_ADMIN' || workData.role == 'ROLE_SU') &amp;&amp; workData.isRecommendedAgency == 0">
+				Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
+			</button>
+		</div>
+
+
+
+	</form>
+</div>

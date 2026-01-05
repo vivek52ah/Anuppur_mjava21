@@ -1,0 +1,63 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Development_Monitoring_New_Work">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="page1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="district"/>
+              <xs:element type="xs:string" name="block"/>
+              <xs:element type="xs:string" name="gramPanchayat"/>
+              <xs:element type="xs:string" name="village"/>
+              <xs:element type="xs:string" name="parliamentaryConstituency"/>
+              <xs:element type="xs:string" name="legislativeConstituency"/>
+              <xs:element type="xs:string" name="workNo"/>
+              <xs:element type="xs:string" name="workName"/>
+              <xs:element type="xs:string" name="workType"/>
+              <xs:element type="xs:string" name="year"/>
+              <xs:element type="xs:string" name="scheme"/>
+              <xs:element type="xs:string" name="workPriority"/>
+              <xs:element type="xs:string" name="workHead"/>
+              <xs:element type="xs:string" name="implementationAgency"/>
+              <xs:element type="xs:string" name="subEngineerName"/>
+              <xs:element type="xs:string" name="estimatedAmount"/>
+              <xs:element type="xs:string" name="amountReleased"/>
+              <xs:element type="xs:string" name="performanceGrant"/>
+              <xs:element type="xs:string" name="tsDate"/>
+              <xs:element type="xs:string" name="tsNo"/>
+              <xs:element type="xs:string" name="asDate"/>
+              <xs:element type="xs:string" name="asNo"/>
+              <xs:element type="xs:string" name="status"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="page2">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="stage1Pic1"/>
+              <xs:element type="xs:string" name="stage1Pic2"/>
+              <xs:element type="xs:string" name="stage1Pic3"/>
+              <xs:element type="xs:string" name="stage1Pic4"/>
+              <xs:element type="xs:string" name="stage2Pic1"/>
+              <xs:element type="xs:string" name="stage2Pic2"/>
+              <xs:element type="xs:string" name="stage2Pic3"/>
+              <xs:element type="xs:string" name="stage2Pic4"/>
+              <xs:element type="xs:string" name="stage3Pic1"/>
+              <xs:element type="xs:string" name="stage3Pic2"/>
+              <xs:element type="xs:string" name="stage3Pic3"/>
+              <xs:element type="xs:string" name="stage3Pic4"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="meta">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="instanceID"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute type="xs:string" name="id"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

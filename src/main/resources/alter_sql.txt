@@ -1,0 +1,151 @@
+/*************************************************************Data Request**************************************************************************
+
+ALTER TABLE `t_work` ADD COLUMN `asc_date` DATE NULL DEFAULT NULL AFTER `est_date`;
+
+ALTER TABLE `t_work` 
+ADD COLUMN `re_order_no` VARCHAR(45) NULL DEFAULT NULL AFTER `asc_date`,
+ADD COLUMN `re_agency_name` VARCHAR(100) NULL DEFAULT NULL AFTER `re_order_no`,
+ADD COLUMN `re_officer_name` VARCHAR(100) NULL DEFAULT NULL AFTER `re_agency_name`,
+ADD COLUMN `re_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `re_officer_name`,
+ADD COLUMN `est_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `re_remarks`,
+ADD COLUMN `ts_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `est_remarks`,
+ADD COLUMN `as_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `ts_remarks`,
+ADD COLUMN `first_inst_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `as_remarks`,
+ADD COLUMN `sec_inst_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `first_inst_remarks`,
+ADD COLUMN `final_inst_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `sec_inst_remarks`,
+ADD COLUMN `at_order_no` VARCHAR(45) NULL DEFAULT NULL AFTER `final_inst_remarks`,
+ADD COLUMN `at_order_date` DATE NULL DEFAULT NULL AFTER `at_order_no`,
+ADD COLUMN `at_to` VARCHAR(100) NULL DEFAULT NULL AFTER `at_order_date`,
+ADD COLUMN `at_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `at_to`,
+ADD COLUMN `so_order_no` VARCHAR(45) NULL DEFAULT NULL AFTER `at_remarks`,
+ADD COLUMN `so_order_date` DATE NULL DEFAULT NULL AFTER `so_order_no`,
+ADD COLUMN `so_work_status` VARCHAR(100) NULL DEFAULT NULL AFTER `so_order_date`,
+ADD COLUMN `so_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `so_work_status`,
+ADD COLUMN `ria_order_no` VARCHAR(45) NULL DEFAULT NULL AFTER `so_remarks`,
+ADD COLUMN `ria_order_date` DATE NULL DEFAULT NULL AFTER `ria_order_no`,
+ADD COLUMN `ria_refund_AMT` DECIMAL(13,2) NULL DEFAULT NULL AFTER `ria_order_date`,
+ADD COLUMN `ria_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `ria_refund_AMT`;
+
+
+ALTER TABLE `t_work` 
+ADD COLUMN `wc_order_no` VARCHAR(45) NULL DEFAULT NULL AFTER `ria_remarks`,
+ADD COLUMN `wc_order_date` DATE NULL DEFAULT NULL AFTER `wc_order_no`,
+ADD COLUMN `wc_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `wc_order_date`,
+ADD COLUMN `cc_remarks` VARCHAR(500) NULL DEFAULT NULL AFTER `wc_remarks`;
+
+
+ALTER TABLE `dms_owms_db`.`t_work` 
+ADD COLUMN `mla_house` VARCHAR(45) NULL DEFAULT NULL AFTER `cc_remarks`,
+CHANGE COLUMN `re_remarks` `re_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `est_remarks` `est_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `ts_remarks` `ts_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `as_remarks` `as_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `first_inst_remarks` `first_inst_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `sec_inst_remarks` `sec_inst_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `final_inst_remarks` `final_inst_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `at_remarks` `at_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `so_remarks` `so_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `ria_remarks` `ria_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `wc_remarks` `wc_remarks` VARCHAR(200) NULL DEFAULT NULL ,
+CHANGE COLUMN `cc_remarks` `cc_remarks` VARCHAR(200) NULL DEFAULT NULL ;
+
+
+CREATE TABLE `mst_sub_office` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sub_office_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `impl_agency_id` int(11) DEFAULT NULL,
+  `enabled` tinyint(1) DEFAULT NULL,
+  `district_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idfk_mst_sub_office_1_idx` (`impl_agency_id`),
+  CONSTRAINT `idfk_mst_sub_office_1` FOREIGN KEY (`impl_agency_id`) REFERENCES `mst_implementation_agency` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+
+ALTER TABLE `t_work` ADD COLUMN `sub_office_name` VARCHAR(100) NULL DEFAULT NULL AFTER `mla_house`;
+
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('13', 'Created', '1');
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('14', 'Estimates and TS Pending', '1');
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('15', 'Approval Pending', '1');
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('16', 'Approved and Not Paid', '1');
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('17', 'Approved and Paid but Not Started', '1');
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('18', 'Started/ In Progress', '1');
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('19', 'Started but Stopped', '1');
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('20', 'Completed CC Pending', '1');
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('21', 'CC Issued', '1');
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`) VALUES ('22', 'Completed and Transferred', '1');
+
+ALTER TABLE `mst_work_status` ADD COLUMN `scheme_id` INT(11) NULL DEFAULT NULL AFTER `work_type_id`;
+
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '13');
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '14');
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '15');
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '16');
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '17');
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '18');
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '19');
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '20');
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '21');
+UPDATE `mst_work_status` SET `scheme_id` = '8' WHERE (`id` = '22');
+
+
+
+
+//**************************************22/09/2021
+
+INSERT INTO `mst_role` (`role_code`, `role_name`, `ordering`) VALUES ('ROLE_HQ', 'HQ', '10');
+INSERT INTO `mst_role` (`role_code`, `role_name`, `ordering`) VALUES ('ROLE_DEPARTMENT', 'DIVISION', '11');
+
+INSERT INTO `mst_designation` (`id`, `designation`, `enabled`) VALUES ('26', 'Commissioner DES', '1');
+INSERT INTO `mst_designation` (`id`, `designation`, `enabled`) VALUES ('27', 'Additional Director', '1');
+INSERT INTO `mst_designation` (`id`, `designation`, `enabled`) VALUES ('28', 'JD HQ', '1');
+INSERT INTO `mst_designation` (`id`, `designation`, `enabled`) VALUES ('29', 'DD HQ', '1');
+INSERT INTO `mst_designation` (`id`, `designation`, `enabled`) VALUES ('30', 'AD HQ', '1');
+
+INSERT INTO `users`
+(`username`,`password`,`name`,`district_id`,`designation_id`,`sub_engg_id`,`email_id`,`mobile_no`,`status`,`verification_random_str`,`created_date`,`created_by`,`modified_date`,`modified_by`)
+VALUES
+('commdes@gmail.com', '$2a$10$eQLi6iG5oj9QH.lqABP46.VMEXt0cbaf6MXydVMdKju7lfBEZbPp2', 'Commissioner DES', NULL, '28', NULL, 'commdes@gmail.com', '1111111111', 'Active', NULL, '2021-09-21 16:04:50', 'superadmin@gmail.com', '2021-09-21 16:04:50', 'superadmin@gmail.com');
+
+INSERT INTO `user_role` values ((select id from `users` where `username` = 'commdes@gmail.com'),'ROLE_HQ');
+
+
+
+
+ALTER TABLE `users` 
+ADD COLUMN `division_id` INT(11) NULL DEFAULT NULL AFTER `modified_by`;
+
+INSERT INTO `mst_designation` (`id`, `designation`, `enabled`) VALUES ('31', 'JD Division', '1');
+
+INSERT INTO `users`
+(`username`,`password`,`name`,`district_id`,`designation_id`,`sub_engg_id`,`email_id`,`mobile_no`,`status`,`verification_random_str`,`created_date`,`created_by`,`modified_date`,`modified_by`,`division_id`)
+VALUES
+('gadivision@gmail.com', '$2a$10$eQLi6iG5oj9QH.lqABP46.VMEXt0cbaf6MXydVMdKju7lfBEZbPp2', 'Gwalior Admin Division', NULL, '31', NULL, 'gadivision@gmail.com', '1111111111', 'Active', NULL, '2021-09-21 16:04:50', 'superadmin@gmail.com', '2021-09-21 16:04:50', 'superadmin@gmail.com','1');
+
+INSERT INTO `user_role` values ((select id from `users` where `username` = 'gadivision@gmail.com'),'ROLE_DEPARTMENT');
+
+
+//*******************23/09/2021
+ALTER TABLE `t_work` 
+ADD COLUMN `recommended_amt` DECIMAL(13,2) NULL DEFAULT NULL AFTER `sub_office_name`,
+ADD COLUMN `re_designation` VARCHAR(100) NULL DEFAULT NULL AFTER `recommended_amt`;
+
+INSERT INTO `mst_work_status` (`id`, `work_status_name_e`, `enabled`, `scheme_id`) VALUES ('23', 'Cancelled', '1', '8');
+
+UPDATE `mst_schemes` SET `scheme_name` = 'Jan Bhagidari' WHERE (`id` = '11');
+
+ALTER TABLE `t_work` 
+ADD COLUMN `district_mla` VARCHAR(10) NULL DEFAULT 0 AFTER `re_designation`,
+ADD COLUMN `other_district_name` VARCHAR(45) NULL DEFAULT NULL AFTER `district_mla`,
+ADD COLUMN `other_lc_dd` VARCHAR(45) NULL DEFAULT NULL AFTER `other_district_name`;
+
+update t_work set scheme = 'Jan Bhagidari' where scheme = 'Jan Bhagidar';
+
+ALTER TABLE `dms_owms_db`.`t_work` 
+ADD COLUMN `can_recom_by` VARCHAR(100) NULL AFTER `other_lc_dd`,
+ADD COLUMN `can_recom_desig` VARCHAR(45) NULL AFTER `can_recom_by`,
+ADD COLUMN `can_remarks` VARCHAR(200) NULL AFTER `can_recom_desig`;
+
+
+

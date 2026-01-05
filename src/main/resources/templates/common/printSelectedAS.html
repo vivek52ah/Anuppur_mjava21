@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+
+<style>
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+td, th {
+	border: 1px solid #dddddd;
+	text-align: left;
+	padding: 8px;
+	font-size: 16px;
+}
+</style>
+
+<style>
+td {
+	font-size: 16px;
+}
+
+.report {
+	background: rgb(255, 255, 255);
+	border-radius: 6px;
+	padding: 20px;
+	max-width: 1000px;
+	margin: 20px auto;
+	font-family: 'Arial Unicode MS';
+}
+
+.bt-print {
+	border: 0;
+	background: rgb(229, 237, 242);
+	line-height: 1;
+	padding: 8px 12px 5px;
+	display: inline-block;
+}
+
+h3 {
+	text-align: center;
+	text-align: center;
+	font-size: 25px;
+	margin: 0;
+	padding-bottom: 10px;
+}
+
+@media print {
+	@page {
+		size: portrait;
+	}
+	.app-header, .sidebar, .card-header, .app-footer, .bt-print {
+		display: none;
+	}
+	.header-fixed .app-body, .pt-4 {
+		margin: 0;
+		padding: 0 !important;
+	}
+	.report {
+		border-radius: 0;
+		padding: 0;
+		max-width: 100%;
+		margin: 0;
+	}
+}
+
+/* header, footer, .btn, .sidebar, .printBtn, .pace, .bt-print {
+        display: none !important;
+    } */
+</style>
+</head>
+
+<body>
+	<div class="container-fluid">
+		<!-- Breadcrumb -->
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="#dashboard"><span
+					th:text="#{home}">Home</span></a></li>
+			<li class="breadcrumb-item active"><span>View
+					Administrative Sanction File</span></li>
+
+			<!-- Breadcrumb Menu-->
+			<li class="breadcrumb-menu d-md-down-none">
+				<div class="btn-group" role="group" aria-label="Button group">
+					<a class="btn" data-ng-click="doTheBack()"><i
+						class="icon-arrow-left-circle"></i> &nbsp;Back</a>
+				</div>
+			</li>
+		</ol>
+		<div class="card">
+
+			<div class="card-body">
+				<button type="button" onclick="jQuery('#PrintForm').print();"
+					class="btn btn-primary  btn-sm float-right" style="float: right;">
+					Print <i class="fa fa-print"></i>
+				</button>
+				<div id="PrintForm" class="print report"
+					data-ng-init="loadPrintDataForAsMain();">
+
+					<h3>
+						<strong> जिला योजना एवं सांख्यिकी कार्यालय, जिला-
+							{{workList.districtName}} </strong>(म.प्र.)
+					</h3>
+					<p
+						style="text-align: center; text-align: center; font-size: 20px; margin: 0; padding-bottom: 1px;">
+						(मध्यप्रदेश शासन, योजना आर्थिक एवं सांख्यिकी विभाग)</p>
+					<p
+						style="text-align: center; text-align: center; font-size: 15px; margin: 0; padding-bottom: 1px;">
+						(Email : {{workList.loggedInUserEmailId}}, दूरभाष:
+						{{workList.phoneNo}} )</p>
+					<p
+						style="text-align: center; text-align: center; font-size: 20px; margin: 0; padding-bottom: 1px;">
+						<strong> विधानसभा निर्वाचन क्षेत्र विकास योजना के अंतर्गत
+							<br /> प्रशासकीय एवं वित्तीय स्वीकृति आदेश
+						</strong>
+					</p>
+
+
+
+
+					<p style="font-size: 16px; padding: 15px 0; line-height: 24px;">
+						&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; क्रमांक:
+						{{workList.asNo}} दिनांक: {{workList.asDate}} मध्यप्रदेश शासन,
+						योजना, आर्थिक एवं सांख्यिकी विभाग, मंत्रालय, भोपाल द्वारा विधानसभा
+						निर्वाचन क्षेत्र विकास योजना की मार्गदर्शिका (अद्यतन दिनांक 29
+						जनवरी 2013) तथा विभाग द्वारा समय-समय पर जारी संशोधित नियमों के
+						द्वारा प्रदत्त शक्तियों का उपयोग करते हुए माननीय विधायक महोदय से
+						प्राप्त अनुशंसा प्रस्ताव के अनुसार निम्न स्वीकृती बॉक्स के बिंदु
+						क्रमांक 7 पर उल्लिखित तकनीकी स्वीकृति के आधार पर निम्नांकित
+						कार्यों के लिए उनके विवरण में दर्शायी गई राशि की प्रशासकीय एवं
+						वित्तीय स्वीकृति प्रदान की जाती है:-</p>
+
+					<div data-ng-repeat="work in workList track by $index">
+						<p>क्रमांक-{{$index+1}}</p>
+
+						<table>
+							<tbody>
+								<tr>
+									<th>1-विधानसभा क्षेत्र:</th>
+									<td>{{work.lcName}}</td>
+									<th>2-माननीय विधायक</th>
+									<td>{{work.mla}}</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<table>
+							<tbody>
+								<tr>
+									<th>3-अनुशंसा क्रमांक/दिनांक:</th>
+									<td>{{work.recommendationNo}} /
+										{{work.recommendationDate}}</td>
+									<th rowspan="2">4-क्षेत्र का विवरण:</th>
+									<td rowspan="2">{{work.workLocation}}</td>
+								</tr>
+								<tr>
+									<th>5-वर्क आईडी</th>
+									<td>{{work.workNo}}</td>
+								</tr>
+							</tbody>
+						</table>
+						<table>
+							<tbody>
+								<tr>
+									<th>6-प्रस्तावित कार्य का विवरण:</th>
+									<td colspan="6">{{work.workName}}</td>
+								</tr>
+								<tr>
+									<th>7-तकनीकी स्वीकृती का क्रमांक एवं दिनांक:</th>
+									<td colspan="6">{{work.tsNo}} / {{work.tsDate}}</td>
+								</tr>
+								<tr>
+									<th>8-प्रशासकीय स्वीकृती की राशि :</th>
+									<td colspan="2">{{work.asAmt}}</td>
+									<th>9-प्रथम किस्त की राशि</th>
+									<td colspan="2">{{work.firstInstallAmt}}</td>
+								</tr>
+								<tr>
+									<th>10-क्रियान्वयन एजेंसी</th>
+									<td colspan="6">{{work.implementationAgency}}</td>
+								</tr>
+								<tr>
+									<th>11-स्वीकृति जारी दिनांक:</th>
+									<td>{{work.asDate}}</td>
+									<th>12-अपेक्षित पूर्णता का दिनांक:</th>
+									<td>{{work.completionDate}}</td>
+									<th>13-अवधि दिनों में</th>
+									<td>{{work.durationInDays}}</td>
+								</tr>
+								<tr data-ng-show="work.addAmt!=null">
+									<th colspan="3">14- आंशिक रूप से किसी अन्य मद से जारी राशी
+										एवं उसका संक्षित विवरण (ऑप्शनल):</th>
+									<td colspan="3">{{work.addAmt}},
+										{{work.additionalAmtRemark}}</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+
+
+
+					<table>
+						<tbody>
+							<tr data-ng-show="workList.lctype=='GEN'">
+
+								<td>उपरोक्त स्वीकृत राशि का व्यय मांग संख्या 60, लेखा शीर्ष
+									4515-अन्य ग्राम विकास कार्यक्रमों पर पूंजीगत परिव्यय, सेगमेंट
+									0101-सामान्य, मध्यप्रदेश विधान सभा निर्वाचन क्षेत्र विकास
+									योजना-(8284), #64 वृहद निर्माण कार्य, 002-उप वृहद निर्माण कार्य
+									के अन्तर्गत विकलनीय होगा।</td>
+							</tr>
+							<tr data-ng-show="workList.lctype=='ST'">
+
+								<td>उपरोक्त स्वीकृत राशि का व्यय मांग संख्या 60, लेखा शीर्ष
+									4515-अन्य ग्राम विकास कार्यक्रमों पर पूंजीगत परिव्यय, सेगमेंट
+									0102-अनुसूचित जनजाति उप योजना (सब स्कीम), मध्यप्रदेश विधान सभा
+									निर्वाचन क्षेत्र विकास योजना-(8284), #64 वृहद निर्माण कार्य,
+									002-उप वृहद निर्माण कार्य के अन्तर्गत विकलनीय होगा।</td>
+							</tr>
+							<tr data-ng-show="workList.lctype=='SC'">
+
+								<td>उपरोक्त स्वीकृत राशि का व्यय मांग संख्या 60, लेखा शीर्ष
+									4515-अन्य ग्राम विकास कार्यक्रमों पर पूंजीगत परिव्यय, सेगमेंट
+									0103-अनुसूचित जाति उप योजना (सब स्कीम), मध्यप्रदेश विधान सभा
+									निर्वाचन क्षेत्र विकास योजना-(8284), #64 वृहद निर्माण कार्य,
+									002-उप वृहद निर्माण कार्य के अन्तर्गत विकलनीय होगा।</td>
+							</tr>
+						</tbody>
+					</table>
+					<br />
+					<div data-ng-show="workList.workTypeId==1">
+						<h3>
+							<strong> निर्माण कार्य की शर्तें </strong>
+						</h3>
+						<p style="font-size: 16px; padding: 15px 0; line-height: 24px;">
+							उपरोक्त स्वीकृत निर्माण कार्य शासन द्वारा निर्देशित सिद्धांतों के
+							तहत निम्नलिखित शर्तों के अन्तर्गत किये जायेंगे :-</p>
+						<ol style="font-size: 16px">
+							<li>किसी भी परिस्थिति में प्रशासकीय स्वीकृति राशि से अधिक
+								व्यय नहीं किया जावे। उक्त निर्माण कार्य को ठेकेदारी प्रथा से
+								कार्य कराया जाता है तो ठेकेदार का चयन करने के लिए एजेंसी की
+								विभागीय प्रणाली का अनुसरण किया जायेगा। उक्त कार्यों में मजदूरी
+								दर, जवाहर रोजगार योजना के तहत निर्धारित मजदूरी दर के अनुसार होगी
+								इस योजना के अन्तर्गत किसी भी कार्य के लिये किसी भी प्रकार के
+								ठेकेदार/सप्लायर को अग्रिम राशि का भुगतान करना निषिद्ध है।</li>
+							<li>स्वीकृत कार्य हेतु प्रस्तुत प्राक्कलन मानचित्र एवं
+								तकनीकि स्वीकृति के अनुसार चयनित स्थल पर ही कार्य कराया जावे।
+								निर्माण कार्य एवं प्रस्तावित स्थल में किसी भी प्रकार का परिवर्तन
+								इस कार्यालय की पूर्व अनुमति के बगैर नहीं किया जाये। स्वीकृत
+								कार्य निर्धारित प्राक्कलन के अनुसार न किये जाने पर राशि की वसूली
+								क्रियान्वयन एजेंसी से की जायेगी</li>
+							<li>स्वीकृति निर्माण कार्य, शासकीय भूमि पर कराये जायें या
+								कहीं निजी भूमि बीच में आती है तो संबंधित भू-स्वामी द्वारा उसे
+								शासन के पक्ष में दानपत्र लिखने एवं तदानुसार राजस्व अभिलेख में
+								संशोधन होने के उपरान्त ही प्रारंभ किया जावे।</li>
+							<li>स्वीकृत निर्माण कार्य उत्तम गुणवत्ता के साथ उपरोक्त
+								तालिका के क्रमांक 9 पर वर्णित "अपेक्षित पूर्णता का दिनांक" तक
+								अनिवार्य रूप से पूर्ण किया जावे। स्वीकृत कार्य निर्धारित समय
+								सीमा में यदि पूर्ण नहीं कराया जाता है तो कार्य की लागत में होने
+								वाली वृद्धि की राशि निर्माण एजेंसी स्वयं वहन करेगी।</li>
+							<li>निर्माण एजेंसी पहले संस्था निधि राशि का व्यय कर निर्माण
+								कार्य करायगी तत्पश्चात् ही स्वीकृत विधायक निधि का उपयोग किया
+								जायेगा निर्माण कार्य अपूर्ण रहने पर विधायक निधि की स्वीकृत राशि
+								निर्माण एजेंसी से वसूली योग्य होगी।</li>
+							<li>कार्य के प्रारंभ होने एवं पूर्ण होने की सूचना संबंधित
+								माननीय विधायक महोदय को अनिवार्य रूप से दी जाये</li>
+							<li>सबंधित क्रियान्वयन एजेंसी निर्माण कार्य के संबंध में
+								शासन निर्देशों के अनुरूप एक निर्माण नस्ती तैयार करेंगे, जिसमें
+								निर्माण स्थल का खसरा नक्सा पंचायत का प्रस्ताव ग्रामीणों की
+								मांगपत्र जन प्रतिनिधियों की अनुशता तकनीकी स्वीकृति आदेश
+								प्रशासकीय स्वीकृति आदेश एवं निर्माण एजेंसी के अनुबंध एवं व्यय के
+								लेखा का संधारण करेंगे एवं निरीक्षण/आडिट के समय उपलब्ध करायेगे।</li>
+							<li>कार्य स्थल पर बोर्ड लगाया जावे जिसमें माननीय विधायक का
+								नाम/विधानसभा क्षेत्र एवं स्वीकृत राशि मजदूरी दर आदि जानकारी
+								अंकित की जावे।</li>
+							<li>स्वीकृत कार्य की द्वितीय किश्त की राशि की मांग हेतु
+								प्रथम किश्त की राशि की उपयोगिता हेतु माप पुस्तिका की छायाप्रति
+								एवं निर्माण कार्य के फोटोग्राफ्स मांगपत्र के साथ प्रस्तुत करना
+								अनिवार्य होगा। कार्य के लिए स्वीकृत राशि में से कंटिन्जेंसी के
+								रूप में कार्यालयीन व्यय आवर्ती व्यय, वाहन व्यय तथा स्थापना मद
+								में किया जाने वाला व्यय पूर्णतः प्रतिबंधित है।</li>
+							<li>स्वीकृत कार्य का मासिक वित्तीय एवं भौतिक प्रगति
+								प्रतिवेदन निर्धारित प्रपत्र में प्रत्येक माह की 5 तारीख तक इस
+								कार्यालय को उपलब्ध कराया जावे तथा कार्य पूर्ण उपरांत एक सप्ताह
+								के अंदर कार्य पूर्णता प्रमाण-पत्र एवं परिसंपत्ति हस्तांतरण का
+								प्रमाण-पत्र इस कार्यालय में प्रस्तुत किया जावे।</li>
+							<li>कार्यों हेतु प्रदाय राशि राष्ट्रीयकृत बैंकों में जमा रखी
+								जाये। कार्य निष्पादन की प्रक्रिया के दौरान जमा अवधि में जो ध्याज
+								अर्जित होता है, व्याज राशि एवं कार्य पूर्णता उपरांत यदि राशि शेष
+								बचती है तो कार्य पूर्णता प्रमाण पत्र के साथ ही इस कार्यालय को
+								वापिस किया जाये।</li>
+							<li>कार्य पूर्ण होने के पश्चात यदि राशि शेष बचती है तो चालान
+								के माध्यम से शासन के निर्धारित शीर्ष 0515 अन्य ग्रामीण विकास
+								कार्यक्रम, उप शीर्ष 800- अन्य प्राप्तियां अनाबद्ध राशि/विधानसभा
+								निर्वाचन क्षेत्र विकास योजना की अवशिष्ट राशि में जमा कर चालान की
+								मूल प्रति पूर्णता प्रमाण पत्र के साथ इस कार्यालय को अनिवार्य
+								भेजा जावे।</li>
+							<li>उपरोक्त स्वीकृत कार्य यदि किसी अन्य योजना में पूर्व से
+								स्वीकृत हों तो, कार्य की यह स्वीकृति स्वयमेव निरस्त होगी।
+								निर्देशों की अवहेलना करने पर संबंधित एजेन्सी, अधिकारियों,
+								कर्मचारियों एवं जिम्मेदार जनप्रतिनिधियों से ब्याज सहित राशि वसूल
+								की जाने के साथ वैधानिक कार्यवाही की जायेगी।</li>
+							<li>उपरोक्त स्वीकृत निर्माण कार्यों पर व्यय की गई राशि के
+								प्रत्येक व्हाउचर एवं एमबी की छायाप्रति इस कार्यालय द्वारा मांग
+								किये जाने पर जांच हेतु प्रस्तुत करना होगी। व्यय एवं कार्य की
+								अनियमितताये एवं आडिट आपत्तियों के लिये क्रियान्वयन एजेन्सी
+								पूर्णरूप से उत्तरदायी होगी।</li>
+							<li>निर्देशित सिद्धांतों का पालन न किये जाने पर क्रियान्वयन
+								एजेन्सी पूर्ण रूपेण उत्तरदायी होगी। योजना के अंतर्गत शरू किये गए
+								सभी कार्यों पर सामान्य वित्तीय और लेखा परीक्षा प्रक्रिया लागु
+								होगी।</li>
+							<li>उपलब्ध कराई गई राशि का उपयोग अन्य किमी विभागीय योजना की
+								कमी को पूरा करने हेतु न किया जावें ।</li>
+							<li>निर्मित परिसंपत्ति के संधारण का दायित्व संबंधित विभाग का
+								होगा, जिसको परिसंपत्ति का आधिपत्य सौंपा गया है ।</li>
+							<li data-ng-show="workData.specialCondition!=null">
+								{{workData.specialCondition}}</li>
+						</ol>
+
+					</div>
+
+					<div
+						data-ng-show="workList.workTypeId==2 || workList.workTypeId==3 || workList.workTypeId==4">
+						<h3>
+							<strong> क्रय कार्य की शर्तें</strong>
+						</h3>
+
+						<p style="font-size: 16px; padding: 15px 0; line-height: 24px;">
+							उपरोक्त स्वीकृती शासन द्वारा निर्देशित सिद्धांतों के तहत
+							निम्नलिखित शर्तों के अन्तर्गत दी जा रही है :-</p>
+
+						<ol style="font-size: 16px">
+
+
+							<li>स्वीकृत कार्य का मासिक प्रगति प्रतिवेदन निर्धारित
+								प्रपत्र में प्रत्येक माह की 5 तारीख तक इस कार्यालय को उपलब्ध
+								कराया जावे तथा कार्य पूर्ण उपरांत एक सप्ताह के अंदर कार्य
+								पूर्णता प्रमाण-पत्र एवं परिसंपत्ति हस्तांतरण का प्रमाण-पत्र इस
+								कार्यालय में प्रस्तुत किया जावे।</li>
+							<li>कार्य पूर्ण होने के पश्चात यदि राशि शेष बचती है तो चालान
+								के माध्यम से शासन के निर्धारित शीर्ष 0515 अन्य ग्रामीण विकास
+								कार्यक्रम, उप शीर्ष 800- अन्य प्राप्तियां अनाबद्ध राशि/विधानसभा
+								निर्वाचन क्षेत्र विकास योजना की अवशिष्ट राशि में जमा कर चालान की
+								मूल प्रति पूर्णता प्रमाण पत्र के साथ इस कार्यालय को अनिवार्य
+								भेजा जावे।</li>
+							<li>उपरोक्त स्वीकृत कार्य यदि किसी अन्य योजना में पूर्व से
+								स्वीकृत हों तो, कार्य की यह स्वीकृति स्वयमेव निरस्त होगी।
+								निर्देशों की अवहेलना करने पर संबंधित एजेन्सी, अधिकारियों,
+								कर्मचारियों एवं जिम्मेदार जनप्रतिनिधियों से ब्याज सहित राशि वसूल
+								की जाने के साथ वैधानिक कार्यवाही की जायेगी।</li>
+							<li>निर्देशित सिद्धांतों का पालन न किये जाने पर क्रियान्वयन
+								एजेन्सी पूर्ण रूपेण उत्तरदायी होगी। योजना के अंतर्गत शरू किये गए
+								सभी कार्यों पर सामान्य वित्तीय और लेखा परीक्षा प्रक्रिया लागु
+								होगी।</li>
+							<li>क्रय सामग्री पर माननीय विधायक का नाम/विधानसभा क्षेत्र
+								एवं स्वीकृत राशि आदि जानकारी अंकित की जावे।</li>
+							<li>स्वीकृत कार्य की द्वितीय किश्त की राशि की मांग हेतु
+								प्रथम किश्त की राशि की उपयोगिता हेतु फोटोग्राफ्स मांगपत्र के साथ
+								प्रस्तुत करना अनिवार्य होगा। कार्य के लिए स्वीकृत राशि में से
+								कंटिन्जेंसी के रूप में कार्यालयीन व्यय आवर्ती व्यय, वाहन व्यय
+								तथा स्थापना मद में किया जाने वाला व्यय पूर्णतः प्रतिबंधित है।</li>
+							<li>किसी भी परिस्थिति में प्रशासकीय स्वीकृति राशि से अधिक
+								व्यय नहीं किया जावे। इस योजना के अन्तर्गत किसी भी कार्य के लिये
+								किसी भी प्रकार के अग्रिम राशि का भुगतान करना निषिद्ध है।</li>
+							<li>म.प्र. शासन योजना, आर्थिक एवं सांख्यिकी विभाग के ज्ञाप
+								क्रमांक 1856 / 1964 / 2014/23/ यो.आ.सां. भोपाल दिनांक 12.09.2014
+								द्वारा दिशा-निर्देशों के क्रम में विधानसभा निर्वाचन क्षेत्र
+								विकास योजना में भण्डार क्रय नियम का पूर्णत: पालन किया जावे।
+								विधानसभा निर्वाचन विकास योजनान्तर्गत विधायक निधि से 25000/- से
+								अधिक मूल्य की सामग्री कय करने पर म.प्र. भण्डार क्रय नियमों का
+								पालन सुनिश्चित किया जावें ।</li>
+							<li>क्रय सामग्री का परिवहन व्यय संबंधित विभाग/प्रदायकर्ता
+								फर्म द्वारा वहन किया जाये।</li>
+							<li>सामग्री क्रय की स्वीकृति प्राप्त होने के तुरन्त पश्चात
+								म.प्र. भण्डार क्रय नियम का पालन करते हुये, मध्यप्रदेश स्टेट
+								एग्रो इण्डस्ट्रीज डेव्हलपमेन्ट कार्पोरेशन लिमिटेड, म.प्र. लघु
+								उद्योग निगम अथवा अन्य शासकीय संस्था से ही क्रय करें, एवं स्टॉक
+								पंजी में प्रविष्टि करते हुये क्रय की गई वस्तु पर योजना का नाम,
+								स्वीकृत राशि क्रियान्वयन एजेन्सी का नाम एवं स्वीकृत वर्ष अंकित
+								किया जावें।</li>
+							<li>सामग्री क्रय करने के पश्चात राशि की कमी/वृद्धि होने पर
+								संशोधित स्वीकृति हेतु प्रस्ताव प्रेषित किये जायें।</li>
+							<li data-ng-show=" workList.specialCondition!=null">
+								{{workList.specialCondition}}</li>
+						</ol>
+
+					</div>
+
+
+
+					<p
+						style="display: table; margin-right: auto; text-align: center; line-height: 25px; font-size: 18px;"
+						data-ng-show="workData.asIssuingAuthorityId!=1">(कलेक्टर
+						द्वारा अनुमोदित)</p>
+					<p data-ng-show="workData.asIssuingAuthorityId==1"
+						style="display: table; margin-left: auto; text-align: center; line-height: 25px; font-size: 18px;">
+						({{workData.asIssuingAuthorityName}})<br />
+						{{workData.asIssuingAuthority}} <br /> जिला
+						{{workList.districtNameH}} <br /> मध्यप्रदेश
+					</p>
+					<p data-ng-show="workData.asIssuingAuthorityId==2"
+						style="display: table; margin-left: auto; text-align: center; line-height: 25px; font-size: 18px;">
+						({{workData.asIssuingAuthorityName}}) <br />
+						{{workData.asIssuingAuthority}} <br /> जिला
+						{{workList.districtNameH}} <br /> मध्यप्रदेश
+					</p>
+					<p data-ng-show="workData.asIssuingAuthorityId==4"
+						style="display: table; margin-left: auto; text-align: center; line-height: 25px; font-size: 18px;">
+						({{workData.asIssuingAuthorityName}}) <br />
+						{{workData.asIssuingAuthority}}<br /> जिला
+						{{workList.districtNameH}} <br /> मध्यप्रदेश
+					</p>
+					<p data-ng-show="workData.asIssuingAuthorityId==5"
+						style="display: table; margin-left: auto; text-align: center; line-height: 25px; font-size: 18px;">
+						({{workData.asIssuingAuthorityName}}) <br />{{workData.asIssuingAuthority}}
+						<br /> जिला {{workList.districtNameH}} <br /> मध्यप्रदेश
+					</p>
+
+					<p style="font-size: 18px;">पृ.क्रमांक: {{workList.asNo}}
+						दिनांक: {{workList.asDate}}</p>
+
+
+					<strong> प्रतिलिपि : </strong>
+					<ol style="font-size: 17px;">
+						<li>निज सहायक, माननीय विधायक महोदय विधानसभा क्षेत्र
+							{{workList.lcName}} की ओर सूचनार्थ।</li>
+						<li>महालेखाकार, म.प्र. ग्वालियर की ओर सूचनार्थ।</li>
+						<li>मुख्य कार्यपालन अधिकारी, जिला पंचायत जिला
+							{{workList.districtName}} की ओर सूचनार्थ</li>
+						<li>अनुविभागीय अधिकारी (राजस्व) जिला
+							{{workList.districtName}} की ओर सूचनार्थ।</li>
+						<li>अनुविभागीय अधिकारी (राजस्व) जिला
+							{{workList.districtName}} की ओर सूचनार्थ।</li>
+						<li>जिला कोषालय अधिकारी, जिला {{workList.districtName}} को
+							देयक पारित करने हेतु अग्रेषित।</li>
+						<li>नोडल एजेन्सी/क्रियान्वयन एजेन्सी नगरपालिका अधिकारी,
+							नगरपालिका परिषद जिला {{workList.districtName}} की ओर सूचनार्थ।</li>
+						<li>लेखा शाखा, जिला योजना एवं सांख्यिकी कार्यालय जिला
+							{{workList.districtName}} की ओर सॉफ्टवेयर में एंट्री करने तथा
+							नियमानुसार कार्यवाही हेतु प्रेषित।</li>
+						<li>कार्यालय के जावक क्रमांक एवं दिनांक से वितरित</li>
+					</ol>
+
+
+					<p data-ng-show="workData.asIssuingAuthorityId==1"
+						style="display: table; margin-left: auto; text-align: center; line-height: 25px; font-size: 18px;">
+						({{workData.asEndorsementAuthorityName}}) <br />
+						{{workData.asEndorsementAuthority}} <br /> जिला
+						{{workList.districtNameH}} <br /> मध्यप्रदेश
+					</p>
+					<p data-ng-show="workData.asIssuingAuthorityId==2"
+						style="display: table; margin-left: auto; text-align: center; line-height: 25px; font-size: 18px;">
+						({{workData.asEndorsementAuthorityName}}) <br />
+						{{workData.asEndorsementAuthority}} <br /> जिला
+						{{workList.districtNameH}} <br /> मध्यप्रदेश
+					</p>
+					<p data-ng-show="workData.asIssuingAuthorityId==4"
+						style="display: table; margin-left: auto; text-align: center; line-height: 25px; font-size: 18px;">
+						({{workData.asEndorsementAuthorityName}}) <br />
+						{{workData.asEndorsementAuthority}}<br /> जिला
+						{{workList.districtNameH}} <br /> मध्यप्रदेश
+					</p>
+					<p data-ng-show="workData.asIssuingAuthorityId==5"
+						style="display: table; margin-left: auto; text-align: center; line-height: 25px; font-size: 18px;">
+						({{workData.asEndorsementAuthorityName}}) <br />{{workData.asEndorsementAuthority}}
+						<br /> जिला {{workList.districtNameH}} <br /> मध्यप्रदेश
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

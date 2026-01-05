@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8" />
+
+
+	<title>Dynamic Exportable Table</title>
+
+	<!-- DataTables CSS -->
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
+	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css"/>
+	
+
+	<!-- jQuery & DataTables JS -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+	<script th:src="@{/js/bootstrap-select.min.js}"></script>
+	<script th:src="@{/js/bootstrap-select.js}"></script>
+	
+
+	<style>
+		.checkbox-container {
+			margin-bottom: 10px;
+		}
+
+		.checkbox-container label {
+			margin-right: 15px;
+		}
+	</style>
+
+	<style>
+		div#imageModal .modal-header h5:nth-child(2) {
+			margin-right: 30px;
+			margin-top: -21px;
+			font-size: 16px;
+		}
+
+		div#imageModal .close {
+			position: absolute;
+			right: 0;
+			background: red;
+			width: 35px;
+			height: 35px;
+			border-radius: 50%;
+			color: #fff;
+			top: 10px;
+		}
+
+		button.newbtn {
+			padding: 5px 15px;
+			width: 110px;
+			border: 3px solid #fff !important;
+		}
+
+		#dynamic-table tr td:first-child,
+		#dynamic-table tr td:nth-child(2),
+		#dynamic-table tr td:first-child,
+		table tr td:nth-child(2) {
+			white-space: nowrap;
+		}
+
+		#dynamic-table tr td:first-child {
+			text-align: center
+		}
+
+		.table thead th {
+			vertical-align: inherit;
+		}
+
+		#dynamic-table tr td:nth-child(4) {
+			min-width: 150px;
+		}
+
+		.table th,
+		.table td {
+			text-align: center
+		}
+
+		.card {
+			margin-bottom: 1.5rem;
+			box-shadow: 0 0 7px rgb(0 0 0/ 70%);
+			border-radius: 7px
+		}
+
+		.btn.btn-secondary {
+			box-shadow: 0px 0px 7px rgb(0 0 0/ 10%);
+		}
+
+		btn-xs.btn-primary {
+			box-shadow: 0px 0px 20px rgb(0 0 0/ 30%);
+		}
+
+		input#searchBox {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		li#dynamic-table_first {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		li#dynamic-table_previous {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		a.page-link {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		select#workType {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		select#financialYear {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		.modalbg {
+			background: #405189 !important
+		}
+
+		thead th {
+			color: #076659;
+			background-color: #D0EAEB;
+		}
+
+		.modal-header.modalbg h4 {
+			font-size: 17px;
+		}
+
+		.modal-header {
+			border-bottom: 0px;
+		}
+
+		.thead-default th {
+			color: #0b8675;
+			background-color: #20c997a6;
+		}
+	</style>
+
+	<style>
+		/* Model CSS */
+
+		/* thead th {
+	color: #fff;
+	background-color: #09A9F7;
+}
+ */
+		.modal-dialog {
+			max-width: 75%;
+			/* Adjust as needed */
+			width: auto;
+		}
+
+		.modal-content {
+			max-height: 90vh;
+			/* Adjust as needed */
+			overflow-y: auto;
+			/* Enables scrolling if content overflows */
+		}
+
+		/* .scrollable-table-container {
+	max-height: 400px; 
+	overflow-y: auto; 
+	overflow-x: hidden; 
+} */
+
+		/* .table {
+	width: 100%;
+	
+	table-layout: fixed; 
+} */
+
+		/* Optional: Set specific widths for each column */
+		/* .table th:nth-child(1), .table td:nth-child(1) {
+	width: 50px; 
+}
+
+.table th:nth-child(2), .table td:nth-child(2) {
+	width: 200px; 
+}
+
+.table th:nth-child(3), .table td:nth-child(3) {
+	width: 200px; 
+}
+
+.table th:nth-child(4), .table td:nth-child(4) {
+	width: 100px;
+}
+
+.table th:nth-child(5), .table td:nth-child(5) {
+	width: 120px;
+}
+
+.table th:nth-child(6), .table td:nth-child(6) {
+	width: 150px; 
+}
+
+.table th:nth-child(7), .table td:nth-child(7) {
+	width: 100px; 
+}
+
+.table th:nth-child(8), .table td:nth-child(8) {
+	width: 100px; 
+} */
+		/* .table th, .table td {
+	word-wrap: break-word;
+	word-break: break-all;
+	white-space: normal;
+} */
+
+		/* #dynamic-table tr td:first-child {
+	white-space: nowrap;
+}
+
+#dynamic-table tr td:nth-child(4) {
+	min-width: 200px;
+}
+ */
+		/* Model CSS End */
+		.card {
+			margin-bottom: 1.5rem;
+			box-shadow: 0 0 7px rgb(0 0 0/ 70%);
+			border-radius: 7px
+		}
+
+		.btn.btn-secondary {
+			box-shadow: 0px 0px 7px rgb(0 0 0/ 10%);
+		}
+
+		.btn-xs.btn-primary {
+			box-shadow: 0px 0px 20px rgb(0 0 0/ 30%);
+		}
+
+		input#searchBox {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		li#dynamic-table_first {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		li#dynamic-table_previous {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		a.page-link {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		select#workType {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		select#financialYear {
+			box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+		}
+
+		#dynamic-table tr td:nth-child(3) {
+			text-align: justify
+		}
+	</style>
+
+	<style>
+		#dynamic-w-table {
+			border-collapse: separate !important;
+			border-spacing: 0 5px !important;
+			/* row ke beech vertical gap */
+		}
+	</style>
+
+	<style>
+		#dynamic-w-table th,
+		#dynamic-w-table td {
+			padding: 8px 12px;
+			/* top-bottom, left-right spacing */
+			white-space: nowrap;
+			/* taaki content wrap na ho */
+			text-align: left;
+			/* optional: align left */
+		}
+
+		#dynamic-w-table {
+			table-layout: auto !important;
+			width: 100% !important;
+		}
+
+		#dynamic-w-table td,
+		#dynamic-w-table th {
+			border: 1px solid #ccc;
+		}
+	</style>
+
+	<style>
+		#dynamic-w-table {
+			width: 100% !important;
+			table-layout: auto !important;
+			border-collapse: collapse !important;
+		}
+
+		#dynamic-w-table th,
+		#dynamic-w-table td {
+			padding: 8px 12px;
+			white-space: nowrap;
+			vertical-align: middle;
+			text-align: left;
+		}
+
+		/* Scrollbar ke liye */
+		div.dataTables_wrapper {
+			width: 100%;
+			overflow-x: auto;
+		}
+	</style>
+
+	<style>
+		table.dataTable th,
+		table.dataTable td {
+			white-space: normal !important;
+			word-wrap: break-word;
+			vertical-align: middle;
+			text-align: center;
+			padding: 8px !important;
+		}
+
+		table.dataTable {
+			table-layout: auto !important;
+			width: 100% !important;
+		}
+
+		.column-toggle-container {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+			margin-bottom: 15px;
+			padding: 10px;
+			background-color: #f8f9fa;
+			border-radius: 8px;
+			border: 1px solid #dee2e6;
+			max-height: 250px;
+			overflow-y: auto;
+		}
+
+		.column-toggle-container label {
+			background: #ffffff;
+			border: 1px solid #ced4da;
+			border-radius: 5px;
+			padding: 5px 10px;
+			font-size: 14px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+		}
+
+		.column-toggle-container input[type="checkbox"] {
+			cursor: pointer;
+		}
+
+		#toggleAllColumns {
+			padding: 8px 16px;
+			font-size: 14px;
+			background-color: #007bff;
+			/* Bootstrap blue */
+			color: white;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+			transition: background-color 0.3s ease, transform 0.2s ease;
+		}
+
+		#toggleAllColumns:hover {
+			background-color: #0056b3;
+			transform: translateY(-1px);
+		}
+
+		#toggleAllColumns:active {
+			transform: scale(0.98);
+		}
+	</style>
+
+
+	<style>
+		/* Optional: layout nicely if multiple images */
+		#imageModal .modal-body {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+			justify-content: center;
+		}
+
+		/* Force the same size for all images */
+		#imageModal .modal-body img {
+			width: 600px !important;
+			/* fixed */
+			height: 350px !important;
+			/* fixed */
+			max-width: none !important;
+			max-height: none !important;
+			object-fit: contain;
+			/* no distortion; letterboxed if needed */
+			/* optional: neutral background behind letterboxing */
+			display: block;
+		}
+		
+		
+		
+		.neat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);   /* 👉 3 Columns */
+    grid-gap: 10px 20px;                     /* Row-gap  Column-gap */
+    margin-top: 10px;
+    padding: 10px;
+    background: #f7f7f7;
+    border-radius: 6px;
+}
+
+.neat-grid label {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px;
+}
+
+		
+	</style>
+	
+	<script>
+	
+	setTimeout(function() {
+		$('#accountHeadId1').selectpicker();
+	}, 1000);
+	
+	$('#financialYear1').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select--'
+	});
+	$('#workType').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select--'
+	});
+	$('#workStatusId1').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select--'
+	});
+	$('#implementationAgency').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select--'
+	});
+	$('#workPriorityId').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select--'
+	});
+	$('#financialHeadId').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select--'
+	});
+	$('#vidhanSabhaId').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select--'
+	});
+	
+	
+</script>
+
+<style>
+
+.dropdown-menu.show{width:100%!important}
+.dropdown-menu.show {
+    top: -35px !important;position:relative!important;
+}
+#fyId {
+    position: relative!important;
+}
+#wtId {
+    position: relative!important;
+}
+
+#wsId {
+    position: relative!important;
+}
+
+#iaId {
+    position: relative!important;
+}
+
+#wpId {
+    position: relative!important;
+}
+
+#fyhId {
+    position: relative!important;
+}
+
+#vsId {
+    position: relative!important;
+}
+
+div#bs-select-1 {
+    overflow: auto;
+    height: 200px!important;overflow-x:hidden!important;
+}
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 7px rgb(0 0 0 / 70%);border-radius:7px
+}
+
+.custom-select {
+    background-color: white;
+    color: black;
+    height: 120px;
+    font-size: 14px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* After Selection, Keep the Blue Background */
+.custom-select.has-selection {
+    background-color: blue !important;
+    color: white !important;
+}
+
+select#financialYear1 + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#workType + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#workStatusId1 + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#implementationAgency + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#workPriorityId + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#financialHeadId + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#vidhanSabhaId + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+
+ul.dropdown-menu.inner.show {
+    max-width: 200px!important;overflow:hidden!important
+}
+ul.dropdown-menu.inner.show li {
+    width: 276px !important;overflow:hidden!important
+}
+</style>
+
+
+</head>
+
+<body>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row" data-ng-init="loadWorkForReport();">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-folder-open-o"></i> <span> Manage onGoing
+								Works </span>
+							<!-- 	<li  class="breadcrumb-item"><a href="#dashboard"><span
+				             th:text="${roleName}"></span></a></li> -->
+						</div>
+						<div class="card-body">
+
+
+							<div class="pr">
+								<form name="searchForm" novalidate="novalidate" id="searchForm">
+									<fieldset class="legend-border">
+										<legend class="legend-border">Filters</legend>
+										<div class="row">
+							
+											<!-- Work Name -->
+											<div class="form-group col-sm-4" style="position:relative;">
+													<div class="form-group col-sm-4">
+								
+											</div>
+												<input type="text" class="form-control" placeholder="--Type Work Name--" id="searchBoxVal" name="searchBoxVal" ng-model="workName"
+													ng-change="loadWorkNameSuggestions(workName)" />
+											
+												<ul class="list-group" ng-show="suggestedWorkNames.length > 0">
+													<li class="list-group-item" ng-repeat="name in suggestedWorkNames" ng-click="selectWorkName(name)">
+														{{name}}
+													</li>
+												</ul>
+											</div>
+							
+											<!-- Financial Year -->
+										<div id="fyId" class="form-group col-sm-4" data-ng-init="loadFinancialYears();">
+												<input type="text" class="form-control search-input" ng-model="financialYearss"
+													placeholder="Search..." ng-change="updateFilter()" />
+												<select multiple="multiple" class="form-control " id="financialYear1" data-ng-model="workData.financialYear"
+													 name="financialYear" data-live-search="true">
+													<option value="" disabled="disabled">--Select
+														Financial Year--</option>
+													<option data-ng-repeat="financialYearName in financialYears "
+														value="{{financialYearName.financialYearId}}"
+														data-ng-class="{'selected-option': isSelected(financialYearName.financialYearId)}">
+														{{financialYearName.financialYearName}}</option>
+												</select>
+											</div>
+							
+											<!-- Department -->
+							
+							
+											<!--  	<option
+																					data-ng-repeat="divisionName in divisions | orderBy : 'divisionName'"
+																					value="{{divisionName.divisionId}}">{{divisionName.divisionName}}</option> -->
+							
+							
+											<div class="form-group col-sm-4">
+												<input type="text" class="form-control search-input" ng-model="searchText" placeholder="Search..."
+													ng-change="updateFilter()" disabled="disabled" />
+												<select class="form-control" id="divisionId" data-ng-model="workData.divisionId"
+													data-ng-init="loadDivisionsWork();" name="divisionId" disabled="disabled">
+													<option value="" disabled="disabled">--Select
+														Division--</option>
+													<option value="3">Rewa</option>
+												</select>
+											</div>
+							
+											<!--  			<option
+																					data-ng-repeat="districtName in districts | orderBy : 'districtName'"
+																					value="{{districtName.districtId}}">{{districtName.districtName}}</option> -->
+							
+							
+							
+											<div class="form-group col-sm-4">
+												<input type="text" class="form-control search-input" ng-model="searchText" placeholder="Search..."
+													ng-change="updateFilter()" disabled="disabled" />
+												<select class="form-control" id="districtId" data-ng-model="workData.districtId"
+													data-ng-init="loadDistrictsWork();" disabled="disabled"
+													data-ng-change="reloadJqueryDatatable();" name="districtId">
+													<option value="" disabled="disabled">--Select
+														District--</option>
+													<option value="49">Anuppur</option>
+												</select>
+											</div>
+											<div id="wtId" class="form-group col-sm-4">
+												<input type="text" class="form-control search-input" ng-model="workType" placeholder="Search..."
+													ng-change="updateFilter()" />
+												<select multiple="multiple" class="form-control" id="workType" data-ng-model="workData.workType"
+													data-ng-init="loadWorkTypes();" data-ng-change="" name="workType" data-live-search="true">
+													<option value="" disabled="disabled">--Select Work
+														Type--</option>
+													<option data-ng-repeat="workType in workTypes | filter:workType"
+														value="{{workType.workTypeId}}" data-ng-class="{'selected-option': isSelected(workType.workTypeId)}">{{workType.workTypeNameE}}
+													</option>
+												</select>
+							
+											</div>
+							
+							
+											<!-- Work Status -->
+											<div id="wsId" class="form-group col-sm-4">
+												<input type="text" class="form-control search-input" ng-model="worksStatu" placeholder="Search..."
+													ng-change="updateFilter()" />
+												<select multiple="multiple" class="form-control" id="workStatusId1" data-ng-model="workData.workStatusId"
+													data-ng-init="loadWorkStatus1();" name="workStatusId" data-live-search="true">
+													<option value="" disabled="disabled">--Select Work
+														Status--</option>
+													<option data-ng-repeat="worksStatusName in worksStatus | filter:worksStatu"
+														value="{{worksStatusName.workStatusId}}"  data-ng-class="{'selected-option': isSelected(worksStatusName.workStatusId)}">
+														{{worksStatusName.workStatusNameE}}</option>
+												</select>
+											</div>
+							
+											<!-- Implementation Agency -->
+											<div id="iaId" class="form-group col-sm-4" data-ng-init="loadAgencies()">
+												<input type="text" class="form-control search-input" ng-model="implAgency" placeholder="Search..."
+													ng-change="updateFilter()" />
+												<select multiple="multiple" class="form-control" data-ng-model="workData.implementationAgency"
+													name="implementationAgency" id="implementationAgency" data-live-search="true">
+													<option value="" disabled="disabled">--Select
+														Agency--</option>
+													<option data-ng-repeat="agency in agencies | filter:implAgency"
+														value="{{agency.implementationAgencyId}}" data-ng-class="{'selected-option': isSelected(agency.implementationAgencyId)}">
+														{{agency.implementationAgencyNameE}}</option>
+												</select>
+											</div>
+							
+							
+											<div id="wpId" class="form-group col-sm-4" data-ng-init="loadWorkPriority(); ">
+												<input type="text" class="form-control search-input" ng-model="priorityText" placeholder="Search..."
+													ng-change="updateFilter()" />
+												<select class="form-control" id="workPriorityId" data-ng-model="workData.workPriorityId"
+													name="workPriorityId" data-live-search="true">
+													<option value="" disabled="disabled">--Select Work Priority--
+													</option>
+													<option data-ng-repeat="priority in priorityies | filter:priorityText" value="{{priority.id}}"
+													data-ng-class="{'selected-option': isSelected(priority.id)}">
+														{{priority.workPriorityName}}</option>
+												</select>
+											</div>
+							
+							
+											<div id="fyhId" class="form-group col-sm-4" data-ng-init="loadFinancialHead();">
+												<input type="text" class="form-control search-input" ng-model="financialHeadText"
+													placeholder="Search..." ng-change="updateFilter()" />
+												<select  multiple="multiple" class="form-control" data-ng-model="workData.financialHeadId" name="financialHeadId"
+													id="financialHeadId" required="required" data-live-search="true">
+													<option value="" disabled="disabled">--Select Financial Head--
+													</option>
+													<option data-ng-repeat="financialHead in financialHeads | filter:financialHeadText"
+														value="{{financialHead.id}}" data-ng-class="{'selected-option': isSelected(financialHead.id)}">{{financialHead.financialHeadName}}
+													</option>
+												</select>
+											</div>
+							
+							
+											<div id="vsId" class="form-group col-sm-4" data-ng-init="loadVidhanSabha();">
+												<input type="text" class="form-control search-input" ng-model="vidhanSabhaText"
+													placeholder="Search..." ng-change="updateFilter()" />
+												<select class="form-control" data-ng-model="workData.vidhanSabhaId" name="vidhanSabhaId"
+													id="vidhanSabhaId" required="required" data-live-search="true">
+													<option value="" disabled="disabled">--Select Vidhan Sabha--</option>
+													<option data-ng-repeat="vidhanSabha in vidhanSabhas | filter:vidhanSabhaText"
+														value="{{vidhanSabha.id}}" data-ng-class="{'selected-option': isSelected(vidhanSabha.id)}">{{vidhanSabha.vidhanSabhaName}}
+													</option>
+												</select>
+											</div>
+							
+										</div>
+									</fieldset>
+								</form>
+							</div>
+
+							<div class="form-group col-sm-12 text-right mt-2">
+								<button type="button" class="btn btn-primary"
+									onclick="window.reloadJqueryDatatables();">Search</button>
+								<button type="button" class="btn btn-secondary" onclick="resetFilters();">Reset</button>
+							</div>
+
+
+							<div class="checkbox-container">
+								<div
+									style="background-color: #f1f1f1; padding: 10px 15px; border: 1px solid #ccc; border-radius: 5px;">
+									<label class="m-0"><strong>Filter Parameters</strong></label>
+								</div>
+							</div>
+
+							<button id="toggleAllColumns">Select All</button>
+
+							<br /> <br />
+							<div class="checkbox-container column-toggle-container neat-grid">
+
+    <label><input type="checkbox" class="col-toggle" data-column="0" checked="checked" /> S.No.</label>
+    <label><input type="checkbox" class="col-toggle" data-column="1" checked="checked" /> Work Unique ID</label>
+    <label><input type="checkbox" class="col-toggle" data-column="2" checked="checked" /> Work Name</label>
+    <label><input type="checkbox" class="col-toggle" data-column="3" checked="checked" /> Work Type</label>
+
+    <label><input type="checkbox" class="col-toggle" data-column="4" checked="checked" /> FY of Sanction</label>
+    <label><input type="checkbox" class="col-toggle" data-column="5" checked="checked" /> District</label>
+    <label><input type="checkbox" class="col-toggle" data-column="6" checked="checked" /> Executive Agency</label>
+    <label><input type="checkbox" class="col-toggle" data-column="7" checked="checked" /> Division Name</label>
+
+    <label><input type="checkbox" class="col-toggle" data-column="8" checked="checked" /> Year of Sanction</label>
+    <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Date Of Sanction</label>
+    <label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> Sanction Amount</label>
+    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> Work Order</label>
+
+    <label><input type="checkbox" class="col-toggle" data-column="12" checked="checked" /> Timeline (Months)</label>
+    <label><input type="checkbox" class="col-toggle" data-column="13" checked="checked" /> Total Expenditure</label>
+    <label><input type="checkbox" class="col-toggle" data-column="14" checked="checked" /> Completion Level</label>
+    <label><input type="checkbox" class="col-toggle" data-column="15" checked="checked" /> Contractor Name</label>
+
+    <label><input type="checkbox" class="col-toggle" data-column="16" checked="checked" /> SOR Year</label>
+    <label><input type="checkbox" class="col-toggle" data-column="17" checked="checked" /> Tender %</label>
+    <label><input type="checkbox" class="col-toggle" data-column="18" checked="checked" /> Current Status</label>
+    <label><input type="checkbox" class="col-toggle" data-column="19" checked="checked" /> Work Priority</label>
+
+    <label><input type="checkbox" class="col-toggle" data-column="20" checked="checked" /> Financing Agency</label>
+    <label><input type="checkbox" class="col-toggle" data-column="21" checked="checked" /> Vidhan Sabha</label>
+    <label><input type="checkbox" class="col-toggle" data-column="22" checked="checked" /> DM Remarks</label>
+    <label><input type="checkbox" class="col-toggle" data-column="23" checked="checked" /> Action</label>
+
+
+
+
+
+</div>
+<div class="slide-dropdown-wrapper" style="position: relative; width: 260px; float:right;">
+
+    <button id="dropdownBtn" style="
+        width: 100%;
+        padding: 7px;
+        border: 1px solid #888;
+        background: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: left;">
+        Add Column ▼
+    </button>
+
+    <div id="dropdownContainer" style="display:none; position:absolute; width:100%; z-index:999;">
+        <select id="add-column-list" multiple="multiple" size="7" style="
+            width:100%;
+            padding:6px;
+            border:1px solid #aaa;
+            border-radius:4px;
+            background:white;">
+            <option value="">-- Select Column to Add --</option>
+        </select>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+							<table id="dynamic-w-table" style="width: 100%">
+								<thead>
+									<!-- <tr>
+                <th>S.No</th>
+                <th>Work ID</th>
+                <th>Work Name</th>
+                <th>Work Type</th>
+                <th>Financial Year</th>
+                More headers as per above
+            </tr> -->
+								</thead>
+								<tbody>
+									<!-- Data will be filled by Ajax -->
+								</tbody>
+							</table>
+
+
+
+
+
+							<script>
+								/*<![CDATA[*/
+
+								function getBaseUrl() {
+									var path = window.location.pathname;
+									var firstPart = path.split('/')[1];
+
+									// If context path is 'anuppur', return it with slash
+									if (firstPart === 'anuppur') {
+										return '/' + firstPart;
+									}
+
+									// Else no context path (like in LIVE), return empty
+									return '';
+								}
+
+								var table;
+
+								$(document).ready(function () {
+
+
+									const FILTER_KEYS = [
+										'searchBoxVal',
+										'financialYear',
+										'department',
+										'workType',
+										'workStatusId',
+										'implementationAgency',
+										'workPriorityId',
+										'financialHeadId',
+										'vidhanSabhaId'
+									];
+
+									// 🟢 Restore saved filters
+									const savedFilters = JSON.parse(localStorage.getItem('work_filters') || '{}');
+
+									// 1. Populate HTML inputs
+									FILTER_KEYS.forEach(key => {
+										$('#' + key).val(savedFilters[key] || '');
+									});
+
+									// 2. Apply to Angular scope
+									const scope = angular.element($('#searchForm')).scope();
+									if (scope) {
+										scope.$applyAsync(() => {
+											scope.workName = savedFilters.searchBoxVal || '';
+											scope.workData.financialYear = savedFilters.financialYear || '';
+											scope.workData.department = savedFilters.department || '';
+											scope.workData.workType = savedFilters.workType || '';
+											scope.workData.workStatusId = savedFilters.workStatusId || '';
+											scope.workData.implementationAgency = savedFilters.implementationAgency || '';
+											scope.workData.workPriorityId = savedFilters.workPriorityId || '';
+											scope.workData.financialHeadId = savedFilters.financialHeadId || '';
+											scope.workData.vidhanSabhaId = savedFilters.vidhanSabhaId || '';
+										});
+									}
+
+									// 3. Save filters on any change
+									FILTER_KEYS.forEach(key => {
+										$('#' + key).on('change input', function () {
+											const filterData = {};
+											FILTER_KEYS.forEach(k => {
+												filterData[k] = $('#' + k).val() || '';
+											});
+											localStorage.setItem('work_filters', JSON.stringify(filterData));
+										});
+									});
+
+
+
+
+									table = $('#dynamic-w-table').DataTable({
+
+										processing: true,
+										serverSide: true,
+
+										ajax: {
+											url: getBaseUrl() + '/systemAdmin/fetchWorksList',
+											type: 'GET',
+											data: function (d) {
+
+
+
+												const f = JSON.parse(localStorage.getItem('work_filters') || '{}');
+												d.searchBoxVal = f.searchBoxVal || '';
+												d.financialYear = f.financialYear || '';
+												d.department = f.department || '';
+												d.workType = f.workType || '';
+												d.workStatusId = f.workStatusId || '';
+												d.implementationAgency = f.implementationAgency || '';
+												d.workPriorityId = f.workPriorityId || '';
+												d.financialHeadId = f.financialHeadId || '';
+												d.vidhanSabhaId = f.vidhanSabhaId || '';
+
+
+
+												console.log("Sending filters to backend: ", {
+													searchBoxVal: d.searchBoxVal,
+													financialYear: d.financialYear,
+													department: d.department,
+													workType: d.workType,
+													workStatusId: d.workStatusId,
+													implementationAgency: d.implementationAgency,
+													workPriorityId: d.workPriorityId,
+													financialHeadId: d.financialHeadId,
+													vidhanSabhaId: d.vidhanSabhaId
+													
+												});
+
+
+												d.iDisplayLength = d.length; // ✅ Already sent by DataTables
+												d.iDisplayStart = d.start;   // ✅ Already sent
+												d.sort = 'position';         // ✅ Your custom key if needed
+											}
+
+										},
+
+
+
+
+										scrollX: true,
+										autoWidth: false,
+										destroy: true,
+										fixedHeader: true,
+										responsive: true,
+										dom: 'Blfrtip',
+										pagingType: 'full_numbers',
+										bStateSave: false,
+										iDisplayLength: 10,
+										iDisplayStart: 0,
+										aaSorting: [],
+
+										lengthMenu: [[10, 25, 50, 100000], [10, 25, 50, "All"]],
+
+
+										columns: [
+											{
+												data: null,
+												title: "S.No.",
+												orderable: false,
+												render: function (data, type, row, meta) {
+													return meta.row + meta.settings._iDisplayStart + 1;
+												}
+											},
+											{data: "workNo", title: "Work Unique ID", defaultContent: "-"},
+											{data: "workName", title: "Work Name", defaultContent: "-"},
+											{data: "workType", title: "Work Type", defaultContent: "-"},
+											{data: "financialYearName", title: "FY of Sanction", defaultContent: "-"},
+											{data: "districtName", title: "District", defaultContent: "-"},
+											{data: "implementationAgencyName", title: "Executive Agency", defaultContent: "-"},
+											{data: "divisionName", title: "Division Name", defaultContent: "-"},
+											{data: "yearOfAdministrativeApproval", title: "Year of Administrative Sanction", defaultContent: "-"},
+											{data: "dateOfAdministrativeApproval", title: "Date of Administrative Sanction", defaultContent: "-"},
+											{data: "amountOfAdministrativeApproval", title: "Amount of Administrative Sanction (Rs. in Lakh)", defaultContent: "-"},
+											{data: "workOrderDate", title: "Work Order", defaultContent: "-"},
+											{data: "timeLineInMonths", title: "Time Line in Months", defaultContent: "-"},
+											{data: "totalExpeditureTillDate", title: "Total Expenditure Till Date", defaultContent: "-"},
+											{data: "levelOfCompletion", title: "Level of Completion", defaultContent: "-"},
+											{data: "contractorName", title: "Contractor Name", defaultContent: "-"},
+											{data: "sor", title: "SOR Year", defaultContent: "-"},
+											{data: "tenderParcentage", title: "Tender Percentage", defaultContent: "-"},
+											{data: "workStatusName", title: "Current Physical Status", defaultContent: "-"},
+											{data: "workPriority", title: "Work Priority", defaultContent: "-"},
+											{data: "financialHeadName", title: "Financing Agency", defaultContent: "-"},
+											{data: "vidhanSabhaName", title: "Vidhan Sabha", defaultContent: "-"},
+											{
+												data: null,               // tell DataTables we will build the value ourselves
+												title: 'DM  Remarks',
+												defaultContent: '-',
+												render: function (data, type, row) {
+													// get the three pieces (use empty string if any is missing)
+													const dmRemark = row.DmRemakrs || '';
+													const dmDate = row.dmAproveRejectDate || '';
+													return `
+				        ${dmRemark || '-'}
+				        <br><small><b>DM&nbsp;Date:</b> ${dmDate || '-'}</small>
+				      
+				      `;
+												}
+											},
+
+
+
+											{
+												data: null,
+												title: "Action",
+												defaultContent: "-",
+												className: "action-col"
+											}
+
+
+										],
+
+
+
+										drawCallback: function (settings) {
+											const api = this.api();
+
+											api.rows({page: 'current'}).every(function (rowIdx) {
+												const data = this.data();
+												const $row = $(this.node());
+												const $actionCell = $row.find('td.action-col');
+
+												$actionCell.html(""); // Clear previous
+
+												// Progress Documents
+												if (data.progressDocuments && data.progressDocuments.length > 0) {
+													const html = `
+                            <a class="btn btn-xs btn-warning m-1 btn-edit" title="View Images"
+                               onclick="openProgressImages(${rowIdx}, '${data.workNo}', '${data.workSubTypeName}')">
+                               <i class="fa fa-eye"></i>
+                            </a>`;
+													$actionCell.append(html);
+
+													window.progressDocsStore = window.progressDocsStore || {};
+													window.progressDocsStore[rowIdx] = {
+														docs: data.progressDocuments,
+														workNo: data.workNo,
+														workSubTypeName: data.workSubTypeName
+													};
+												} else {
+													$actionCell.append('<span style="color:gray">No Document</span>');
+												}
+
+												// Role-based Edit/View buttons
+												if (data.role === 'ROLE_SYSTEM_ADMIN' || data.role === 'ROLE_DM' || data.role === 'ROLE_CEO') {
+													$actionCell.append(
+														`<a class="btn btn-xs btn-primary m-1 btn-edit" title="View" href="#viewWork/${data.id}">
+                                <i class="fa fa-pencil"></i>
+                             </a>`
+													);
+												}
+
+												if (data.role === 'ROLE_DEPARTMENT') {
+													$actionCell.append(
+														`<a class="btn btn-xs btn-primary m-1 btn-edit" title="Edit" href="#editWork/${data.id}">
+                                <i class="fa fa-pencil"></i>
+                             </a>`
+													);
+												}
+
+												if (data.role === 'ROLE_SYSTEM_ADMIN') {
+													$actionCell.append(
+														`<a class="btn btn-xs btn-danger m-1 delete-btn" 
+                                title="Delete" 
+                                data-id="${data.id}"   <!-- yaha attribute set kiya -->
+                                
+                                <i class="fa fa-trash-o"></i>
+                             </a>`
+													);
+												}
+
+											});
+										}
+
+										,
+
+
+										buttons: [
+											{
+												extend: 'excelHtml5',
+												text: 'Export to Excel',
+												filename: 'Works',
+												title: 'Work Report', // ❌ PDF ke andar title nahi dikhega
+												exportOptions: {
+													columns: function (idx) {
+														return $('.col-toggle[data-column="' + idx + '"]').is(':checked');
+													}
+												}
+											},
+
+											/*   {
+												  text: '<span class="fa fa-file-excel-o"></span> Export Full Excel',
+												  action: function (e, dt, node, config) {
+													  window.location.href = 'manageOngoingWorks/downloadAllWorksExcel';
+												  }
+											  }, */
+
+
+
+
+											{
+												extend: 'pdfHtml5',
+												text: 'Export to PDF',
+												title: '', // ❌ PDF ke andar title nahi dikhega
+												orientation: 'landscape',    // Aadha page ghooma ke wide banaya
+												pageSize: 'A3',              // A3 size for wide data
+												filename: 'Works',                    // Remove default title
+												customize: function (doc) {
+
+
+													// 👉 HEADER
+													doc.content.splice(0, 0, {
+														text: [
+															{text: 'Collectorate Office, District Anuppur\n', fontSize: 14, bold: true, alignment: 'center'},
+															{text: 'Works Status Report\n\n', fontSize: 11, alignment: 'center'}
+														]
+													});
+
+													// 👉 FOOTER
+													var now = new Date();
+													var dateStr = now.toLocaleDateString('en-IN');
+
+													doc.footer = function (currentPage, pageCount) {
+														return {
+															columns: [
+																{text: 'Date: ' + dateStr, alignment: 'left', margin: [20, 0, 0, 0]},
+																{text: 'Disclaimer: Generated by Works Management System - District Anuppur', alignment: 'center'},
+																{text: 'Page ' + currentPage + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0]}
+															],
+
+															fontSize: 7
+														};
+													};
+
+													// 👉 Font & table adjustment
+													doc.defaultStyle.fontSize = 6;
+													doc.styles.tableHeader.fontSize = 7;
+
+													// 👉 Optional table line style
+													var objLayout = {};
+													objLayout['hLineWidth'] = function () {return 0.5;};
+													objLayout['vLineWidth'] = function () {return 0.5;};
+													objLayout['hLineColor'] = function () {return '#aaa';};
+													objLayout['vLineColor'] = function () {return '#aaa';};
+													objLayout['paddingLeft'] = function () {return 4;};
+													objLayout['paddingRight'] = function () {return 4;};
+													doc.content[1].layout = objLayout;
+												},
+												exportOptions: {
+													columns: function (idx, data, node) {
+														return $('.col-toggle[data-column="' + idx + '"]').is(':checked');
+													}
+												}
+											}
+
+											/* {
+												text: '<span class="fa fa-file-pdf-o"></span> Export Full PDF',
+												action: function (e, dt, node, config) {
+													window.location.href = 'manageOngoingWorks/downloadAllWorksPdf';
+												}
+											} */
+
+										]
+									});
+									// ✅ Forcefully remove Search box
+									$('#dynamic-w-table_filter').remove();
+
+
+									//         $('.col-toggle').on('change', function () {
+									//             var column = table.column($(this).data('column'));
+									//             column.visible($(this).is(':checked'));
+									//         });
+								});
+
+
+								window.reloadJqueryDatatables = function () {
+
+									//	alert("call")
+									if (table) {
+										setTimeout(function () {
+											table.ajax.reload(null, false);
+										}, 100); // Delay to let Angular update model
+									}
+								};
+
+
+
+								function downloadFileWSDocumnt(documentId, workSubStatusNameE) {
+									// Build the image URL
+									let url = getBaseUrl() + '/downloadDocumentWSPro/' + documentId;
+
+									// Set the image URL in the modal
+									document.querySelector('#exampleModal img').src = url;
+
+									// Open the modal
+									$('#exampleModal').modal('show');
+
+									return false;
+								}
+
+
+
+								function openProgressImages(index, workNo, subTypeName) {
+									const data = window.progressDocsStore[index];
+									console.log("Showing docs for:", workNo, subTypeName);
+									if (data && data.docs) {
+										angular.forEach(data.docs, function (doc, idx) {
+											console.log("Doc #" + (idx + 1));
+											console.log("Path: " + doc.filePath);   // agar filePath hai
+											console.log("Date: " + doc.createdDate); // agar createdDate hai
+										});
+									}
+									// Your modal or viewer logic here...
+								}
+
+
+								function handleLogout() {
+									//	alert("call")
+									// ✅ Remove filters
+									localStorage.removeItem('work_filters');
+
+									// ✅ Remove column visibility settings
+									Object.keys(localStorage).forEach(function (key) {
+										if (key.startsWith('col_')) {
+											localStorage.removeItem(key);
+										}
+									});
+
+									// ✅ Clear DataTable saved state (if using stateSave)
+									if ($.fn.dataTable && $('#dynamic-w-table').length) {
+										$('#dynamic-w-table').DataTable().state.clear();
+									}
+
+									// ✅ Finally, logout
+									//  document.forms['logoutForm'].submit();
+								}
+
+								//filter stores
+								// 🟩 On Edit Button Click – Save current filters to localStorage
+								$(document).on('click', '.btn-edit', function () {
+									const scope = angular.element($('#searchForm')).scope();
+									const filters = {
+										searchBoxVal: $('#searchBoxVal').val() || scope.workName || '',
+										financialYear: $('#financialYear').val() || scope.workData.financialYear || '',
+										department: $('#department').val() || scope.workData.department || '',
+										workSubTypeId: $('#workType').val() || scope.workData.workType || '',
+										workStatusId: $('#workStatusId').val() || scope.workData.workStatusId || '',
+										implementationAgency: $('#implementationAgency').val() || scope.workData.implementationAgency || ''
+									};
+									localStorage.setItem('work_filters', JSON.stringify(filters));
+
+									const id = $(this).data('id');
+									//   window.location.href = '/anuppur/work/edit/' + id;
+								});
+
+
+								/*]]>*/
+
+
+
+							</script>
+
+
+							<script>
+								function resetFilters() {
+									// Reset form
+									document.getElementById("searchForm").reset();
+
+									// Manually clear angular-bound model fields (if needed)
+									$('#searchBoxVal').val('');
+									$('#financialYear').val('');
+									$('#department').val('');
+									$('#workStatusId').val('');
+									$('#implementationAgency').val('');
+									$('#workType').val('');
+									$('#workPriorityId').val('');
+									$('#financialHeadId').val('');
+									$('#vidhanSabhaId').val('');
+									//   $('#divisionId').val('');
+									//    $('#districtId').val('');
+
+
+									// Reload the table
+									window.reloadJqueryDatatables();
+
+									// Reset AngularJS scope
+									const scope = angular.element($('#searchForm')).scope();
+									if (scope) {
+										scope.$applyAsync(function () {
+											scope.workName = '';
+											scope.workData.financialYear = '';
+											scope.workData.department = '';
+											scope.workData.workType = '';
+											scope.workData.workStatusId = '';
+											scope.workData.implementationAgency = '';
+											scope.workData.workPriorityId = '';
+											scope.workData.financialHeadId = '';
+											scope.workData.vidhanSabhaId = '';
+											
+										});
+									}
+
+
+
+									localStorage.removeItem('work_filters');
+
+
+
+								}
+
+
+
+
+								$(document).ready(function () {
+
+								    const defaultSelect = [0, 1, 2, 6, 13, 14, 18, 22];
+
+								    // -------------------------
+								    // 1. Load saved columns from sessionStorage
+								    // -------------------------
+								    let savedCols = sessionStorage.getItem("selectedColumns");
+								    savedCols = savedCols ? JSON.parse(savedCols) : null;
+
+								    $('.col-toggle').each(function () {
+								        const colIdx = $(this).data('column');
+
+								        // If session has saved state → apply it
+								        if (savedCols) {
+								            const isVisible = savedCols.includes(colIdx);
+								            $(this).prop('checked', isVisible);
+								            table.column(colIdx).visible(isVisible);
+								        }
+								        // Else first time → apply default selections
+								        else {
+								            if (defaultSelect.includes(colIdx)) {
+								                $(this).prop('checked', true);
+								                table.column(colIdx).visible(true);
+								            } else {
+								                $(this).prop('checked', false);
+								                table.column(colIdx).visible(false);
+								            }
+								        }
+								    });
+
+								    table.columns.adjust().draw();
+
+
+								    // -------------------------
+								    // 2. User manual toggle
+								    // -------------------------
+								    $('.col-toggle').on('change', function () {
+								        const colIdx = $(this).data('column');
+								        const isVisible = $(this).is(':checked');
+
+								        table.column(colIdx).visible(isVisible);
+								        table.columns.adjust().draw();
+
+								        saveStateToSession();
+								    });
+
+
+								    // -------------------------
+								    // 3. Toggle All Button
+								    // -------------------------
+								    $('#toggleAllColumns').on('click', function () {
+								        let allOn = $(this).text() === "Select All";
+
+								        $('.col-toggle').each(function () {
+								            const colIdx = $(this).data('column');
+								            $(this).prop('checked', allOn);
+								            table.column(colIdx).visible(allOn);
+								        });
+
+								        $(this).text(allOn ? "Deselect All" : "Select All");
+								        table.columns.adjust().draw();
+
+								        saveStateToSession();
+								    });
+
+
+								    // -------------------------
+								    // 4. Save current state to sessionStorage
+								    // -------------------------
+								    function saveStateToSession() {
+								        let selectedArr = [];
+
+								        $('.col-toggle').each(function () {
+								            const colIdx = $(this).data('column');
+								            if ($(this).is(':checked')) {
+								                selectedArr.push(colIdx);
+								            }
+								        });
+
+								        sessionStorage.setItem("selectedColumns", JSON.stringify(selectedArr));
+								    }
+
+								});
+
+
+
+
+
+
+
+
+
+$(document).ready(function(){
+
+    // Initially hide divs corresponding to unchecked checkboxes
+    $('.col-toggle').each(function(){
+        let colIndex = $(this).data('column');
+        if(!$(this).is(':checked')){
+            $('.col-toggle[data-column="'+colIndex+'"]').parent().hide();
+        }
+    });
+
+    // Refresh the Add Column dropdown with unchecked columns
+    function refreshAddColumnList(){
+        let addList = $('#add-column-list');
+        addList.empty();
+        addList.append('<option value="">-- Select Column to Add --</option>');
+        $('.col-toggle').each(function(){
+            if(!$(this).is(':checked')){
+                let colIndex = $(this).data('column');
+                let colName = $(this).parent().text().trim();
+                addList.append('<option value="'+colIndex+'">'+colName+'</option>');
+            }
+        });
+    }
+
+    refreshAddColumnList();
+
+    // Add column from dropdown
+    // Add column from MULTI SELECT dropdown
+$('#add-column-list').change(function(){
+
+    let selectedValues = $(this).val();  // array milegi
+
+    if(!selectedValues || selectedValues.length === 0) return;
+
+    selectedValues.forEach(function(colIndex){
+        if(colIndex !== ""){
+            $('.col-toggle[data-column="'+colIndex+'"]').parent().show();
+        }
+    });
+
+    // Refresh dropdown list again so added ones disappear
+    refreshAddColumnList();
+
+    // Reset dropdown selection
+    $(this).val([]);
+});
+
+
+    // Optional: If you want checkboxes to still toggle div manually
+    $('.col-toggle').change(function(){
+        let colIndex = $(this).data('column');
+        if($(this).is(':checked')){
+            $('.col-toggle[data-column="'+colIndex+'"]').parent().show();
+        } else {
+            $('.col-toggle[data-column="'+colIndex+'"]').parent().hide();
+        }
+        refreshAddColumnList();
+    });
+
+});
+
+
+$(document).ready(function(){
+
+    // Your existing code runs as-is
+    // ----------------------------------------------
+
+    // OPEN animated dropdown
+    $("#dropdownBtn").click(function (e) {
+        e.stopPropagation();
+        $("#dropdownContainer").slideToggle(150); 
+    });
+
+    // CLOSE dropdown when clicking outside
+    $(document).click(function () {
+        $("#dropdownContainer").slideUp(150);
+    });
+
+    // Stop closing when clicking inside dropdown
+    $("#dropdownContainer").click(function (e) {
+        e.stopPropagation();
+    });
+
+});
+
+
+
+							</script>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="imageModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">
+						Work No. :- {{workNo}} <br /> Progress Level :-
+						{{workSubTypeName}}
+
+					</h5>
+					<h5>Date Time:- {{date}}</h5>
+
+				</div>
+
+				<div class="modal-body text-center">
+
+					<h5 id="workNoHeading" class="mb-3" style="color: #333;"></h5>
+					<img id="modalImage" src="" class="img-fluid" style="max-height: 500px;" />
+				</div>
+
+
+
+
+
+
+
+				<!-- Counter Above Footer -->
+				<div style="text-align: center; padding: 10px; background: #f5f5f5;">
+					<p id="imageCounter" style="margin: 0; font-size: 14px; font-weight: 500; color: #333;">
+						1/10</p>
+				</div>
+
+				<div class="modal-footer"
+					style="display: flex; justify-content: center; gap: 16px; padding: 24px; background: #f5f5f5;">
+					<button class="newbtn btn btn-secondary buttons-pdf buttons-html5"
+						style="color: #0056b3; border: #0056b3; font-size: 20px;"
+						onclick="showPrevImage()">Previous</button>
+					<button class="newbtn btn btn-secondary buttons-pdf buttons-html5"
+						style="color: #0056b3; border: #0056b3; font-size: 20px;"
+						onclick="showNextImage()">Next</button>
+				</div>
+
+
+
+
+
+			</div>
+		</div>
+	</div>
+
+
+	<script type="text/javascript">
+		$("document").ready(function () {
+			$('#myModal').modal('show');
+		});
+
+		function openImageModal(imageUrl, workNo) {
+			document.getElementById('modalImage').src = imageUrl;
+			document.getElementById('workNoHeading').innerText = "Work No: " + workNo;
+			$('#imageModal').modal('show');
+		}
+
+	</script>
+	<script>
+		/*<![CDATA[*/
+
+		window.currentImageIndex = 0;
+		window.currentImageList = [];
+
+		window.openProgressImages = function (rowIndex) {
+			const data = window.progressDocsStore[rowIndex]; // <-- Yeh line important hai
+
+			if (!data || !data.docs) {
+				alert("No document data found.");
+				return;
+			}
+
+			window.currentImageList = data.docs.filter(doc => doc.workStatusId === 10);
+			window.currentImageIndex = 0;
+
+			// AngularJS scope update
+			const scope = angular.element(document.getElementById('imageModal')).scope();
+			scope.$apply(function () {
+				scope.workNo = data.workNo;
+				scope.workSubTypeName = data.workSubTypeName;
+
+				if (data && data.docs) {
+					angular.forEach(data.docs, function (doc, idx) {
+						scope.date = doc.createdDate; // agar createdDate hai
+					});
+				}
+			});
+
+			if (window.currentImageList.length > 0) {
+				window.currentImageIndex = 0;
+				window.showImageAt(window.currentImageIndex);
+				$('#imageModal').modal('show');
+			} else {
+				alert("No image found.");
+			}
+		};
+
+		window.showImageAt = function (index) {
+			if (index >= 0 && index < window.currentImageList.length) {
+				const doc = window.currentImageList[index];
+				const url = getBaseUrl() + '/downloadDocumentWSPro/' + doc.documentId;
+				document.getElementById('modalImage').src = url;
+
+
+				// AngularJS scope update for createdDate
+				const scope = angular.element(document.getElementById('imageModal')).scope();
+				scope.$apply(function () {
+					scope.date = doc.createdDate; // yaha set hoga har image ke hisab se
+				});
+
+				// Optional: show counter (like 2/10)
+				document.getElementById('imageCounter').innerText =
+					(index + 1) + '/' + window.currentImageList.length;
+
+
+			}
+		};
+
+		window.showNextImage = function () {
+			if (window.currentImageIndex < window.currentImageList.length - 1) {
+				window.currentImageIndex++;
+				window.showImageAt(window.currentImageIndex);
+			}
+		};
+
+		window.showPrevImage = function () {
+			if (window.currentImageIndex > 0) {
+				window.currentImageIndex--;
+				window.showImageAt(window.currentImageIndex);
+			}
+		};
+
+		//Delete Work
+		$('#dynamic-w-table').on("click", ".delete-btn", function (e) {
+			//alert("call")
+			e.preventDefault();
+
+			var workId = $(this).data("id");
+			if (confirm("Are you sure to delete this entry?")) {
+				$.ajax({
+					url: getBaseUrl() + '/systemAdmin/deleteWork/' + workId,
+					type: 'GET',
+					data: {workId: workId},
+					success: function (res) {
+						console.log("Work deleted", res);
+						// ✅ reload DataTable using the same variable
+						table.ajax.reload();
+					},
+					error: function (err) {
+						console.error("Delete failed", err);
+					}
+				});
+			}
+		});
+
+
+		/*]]>*/
+	</script>
+
+</body>
+
+</html>

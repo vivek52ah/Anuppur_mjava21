@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+<script th:src="@{/js/datepicker/jquery.ui.datepicker.js}"></script>
+<script th:src="@{/js/datepicker/jquery-ui.min.js}"></script>
+
+<link th:href="@{/css/datepicker/jquery.ui.datepicker.css}"
+	rel="stylesheet" />
+<link th:href="@{/css/datepicker/jquery-ui.min.css}" rel="stylesheet" />
+
+<style>
+.ui-datepicker {
+	z-index: 99 !important;
+}
+</style>
+</head>
+<script type="text/javascript">
+	window.scrollTo(0, 0);
+</script>
+
+<script type="text/javascript">
+	$(function() {
+
+		$('#datetimepicker1').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			format : 'DD/MM/YYYY'
+		//useCurrent : false
+		});
+
+		/* $("#dateOfRegistration").keypress(function(event) {
+			event.preventDefault();
+		}); */
+
+		$('#datetimepicker2').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+
+		$('#datetimepickerWorkOrder').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+		$('#datetimepickerEst').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+
+		$('#datetimepicker3').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+
+		$('#datetimepicker4').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+
+		$('#datetimepicker5').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+		$('#datetimepicker6').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+		$('#datetimepicker7').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+		$('#datetimepickerSec').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+		$('#datetimepickerFin').datetimepicker({
+			//viewMode : 'days',
+			maxDate : moment(),
+			//useCurrent: false,
+			// format : 'DD/MM/YYYY',
+			format : 'DD/MM/YYYY'
+		// useCurrent : false
+		});
+		$("#datetimepicker2").on("change.datetimepicker", function(e) {
+			$('#datetimepicker3').datetimepicker('minDate', e.date);
+		});
+		$("#datetimepicker3").on("change.datetimepicker", function(e) {
+			$('#datetimepicker2').datetimepicker('maxDate', e.date);
+		});
+	});
+</script>
+<div>
+	<!-- <ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item active"><span>Add MLA
+				Recommended Works</span></li>
+
+		Breadcrumb Menu
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol> -->
+
+	<div class="container-fluid" data-ng-init="FileData=[];">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<!-- <div class="card-header top-header">
+							<i class="fa fa-wpforms"></i> <span>View MLA Recommended
+								Works</span>
+						</div> -->
+						<div class="col-md-12">
+							<div data-ng-if="responseObject.errorMessage != null"
+								class="text-danger">
+								<strong>Error!</strong>
+								<p>{{responseObject.errorMessage}}</p>
+							</div>
+						</div>
+
+						<form
+							data-ng-submit="addNewWorkData(workForm.$valid, tsDocument, asDocument,estDocument,workOrderDocument,FileData)"
+							name="workForm" id="workForm" novalidate="novalidate">
+
+							<!-- <div class="card-body">
+								<div class="row">
+									<div class="col-sm-4">
+										<label><span>Name</span></label>
+										<p class="mb-1">
+											<span>{{workData.name}}</span>
+										</p>
+									</div>
+									<div class="col-sm-4">
+										<label><span>Mobile No</span></label>
+										<p class="mb-1">
+											<span>{{workData.mobileNo}}</span>
+										</p>
+									</div>
+									<div class="col-sm-4">
+										<label><span>Email</span></label>
+										<p class="mb-1">
+											<span>{{workData.emailId}}</span>
+										</p>
+									</div>
+
+
+								</div>
+								/.row
+
+								2nd Row start
+
+
+
+
+							</div>
+							3rd Row Started
+							<div class="card-header">
+								<div class="row">
+									<div class="col-sm-6">
+										<span> Address</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="card-body">
+								<div class="row">
+
+									<div class="col-sm-3">
+										<label><span>Address Line 1</span> </label>
+										<p class="mb-1">
+											<span>{{workData.addressLine1}}</span>
+										</p>
+									</div>
+
+
+									<div class="col-sm-3">
+										<label><span>Address Line 2</span></label>
+										<p class="mb-1">
+											<span>{{workData.addressLine2}}</span>
+										</p>
+									</div>
+
+									<div class="col-sm-3" data-ng-if="workData.pinCode">
+										<label><span>Pin Code</span></label>
+										<p class="mb-1">
+											<span>{{workData.pinCode}}</span>
+										</p>
+									</div>
+
+
+
+									<div class="form-group col-sm-3">
+									<label><span>Work Order Document</span></label>
+									<p class="help-block"
+										data-ng-show="workData.workOrderDocumentId==null">
+										Not Available
+									</p>
+									<p class="help-block"
+										data-ng-show="workData.workOrderDocumentId!=null">
+										<a style="cursor: pointer;"
+											data-ng-click="downloadWorkDocument(workData.workOrderDocumentId)">
+											<img th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+											<span>{{workData.workOrderDocumentName}}</span>
+										</a>
+										<br/><span>Download saved document</span>
+									</p>
+
+								</div>
+								</div>
+							</div>
+							<div class="card-header">
+								<span>Work Location</span>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="form-group col-sm-3">
+										<label><span>District </span></label>
+										<p>
+											<span>{{workData.districtName}}</span>
+										</p>
+									</div>
+
+									<div class="form-group col-sm-3"
+										data-ng-if="workData.blockName">
+										<label><span>Block</span></label>
+										<p>
+											<span>{{workData.blockName}}</span>
+										</p>
+									</div>
+
+
+									<div class="form-group col-sm-3" data-ng-if="workData.gpName">
+										<label><span>Gram Panchayat </span></label>
+										<p>
+											<span>{{workData.gpName}}</span>
+										</p>
+									</div>
+
+									<div class="form-group col-sm-3"
+										data-ng-if="workData.villageName">
+										<label><span>Village </span></label>
+										<p>
+											<span>{{workData.villageName}}</span>
+										</p>
+									</div>
+									<div class="form-group col-sm-3" data-ng-if="workData.ulbName">
+										<label><span>ULB</span></label>
+										<p>
+											<span>{{workData.ulbName}}</span>
+										</p>
+									</div>
+
+									<div class="form-group col-sm-3" data-ng-if="workData.wardName">
+										<label><span>Ward </span></label>
+										<p>
+											<span>{{workData.wardName}}</span>
+										</p>
+									</div>
+
+								</div>
+
+								<div class="row">
+									<div class="form-group col-sm-3">
+									<label><span>Parliamentary Constituency</span></label>
+									<p>
+										<span>{{workData.pcName}}</span>
+									</p>
+								</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Legislative Constituency</span></label>
+										<p>
+											<span>{{workData.lcName}}</span>
+										</p>
+									</div>
+
+									<div class="form-group col-sm-3" data-ng-if="workData.mlaName">
+										<label><span>Name of MLA</span></label>
+										<p>
+											<span>{{workData.mlaName}}</span>
+										</p>
+									</div>
+
+									<div class="form-group col-sm-3" data-ng-if="workData.khasraNo">
+										<label><span>Khasra No.</span></label>
+										<p>
+											<span>{{workData.khasraNo}}</span>
+										</p>
+									</div>
+								</div>
+
+
+
+
+
+
+
+
+
+								<div class="row">
+
+
+
+
+
+
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Image</span></label>
+										<p class="help-block" data-ng-show="workData.imageId==null">Not
+											Available</p>
+										<p class="help-block" data-ng-show="workData.imageId!=null">
+											<a style="cursor: pointer;"
+												data-ng-click="downloadDocument(workData.imageId)"> <img
+												th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+												<span>{{workData.imageName}}</span>
+											</a> <br />
+
+										</p>
+
+									</div>
+								</div>
+
+								<div class="row">
+
+
+
+
+
+
+
+
+									<div class="form-group col-sm-3" data-ng-if="workData.remarks">
+										<label><span>Work Description</span></label>
+										<p>
+											<span>{{workData.remarks}}</span>
+										</p>
+									</div>
+								</div>
+
+							</div>
+
+
+
+
+							<div class="row m-0 px-1" data-ng-disabled="true">
+								<div class="form-group col-sm-12">
+									<div class="form-group" data-ng-disabled="true">
+										<label><span>Remarks</span></label>
+										<textarea class="form-control" style="min-height: 120px;"
+											data-ng-disabled="true" data-ng-model="workData.paRemarks"
+											name="remarkName" maxlength="1500" autocomplete="off"></textarea>
+										<div>
+													<p class="help-block" style="color: red;">
+														<span th:text="#{*(characterLimitIs}">* ( character
+															limit is</span> <span th:text="#{1500}">1500 )</span>
+
+													</p>
+												</div>
+									</div>
+
+
+								</div>
+
+							</div> -->
+
+							<div class="card-header top-header header2">
+								<i class="fa fa-wpforms"></i> <span>Add MLA Recommended
+									Work</span>
+							</div>
+							<div class="card-header">
+								<span>Work Details</span>
+							</div>
+							<div class="card-body">
+								<div class="row" data-ng-disabled="true">
+
+									<div class="form-group col-sm-3"
+										data-ng-init="loadSchemesByDesignationForDpo();">
+										<label><span>Scheme</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="scheme" required="required"
+											data-ng-disabled="true" data-ng-model="workData.schemeId"
+											name="scheme"
+											data-ng-change="workData.workPriorityId='';workData.workHeadId='';workData.pgOf=''">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="scheme in schemes | orderBy : 'schemeNameE'"
+												value="{{scheme.id}}">{{scheme.schemeNameE}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.scheme.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Scheme</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3"
+										data-ng-init="loadFinancialYears()">
+										<label><span>Financial Year</span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="financialYear" required="required"
+											data-ng-model="workData.financialYear" name="financialYear">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="fy in financialYears | orderBy : 'financialYearName'"
+												value="{{fy.financialYearName}}">{{fy.financialYearName}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.financialYear.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Financial
+													Year</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Work Name</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" id="workName"
+											required="required" data-ng-model="workData.workName"
+											name="workName" maxlength="150" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.workName.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Work
+													Name</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3" data-ng-init="loadWorkTypes()">
+										<label><span>Work Type </span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="workType" required="required"
+											data-ng-model="workData.workTypeId" name="workType"
+											data-ng-change="loadWorkStatusByWorkType(workData.workTypeId);loadWorkCategoryByWorkType(workData.workTypeId);workData.workCategory='';workData.workStatusId='';">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="workType in workTypes | orderBy : 'workTypeNameE'"
+												value="{{workType.workTypeId}}">{{workType.workTypeNameE}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.workType.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Work
+													Type</span>
+											</p>
+										</div>
+									</div>
+								</div>
+								<!--/.row-->
+
+								<!-- 2nd Row start -->
+								<div class="row">
+
+									<div class="form-group col-sm-3"
+										data-ng-init="loadImplementationAgencies()">
+										<label><span>Implementation Agency </span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="implementationAgency" required="required"
+											data-ng-model="workData.implementationAgencyId"
+											name="implementationAgency"
+											data-ng-change="loadSubEnggByIAAndDistrict(workData.implementationAgencyId,workData.districtName);workData.subEnggId='';">
+											<option value="" disabled="disabled">--Select--</option>
+											<option
+												data-ng-repeat="ia in implementationAgencies | orderBy : 'implementationAgencyNameE'"
+												value="{{ia.implementationAgencyId}}">{{ia.implementationAgencyNameE}}</option>
+											<!-- <option value="RES">RES</option>	 -->
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.implementationAgency.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Implementation
+													Agency</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Estimated Amount</span><span
+											data-ng-show="workData.workTypeId==1" class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control digits-only"
+											id="estimatedAmt" data-ng-required="workData.workTypeId==1"
+											data-ng-model="workData.estimatedAmt" name="estimatedAmt"
+											data-ng-pattern="/^[0-9]*$/" maxlength="10"
+											autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.estimatedAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Estimated
+													Amt</span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="workForm.estimatedAmt.$error.pattern">
+											<span>Please enter valid Amount</span>
+										</p>
+										<label class="amount-color"> {{workData.estimatedAmt |
+											inWords}} </label>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Amount Released Till Date</span><span
+											data-ng-show="workData.workTypeId==1" class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control digits-only"
+											id="amtReleasedTillDate"
+											data-ng-required="workData.workTypeId==1"
+											data-ng-model="workData.amtReleasedTillDate"
+											name="amtReleasedTillDate" data-ng-pattern="/^[0-9]*$/"
+											maxlength="10" autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.amtReleasedTillDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Amt
+													Released Till Date</span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="workForm.amtReleasedTillDate.$error.pattern">
+											<span>Please enter valid Amount</span>
+										</p>
+										<label class="amount-color">
+											{{workData.amtReleasedTillDate | inWords}} </label>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Sub Engineer</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="subEngg" required="required"
+											data-ng-model="workData.subEnggId" name="subEngg">
+											<option value="" disabled="disabled">--Select--</option>
+											<option
+												data-ng-repeat="sub in subEngg | orderBy : 'subEnggName'"
+												value="{{sub.subEnggId}}">{{sub.subEnggName}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.subEngg.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Sub
+													Engineer</span>
+											</p>
+										</div>
+									</div>
+								</div>
+
+								<!-- 3rd Row Started -->
+								<div class="row">
+
+									<div class="form-group col-sm-3">
+										<label><span>Work Status</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="workStatus"
+											required="required" data-ng-model="workData.workStatusId"
+											name="workStatus">
+											<option value="" disabled="disabled">--Select--</option>
+											<option
+												data-ng-repeat="status in workStatus | filter:{workStatusNameE:'!Completed' | orderBy : 'workStatusNameE'}"
+												value="{{status.workStatusId}}">{{status.workStatusNameE}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.workStatus.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Work
+													Status</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3"
+										data-ng-show="workData.schemeId==1">
+										<label><span>Work Priority</span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="workPriority" data-ng-required="workData.schemeId==1"
+											data-ng-model="workData.workPriorityId" name="workPriority"
+											data-ng-change="loadWorkHeads(workData.workPriorityId);workData.workHeadId=''">
+											<option value="" disabled="disabled">--Select--</option>
+											<!-- <option data-ng-repeat="workType in workTypes"
+												value="{{workType.workTypeId}}">{{workType.workTypeNameE}}</option> -->
+											<option value="1">High Priority</option>
+											<option value="2">Other Priority</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.workPriority.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Work
+													Priority</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3"
+										data-ng-show="workData.schemeId==1">
+										<label><span>Work Head</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="workHead"
+											data-ng-required="workData.schemeId==1"
+											data-ng-model="workData.workHeadId" name="workHead">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="workHead in workHeads | orderBy : 'workHeadName'"
+												value="{{workHead.workHeadId}}">{{workHead.workHeadName}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.workHead.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Work
+													Head</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3"
+										data-ng-show="workData.schemeId==2">
+										<label><span>Performance Grant Of</span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="pgOf" data-ng-required="workData.schemeId==2"
+											data-ng-model="workData.pgOf" name="pgOf">
+											<option value="" disabled="disabled">--Select--</option>
+											<!-- <option data-ng-repeat="workType in workTypes"
+												value="{{workType.workTypeId}}">{{workType.workTypeNameE}}</option> -->
+											<option value="Janpad">Janpad</option>
+											<option value="Zila">Zila</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.pgOf.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Executed
+													At</span>
+											</p>
+										</div>
+									</div>
+									<div class="form-group col-sm-3"
+										data-ng-show="workData.workStatusId=='4' || workData.workStatusId=='12'">
+										<label><span>Completion Date</span><span
+											class="aestrick">&#42;</span></label>
+										<div class="input-group date" id="datetimepicker1"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepicker1" name="completionDate"
+												data-ng-required="workData.workStatusId=='4'"
+												placeholder="DD/MM/YYYY" maxlength="10"
+												data-ng-model="workData.completionDate" id="completionDate"
+												autocomplete="off" />
+
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepicker1" data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.completionDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Completion
+													Date</span>
+											</p>
+										</div>
+
+									</div>
+									<div class="form-group col-sm-3">
+										<label><span>Work Category</span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="workCategory" required="required"
+											data-ng-model="workData.workCategory" name="workCategory">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="workCategory in workCategories | orderBy : 'workCategoryNameE'"
+												value="{{workCategory.workCategoryNameE}}">{{workCategory.workCategoryNameE}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.workCategory.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Work
+													Category</span>
+											</p>
+										</div>
+									</div>
+									<div class="form-group col-sm-3">
+										<label><span>Recommendation No.</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control" id="recommendationNo"
+											data-ng-model="workData.recommendationNo"
+											name="recommendationNo" maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.recommendationNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Recommendation
+													No</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Recommendation Date</span> <!-- <span
+											class="aestrick">&#42;</span> --></label>
+										<div class="input-group date" id="datetimepicker4"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepicker4" name="recommendationDate"
+												placeholder="DD/MM/YYYY"
+												data-ng-model="workData.recommendationDate"
+												id="recommendationDate" autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepicker4" data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.recommendationDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Recommendation
+													Date</span>
+											</p>
+										</div>
+									</div>
+								</div>
+								<div class="row"
+									data-ng-show="workData.workTypeId==2 || workData.workTypeId==3">
+									<div class="form-group col-sm-3">
+										<label><span>PO No.</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control" id="poNo" data-ng-model="workData.poNo"
+											name="poNo" maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.poNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>PO
+													No.</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>PO Date</span> <!-- <span
+											class="aestrick">&#42;</span> --></label>
+										<div class="input-group date" id="datetimepicker7"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepicker7" name="poDate"
+												placeholder="DD/MM/YYYY" data-ng-model="workData.poDate"
+												id="poDate" autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepicker7" data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.poDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>PO
+													Date</span>
+											</p>
+										</div>
+									</div>
+									<div class="form-group col-sm-3">
+										<label><span>Source of Procurement</span> <!-- <span class="aestrick">&#42;</span> --></label>
+										<select class="form-control" id="procurementSource"
+											data-ng-model="workData.procurementSource"
+											name="procurementSource">
+											<option value="" disabled="disabled">--Select--</option>
+											<option value="MPLUN">MPLUN</option>
+											<option value="Gem">Gem</option>
+											<option value="Tender">Tender</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.procurementSource.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Procurement
+													Source</span>
+											</p>
+										</div>
+									</div>
+									<div class="form-group col-sm-3">
+										<label><span>Vender Name</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control" id="venderName"
+											data-ng-model="workData.venderName" name="venderName"
+											maxlength="100" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.venderName.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Vender
+													Name</span>
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-header">
+								<span>Work Location</span>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="form-group col-sm-3" data-ng-init="loadWorkForm()">
+										<label><span>District</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" id="district"
+											required="required" data-ng-model="workData.districtName"
+											name="district" data-ng-readonly="true" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.district.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span
+													th:text="#{district}">District</span>
+											</p>
+										</div>
+									</div>
+									<div class="form-group col-sm-3">
+										<label><span>&nbsp;</span></label><br /> <label
+											class="radio-inline" style="padding-right: 5px;"><input
+											type="radio" name="rural" checked="checked"
+											data-ng-model="workData.rural" value="1" required="required"
+											data-ng-change="workData.ulb='';workData.ward='';workData.blockId='';workData.gpId='';workData.villageId=''" />
+											<span>Rural</span><span class="aestrick">&#42;</span></label> <label
+											class="radio-inline"><input type="radio" name="rural"
+											data-ng-model="workData.rural" value="0" checked="checked"
+											data-ng-change="workData.ulb='';workData.ward='';workData.blockId='';workData.gpId='';workData.villageId=''"
+											required="required" /> <span>Urban</span><span
+											class="aestrick">&#42;</span></label>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.rural.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span></span>
+											</p>
+										</div>
+									</div>
+									<div class="form-group col-sm-3"
+										data-ng-show="workData.rural=='0'">
+										<label><span>ULB</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="ulb"
+											data-ng-required="workData.rural=='0'"
+											data-ng-model="workData.ulb"
+											data-ng-change="loadWard(workData.ulb);workData.ward='';"
+											name="ulb">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="ulb in ulbs | orderBy : 'ulbName'"
+												value="{{ulb.ulbCode}}">{{ulb.ulbName}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.ulb.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>ULB</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3"
+										data-ng-show="workData.rural=='0'">
+										<label><span>Ward</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="ward"
+											data-ng-required="workData.rural=='0'"
+											data-ng-model="workData.ward" name="ward">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="ward in wards | orderBy : 'wardName'"
+												value="{{ward.wardCode}}">{{ward.wardName}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.ward.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Ward</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-2"
+										data-ng-show="workData.rural=='1'">
+										<label><span>Block</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="block"
+											data-ng-required="workData.rural=='1'"
+											data-ng-model="workData.blockId"
+											data-ng-change="loadGramPanchayatByBlockId(workData.blockId);workData.gpId='';workData.villageId=''"
+											name="block">
+											<option value="" disabled="disabled">--Select--</option>
+											<option
+												data-ng-repeat="block in blocks | orderBy : 'blockName'"
+												value="{{block.blockId}}">{{block.blockName}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.block.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Block</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-2"
+										data-ng-show="workData.rural=='1'">
+										<label><span>Gram Panchayat </span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="gramPanchayat" data-ng-model="workData.gpId"
+											name="gramPanchayat" data-ng-required="workData.rural=='1'"
+											data-ng-change="loadVillageByGPId(workData.gpId);workData.villageId=''">
+											<option value="" disabled="disabled">--Select--</option>
+											<option
+												data-ng-repeat="gp in gramPanchayats | orderBy : 'gpName'"
+												value="{{gp.gramPanchayatId}}">{{gp.gpName}}</option>
+											<!-- <option value="Chitrangi">Chitrangi</option>	 -->
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.gramPanchayat.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Gram
+													Panchayat</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-2"
+										data-ng-show="workData.rural=='1'">
+										<label><span>Village </span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="village"
+											data-ng-model="workData.villageId" name="village"
+											data-ng-required="workData.rural=='1'">
+											<option value="" disabled="disabled">--Select--</option>
+											<option
+												data-ng-repeat="village in villages | orderBy : 'villageName'"
+												value="{{village.villageId}}">{{village.villageName}}</option>
+											<!-- <option value="Chitrangi">Chitrangi</option>	 -->
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.village.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Village</span>
+											</p>
+										</div>
+									</div>
+
+								</div>
+
+								<div class="row">
+									<div class="form-group col-sm-3">
+										<label><span>Parliamentary Constituency</span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="pc" required="required" data-ng-model="workData.pcId"
+											name="pc">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="pc in pcs | orderBy : 'pcName'" 
+											value="{{pc.pcId}}">{{pc.pcName}}</option>
+											<!-- <option value="SIDHI">Sidhi</option> -->
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.pc.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Parliamentary
+													Constituency</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Legislative Constituency</span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="lc" required="required" data-ng-model="workData.lcId"
+											data-ng-change="loadMLAList(workData.lcId);workData.mla='';"
+											name="lc">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="lc in lcs | orderBy : 'lcName'"
+												value="{{lc.lcId}}">{{lc.lcName}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.lc.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Legislative
+													Constituency</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-3"
+										data-ng-show="workData.schemeId==8">
+										<label><span>Name of MLA</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" id="mla"
+											data-ng-required="workData.schemeId==8"
+											data-ng-model="workData.mla" name="mla">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="mla in mlas | orderBy : 'mlaName'" 
+											value="{{mla.mlaName}}">{{mla.mlaName}}</option>
+										</select>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.mla.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>MLA
+													name</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Khasra No.</span> <!-- <span class="aestrick">&#42;</span> --></label>
+										<input type="text" class="form-control" id="khasraNo"
+											data-ng-model="workData.khasraNo" name="khasraNo"
+											maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.khasraNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Khasra
+													No.</span>
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="card-header">
+								<div class="row">
+									<div class="col-sm-6">
+										<span> Work Order Details</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="card-body">
+								<div class="row">
+
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Work Order No.</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control" id="workOrderNo"
+											data-ng-model="workData.workOrderNo" name="workOrderNo"
+											maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.workOrderNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Work
+													Order No</span>
+											</p>
+										</div>
+
+									</div>
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Work Order Date</span></label>
+										<div class="input-group date" id="datetimepickerWorkOrder"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepickerWorkOrder" name="workOrderDate"
+												placeholder="DD/MM/YYYY"
+												data-ng-model="workData.workOrderDate" id="workOrderDate"
+												autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepickerWorkOrder"
+												data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.workOrderDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Work
+													Order Date</span>
+											</p>
+										</div>
+									</div>
+
+
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Work Order Document</span></label> <input
+											id="workOrderDocument" name="workOrderDocument" type='file'
+											class="form-control" accept=".pdf, .jpeg, .jpg"
+											file-model="workOrderDocument" />
+										<p class="help-block" style="color: red; font-size: 14px"
+											data-ng-show="fileExtentionErrorWorkOrder">
+											<span><b>(pdf ,.jpg files allowed with max size 30 mb)</b></span>
+										</p>
+										<p class="help-block" style="color: red; font-size: 14px"
+											data-ng-show="maxSizeErrorWorkOrder">
+											<span>Allowed file size max upto 5 MB.</span>
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="card-header" data-ng-show="workData.workTypeId==1">
+								<div class="row">
+									<div class="col-sm-6">
+										<span> Technical Sanction Details</span>
+									</div>
+								</div>
+							</div>
+							<div class="card-body" data-ng-show="workData.workTypeId==1">
+								<div class="row">
+
+									<div class="form-group col-sm-3">
+										<label><span>Technical Sanction No.</span> <span
+											class="aestrick">&#42;</span></label> <input type="text"
+											class="form-control" id="tsNo"
+											data-ng-required="workData.workTypeId==1"
+											data-ng-model="workData.tsNo" name="tsNo" maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.tsNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Technical
+													Sanction No</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Technical Sanction Date</span><span
+											class="aestrick">&#42;</span></label>
+										<div class="input-group date" id="datetimepicker2"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepicker2" name="tsDate"
+												data-ng-required="workData.workTypeId==1"
+												placeholder="DD/MM/YYYY" data-ng-model="workData.tsDate"
+												id="tsDate" autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepicker2" data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.tsDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Technical
+													Sanction Date</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Technical Sanction Amount</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control digits-only" id="tsAmt"
+											data-ng-model="workData.tsAmt" name="tsAmt"
+											data-ng-pattern="/^[0-9]*$/" maxlength="10"
+											autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.tsAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Technical
+													Sanction Amt</span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="workForm.tsAmt.$error.pattern">
+											<span>Please enter valid Amount</span>
+										</p>
+										<label class="amount-color"> {{workData.tsAmt |
+											inWords}} </label>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>TS Document</span></label> <input id="tsDocument"
+											name="tsDocument" type='file' class="form-control"
+											accept=".pdf, .jpeg, .jpg" file-model="tsDocument" />
+										<p class="help-block" style="color: red; font-size: 14px"
+											data-ng-show="fileExtentionErrorTS">
+											<span><b>(pdf file with max size 30 mb)</b></span>
+										</p>
+										<p class="help-block" style="color: red; font-size: 14px"
+											data-ng-show="maxSizeErrorTS">
+											<span>Allowed file size max upto 5 MB.</span>
+										</p>
+									</div>
+								</div>
+							</div>
+							<div class="card-header">
+								<div class="row">
+									<div class="col-sm-6">
+										<span>Administrative Sanction Details</span>
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="form-group col-sm-3">
+										<label><span>Administrative Sanction No.</span><span
+											class="aestrick">&#42;</span></label> <input type="text"
+											class="form-control" id="asNo" required="required"
+											data-ng-model="workData.asNo" name="asNo" maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.asNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Administrative
+													Sanction No</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Administrative Sanction Date</span><span
+											class="aestrick">&#42;</span></label>
+										<div class="input-group date" id="datetimepicker3"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepicker3" name="asDate"
+												required="required" placeholder="DD/MM/YYYY"
+												data-ng-model="workData.asDate" id="asDate"
+												autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepicker3" data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.asDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Administrative
+													Sanction Date</span>
+											</p>
+										</div>
+
+									</div>
+									<div class="form-group col-sm-3">
+										<label><span>Administrative Sanction Amount</span><span
+											class="aestrick">&#42;</span></label> <input type="text"
+											class="form-control digits-only" id="asAmt"
+											required="required" data-ng-model="workData.asAmt"
+											name="asAmt" data-ng-pattern="/^[0-9]*$/" maxlength="10"
+											autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.asAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Administrative
+													Sanction Amt</span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="workForm.asAmt.$error.pattern">
+											<span>Please enter valid Amount</span>
+										</p>
+										<label class="amount-color"> {{workData.asAmt |
+											inWords}} </label>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>AS Document</span></label> <input id="asDocument"
+											name="asDocument" type='file' class="form-control"
+											accept=".pdf, .jpeg, .jpg" file-model="asDocument" />
+										<p class="help-block" style="color: red; font-size: 14px"
+											data-ng-show="fileExtentionErrorAS">
+											<span><b>(pdf file with max size 30 mb)</b></span>
+										</p>
+										<p class="help-block" style="color: red; font-size: 14px"
+											data-ng-show="maxSizeErrorAS">
+											<span>Allowed file size max upto 5 MB.</span>
+										</p>
+									</div>
+
+								</div>
+							</div>
+
+							<div class="card-header">
+								<div class="row">
+									<div class="col-sm-6">
+										<span>Estimation Details</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="card-body">
+								<div class="row">
+									<div class="form-group col-sm-3">
+										<label><span>Estimation No.</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control" id="estNo"
+											data-ng-model="workData.estNo" name="estNo" maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.estNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Estimation
+													No</span>
+											</p>
+										</div>
+									</div>
+
+
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Estimation Date</span> <!-- <span
+											class="aestrick">&#42;</span> --></label>
+										<div class="input-group date" id="datetimepickerEst"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepickerEst" name="estDate"
+												placeholder="DD/MM/YYYY" data-ng-model="workData.estDate"
+												id="estDate" autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepickerEst"
+												data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.estDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Estimation
+													Date</span>
+											</p>
+										</div>
+
+									</div>
+									<div class="form-group col-sm-3">
+										<label><span>Estimation Amount</span>
+										<!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control digits-only" id="estAmt"
+											data-ng-model="workData.estAmt" name="estAmt"
+											data-ng-pattern="/^[0-9]*$/" maxlength="10"
+											autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.estAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Estimation
+													Amt</span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="workForm.estAmt.$error.pattern">
+											<span>Please enter valid Amount</span>
+										</p>
+										<label class="amount-color"> {{workData.estAmt |
+											inWords}} </label>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Estimation Document</span></label> <input
+											id="estDocument" name="estDocument" type='file'
+											class="form-control" accept=".pdf, .jpeg, .jpg"
+											file-model="estDocument" />
+										<p class="help-block" style="color: red; font-size: 14px"
+											data-ng-show="fileExtentionErrorEst">
+											<span><b>(pdf file with max size 30 mb)</b></span>
+										</p>
+										<p class="help-block" style="color: red; font-size: 14px"
+											data-ng-show="maxSizeErrorEst">
+											<span>Allowed file size max upto 5 MB.</span>
+										</p>
+									</div>
+
+								</div>
+							</div>
+
+
+							<div class="card-header">
+								<div class="row">
+									<div class="col-sm-6">
+										<span>Financial Details</span>
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="form-group col-sm-3">
+										<label><span>First installment amount</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control digits-only" id="firstInstallAmt"
+											data-ng-model="workData.firstInstallAmt"
+											data-ng-change="workData.secInstOrderNo='';workData.secInstDate='';workData.secondInstallmentAmt='';workData.finalInstOrderNo='';workData.finalInstDate='';workData.finalInstallmentAmt=''"
+											name="firstInstallAmt" data-ng-pattern="/^[0-9]*$/"
+											maxlength="10" autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.firstInstallAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>First
+													installment amount </span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="workForm.firstInstallAmt.$error.pattern">
+											<span>Please enter valid Amount</span>
+										</p>
+										<label class="amount-color">
+											{{workData.firstInstallAmt | inWords}} </label>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>First installment order Number</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control" id="firstInstOrderNo"
+											data-ng-model="workData.firstInstOrderNo"
+											name="firstInstOrderNo" maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.firstInstOrderNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>First
+													installment order Number</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-3">
+										<label><span>First installment Date</span> <!-- <span
+											class="aestrick">&#42;</span> --></label>
+										<div class="input-group date" id="datetimepicker5"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepicker5" name="firstInstDate"
+												placeholder="DD/MM/YYYY"
+												data-ng-model="workData.firstInstDate" id="firstInstDate"
+												autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepicker5" data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.firstInstDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>First
+													installment Date</span>
+											</p>
+										</div>
+
+									</div>
+
+									<!-- <div class="form-group col-sm-3">
+										<label><span>Second installment amount</span><span
+											class="aestrick">&#42;</span></label> <input type="text"
+											class="form-control digits-only" id="secondInstallmentAmt"
+											data-ng-disabled="workData.asAmt==workData.firstInstallAmt"
+											data-ng-model="workData.secondInstallmentAmt"
+											
+											name="secondInstallmentAmt" maxlength="10" autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.secondInstallmentAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Second
+													installment amount </span>
+											</p>
+										</div>
+										<label class="amount-color">
+											{{workData.secondInstallmentAmt | inWords}} </label>
+									</div> -->
+
+								</div>
+
+								<div class="row">
+									<div class="form-group col-sm-3">
+										<label><span>Second installment amount</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control digits-only" id="secondInstallmentAmt"
+											data-ng-disabled="(workData.firstInstallAmt==null) || (workData.firstInstallAmt=='')"
+											data-ng-model="workData.secondInstallmentAmt"
+											data-ng-change="workData.finalInstOrderNo='';workData.finalInstDate='';workData.finalInstallmentAmt=''"
+											name="secondInstallmentAmt" data-ng-pattern="/^[0-9]*$/"
+											maxlength="10" autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.secondInstallmentAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Second
+													installment amount </span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="workForm.secondInstallmentAmt.$error.pattern">
+											<span>Please enter valid Amount</span>
+										</p>
+										<label class="amount-color">
+											{{workData.secondInstallmentAmt | inWords}} </label>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Second installment order Number</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control" id="secInstOrderNo"
+											data-ng-disabled="(workData.firstInstallAmt==null) || (workData.firstInstallAmt=='')"
+											data-ng-model="workData.secInstOrderNo" name="secInstOrderNo"
+											maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.secInstOrderNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Second
+													installment order Number</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Second installment Date</span> <!-- <span
+											class="aestrick">&#42;</span> --></label>
+										<div class="input-group date" id="datetimepickerSec"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="datetimepickerSec" name="secInstDate"
+												placeholder="DD/MM/YYYY"
+												data-ng-model="workData.secInstDate" id="secInstDate"
+												data-ng-disabled="(workData.firstInstallAmt==null) || (workData.firstInstallAmt=='')"
+												autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepickerSec"
+												data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.secInstDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Second
+													installment Date</span>
+											</p>
+										</div>
+
+									</div>
+
+									<!-- <div class="form-group col-sm-3">
+										<label><span>Second installment amount</span><span
+											class="aestrick">&#42;</span></label> <input type="text"
+											class="form-control digits-only" id="secondInstallmentAmt"
+											data-ng-disabled="workData.asAmt==workData.firstInstallAmt"
+											data-ng-model="workData.secondInstallmentAmt"
+											
+											name="secondInstallmentAmt" maxlength="10" autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.secondInstallmentAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Second
+													installment amount </span>
+											</p>
+										</div>
+										<label class="amount-color">
+											{{workData.secondInstallmentAmt | inWords}} </label>
+									</div> -->
+
+								</div>
+
+
+								<div class="row">
+									<div class="form-group col-sm-3">
+										<label><span>Final installment amount</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control digits-only" id="finalInstallmentAmt"
+											data-ng-disabled="((workData.firstInstallAmt==null) || (workData.firstInstallAmt=='')) || ((workData.secondInstallmentAmt==null) || (workData.secondInstallmentAmt=='')) "
+											data-ng-model="workData.finalInstallmentAmt"
+											name="finalInstallmentAmt" data-ng-pattern="/^[0-9]*$/"
+											maxlength="10" autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.finalInstallmentAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Final
+													installment amount </span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="workForm.finalInstallmentAmt.$error.pattern">
+											<span>Please enter valid Amount</span>
+										</p>
+										<label class="amount-color">
+											{{workData.finalInstallmentAmt | inWords}} </label>
+									</div>
+
+									<div class="form-group col-sm-3">
+										<label><span>Final installment order Number</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control" id="finalInstOrderNo"
+											data-ng-disabled="((workData.firstInstallAmt==null) || (workData.firstInstallAmt=='')) || ((workData.secondInstallmentAmt==null) || (workData.secondInstallmentAmt=='')) "
+											data-ng-model="workData.finalInstOrderNo"
+											name="finalInstOrderNo" maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.finalInstOrderNo.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>final
+													installment order Number</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Final installment Date</span> <!-- <span
+											class="aestrick">&#42;</span> --></label>
+										<div class="input-group date" id="datetimepickerFin"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepickerFin" name="finalInstDate"
+												placeholder="DD/MM/YYYY"
+												data-ng-model="workData.finalInstDate" id="finalInstDate"
+												data-ng-disabled="((workData.firstInstallAmt==null) || (workData.firstInstallAmt=='')) || ((workData.secondInstallmentAmt==null) || (workData.secondInstallmentAmt=='')) "
+												autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepickerFin"
+												data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.finalInstDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Second
+													installment Date</span>
+											</p>
+										</div>
+
+									</div>
+
+									<!-- <div class="form-group col-sm-3">
+										<label><span>Second installment amount</span><span
+											class="aestrick">&#42;</span></label> <input type="text"
+											class="form-control digits-only" id="secondInstallmentAmt"
+											data-ng-disabled="workData.asAmt==workData.firstInstallAmt"
+											data-ng-model="workData.secondInstallmentAmt"
+											
+											name="secondInstallmentAmt" maxlength="10" autocomplete="off" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.secondInstallmentAmt.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Second
+													installment amount </span>
+											</p>
+										</div>
+										<label class="amount-color">
+											{{workData.secondInstallmentAmt | inWords}} </label>
+									</div>
+ -->
+								</div>
+								<div class="row"
+									data-ng-show="workData.workStatusId=='4' || workData.workStatusId=='12' ">
+									<div class="form-group col-sm-3">
+										<label><span>Completion Certificate Number</span> <!-- <span
+											class="aestrick">&#42;</span> --></label> <input type="text"
+											class="form-control" id="ccNumber"
+											data-ng-model="workData.ccNumber" name="ccNumber"
+											maxlength="45" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.ccNumber.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Completion
+													Certificate Number</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-3">
+										<label><span>Completion Certificate Date</span> <!-- <span
+											class="aestrick">&#42;</span> --></label>
+										<div class="input-group date" id="datetimepicker6"
+											data-target-input="nearest">
+											<input type="text" class="form-control datetimepicker-input"
+												data-target="#datetimepicker6" name="ccDate"
+												placeholder="DD/MM/YYYY" data-ng-model="workData.ccDate"
+												id="ccDate" autocomplete="off" maxlength="10" />
+											<div class="input-group-append input-group-addon"
+												data-target="#datetimepicker6" data-toggle="datetimepicker">
+												<div class="input-group-text">
+													<i class="fa fa-calendar"></i>
+												</div>
+											</div>
+										</div>
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.ccDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Completion
+													Certificate Date</span>
+											</p>
+										</div>
+
+									</div>
+								</div>
+
+							</div>
+
+							<div data-ng-init="fetchDefaultDocList();">
+
+								<div class="card-header">
+									<div class="row">
+										<div class="col-sm-4">
+											<span> Other Document </span>
+										</div>
+									</div>
+								</div>
+
+								<div class="card-body">
+									<table class="table table-bordered">
+										<thead class="bg-light">
+											<tr>
+												<th>Name of Doc</th>
+												<th>Order No.</th>
+
+												<th>Date</th>
+												<th>Upload Doc</th>
+												<th>Action</th>
+											</tr>
+										</thead>
+										<tr data-ng-repeat="file in FileData"
+											data-ng-show="FileData.length > 0">
+											<td>{{file.remarks}}</td>
+											<td>{{file.noOfDocs}}</td>
+											<td>{{file.fillArr.formattedDate}}</td>
+											<td>{{file.fillArr.name}}</td>
+											<td><input type="button" class="remove"
+												data-ng-click="removeOtherDocument($index)" title="Remove"
+												value="&#10006;" /></td>
+										</tr>
+										<!-- <tr data-ng-show="FileData.length == 0">
+										<td class="text-center text-danger" colspan="5">No file has
+											been uploaded yet.</td>
+									</tr> -->
+										<tr>
+											<td><input class="form-control" id="remarks_{{$index}}"
+												data-ng-model="uploadFileData.remarks"
+												name="remarks_{{$index}}" type="text" maxlength="500" /></td>
+											<td><input type="text" class="form-control digits-only"
+												id="otherDocNo_{{$index}}"
+												data-ng-model="uploadFileData.noOfDocs"
+												name="otherDocNo_{{$index}}" maxlength="3" /></td>
+
+											<td><input type="date" class="form-control"
+												id="otherDocDate_{{$index}}" placeholder="DD-MM-YYYY"
+												data-ng-model="uploadFileData.otherDocDate"
+												name="otherDocDate_{{$index}}" maxlength="10"
+												autocomplete="off" /></td>
+											<td id="fileupload">
+												<div>
+													<input id="otherDocument_{{$index}}"
+														name="otherDocument_{{$index}}" type='file'
+														class="form-control" file-model="model.File"
+														accept=".pdf, .jpeg, .jpg" />
+													<p class="help-block" style="color: red; font-size: 14px"
+														data-ng-show="fileExtentionErrorOtherDoc">
+														<span>Only .pdf, .jpg files allowed.</span>
+													</p>
+													<p class="help-block" style="color: red; font-size: 14px"
+														data-ng-show="maxSizeErrorOtherDoc">
+														<span>Allowed file size max upto 5 MB.</span>
+													</p>
+												</div>
+											</td>
+
+											<td><input type="button"
+												class="add btn btn-sm btn-success"
+												data-ng-click="addOtherDocument($index,uploadFileData, model.File)"
+												title="Add More" value="Add"
+												data-ng-if="otherDoc.newElement==null" /></td>
+										</tr>
+
+
+
+
+										<!-- <tr data-ng-if="FileData.length==0">
+										<td><input class="form-control" id="remarks_{{$index}}"
+											data-ng-model="otherDoc.remarks" name="remarks_{{$index}}"
+											type="text" maxlength="500" /></td>
+										<td><input type="text" class="form-control digits-only"
+											id="otherDocNo_{{$index}}" data-ng-model="otherDoc.noOfDocs"
+											name="otherDocNo_{{$index}}" maxlength="3" /></td>
+
+										<td><input type="date" class="form-control"
+											id="otherDocDate_{{$index}}" required="required"
+											placeholder="DD-MM-YYYY"
+											data-ng-model="otherDoc.otherDocDate"
+											name="otherDocDate_{{$index}}" maxlength="10"
+											autocomplete="off" /></td>
+										<td>
+											<div class="form-group col-sm-5">
+												<input id="otherDocument_{{$index}}"
+													name="otherDocument_{{$index}}" type='file'
+													class="form-control" file-model="model.File"
+													accept=".pdf, .jpeg, .jpg" />{{model|json}}
+												<p class="help-block" style="color: red; font-size: 14px"
+													data-ng-show="fileExtentionOtherDoc">
+													<span>Only .pdf, .jpg files allowed.</span>
+												</p>
+												<p class="help-block" style="color: red; font-size: 14px"
+													data-ng-show="maxSizeErrorWorkOrder">
+													<span>Allowed file size max upto 5 MB.</span>
+												</p>
+											</div>
+										</td>
+
+										<td><input type="button" class="add"
+											data-ng-click="addBillItemEntryJNM($index, model.File)"
+											title="Add More" value="+"
+											data-ng-if="otherDoc.newElement==null" /> <input
+											type="button" class="remove"
+											data-ng-click="removeBillItemEntryJNM($index)"
+											title="Remove More" value="-"
+											data-ng-if="otherDoc.newElement=='New'" /></td>
+									</tr> -->
+
+									</table>
+
+								</div>
+
+							</div>
+
+							<!-- <div class="card-body">
+
+								<div class="row">
+									<div class="form-group col-sm-12">
+										<label><span th:text="#{remarks}">Remarks</span></label>
+										<textarea class="form-control" style="min-height: 120px;"
+											data-ng-model="workData.remarks" name="remarks"
+											maxlength="500" autocomplete="off"></textarea>
+										<div>
+											<p class="help-block" style="color: red;">
+												<span>* (Character limit is</span> <span>500 )</span>
+											</p>
+										</div>
+									</div>
+								</div>
+							</div> -->
+
+
+							<div class="card-footer text-right"
+								data-ng-init="loadCitizenRequestData()">
+								<!-- <button type="submit" class="btn btn-sm btn-primary"
+									data-ng-click="saveAsDraft=true;finalSubmit=false">
+									<span th:text="#{saveAsDraft}">Save As Draft</span>
+								</button> -->
+
+								<button type="submit" class="btn btn-sm btn-primary" id="submit">
+									<span th:text="#{submit}">Submit</span>
+								</button>
+								<!-- <button type="reset" class="btn btn-sm btn-danger">Reset</button> ng-disabled="workForm.$invalid" -->
+							</div>
+
+						</form>
+
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+</div>
+
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+<script th:src="@{/js/bootstrap-select.min.js}"></script>
+
+<script th:src="@{/js/bootstrap-select.js}"></script>
+
+<script th:src="@{/js/jquery-2.2.3.min.js}"></script>
+<script th:src="@{/js/jquery-gmaps-latlon-picker.js}"></script>
+<script th:src="@{/js/wizard.js}"></script>
+
+<style>
+.table-head {
+	padding: 5px 10px !important;
+	border-top-color: rgb(255, 255, 255) !important;
+	border-right-color: rgb(255, 255, 255) !important;
+	background: rgb(224, 229, 238);
+	border-radius: 7px;
+}
+
+.table-head>div {
+	white-space: nowrap;
+	display: inline-block;
+	font-size: 19px;
+	color: rgb(0, 108, 182);
+	font-weight: 500;
+}
+
+.tbl1 td:first-child {
+	max-width: 50px;
+}
+
+.plus {
+	float: right;
+	background: rgb(73, 112, 176);
+	height: 28px;
+	width: 28px;
+	color: rgb(255, 255, 255);
+	text-align: center;
+	border-radius: 50%;
+	font-size: 12px;
+	line-height: 29px;
+	margin-left: 10px;
+	cursor: pointer;
+}
+
+.plus .fa {
+	transition: all .3s ease;
+}
+
+.plus.active .fa {
+	transform: rotate(-90deg);
+}
+
+.tbody-content {
+	/*  display: none; */
+	
+}
+
+.tbl-lg tr td input[type="text"] {
+	min-width: 100px;
+	height: 37px;
+	font-size: 13px;
+	/* padding: 2px 5px; */
+	text-align: center;
+}
+
+
+.datePickerTimeSplit1 .bootstrap-datetimepicker-widget {
+	position: absolute;
+	top: -10em !important;
+}
+
+.first-table-div {
+	height: 30vh;
+   
+}
+.nav-justified .nav-link {
+    color: #f57f17;
+    font-weight: 600;
+    border: 1px solid #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+li.nav-item a {
+    padding: 6px 5px;
+    min-height: auto!important;
+    background: #f5f2f2;
+    font-size: 14px;
+}
+
+
+li.nav-item a .fa {font-size: 20px; margin-right:5px}
+.wizard-inner {
+    /* width:1236px; */
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.nav-justified {
+    background: #f6f6f6;
+    width: 800px;
+}
+.card-header {
+ border-bottom: 0px solid #e4e4e4;}
+ a.nav-link.active {
+    background: #1a2942!important;
+    color: #fff!important;
+}
+a.nav-link:hover {
+    background: #f57f17;
+    color: #fff;
+}
+ul.nav.nav-tabs.nav-justified.border-0.bg-white {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    margin-bottom:15px
+
+}
+ul.nav.nav-tabs.nav-justified.border-0.bg-white li a,ul.nav.nav-tabs.nav-justified.border-0.bg-white li{width: auto;}
+a.nav-link.disabled.stopVald {
+    background: #ccc;
+    color: #000;
+}
+
+li.nav-item  span.fa.fa-road{  background:rgba(41, 156, 219, 0.85)!important;}
+.wizard-inner li.nav-item a span:last-child {
+  
+    width: 100% !important;
+    color: #fff;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to top, #09203f 0%, #537895 100%);
+}
+.wizard-inner a.nav-link {
+    background:#fff !important;
+    color: #fff!important;
+}
+a.nav-link.active{background:#fff!important}
+a.nav-link.active span {
+    background: linear-gradient(109.6deg, rgb(0, 204, 130) 11.2%, rgb(58, 181, 46) 91.7%) !important;
+}
+.tab-footer .btn-success {
+    color: #fff;
+    background-color: #11c15b;
+    border-color: #11c15b;
+    background: -webkit-linear-gradient(top, rgba(163, 255, 206, 1) 0%, rgba(100, 209, 128, 1) 4%, #11c15b 100%);
+    padding: 7px 15px;
+    font-weight: 900;
+    font-size: 13px;
+    box-shadow: 0px 0px 7px rgb(0 0 0 / 10%);    border-radius: 25px;
+}
+
+.tab-footer .btn-primary {
+    color: #fff;
+    background-color: #11c15b;
+    border-color: #11c15b;
+    background: -webkit-linear-gradient(top, #536dfe 0%,#536dfe 4%,#536dfe 100%);
+    padding: 7px 15px;
+    font-weight: 900;
+    padding: 7px 15px;
+    box-shadow: 0px 0px 7px rgb(0 0 0 / 10%);    border-radius: 25px;
+}
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 7px rgb(0 0 0 / 70%);border-radius:7px
+}
+li.nav-item a.nav-link {
+    display: block;
+}
+
+li.nav-item span.fa {
+    border: 1px solid #fff;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 50%;
+    background:linear-gradient(109.6deg, rgb(0, 204, 130) 11.2%, rgb(58, 181, 46) 91.7%)!important;
+    color: #fff;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 15px;
+}
+
+ul.nav.nav-tabs.nav-justified.border-0.bg-white li a, ul.nav.nav-tabs.nav-justified.border-0.bg-white li {
+    width: auto;
+    border: none;
+}
+textarea#workStatus {
+    display: block;
+}
+.wizard .tab-content {
+    border: none;
+}
+li.nav-item a .fa{font-size:14px!important}
+ul.pagination {
+    display: none;
+}
+th {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+td {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+</style>
+
+</head>
+<script type="text/javascript">
+	$(function() {
+
+		
+	//$('#datetimepicker4').datetimepicker('clear');
+	
+	
+	
+		$('#datetimepicker4021').datetimepicker({
+			 format: 'DD/MM/YYYY',                     // Date format
+			  useCurrent: false,                        // Prevent default date selection
+			  //minDate: moment('01/01/1995', 'DD/MM/YYYY'), // Minimum date: January 1, 1995
+			  maxDate: moment(),                        // Maximum date: Today
+			  defaultDate: false  
+				
+		});
+		$('#datetimepicker4').on('change.datetimepicker', function (e) {
+			var startDate = e.date;
+			$('#datetimepicker4021').data('datetimepicker').minDate(startDate);
+		});
+		$('#datetimepicker7').datetimepicker({
+			maxDate : moment(),
+			minDate: moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+		});
+		
+		$('#datetimepicker1').datetimepicker({
+			maxDate : moment(),
+			minDate: moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+		});
+		
+		$('#datetimepicker9').datetimepicker({
+			maxDate : moment(),
+			minDate: moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+		});
+		
+		$('#datetimepicker10').datetimepicker({
+			maxDate : moment(),
+			minDate: moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+			
+		});
+		$('#datetimepicker10001').datetimepicker({
+			maxDate : moment(),
+			minDate: moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+			
+		});
+		
+	/* 	$('#datetimepicker4').on('keydown paste', function (e) {
+			e.preventDefault();
+		}); */
+		$('#datetimepicker3').on('keydown paste', function (e) {
+			e.preventDefault();
+			
+		});
+		$('#datetimepicker4').on('change.datetimepicker', function (e) {
+			var startDate = e.date;
+			$('datetimepicker10001').data('datetimepicker').minDate(startDate);
+		});
+
+		
+	});
+</script>
+
+<div>
+	<ol class="breadcrumb">
+		<!-- <li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li> -->
+				
+				<li class="breadcrumb-item"><a ><span
+				th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item active"><span>Create Work</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header top-header">
+							<i class="fa fa-wpforms"></i> <span>Create Work</span>
+						</div>
+						<div class="col-md-12">
+							<div data-ng-if="responseObject.errorMessage != null"
+								class="text-danger">
+								<strong>Error!</strong>
+								<p>{{responseObject.errorMessage}}</p>
+							</div>
+						</div>
+
+						<div class="wizard bg-white mb-3">
+							<div class="wizard-inner">
+								<!-- <div class="physicalDetail">
+										<span> Physical Progress</span>
+									</div> -->
+
+								<ul class="nav nav-tabs nav-justified border-0 bg-white"
+									role="tablist">
+
+
+									<li role="presentation" class="nav-item"><a href=".step1"
+										data-toggle="tab" aria-controls="step1" role="tab"
+										title="Step 1" class="nav-link active"> <span
+											class="fa fa-file-text-o"></span> <span>Work Details <em
+												class="count"></em>
+										</span>
+
+									</a></li>
+
+
+									<!-- <li role="presentation" class="nav-item"><a href=".step2"
+										data-toggle="tab" aria-controls="step2" role="tab"
+										title="Step 2" class="nav-link disabled stopVald"> <span
+											class="fa fa-road"></span> <span>AA  &amp; TS Details<em class="count"></em>
+										</span>
+
+									</a></li> -->
+
+								
+								</ul>
+							</div>
+
+							<div class="tab-content">
+								<!-- /tab1 -->
+								<div class="tab-pane active step1" role="tabpanel" id="step1">
+									<div th:replace="common/work/addWorkDetail :: add_workDetails"></div>
+								</div>
+
+								<!-- /tab2 -->
+								<!-- <div class="tab-pane  step2" role="tabpanel" id="step2">
+									<div th:replace="common/work/addTSASDetails :: add_TSASDetails"></div>
+								</div> -->
+
+								
+
+
+
+							</div>
+
+						</div>
+
+
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+</div>
+
+</html>

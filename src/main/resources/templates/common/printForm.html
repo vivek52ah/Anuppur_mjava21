@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+<style>
+.grid-table th,.grid-table td{
+font-size:12px;
+}
+.no-border td{
+border:0px
+
+}
+  @media print
+   {
+     .table-responsive{
+     overflow: hidden;
+     }
+   }
+ td{
+ width: auto;
+ } 
+</style>
+</head>
+<div>
+	<ol class="breadcrumb">
+	<!-- 	<li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li> -->
+				
+				<li class="breadcrumb-item"><a ><span
+				th:text="#{home}">Home</span></a></li>
+				
+		<li class="breadcrumb-item"><a href="#manageOngoingWorks"><span
+				th:text="#{manageWorks}">Manage Work</span></a></li>
+		<li class="breadcrumb-item active"><span>Completion Certificate
+				</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						 
+						<div class="col-md-6" align="right">
+							<div class="form-group">
+								<img th:src="@{/img/print.png}" title="Completion Certificate" style="cursor: pointer;" alt="Completion Certificate" 
+									onclick="jQuery('#certForm').print();" />
+							</div>
+						</div>
+						
+						<div class="col-md-12" id="certForm"
+							style="border: 2px solid black; margin-bottom: 10px; margin-top: 30px;">
+						
+						<form  name="certForm" data-ng-init="loadFullWorkDetails();" novalidate="novalidate">
+							
+							
+							
+							<div class="card-header">
+							<div class="row">
+								<div class="col-sm-3" align="center">
+								 <span >Directorate of Health Service (DHS)-Department of Public Health &amp; Family Welfare, Govt. of M.P.</span>
+								</div>
+							</div>
+							</div>
+							
+							<div class="card-header" style="border: 1px solid black; margin-bottom: 10px; margin-top: 30px;">
+								<div class="row">
+									<div class="col-sm-3" align="center">
+										<span >WORK DETAILS</span>
+									</div>
+								</div>
+							</div>
+							
+						<div class="card-body" style="border: 1px solid black; margin-bottom: 10px; margin-top: 10px;">
+							<div class="row">
+								<div class="table-responsive">
+									<table 		 class="table table-striped table-bordered table-hover margin0 tbl-vm grid-table">
+										
+										<tbody>
+											<tr>
+											<td > <label><span >1. Work Name</span> </label>  </td>
+											<td > <label><span >{{workDataPrint.workBeans.workName}}</span> </label>	</td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span >2. Type of Work</span> </label>  </td>
+											<td >  <label><span > {{workDataPrint.workBeans.workType}}	</span> </label> </td>
+									 </tr>
+									 
+									  <tr>
+											<td > <label><span>3. Sub Type of Work</span></label>  </td>
+											<td >  <label><span > {{workDataPrint.workBeans.workSubTypeName}}</span> </label>		</td>
+									 </tr>
+									 
+									 <tr>
+											<td> <label><span >4. Work Category</span>  </label>  </td>
+											<td> <label><span > {{workDataPrint.workBeans.workCategoryName}}	</span> </label></td>
+									 </tr>
+									  <tr>
+											<td > <label><span>5. Construction Agency</span> </label>  </td>
+											<td> <label><span >   {{workDataPrint.workBeans.implementationAgency}}		</span> </label></td>
+									 </tr>
+									 <tr>
+											<td > <label><span>5. Scheme</span> </label>  </td>
+											<td >  <label><span >	 {{workDataPrint.workBeans.scheme}} </span> </label></td>
+									 </tr>
+									 <tr>
+											<td > <label><span>5. Segment</span></label>  </td>
+											<td >  	<label><span >	 {{workDataPrint.workBeans.Head}}  </span> </label> </td>
+									 </tr>
+								</tbody>		 
+							</table>
+									 
+								</div>
+							</div>	
+						</div>
+						
+						
+							<div class="card-header" style="border: 1px solid black; margin-bottom: 10px; margin-top: 30px;">
+								<div class="row">
+									<div class="col-sm-3" align="center">
+										<span >WORK LOCATION</span>
+									</div>
+								</div>
+							</div>
+							
+							
+							<div class="card-body" style="border: 1px solid black; margin-bottom: 10px; margin-top: 10px;">
+							<div class="row">
+								<div class="table-responsive">
+									<table 		 class="table table-striped table-bordered table-hover margin0 tbl-vm grid-table">
+										
+										<tbody>
+											<tr>
+											<td> <label><span >1. Division</span> </label>  </td>
+											<td > 	 {{workDataPrint.workBeans.divisionName}} 	</td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span >2. District</span>  </label>  </td>
+											<td > 	 {{workDataPrint.workBeans.districtName}}  </td>
+									 </tr>
+									 
+									  <tr>
+											<td > <label><span>3. Block</span> </label>  </td>
+											<td > 	 {{workDataPrint.workBeans.blockName}}  </td>
+									 </tr>
+									
+								</tbody>		 
+							</table>
+									 
+								</div>
+							</div>	
+						</div>
+							
+							 	<div class="card-header" style="border: 1px solid black; margin-bottom: 10px; margin-top: 30px;">
+								<div class="row">
+									<div class="col-sm-3" align="center">
+										<span >TECHNICAL SANCTION DETAILS</span>
+									</div>
+								</div>
+							</div>
+							
+							
+							<div class="card-body" style="border: 1px solid black; margin-bottom: 10px; margin-top: 10px;">
+							<div class="row">
+								<div class="table-responsive">
+									<table 		 class="table table-striped table-bordered table-hover margin0 tbl-vm grid-table">
+										
+										<tbody>
+											<tr>
+											<td > <label><span >1. TS Order No.</span></label>  </td>
+											<td > 	 {{workDataPrint.tsasWorkBeans.tsNo}} </td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span >2. TS Order Date</span>  </label>  </td>
+											<td >  {{workDataPrint.tsasWorkBeans.tsDate}} </td>
+									 </tr>
+									 
+									  <tr>
+											<td> <label><span>3. TS Amount</span> </label>  </td>
+											<td >  {{workDataPrint.tsasWorkBeans.tsAmt}}</td>
+									 </tr>
+									
+								</tbody>		 
+							</table>
+									 
+								</div>
+							</div>	
+						</div>
+						
+						
+						<div class="card-header" style="border: 1px solid black; margin-bottom: 10px; margin-top: 30px;">
+								<div class="row">
+									<div class="col-sm-3" align="center">
+										<span >ADMINISTRATIVE SANCTION DETAILS</span>
+									</div>
+								</div>
+							</div>
+							
+							
+							<div class="card-body" style="border: 1px solid black; margin-bottom: 10px; margin-top: 10px;">
+							<div class="row">
+								<div class="table-responsive">
+									<table 		 class="table table-striped table-bordered table-hover margin0 tbl-vm grid-table">
+										
+										<tbody>
+											<tr>
+											<td > <label><span >1. AS Order No.</span></label>  </td>
+											<td>  {{workDataPrint.tsasWorkBeans.asNo}}	</td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span >2. AS Order Date</span>  </label>  </td>
+											<td >  {{workDataPrint.tsasWorkBeans.asDate}} </td>
+									 </tr>
+									 
+									  <tr>
+											<td > <label><span>3. AS Amount</span> </label>  </td>
+											<td >  {{workDataPrint.tsasWorkBeans.asAmt}}	
+											 </td>
+									 </tr>
+									
+								</tbody>		 
+							</table>
+									 
+								</div>
+							</div>	
+						</div>
+						
+						
+						<div class="card-header" style="border: 1px solid black; margin-bottom: 10px; margin-top: 30px;">
+								<div class="row">
+									<div class="col-sm-3" align="center">
+										<span >TENDER AND AGREEMENT DETAILS</span>
+									</div>
+								</div>
+							</div>
+							
+							
+							<div class="card-body" style="border: 1px solid black; margin-bottom: 10px; margin-top: 10px;">
+							<div class="row">
+								<div class="table-responsive">
+									<table 		 class="table table-striped table-bordered table-hover margin0 tbl-vm grid-table">
+										
+										<tbody>
+											<tr>
+											<td > <label><span >1. Work Order Date</span></label>  </td>
+											<td >   {{workDataPrint.workTenderBeans.workOrderDate}}	</td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span >2. PAC Amount</span>  </label>  </td>
+											<td >   {{workDataPrint.workTenderBeans.pacAmount}} </td>
+									 </tr>
+									 
+									  <tr>
+											<td > <label><span>3. Tender percentage</span> </label>  </td>
+											<td >  {{workDataPrint.workTenderBeans.tenderPercentage}} 	
+											 </td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span>3. Contractor Amount</span> </label>  </td>
+											<td >   {{workDataPrint.workTenderBeans.contractAmount}}	
+											 </td>
+									 </tr>
+									 
+									  
+									 <tr>
+											<td > <label><span>3. Stipulated Completion Date</span> </label>  </td>
+											<td >   {{workDataPrint.workTenderBeans.workCompletionDate}}	 
+											 </td>
+									 </tr>
+									
+								</tbody>		 
+							</table>
+									 
+								</div>
+							</div>	
+						</div>
+						
+						
+						<div class="card-header" style="border: 1px solid black; margin-bottom: 10px; margin-top: 30px;">
+								<div class="row">
+									<div class="col-sm-3" align="center">
+										<span >CONTRACTOR DETAILS</span>
+									</div>
+								</div>
+							</div>
+							
+							
+							<div class="card-body" style="border: 1px solid black; margin-bottom: 10px; margin-top: 10px;">
+							<div class="row">
+								<div class="table-responsive">
+									<table 		 class="table table-striped table-bordered table-hover margin0 tbl-vm grid-table">
+										
+										<tbody>
+											<tr>
+											<td > <label><span >1. Contractor Name</span></label>  </td>
+											<td > 	 {{workDataPrint.woContractorBeans.name}}</td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span >2. Mobile No.</span>  </label>  </td>
+											<td > {{workDataPrint.woContractorBeans.contactNo}}</td>  
+									 </tr>
+									 
+									  <tr>
+											<td > <label><span>3. Email-ID</span> </label>  </td>
+											<td > 	 {{workDataPrint.woContractorBeans.emailId}}
+											 </td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span>3. Contractor's Firm Name</span> </label>  </td>
+											<td > {{workDataPrint.woContractorBeans.firmNameAddress}}	
+											 </td>
+									 </tr>
+									 
+									  
+									
+								</tbody>		 
+							</table>
+									 
+								</div>
+							</div>	
+						</div>
+						
+						
+							<div class="card-header" style="border: 1px solid black; margin-bottom: 10px; margin-top: 30px;">
+								<div class="row">
+									<div class="col-sm-3" align="center">
+										<span >COMPLETION CERTIFICATE DETAILS</span>
+									</div>
+								</div>
+							</div>
+							
+							
+							<div class="card-body" style="border: 1px solid black; margin-bottom: 10px; margin-top: 10px;">
+							<div class="row">
+								<div class="table-responsive">
+									<table 		 class="table table-striped table-bordered table-hover margin0 tbl-vm grid-table">
+										
+										<tbody>
+											<tr>
+											<td > <label><span >1. CC No.</span></label>  </td>
+											<td > {{workDataPrint.ccBeans.ccNo}}		</td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span >2. CC Date</span>  </label>  </td>
+											<td > {{workDataPrint.ccBeans.ccDate}}	 </td>
+									 </tr>
+									 
+									  <tr>
+											<td > <label><span>3. HandOver Date</span> </label>  </td>
+											<td > {{workDataPrint.ccBeans.dateHandOver}}		
+											 </td>
+									 </tr>
+									 
+									 <tr>
+											<td > <label><span>3. Final Payment Status</span> </label>  </td>
+											<td > 	{{workDataPrint.ccBeans.paymentStatus}}	
+											 </td>
+									 </tr>
+									 
+									  
+									
+								</tbody>		 
+							</table>
+									 
+								</div>
+							</div>	
+						</div>
+						
+							
+							
+						</form>
+					</div> <!-- Print div -->	
+						
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+</div>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+</head>
+<script type="text/javascript">
+	//<![CDATA[
+	//]]>
+</script>
+<style>
+.label {
+	color: white;
+	padding: 8px;
+}
+
+.other {
+	background-color: #e7e7e7;
+	color: black;
+}
+
+
+
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 7px rgb(0 0 0 / 70%);border-radius:7px
+}
+
+
+</style>
+<div>
+	<ol class="breadcrumb">
+
+		<!-- 	<li  class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="${userName}"></span></a></li>  -->
+		<li class="breadcrumb-item"><a href="#manageImplAgency"><span>Manage
+					Construction Agency</span></a></li>
+
+		<li class="breadcrumb-item active"><span>Add Construction
+				Agency</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-wpforms"></i> <span>Add Construction
+								Agency</span>
+						</div>
+						<form data-ng-submit="addImplAgency(implAgencyForm.$valid)"
+							name="implAgencyForm" novalidate="novalidate"
+							th:object="${addImplAgencyForm}">
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-12">
+										<div data-ng-if="responseObject.errorMessage != null"
+											class="text-danger">
+											<strong>Error!</strong>
+											<p>{{responseObject.errorMessage}}</p>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="form-group col-sm-6">
+										<label><span>Construction Agency Name</span><span
+											class="aestrick">&#42;</span></label> <input type="text"
+											class="form-control" name="implementationAgencyNameE"
+											maxlength="200" required="required"
+											data-ng-model="implAgencyData.implementationAgencyNameE"
+											id="implementationAgencyNameE" autofocus="autofocus" />
+										<div data-ng-show="implAgencyForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="implAgencyForm.implementationAgencyNameE.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Construction
+													Agency Name</span>
+											</p>
+										</div>
+									</div>
+									<div class="form-group col-sm-6"
+										data-ng-init="loadImplementationAgencyType()">
+										<label><span>Type of Construction Agency </span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											id="implAgencyType" required="required"
+											data-ng-model="implAgencyData.implAgencyTypeId"
+											name="implAgencyType">
+											<option value="" disabled="disabled">--Select--</option>
+											<option value="1">Government Agency</option>
+											<!-- <option value="2" >Corporation</option>
+										<option value="10" >Boards</option> -->
+											<!-- <option data-ng-repeat="ia in implementationAgencyTypes"
+											value="{{ia.id}}">{{ia.implAgencyType}}</option> -->
+										</select>
+										<div data-ng-show="implAgencyForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="implAgencyForm.implAgencyType.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Construction
+													Agency Type</span>
+											</p>
+										</div>
+									</div>
+								
+									<div class="form-group col-sm-6">
+										<label><span>Created By</span><span class="aestrick">&#42;</span></label>
+										<!-- <label ><span  class="label other"
+				                                th:text="${userName}"></span></label>  -->
+										<!--  <input type="text"
+											class="form-control" name="createdBy"
+											maxlength="200" required="required"
+											
+											data-ng-model="implAgencyData.createdBy"
+											id="createdBy" autofocus="autofocus" />   -->
+										<span class="form-control"
+											data-ng-model="implAgencyData.createdBy" id="createdBy"
+											th:text="${userName}"></span>
+										<!-- <input  name="implAgencyData.createdBy" id="implAgencyData.createdBy" data-ng-model="implAgencyData.createdBy" type="text" data-ng-bind="${userName}"  ></input> -->
+										<!-- <th:block th:text="${userName}" name="createdBy" data-ng-model="implAgencyData.createdBy" id="createdBy" maxlength="200"> </th:block> -->
+										<div data-ng-show="implAgencyForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="implAgencyForm.createdBy.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Created
+													By</span>
+											</p>
+										</div>
+									</div>
+
+									<div class="form-group col-sm-6">
+										<label><span>Created Date</span><span class="aestrick">&#42;</span></label>
+										<!-- <input type="date"
+											class="form-control" name="createdDate" min="2017-04-01" max="2032-12-30"
+											maxlength="200" required="required"
+											data-ng-model="implAgencyData.createdDate"
+											id="createdDate" autofocus="autofocus" /> -->
+										<span class="form-control" name="createdDate"
+											data-ng-model="implAgencyData.createdDate" id="createdDate"
+											th:text="${myDate}"></span>
+										<!-- <input id="implAgencyData.createdDate"   name="implAgencyData.createdDate"  type="text" th:value="${myDate}" ></input>
+											<th:block th:text="${myDate}"  name="createdDate" data-ng-model="implAgencyData.createdDate" id="createdDate" maxlength="200"> </th:block> -->
+										<div data-ng-show="implAgencyForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="implAgencyForm.createdDate.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span>Created
+													Date</span>
+											</p>
+										</div>
+									</div>
+
+
+
+
+									<!-- 									<div class="form-group col-sm-3"> -->
+									<!-- 										<label><span>Creation Date</span> -->
+									<!-- 										<span -->
+									<!-- 											class="aestrick">&#42;</span></label> -->
+									<!-- 										<div class="input-group date" id="datetimepicker4" -->
+									<!-- 											data-target-input="nearest"> -->
+									<!-- 											<input type="text" class="form-control datetimepicker-input" -->
+									<!-- 												data-target="#datetimepicker4" name="createdDate" -->
+									<!-- 												placeholder="DD/MM/YYYY" required="required" -->
+									<!-- 												data-ng-model="implAgencyData.createdDate" -->
+									<!-- 												id="createdDate" autocomplete="off" maxlength="10" /> -->
+									<!-- 											<div class="input-group-append input-group-addon" -->
+									<!-- 												data-target="#datetimepicker4" data-toggle="datetimepicker"> -->
+									<!-- 												<div class="input-group-text"> -->
+									<!-- 													<i class="fa fa-calendar"></i> -->
+									<!-- 												</div> -->
+									<!-- 											</div> -->
+									<!-- 										</div> -->
+									<!-- 										<div data-ng-show="implAgencyForm.$submitted"> -->
+									<!-- 										<p class="help-block" style="color: red;" -->
+									<!-- 											data-ng-show="implAgencyForm.createdDate.$error.required"> -->
+									<!-- 											<span th:text="#{pleaseSelect}">Please select</span> <span>Creation Date -->
+									<!-- 										 </span> -->
+									<!-- 										</p> -->
+									<!-- 									</div> -->
+									<!-- 									</div> -->
+
+								</div>
+
+							</div>
+							<div class="card-footer text-right">
+								<button type="submit" class="btn btn-sm btn-primary" id="submit">
+									<span th:text="#{submit}">Submit</span>
+								</button>
+								<!-- <button type="reset" class="btn btn-sm btn-danger">Reset</button> -->
+							</div>
+						</form>
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+</div>
+</html>

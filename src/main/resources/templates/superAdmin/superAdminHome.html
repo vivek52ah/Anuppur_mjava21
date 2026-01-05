@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" data-ng-app="dms">
+<head>
+
+
+
+<meta charset="utf-8" />
+<meta name="Referrer-Policy" value="no-referrer | same-origin" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Content-Security-Policy"
+	content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com; frame-src https://app.powerbi.com/; object-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; media-src 'none'; connect-src 'self'" />
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}"
+	type="image/x-icon" />
+<link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon" />
+
+<div th:replace="fragments/header :: header-css" />
+</head>
+<body
+	class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+	<div dw-loading="sample-1" dw-loading-options="{text: 'Loading....'}"
+		class="controller">
+		<!-- <div id="wrapper"> -->
+		<div th:replace="fragments/header :: header_after_login" />
+		<div class="app-body">
+			<div class="sidebar">
+				<nav class="sidebar-nav">
+					<ul class="nav">
+						<!-- <li class="nav-item"><a class="nav-link" href="#dashboard"><i
+								class="icon-speedometer"></i><span th:text="#{dashboard}">Dashboard</span>
+						</a></li> -->
+
+						<!-- <li class="nav-item"><a class="nav-link" href="#manageusers"><i
+								class="fa fa-user"></i><span th:text="#{manageUsers}">Manage
+									Users</span></a></li> -->
+
+						<li class="nav-item"><a class="nav-link"
+							href="#manageImplAgency"><i class="fa fa-circle"></i><span>Manage
+									Contruction Agency</span></a></li>
+						<!-- <li class="nav-item"><a class="nav-link" href="#manageSubEngg"><i
+								class="fa fa-circle"></i><span>Manage
+									Sub Engineer</span></a></li> -->
+
+					</ul>
+					<ul class="nav">
+						<!-- <li class="nav-item"><a class="nav-link"
+							href="#reports"><i class="fa fa-circle"></i><span>Reports</span></a></li> -->
+						<li class="nav-item"><a class="nav-link"
+							href="http://PBIRS_MLALADS:Test%40123@analytics.mp.gov.in:8080/reports/powerbi/PBIRS_MLALADS/MLA%20Lads%20Dashboard%20MIS%20Report?rs:Command=Render&amp;rc:Toolbar=false"><i
+								class="fa fa-circle"></i><span>Reports</span></a></li>
+					</ul>
+				</nav>
+			</div>
+			<!-- <div data-ng-hide="true">
+                <p id = "key" th:text="${key}"></p>
+            </div> -->
+			<!-- Main content -->
+			<main class="main">
+				<!-- <div class="formstyle1"> -->
+				<div data-ng-view=""></div>
+				<!-- </div> -->
+			</main>
+		</div>
+		<!-- </div> -->
+
+		<footer class="app-footer">
+			<span>MLALADS - Monitoring System &copy; 2021. All rights
+				reserved.</span> <span class="ml-auto">Designed &amp; Developed by <a
+				target="_blank"
+				href="http://www.mapit.gov.in/?page=7vG6I3NGGec1YPQRwT3nWQ%3D%3D">Center
+					of Excellence (CoE)</a>, <a target="_blank"
+				href="http://www.mapit.gov.in">MAP_IT</a>.
+			</span>
+		</footer>
+
+		<div th:replace="fragments/footer :: footer" />
+		<script th:src="@{/angular/superAdmin/SuperAdminRouting.js}"></script>
+		<script th:src="@{/angular/superAdmin/SuperAdminController.js}"></script>
+		<script th:src="@{/angular/common/CommonRouting.js}"></script>
+		<script th:src="@{/angular/common/CommonController.js}"></script>
+		<script th:src="@{/angular/customdirective.js}"></script>
+	</div>
+</body>
+
+</html>

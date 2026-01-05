@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+
+
+<script th:src="@{/js/language.js}"></script>
+<script th:src="@{/js/jquery.table2excel.js}"></script>
+<style type="text/css">
+#for_red div#testimonial-slider:hover .testimonial .pic{border-color:#f06548}
+#for_yellow div#testimonial-slider:hover .testimonial .pic{border-color:#FECE62}
+#for_green div#testimonial-slider:hover .testimonial .pic{border-color:#51CDA0}
+.h_iframe iframe {
+	width: 100%;
+	height: 720px;
+}
+.mtop25{margin-top:25px!important}
+.text-center th {
+	text-align: center;
+}
+.card-header {
+    margin-top: 25px;font-size: 20px;
+}
+.dashboardTabs .nav-link.active, .dashboardTabs .nav-link:focus,
+	.dashboardTabs .nav-link:hover, .dashboardTabs .nav-link.active:focus,
+	.dashboardTabs .nav-link.active span:after, .dashboardTabs .nav-link.active span:before,
+	.dashboardTabs .nav-link:focus span:after, .dashboardTabs .nav-link:focus span:before,
+	.dashboardTabs .nav-link:hover span:after, .dashboardTabs .nav-link:hover span:before
+	{
+	background: linear-gradient(to top, rgb(31, 175, 189), rgb(52, 158, 199));
+	color: rgb(255, 255, 255);
+}
+
+.leftstrip {
+	text-align: center;
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+	width: 30px;
+	padding: 7px 0;
+	line-height: 1.3;
+	border-radius: 8px 0;
+	box-shadow: 0 2px 8px 0 rgb(65 65 65/ 19%);
+	align-self: stretch;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* .dashcards.bg3 .leftstrip {
+	background: linear-gradient(45deg, rgb(221 55 117), rgb(230, 74, 66));
+} */
+
+.dashcards {
+	/* display: flex;
+	align-items: center; */
+	margin-bottom: 20px;
+}
+
+/* .dashcards.bg3 {
+	background: rgb(255, 244, 244);
+} */
+
+.dash_card {
+	background: rgb(255 255 255/ 62%);
+	border-radius: 15px;
+	padding: 10px;
+	border: 1px solid rgb(204, 205, 209);
+	display: flex;
+}
+
+.dashboardTabs .nav-link.active, .dashboardTabs .nav-link:focus,
+	.dashboardTabs .nav-link:hover, .dashboardTabs .nav-link.active:focus,
+	.dashboardTabs .nav-link.active span:after, .dashboardTabs .nav-link.active span:before,
+	.dashboardTabs .nav-link:focus span:after, .dashboardTabs .nav-link:focus span:before,
+	.dashboardTabs .nav-link:hover span:after, .dashboardTabs .nav-link:hover span:before
+	{
+	background: linear-gradient(to top, rgb(31, 175, 189), rgb(52, 158, 199));
+	color: rgb(255, 255, 255);
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .navbar .active.dropdown-toggle,
+	.navbar .nav-tabs .active.dropdown-toggle {
+	color: #1a2942;
+	background: #fff;
+	border-color: #e4e4e4;
+	border-bottom-color: #fff;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .navbar .active.dropdown-toggle,
+	.navbar .nav-tabs .active.dropdown-toggle, .nav-tabs .nav-item.show .nav-link,
+	.nav-tabs .nav-item.show .navbar .dropdown-toggle, .navbar .nav-tabs .nav-item.show .dropdown-toggle
+	{
+	color: #3e515b;
+	background-color: #e4e5e6;
+	border-color: #ddd #ddd #e4e5e6;
+}
+
+.dashboardTabs .nav-link.active, .dashboardTabs .nav-link:focus,
+	.dashboardTabs .nav-link:hover, .dashboardTabs .nav-link.active:focus,
+	.dashboardTabs .nav-link.active span:after, .dashboardTabs .nav-link.active span:before,
+	.dashboardTabs .nav-link:focus span:after, .dashboardTabs .nav-link:focus span:before,
+	.dashboardTabs .nav-link:hover span:after, .dashboardTabs .nav-link:hover span:before
+	{
+	background: linear-gradient(to top, rgb(31, 175, 189), rgb(52, 158, 199));
+	color: rgb(255, 255, 255);
+}
+
+.dashboardTabs .nav-link {
+	display: inline-block;
+	background: rgb(204, 127, 12);
+	color: rgb(255, 255, 255);
+	margin: 0;
+	padding: 8px 10px;
+	text-transform: uppercase;
+	font-size: 14px;
+	letter-spacing: 1px;
+	border-radius: 10px 10px 0 0;
+	margin-left: 15px;
+	position: relative;
+}
+
+.dashcards.bg3 .leftstrip {
+	background: linear-gradient(45deg, rgb(221 55 117), rgb(230, 74, 66));
+}
+
+.leftstrip span {
+	width: 15px;
+	word-break: break-all;
+	display: flex;
+	margin: 0 auto;
+	min-height: 75px;
+	justify-content: center;
+	align-items: center;
+}
+
+.dashcards.bg1 .leftstrip {
+	background: linear-gradient(45deg, rgb(111 174 80), rgb(69, 158, 92));
+}
+
+.leftstrip {
+	text-align: center;
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+	width: 30px;
+	padding: 7px 0;
+	line-height: 1.3;
+	border-radius: 8px 0;
+	box-shadow: 0 2px 8px 0 rgb(65 65 65/ 19%);
+	align-self: stretch;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.dash_card {
+	background: rgb(255 255 255/ 62%);
+	border-radius: 15px;
+	padding: 10px;
+	border: 1px solid rgb(204, 205, 209);
+	display: flex;
+}
+
+.dash_card {
+	background: rgb(255 255 255/ 62%);
+	border-radius: 15px;
+	padding: 10px;
+	border: 1px solid rgb(204, 205, 209);
+	display: flex;
+}
+
+.d-block {
+	display: block !important;
+}
+.square-box {
+  width: 150px; /* Adjust the width as needed */
+  height: 150px; /* Make it equal to the width for a square */
+  background-color: #4CAF50; /* Change this to the desired color */
+  color: white;
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+}
+.dashcards .square-box {
+    background: #4cc2e9!important;
+}
+/*  */
+.testimonial {
+    background: linear-gradient(to left, #3a5892 0%, #3487d2 100%);
+    padding: 10px;
+    border-radius: 0 85px 85px 0;
+    color:#fff;
+    position: relative;
+}
+.testimonial .pic {
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    border-radius: 50%;
+    border: 14px solid #5399A5;
+    position: absolute;
+    top: -16px;
+    left: -50px;
+    overflow: hidden;
+    background: #ADADCF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    outline: 2px dotted #fff;
+    outline-offset: -15px;
+}
+.pic span {
+    font-size: 20px;
+    font-weight: 900;
+    color: #000;
+    font-family: math;
+}
+.pic .fa{color: #000;
+    font-size:35px;}
+.testimonial .testimonial-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px;
+    margin: 0;
+    text-align: center;    padding-left: 50px;line-height: 22px;  
+}
+.testimonial {
+   height: 80px;
+}
+.testimonial {
+    height: 70px;
+    width: 90%;
+}
+.testimonial .description{
+    display: inline-block;
+    width: 65%;
+    font-size: 15px;
+    color: #fff;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
+    padding: 28px 0 28px 28px;
+    position: relative;
+}
+div#testimonial-slider {
+    margin-left: 12%;
+}
+.testimonial .description:before{
+    content: "\f10d";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    top: 0;
+    left: 10px;
+    font-size: 20px;
+    color: rgba(255,255,255,0.5);
+}
+.testimonial .description:after{
+    content: "\f10e";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 20px;
+    color: rgba(255,255,255,0.5);
+    position: absolute;
+    bottom: 5px;
+}
+.w100.row.box-set #testimonial-slider {
+    margin-left: 50px;
+}
+.owl-theme .owl-controls .owl-page.active span,
+.owl-theme .owl-controls .owl-page span{
+    width: 7px;
+    height: 7px;
+    background: #2b9464;
+    border: 4px solid #7ccba7;
+    box-sizing: content-box;
+}
+.owl-theme .owl-controls .owl-page span{
+    border: 4px solid transparent;
+    background: #bcbcbc;
+}
+.mset {
+    margin-top: 50px;
+   /*  margin-left: 30px; */
+  
+    display: block;
+}
+div#testimonial-slider:hover .testimonial .pic{border-color:#09A9F7}
+@media only screen and (max-width: 767px){
+    .testimonial{
+        border-radius: 40px;
+        margin: 90px 15px 0;
+        padding: 100px 40px 30px 40px;
+    }
+    .testimonial .pic{
+        position: absolute;
+        top: -85px;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+    .testimonial .testimonial-title{
+        width: 100%;
+        float: none;
+        border-right: none;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    .testimonial .description{
+        width: 100%;
+    }
+    
+}
+@media only screen and (max-width: 480px){
+    .testimonial{ padding: 100px 30px 30px; }
+}
+</style>
+
+
+
+</head>
+
+
+<div id="StartOrFinishSpinnerId"></div>
+<div id="page-div">
+	<ol class="breadcrumb">
+		<!-- <li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li> -->
+				
+				<li class="breadcrumb-item"><a ><span
+				th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item active"><span>Dashboard</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+	<div class="container-fluid pt-4">
+		<div class="row">
+			<!-- <div class="col-xl-1 col-md-2 pt-1 nowrap">
+								<label>Search By:</label>
+							</div> -->
+
+			<div class="col-lg-4">
+				<div class="d-flex">
+					<!-- 	<div class="col-lg-6 form-group"  data-ng-init="loadDistricts();">
+								<select name="district" id="district" class="form-control" data-ng-model="userData.districtId" oncopy="return false" onpaste="return false">
+									<option value="">Select District</option>
+									<option
+												data-ng-repeat="district in districts | orderBy : 'districtName'"
+												value="{{district.districtId}}">{{district.districtName}}</option>
+								</select>
+							</div> -->
+
+
+
+				</div>
+				<!-- <div class="col-lg-1 mb-3">
+								<button type="button" class="btn btn-primary btn-sm"
+									data-ng-click="loadDashBoardData();">Search</button>
+							</div> -->
+			</div>
+
+			<!-- <div class=" px-3 mb-3 float-right">
+								 <button type="button" class="btn btn-success btn-sm" onclick="exportExcel();">
+									<i class="fa fa-file-excel-o"></i>&nbsp;Export To Excel
+								</button>
+								<span > <a
+									th:href="@{/ws/downloadReport/DistrictWiseProgressReport/{{sessionId}}/csv}"
+									target="_blank" class="btn btn-danger btn-sm"> <i
+										class="icon-cloud-download"></i><span>District Wise
+											Progress Report</span></a>
+								</span>
+								
+
+							</div>
+ -->
+		</div>
+		<div class="bg-white p-3 pt-3 shadow-md mb-3"
+			data-ng-init="loadDashBoardData();">
+			<!-- Nav tabs -->
+		<!-- 	<ul class="nav nav-tabs dashboardTabs">
+				<li class="nav-item"><a class="nav-link active"
+					data-toggle="tab" href=".dashboardTab1"> <span>Dashboard</span></a></li>
+				<li class="nav-item"><a class="nav-link" data-toggle="tab" href=".dashboardTab2"> <span>Detail Report</span></a></li>
+				<li class="nav-item"><a class="nav-link" data-toggle="tab" href=".dashboardTab3"> <span>à¤ªà¥�à¤°à¤ªà¤¤à¥�à¤° 1</span></a></li> 
+			</ul> -->
+			<!-- Tab panes -->
+			<div class="tab-content m-0">
+			
+  
+   
+				<!-- Start of dashboardTab 1 -->
+				<div class="tab-pane  active dashboardTab1">
+				
+					<div class="">
+						<div class="dashcards bg3">
+							<!-- <div class="leftstrip">
+								<span>LEGACY</span>
+							</div> -->
+							 <div class="container">
+							 		  <div class="row" >
+							 <div class="col-md-12 ">
+							 <div class="card-header">
+						
+							<i class="fa fa-folder-open-o"></i> <span> Total Works</span>
+
+
+
+						</div>
+						</div>
+							
+        				 <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+                <a href="#manageOngoingWorks"><div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.workCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                       Total Works
+                      
+                       
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+        </div>
+        
+        			 		  <div  id="for_red" class="row  mtop25" style="justify-content:space-between" >
+							 <div class="col-md-12 ">
+							 <div class="card-header">
+						
+							<i class="fa fa-folder-open-o"></i> <span>Not Started works</span>
+
+
+
+						</div>
+						</div>
+						
+							 	 <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+                <a href="#manageOngoingWorks"> <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;"> {{dashboardData.workCreate}} </span>     </div>
+                    <h3 class="testimonial-title">
+                    Work Created
+                      
+                   
+                    </h3>
+                
+                </div>
+ 
+               </a>
+            </div>
+        </div>
+        
+						
+						
+						 	 <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+                <a href="#manageOngoingWorks"> <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.asIsuuesCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                    AS Issued
+                      
+                   
+                    </h3>
+                
+                </div>
+ 
+               </a>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+            <a href="#manageOngoingWorks">     <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.tenderCalledCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                   Tender Called
+                      
+                     
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+        
+        	 <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+                <a href="#manageOngoingWorks"> <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.tenderRcvCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                   Tender Received
+                    
+                       
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+          <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+             <a href="#manageOngoingWorks">    <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.reTenderCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                Re-Tender
+                    
+                     
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+            <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+              <a href="#manageOngoingWorks">   <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.loaIssuesCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                LoA Issued
+                    
+                
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+        
+    
+         <div class="w100 row box-set">
+         
+              <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+               <a href="#manageOngoingWorks">  <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.woIssuedCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                   Work Order Issued
+                   
+                       
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+             <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+            <a href="#manageOngoingWorks">     <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.notStartedCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                   Work Not Started
+                    	
+                       
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+        </div>
+						</div>
+							
+							
+							<!--  -->
+							<div id="for_yellow" class="row mtop25" >
+							 <div class="col-md-12 ">
+							 <div class="card-header">
+						
+							<i class="fa fa-folder-open-o"></i> <span>In progress works</span>
+
+
+
+						</div>
+						</div>
+							
+        		 <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+              <a href="#manageOngoingWorks">   <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.inProgressCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                  Work In-Progress
+             
+                       
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+        </div>
+        
+        	<!-- 2 -->
+							<div id="for_green" class="row mtop25" style="justify-content:space-between" >
+							 <div class="col-md-12 ">
+							 <div class="card-header">
+						
+							<i class="fa fa-folder-open-o"></i> <span>Completed Works</span>
+
+
+
+						</div>
+						</div>
+							
+          <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+             <a href="#manageOngoingWorks">    <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.completedCount}}</span>     </div>
+                    <h3 class="testimonial-title">Work Completed
+                	
+                       
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+            <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+             <a href="#manageOngoingWorks">    <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.ccCount}}</span>     </div>
+                    <h3 class="testimonial-title">Work CC Uploaded
+              
+                    
+                       
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div>
+        
+              <div class="col-md-4 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+          <a href="#manageOngoingWorks">       <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.handOverCount}}</span>     </div>
+                    <h3 class="testimonial-title">Work Hand Over
+                	
+                       
+                    </h3>
+                
+                </div>
+ 
+               </a>
+            </div>
+        </div>
+        </div>
+        
+        		       
+        
+
+        
+							 <div class="row" style="justify-content: space-around;">
+					
+        
+       
+        
+        	 
+        
+        
+        <!--=========start=================  -->
+     <!--     <div class="col-md-3 mset">
+            <div id="testimonial-slider" class="owl-carousel">
+                <a href="#manageOngoingWorks"> <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.tenderApprovalInprocessCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                  Tender Approval in Process
+                    
+                       
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div> -->
+                <!--==========================  -->
+       
+                <!--==========================  -->
+     
+                <!--==========================  -->
+        
+                <!--==========================  -->
+    
+                <!--==========================  -->
+        
+                <!--==========================  -->
+      
+                <!--==========================  -->
+     
+                <!--==========================  -->
+
+              </div>
+          <div class="row"  style="    padding-left: 25px;
+          ">
+   
+                <!--==========================  -->
+         <!-- <div class="col-md-3 mset" style="    margin-left: 95px;" >
+            <div id="testimonial-slider" class="owl-carousel">
+                <a href="#manageOngoingWorks"> <div class="testimonial">
+                    <div class="pic">
+                   <span style="margin: 30px;">{{dashboardData.tenderRcvCount}}</span>     </div>
+                    <h3 class="testimonial-title">
+                   Tender Received
+                    
+                       
+                    </h3>
+                
+                </div>
+ </a>
+               
+            </div>
+        </div> -->
+        
+           </div></div>
+							<div class="flex1">
+							     
+								<!-- <div class="d-flex flex-wrap mx-2">
+									<div class="w-5">
+										<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+											<p>Total Works</p>
+												<h5 style="margin: 30px;">{{dashboardData.workCount}}</h5>
+												
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+										<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+										<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.tenderCalledCount}}</h5>
+												<p>Tender Called</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+										<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.tenderRcvCount}}</h5>
+												<p>Tender Received</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+											<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.tenderApprovalInprocessCount}}</h5>
+												<p>Tender Approval in Process</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+											<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.reTenderCount}}</h5>
+												<p>Re-Tender</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+											<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.loaIssuesCount}}</h5>
+												<p>LoA Issued</p>
+											</div>
+										</div>
+									</div>
+
+
+									<div class="w-5">
+											<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.woIssuedCount}}</h5>
+												<p>Work Order Issued</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+										<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.notStartedCount}}</h5>
+												<p>Work Not Started</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+										<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.inProgressCount}}</h5>
+												<p>Work In-Progress</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+									<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.completedCount}}</h5>
+												<p>Work Completed</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+										<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.ccCount}}</h5>
+												<p>Work CC Uploaded</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="w-5">
+										<div class="text-center d-block" style="margin: 10px;"
+											id="workCount">
+											<div class="square-box">
+												<h5 style="margin: 30px;">{{dashboardData.handOverCount}}</h5>
+												<p>Work Hand Over</p>
+											</div>
+										</div>
+									</div>
+
+								</div> -->
+
+
+							
+							</div>
+						</div>
+
+
+
+
+
+					</div>
+				</div>
+				<!-- Close dashboardTab 1 -->
+
+               <div>
+               	<div style="padding: 20px" class="container mtop25">
+									<div id="chartContainer" style="height: 300px; width: 100%"></div>
+								</div>
+               
+               
+               </div>
+
+
+				<!-- Start dashboardTab 2 -->
+				<div class="tab-pane  fade dashboardTab2">
+					<div>
+
+
+
+						<div>
+							<div class="table-responsive responsive-md table-sticky">
+								<div
+									data-ng-if="dashBoardData==null || dashBoardData.aaData.length==0">
+									<div>
+										<span>No records</span>
+									</div>
+								</div>
+								<table id="table2excelDetailReport"
+									data-ng-if="dashBoardData.aaData.length>=1"
+									class="table table-striped table-bordered table-hover margin0 tbl-vm">
+									<thead class="thead-default">
+										<tr>
+											<th style="text-align: center;"
+												data-ng-repeat="column1 in dashBoardData.aaColumn"><span>{{column1}}</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr data-ng-repeat="aData in dashBoardData.aaData">
+											<td data-ng-repeat="(key,value) in aData">{{value}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Close dashboardTab 2 -->
+				<!-- Start dashboardTab 3 -->
+				<div class="tab-pane  fade dashboardTab3">
+					<h5 class="text-center mb-3">à¤µà¤¿à¤­à¤¾à¤— à¤¸à¥‡
+						à¤ªà¥�à¤°à¤¦à¤¾à¤¯ à¤†à¤¦à¥‡à¤¶ à¤•à¥€ à¤¸à¥�à¤¥à¤¿à¤¤à¤¿</h5>
+					<div class="table-responsive responsive-md table-sticky">
+
+						<table
+							class="table table-striped table-bordered table-hover margin0 tbl-vm">
+							<thead class="thead-default text-center">
+								<tr>
+									<th rowspan="3">à¤¸ à¤•à¥�à¤°</th>
+									<th rowspan="3">à¤œà¤¿à¤²à¥‡ à¤•à¥‡ à¤¨à¤¾à¤®</th>
+									<th colspan="6">à¤°à¤¾à¤œà¥�â€�à¤¯ à¤—à¥�à¤°à¤¾à¤®à¥€à¤£
+										à¤†à¤œà¥€à¤µà¤¿à¤•à¤¾ à¤®à¤¿à¤¶à¤¨</th>
+									<th colspan="6">à¤°à¤¾à¤œà¥�â€�à¤¯ à¤¶à¤¹à¤°à¥€
+										à¤†à¤œà¥€à¤µà¤¿à¤•à¤¾ à¤®à¤¿à¤¶à¤¨</th>
+									<th colspan="6">à¤®à¤¹à¤¿à¤²à¤¾ à¤¬à¤¾à¤² à¤�à¤µà¤‚
+										à¤µà¤¿à¤•à¤¾à¤¸ à¤µà¤¿à¤­à¤¾à¤—</th>
+								</tr>
+								<tr>
+									<th rowspan="2">SHG à¤•à¥€ à¤¸à¤‚à¤–à¥�â€�à¤¯à¤¾</th>
+									<th rowspan="2">à¤†à¤¦à¥‡à¤¶ à¤•à¥€ à¤®à¤¾à¤¤à¥�à¤°à¤¾</th>
+									<th rowspan="2">à¤•à¥�à¤² à¤—à¤£à¤µà¥‡à¤¶
+										à¤¸à¤‚à¤–à¥�â€�à¤¯à¤¾</th>
+									<th colspan="3">Release Fund</th>
+									<th rowspan="2">SHG à¤•à¥€ à¤¸à¤‚à¤–à¥�â€�à¤¯à¤¾</th>
+									<th rowspan="2">à¤†à¤¦à¥‡à¤¶ à¤•à¥€ à¤®à¤¾à¤¤à¥�à¤°à¤¾</th>
+									<th rowspan="2">à¤•à¥�à¤² à¤—à¤£à¤µà¥‡à¤¶
+										à¤¸à¤‚à¤–à¥�â€�à¤¯à¤¾</th>
+									<th colspan="3">Release Fund</th>
+									<th rowspan="2">SHG à¤•à¥€ à¤¸à¤‚à¤–à¥�â€�à¤¯à¤¾</th>
+									<th rowspan="2">à¤†à¤¦à¥‡à¤¶ à¤•à¥€ à¤®à¤¾à¤¤à¥�à¤°à¤¾</th>
+									<th rowspan="2">à¤•à¥�à¤² à¤—à¤£à¤µà¥‡à¤¶
+										à¤¸à¤‚à¤–à¥�â€�à¤¯à¤¾</th>
+									<th colspan="3">Release Fund</th>
+								</tr>
+								<tr>
+									<th>I</th>
+									<th>II</th>
+									<th>III</th>
+									<th>I</th>
+									<th>II</th>
+									<th>III</th>
+									<th>I</th>
+									<th>II</th>
+									<th>III</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td colspan="20">No records found !</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- Close dashboardTab 3 -->
+
+			</div>
+
+
+		</div>
+
+
+
+
+		<div class="row mt-4 flex-wrap dashboard"></div>
+
+	</div>
+	<!-- Modal -->
+
+
+</div>
+
+
+
+<!-- 
+<body data-ng-app="dms" data-ng-controller="SystemAdminController as ctrl" data-ng-init="loadPieChartDashboardData();">
+        <canvas id="pie" class="chart chart-pie"
+        data-chart-data="ctrl.data" data-chart-labels="ctrl.labels" 
+        data-chart-options="ctrl.options">
+    </canvas> 
+
+  </body> -->
+
+<!-- <script type="text/javascript" src="https://cdn.canvasjs.com"></script> -->
+<script th:src="@{/js/canvasjs.min.js}"></script>
+<!-- <script th:src="@{angular/canvasjs.min.js"></script> -->
+<script type="text/javascript">
+ 
+ 
+ 
+
+ 
+ function updateChart(workCount,handOverCount,ccCount,completedCount,inProgressCount,notStartedCount,woIssuedCount,loaIssuesCount,reTenderCount,tenderApprovalInprocessCount,tenderRcvCount,tenderCalledCount,asIsuuesCount) {
+	   
+	 var initialDataPoints = [
+		    { y: 4181563, indexLabel: "Created Work" },
+		    { y: 2175498, indexLabel: "AS Issued" },
+		    { y: 3125844, indexLabel: "Tender Called" },
+		    { y: 1176121, indexLabel: "Work Order Issued" },
+		    { y: 1727161, indexLabel: "Not Started" },
+		    { y: 4303364, indexLabel: "In-Progress" },
+		    { y: 1717786, indexLabel: "HandOver" }
+		];
+	 
+	    // Calculate total value of all input fields
+	    var totalValue = workCount + handOverCount + ccCount + completedCount + inProgressCount + notStartedCount + woIssuedCount
+	    loaIssuesCount + reTenderCount + tenderApprovalInprocessCount + tenderRcvCount + tenderCalledCount + asIsuuesCount;
+
+	    // Calculate new data points only if totalValue is not zero
+	    var dataPoints;
+	    if (totalValue !== 0) {
+	        dataPoints = initialDataPoints.map(dataPoint => ({
+	            y: (dataPoint.y / totalValue) * 100, // Convert to percentage
+	            indexLabel: dataPoint.indexLabel
+	        }));
+	    } else {
+	        // Set dataPoints to an empty array or handle this case as per your requirement
+	        dataPoints = [];
+	    }
+
+	    var chart = new CanvasJS.Chart("chartContainer",{
+	        theme: "light2",
+	        title: {
+	            text: "DHS Progress in 2023-2024"
+	        },
+	        data: [{
+	            type: "pie",
+	            showInLegend: true,
+	            toolTipContent: "{y} - #percent %",
+	            yValueFormatString: "#,##0,,.## ",
+	            legendText: "{indexLabel}",
+	            dataPoints: dataPoints
+	        }]
+	    });
+	    chart.render();
+
+}
+</script>
+
+
+<script type="text/javascript" th:inline="javascript">
+	function exportExcel() {
+		$(".modal").appendTo("body");
+		$("#table2excelDetailReport").table2excel({
+			exclude : ".noExl",
+			name : "Dashboard Data",
+			filename : "DashBoardReport"
+		});
+	}
+</script>
+
+
+</html>

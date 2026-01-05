@@ -1,0 +1,349 @@
+<div th:fragment="add_TSASDetails">
+	<form
+		data-ng-submit="createTSASWorkData(workFormName.$valid,ldPdfFile,AdPdfFile, 'Add')"
+		name="workFormName" id="workFormName" novalidate="novalidate"
+		enctype="multipart/form-data">
+
+		<div class="card">
+
+
+			<div class="card-header">
+				<span>Administrative Approval Details</span>
+			</div>
+			<div class="card-body">
+				<div class="row">
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asOrderNo}">AS Order No. </span><span
+							class="aestrick">&#42;</span></label> <input type="text"
+							class="form-control" id="asNo" required="required"
+							data-ng-model="workDataTS.asNo" name="asNo" />
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asNo.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{asOrderNo}"> Administrative Sanction No</span>
+							</p>
+						</div>
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asOrderDate}">AS Order Date
+						</span><span class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker1"
+							data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input"
+								data-target="#datetimepicker1" name="asDate" required="required"
+								placeholder="DD/MM/YYYY" data-ng-model="workDataTS.asDate"
+								id="asDate" autocomplete="off" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker1" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+						</div>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asDate.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{asOrderDate}"></span>
+							</p>
+						</div>
+
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asAmount}">AS Amount (In
+								Lacs )</span><span class="aestrick">&#42;</span></label> <input type="number"
+							class="form-control number-OnlyTwoDecimal" id="asAmt"
+							required="required" min="0" data-ng-model="workDataTS.asAmt"
+							name="asAmt" data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/"
+							step="0.01" />
+                       
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asAmt.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{asAmount}"></span>
+							</p>
+
+							<div>
+
+								<div data-ng-show="workDataTS.asAmt!=null">
+									<p class="help-block" style="color: red;">
+										<span class="help-block"
+											data-ng-show="!workFormName.asAmt.$valid"> Add Max.
+											Two Decimal! </span>
+									</p>
+
+								</div>
+							</div>
+						</div>
+
+
+
+
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<div class="form-group">
+							<label> <span th:text="#{uploadASSanctionFile}">Upload
+									Technical Sanction File</span> <span class="aestrick">&#42;</span>
+							</label> <input required="required" type='file' accept=".pdf"
+								class="form-control" file-model="AdPdfFile" name="AsPdfFile"
+								id="AsPdfFile" /> <span><b>(pdf file with max size 30 mb)</b></span>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorAd &amp;&amp; !workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileSizeErrorAd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file size does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorAd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file format does not supported</span>
+							</p>
+
+
+
+							<div data-ng-show="workFormName.$submitted">
+								<p class="help-block" style="color: red;"
+									data-ng-show="noFileError">
+									<span th:text="#{pleaseUploadFile}"></span>
+								</p>
+
+							</div>
+
+
+						</div>
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span>Remarks</span><span class="aestrick">&#42;</span></label>
+						<textarea class="form-control" id="asRemarks" required="required"
+							data-ng-model="workDataTS.asRemarks" name="asRemarks"></textarea>
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asRemarks.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{remarks}"></span>
+							</p>
+						</div>
+					</div>
+
+				<!-- 	<div class="form-group col-sm-4">
+
+
+						<label><span>Current Work Status</span></label>
+						<textarea id="workStatus" required="required" name="workStatus"
+							rows="1" cols="30" disabled="disabled">AS Issued</textarea>
+
+						<div data-ng-show="workForm.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workForm.workStatus.$error.required">
+								<span th:text="#{pleaseSelect}">Please select</span> <span>Current
+									Work Status</span>
+							</p>
+						</div>
+					</div> -->
+
+
+
+
+
+				</div>
+			</div>
+
+
+
+			<div class="card-header">
+				<span>Technical Sanction Details</span>
+			</div>
+			<div class="card-body">
+				<div class="row">
+
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsOrderNo}">TS Order No. </span></label> <input
+							type="text" class="form-control" id="tsNo"
+							data-ng-model="workDataTS.tsNo" name="tsNo" /> <input
+							type="hidden" data-ng-model="workDataTS.workId" />
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsNo.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsOrderNo}"> technical Sanction No</span>
+							</p>
+						</div>
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsOrderDate}">TS Order Date
+						</span></label>
+						<div class="input-group date" id="datetimepicker3"
+							data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input"
+								data-target="#datetimepicker3" name="tsDate"
+								placeholder="DD/MM/YYYY" data-ng-model="workDataTS.tsDate"
+								id="startingDate" autocomplete="off" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker3" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+						</div>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsDate.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsOrderDate}"></span>
+							</p>
+						</div>
+
+					</div>
+
+					<!-- data-ng-paste="paste($event)" -->
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsAmount}">TS Amount (In
+								Lacs )</span></label> <input type="number"
+							class="form-control number-OnlyTwoDecimal" id="tsAmt" min="0"
+							data-ng-model="workDataTS.tsAmt" name="tsAmt"
+							data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                     <span><b>(Amount should be less then 99.99 crore)</b></span>
+						<div data-ng-show="workFormName.$submitted">
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsAmt.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsAmount}">Technical Sanction Amount(In Lacs)</span>
+							</p>
+
+							<div>
+								<div data-ng-show="workDataTS.tsAmt!=null">
+									<p class="help-block" style="color: red;">
+										<span class="help-block"
+											data-ng-show="!workFormName.tsAmt.$valid"> Add Max.
+											Two Decimal! </span>
+									</p>
+
+								</div>
+
+							</div>
+
+
+						</div>
+
+
+
+						<!--  <label class="amount-color">{{workDataTS.tsAmt
+							| inWords}}</label>
+ -->
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<div class="form-group">
+							<label> <span th:text="#{uploadTechnicalSanctionFile}">Upload
+									Technical Sanction File</span>
+							</label> <input type='file' accept=".pdf" class="form-control"
+								file-model="ldPdfFile" name="ldPdfFile" id="ldPdfFile" /> 
+								<span><b>(pdf file with max size 30 mb)</b></span>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorLd &amp;&amp; !workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorLd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileSizeErrorLd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file size does not supported</span>
+							</p>
+
+							<div data-ng-show="workFormName.$submitted">
+								<p class="help-block" style="color: red;"
+									data-ng-show="noFileError">
+									<span th:text="#{pleaseUploadFile}"></span>
+								</p>
+
+							</div>
+
+
+						</div>
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<label><span>Remarks</span></label>
+						<textarea class="form-control" id="tsRemarks"
+							data-ng-model="workDataTS.tsRemarks" name="tsRemarks"></textarea>
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsRemarks.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{remarks}"></span>
+							</p>
+						</div>
+					</div>
+
+
+
+
+
+
+
+				</div>
+				<!--/.row-->
+
+
+				<!-- 2nd Row start -->
+
+
+
+
+			</div>
+
+
+
+			<!-- 	<div class="card-footer text-right">
+								<button type="submit" class="btn btn-sm btn-primary" id="submit">
+									<span th:text="#{submit}">Submit</span>
+								</button>
+								<button type="reset" class="btn btn-sm btn-danger">Reset</button>
+							</div> -->
+
+		</div>
+
+		<div class="tab-footer text-right">
+			<button type="submit" class="btn  btn-success  next-button"
+				id="draftTSbtn"
+				data-ng-click="finalSubmit=false;saveTSDraft=true;saveTSNext=false;">
+				<i class="las la-file-alt"></i> Save As Draft
+			</button>
+			<button type="submit" class="btn btn-primary next-button nexxt"
+				id="finalTStbtn"
+				data-ng-click="finalSubmit=false;saveTSDraft=true;saveTSNext=true;">
+				Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
+			</button>
+		</div>
+	</form>
+</div>

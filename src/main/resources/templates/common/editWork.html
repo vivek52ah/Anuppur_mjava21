@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+	<link th:href="@{/js/leaflet/leaflet.css}" rel="stylesheet" />
+	
+	
+<head>
+<meta charset="UTF-8"/>
+
+    <script th:src="@{/js/leaflet/leaflet.js}"></script>
+<script th:src="@{/js/language.js}"></script>
+<script th:src="@{/js/bootstrap-select.min.js}"></script>
+
+
+<script th:src="@{/js/bootstrap-select.js}"></script>
+
+<script th:src="@{/js/jquery-2.2.3.min.js}"></script>
+<script th:src="@{/js/jquery-gmaps-latlon-picker.js}"></script>
+<script th:src="@{/js/wizard.js}"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+  
+ <script>
+ function initilizemap(data) {
+	    // Get the first latitude and longitude for the map center
+	    var firstPoint = data.points[0]; // The first latitude and longitude in the array
+	    var firstLat = firstPoint.lattitude;
+	    var firstLng = firstPoint.longitude;
+
+	    // Initialize the map with the first point as the center
+	    var mymap = L.map('map', {
+	        center: [firstLat, firstLng], // Default center (latitude, longitude)
+	        zoom: 13,        // Start at a zoom level that fits the points (you can adjust it)
+	        minZoom: 16,      // Set minimum zoom level
+	        maxZoom: 18      // Set maximum zoom level
+	    });
+
+	    // Add the tile layer (OpenStreetMap)
+	    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	    }).addTo(mymap);
+	    var customIcon = L.icon({
+	        iconUrl: '/anuppur/js/leaflet/images/marker-icon-2x.png', // Your custom marker image URL
+	        iconSize: [32, 32],  // Set the size of the icon
+	        iconAnchor: [16, 32],  // Anchor point
+	        popupAnchor: [0, -32]  // Popup relative to the icon
+	    });
+	    // Array to hold the coordinates for the polyline
+	    var latlngs = [];
+
+	    // Initialize a LatLngBounds object to calculate the map's bounds for the markers
+	    var bounds = L.latLngBounds();
+
+	    // Loop through the points in the data and create markers
+	    data.points.forEach(function(point) {
+	    	var marker = L.marker([point.lattitude, point.longitude], { icon: customIcon })  // Use the custom icon here
+            .addTo(mymap)
+            .bindPopup(`Latitude: ${point.lattitude}, Longitude: ${point.longitude}`); // Popup with lat/long
+
+	        // Extend the bounds to include the current marker
+	        bounds.extend(marker.getLatLng());
+
+	        // Add the coordinates to the latlngs array for the polyline
+	        latlngs.push([point.lattitude, point.longitude]);
+	    });
+        
+	    // Ensure the polyline is added after markers to avoid drawing before map is ready
+	    var polyline = L.polyline(latlngs, { color: 'blue' }).addTo(mymap);
+
+	    // Fit the map to the bounds of the markers and adjust zoom accordingly
+	    mymap.fitBounds(bounds, {
+	        padding: [50, 50], // Padding to prevent markers from being too close to the edges
+	        maxZoom: 17        // Max zoom when fitting to bounds
+	    });
+
+	    // Optionally zoom to the first marker explicitly
+	     mymap.setView([firstLat, firstLng], 13); // Uncomment if you want to directly set the view to the first marker
+	    
+	}
+</script>
+
+<style>
+div#imageset img {
+	height: 600px;
+	width: 600px;
+}
+
+div#imageset {
+	margin: 0 auto;
+}
+
+.table-head {
+	padding: 5px 10px !important;
+	border-top-color: rgb(255, 255, 255) !important;
+	border-right-color: rgb(255, 255, 255) !important;
+	background: rgb(224, 229, 238);
+	border-radius: 7px;
+}
+  body > #mapBox2 {
+            position: relative;
+            overflow: hidden;
+        }
+.mapBox map{
+	margin-top: 50px;
+}
+
+
+.table-head>div {
+	white-space: nowrap;
+	display: inline-block;
+	font-size: 19px;
+	color: rgb(0, 108, 182);
+	font-weight: 500;
+}
+
+.tbl1 td:first-child {
+	max-width: 50px;
+}
+
+@media ( min-width : 992px) {
+	.modal-lg {
+		max-width: 641px;
+	}
+}
+
+.plus {
+	float: right;
+	background: rgb(73, 112, 176);
+	height: 28px;
+	width: 28px;
+	color: rgb(255, 255, 255);
+	text-align: center;
+	border-radius: 50%;
+	font-size: 12px;
+	line-height: 29px;
+	margin-left: 10px;
+	cursor: pointer;
+}
+
+.plus .fa {
+	transition: all .3s ease;
+}
+
+.plus.active .fa {
+	transform: rotate(-90deg);
+}
+
+.tbody-content {
+	/*  display: none; */
+	
+}
+
+.tbl-lg tr td input[type="text"] {
+	min-width: 100px;
+	height: 37px;
+	font-size: 13px;
+	/* padding: 2px 5px; */
+	text-align: center;
+}
+
+.datePickerTimeSplit1 .bootstrap-datetimepicker-widget {
+	position: absolute;
+	top: -10em !important;
+}
+
+.first-table-div {
+	height: 30vh;
+}
+
+.nav-justified .nav-link {
+	color: #f57f17;
+	font-weight: 600;
+	border: 1px solid #eaeaea;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+li.nav-item a {
+	padding: 6px 5px;
+	min-height: 60px;
+	background: #f5f2f2;
+	font-size: 14px;
+}
+
+li.nav-item a .fa {
+	font-size: 20px;
+	margin-right: 5px
+}
+
+.wizard-inner {
+	width: 1236px;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+.nav-justified {
+	background: #f6f6f6;
+	width: 1400px;
+}
+
+.card-header {
+	border-bottom: 0px solid #e4e4e4;
+}
+
+a.nav-link.active {
+	background: #1a2942 !important;
+	color: #fff !important;
+}
+
+a.nav-link:hover {
+	background: #f57f17;
+	color: #fff;
+}
+
+textarea#workStatus {
+	display: block;
+}
+
+textarea#workStatusNew {
+	display: block;
+}
+
+.display-block {
+	display: block;
+}
+</style>
+<style>
+#multistepsform {
+	width: 660px;
+	margin: 50px auto;
+	text-align: center;
+	position: relative;
+}
+
+#multistepsform fieldset {
+	background: white;
+	border: 0 none;
+	border-radius: 3px;
+	box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+	padding: 20px 30px;
+	box-sizing: border-box;
+	width: 80%;
+	margin: 0 10%;
+	position: relative;
+}
+
+#multistepsform fieldset:not(:first-of-type) {
+	display: none;
+}
+
+#multistepsform input, #multistepsform textarea {
+	padding: 15px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	margin-bottom: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	font-family: montserrat;
+	color: #2c3e50;
+	font-size: 13px;
+}
+
+#multistepsform input:focus, #multistepsform textarea:focus {
+	border-color: #679b9b;
+	outline: none;
+	color: #637373;
+}
+
+#multistepsform .action-button {
+	width: 100px;
+	background: #ff9a76;
+	font-weight: bold;
+	color: #fff;
+	transition: 150ms;
+	border: 0 none;
+	border-radius: 1px;
+	cursor: pointer;
+	padding: 10px 5px;
+	margin: 10px 5px;
+}
+
+#multistepsform .action-button:hover, #multistepsform .action-button:focus
+	{
+	box-shadow: 0 0 0 2px #f08a5d, 0 0 0 3px #ff976;
+	color: #fff;
+}
+
+#multistepsform .fs-title {
+	font-size: 15px;
+	text-transform: uppercase;
+	color: #2c3e50;
+	margin-bottom: 10px;
+}
+
+#multistepsform .fs-subtitle {
+	font-weight: normal;
+	font-size: 13px;
+	color: #666;
+	margin-bottom: 20px;
+}
+
+#multistepsform #progressbar {
+	margin-bottom: 30px;
+	overflow: hidden;
+	counter-reset: step;
+}
+
+#multistepsform #progressbar li {
+	list-style-type: none;
+	color: #679b9b;
+	text-transform: uppercase;
+	font-size: 9px;
+	width: 15%;
+	float: left;
+	position: relative;
+}
+
+#multistepsform #progressbar li:before {
+	content: counter(step);
+	counter-increment: step;
+	width: 20px;
+	line-height: 20px;
+	display: block;
+	font-size: 10px;
+	color: #fff;
+	background: #679b9b;
+	border-radius: 3px;
+	margin: 0 auto 5px auto;
+}
+
+#multistepsform #progressbar li:after {
+	content: "";
+	width: 100%;
+	height: 2px;
+	background: #679b9b;
+	position: absolute;
+	left: -50%;
+	top: 9px;
+	z-index: -1;
+}
+
+#multistepsform #progressbar li:first-child:after {
+	content: none;
+}
+
+#multistepsform #progressbar li.active {
+	color: #ff9a76;
+}
+
+#multistepsform #progressbar li.active:before, #multistepsform #progressbar li.active:after
+	{
+	background: #ff9a76;
+	color: white;
+}
+
+li.nav-item span.fa {
+	border: 1px solid #fff;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	border-radius: 50%;
+	color: #fff;
+	display: block;
+	margin: 0 auto;
+	margin-bottom: 15px;
+}
+
+li.nav-item a.nav-link {
+	display: block
+}
+
+li.nav-item a {
+	padding: 6px 5px;
+	min-height: auto !important;
+	background: #f5f2f2;
+	font-size: 14px;
+}
+
+.wizard-inner a.nav-link {
+	background: #fff !important;
+	color: #fff !important;
+}
+
+a.nav-link.active {
+	background: #fff !important
+}
+
+a.nav-link.active span {
+	background: #1d9220 !important
+}
+
+.card {
+	margin-bottom: 1.5rem;
+	box-shadow: 0 0 7px rgb(0 0 0/ 70%);
+	border-radius: 7px
+}
+
+ul.nav.nav-tabs.nav-justified.border-0.bg-white li a, ul.nav.nav-tabs.nav-justified.border-0.bg-white li
+	{
+	width: auto;
+	border: none;
+}
+
+button#drafTtbtn {
+	margin: 5px;
+}
+
+button#finalTtbtn {
+	margin: 5px;
+}
+
+button#draftCobtn {
+	margin: 5px;
+}
+
+button#finalCotbtn {
+	margin: 5px;
+}
+
+button#drafProbtn {
+	margin: 5px;
+}
+
+button#finalProtbtn {
+	margin: 5px;
+}
+
+.wizard-inner {
+	width: 100% !important;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.wizard .tab-content {
+	border: none;
+}
+
+.dataTables_length {
+	display: none;
+}
+
+ul.pagination {
+	display: none;
+}
+
+th {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+td {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+/* datetimepicker21 .picker-switch, .picker-switch {
+	display: none,
+} */
+.close {
+	color: #fff;
+	top: -10px;
+	position: relative;
+}
+</style>
+
+</head>
+
+
+<script th:src="@{/js/sweetalert2.min.js}"></script>
+<link rel="stylesheet" th:href="@{/css/sweetalert2.min.css}" />
+
+<script type="text/javascript">
+	$(function() {
+
+		$('#datetimepicker4').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+		});
+
+		$('#datetimepicker7').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+		$('#datetimepicker3').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		$('#datetimepicker2').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		var date1;
+		$("#datetimepicker2").on("change.datetimepicker", function(e) {
+			date1 = e.date;
+
+		});
+
+		$('#datetimepicker6').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		$("#datetimepicker6").on("change.datetimepicker", function(e) {
+			$('#datetimepicker6').datetimepicker('minDate', date1);
+		});
+
+		$('#datetimepicker10').datetimepicker({
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		$('#datetimepicker5').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		$('#datetimepicker8').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		$('#datetimepicker9').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		$('#datetimepicker11').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+		$('#datetimepicker12').datetimepicker({
+			maxDate : moment(),
+			pickTime : false,
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+		/* $('#datetimepicker122').datetimepicker({ pickTime: false }), */
+
+		$('#datetimepicker13').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+		$('#datetimepicker14').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		var date2;
+		$("#datetimepicker14").on("change.datetimepicker", function(e) {
+			date2 = e.date;
+
+		});
+
+		$('#datetimepicker15').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		$("#datetimepicker15").on("change.datetimepicker", function(e) {
+			$('#datetimepicker15').datetimepicker('minDate', date2);
+		});
+
+		
+
+	
+
+		$('#datetimepicker21').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
+		$('#datetimepicker18').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+		
+		$('#datetimepicker19').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+		
+		
+		
+		// Sumit Update the minDate of datetimepicker10 when a date is selected in datetimepicker9
+		
+		$('#datetimepicker20').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+			,  useCurrent: false 
+		});
+        $('#datetimepicker22').datetimepicker({
+			
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+      $('#datetimepicker20').on('change.datetimepicker', function (e) {
+            var date = e.date;
+            var newMinDate = date.clone().add(1, 'days');
+            $('#datetimepicker22').datetimepicker('minDate', newMinDate);
+        }); 
+        
+      
+        $('#datetimepicker9').on('change.datetimepicker', function (e) {
+            var date = e.date;
+            var newMinDate = date.clone().add(1, 'days');
+            $('#datetimepicker10').datetimepicker('minDate', newMinDate);
+        });
+        $('#datetimepicker23').datetimepicker({
+    		
+    		minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+    		format : 'DD/MM/YYYY'
+    	});
+
+	});
+	
+	
+
+	/*  $( function() {
+		  
+		  var todaydt = new Date();
+		    $("#workOrderDate").datepicker({
+		                autoclose: true,
+		                    dateFormat: "DD/MM/YYYY",
+		                    endDate: todaydt,
+		                onSelect: function (date) {
+		                   //Get selected date 
+		                    var date2 = $('#workOrderDate').datepicker('getDate');
+		                    //sets minDate to txt_date_to
+		                    $('#txt_date_to').datepicker('option', 'minDate', date2);
+		                }
+		            });
+		            $('#tenderOpeningDate').datepicker({
+		                dateFormat: "DD/MM/YYYY",
+		                
+		            });
+	} ); */
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+	//<![CDATA[
+	/* jQuery.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings) {
+	 return {
+	 "iStart" : oSettings._iDisplayStart,
+	 "iEnd" : oSettings.fnDisplayEnd(),
+	 "iLength" : oSettings._iDisplayLength,
+	 "iTotal" : oSettings.fnRecordsTotal(),
+	 //"iFilteredTotal" : oSettings.fnRecordsDisplay(),
+	 "iPage" : oSettings._iDisplayLength === -1 ? 0 : Math
+	 .ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+	 "iTotalPages" : oSettings._iDisplayLength === -1 ? 0 : Math
+	 .ceil(oSettings.fnRecordsDisplay()
+	 / oSettings._iDisplayLength)
+	 };
+	 }; */
+
+	/* var tsAmt = document.getElementById('tsAmt');
+	 var asAmt = document.getElementById('asAmt');
+	 var asRevAmt = document.getElementById('asRevAmt');
+	 var tsRevAmt = document.getElementById('tsRevAmt'); */
+
+	// Listen for input event on numInput.
+	/* tsAmt.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+	 asAmt.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+
+	 asRevAmt.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+
+	 tsRevAmt.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 } */
+
+	/* var tsTenure = document.getElementById('tsTenure');
+	 var contractAmount = document.getElementById('contractAmount');
+	 var tenderPer = document.getElementById('tenderPer'); */
+	//var pacAmount = document.getElementById('pacAmount');
+	/* tsTenure.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+
+	 contractAmount.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+
+	 tenderPer.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+	 */
+	/* pacAmount.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 } */
+
+	/* var expensessCurrentFy = document.getElementById('expensessCurrentFy');
+
+
+	 expensessCurrentFy.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+
+	 var byState = document.getElementById('byState');
+	 var byNHM = document.getElementById('byNHM');
+	 var byECRP = document.getElementById('byECRP');
+	 var byOthers = document.getElementById('byOthers');
+
+	 byState.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+	 byNHM.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+	 byECRP.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 }
+
+	 byOthers.onkeydown = function(e) {
+	 if(!((e.keyCode > 95 && e.keyCode < 106)
+	 || (e.keyCode > 47 && e.keyCode < 58) 
+	 || e.keyCode == 8)) {
+	 return false;
+	 }
+	 } */
+
+	 var ts = null;
+	function fetchTSASRevisedList(workId) {
+
+		t = $("#dynamic-ts-table")
+				.DataTable(
+						{
+							"processing" : true,
+							"serverSide" : true,
+							"sort" : "position",
+							//bStateSave variable you can use to save state on client cookies: set value "true" 
+							"bStateSave" : false,
+							//Default: Page display length
+							"iDisplayLength" : 10,
+							"bInfo" : false,
+							"searching" : false,
+							"iPage" : false,
+							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+							"iDisplayStart" : 0,
+							"pagingType" : "full_numbers",
+							"aaSorting" : [],
+							/* "dom" : 'Blrtip', */
+							/* 	"dom" : "<'row'<'col-12 datatbl-top'lB>>"
+										+ "<'row'<'col-md-6'r><'col-md-6'>>"
+										+ "<'row'<'col-md-12't>><'row'<'col-md-6'i><'col-md-6'p>>", */
+							/* "buttons" : [
+									{
+										extend : 'excelHtml5',
+										title : 'Work_data',
+										text : '<span class="fa fa-file-excel-o"></span> Excel Export',
+										exportOptions : {
+											columns : [0, 1, 2, 3, 4, 5, 6, 7]
+										}
+									}, ], */
+							/* "lengthMenu" : [ [ 10, 25, 50, 100000 ],
+									[ 10, 25, 50, "All" ] ], */
+
+							/* "fnDrawCallback" : function() {
+
+								angular.element('#StartOrFinishSpinnerId')
+										.scope().startOrStopSpinner(false);
+
+								 
+							}, */
+							/* "fnServerParams" : function(aoData) {
+							//aoData.push( { "name": "districtName", "value": $('#districtId').val()});
+							aoData.push({
+								"name" : "searchBoxVal",
+								"value" : $('#searchBox').val().trim()
+							});
+							
+							
+								
+							}, */
+
+							/* "language" : {
+								searchPlaceholder : "rvOrderNo"
+							},  */
+							
+							/* <i class="fa fa-window-close" aria-hidden="true"></i> */
+							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
+								if(aData.workStatus == "Revised" && (aData.typeDoc == "TS" )){
+									$('td:eq(8)', nRow)
+									.html(
+											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFile('
+													+ (aData.rvFileId)
+													+ '); "><i class="fa fa-download"></i></a>')
+									
+									.append(
+											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="return cancelFileTS('
+													+ (aData.id)
+													+ '); "><i class="fa fa-close" aria-hidden="true"></i></a>');
+									
+					
+		
+								}
+								
+								if(aData.workStatus == "Revised" && (aData.typeDoc == "AS")){
+									$('td:eq(8)', nRow)
+									.html(
+											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFile('
+													+ (aData.rvFileId)
+													+ '); "><i class="fa fa-download"></i></a>')
+									
+									.append(
+											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="return cancelFileAS('
+													+ (aData.id)
+													+ '); "><i class="fa fa-close" aria-hidden="true"></i></a>');
+									
+					
+		
+								}
+								
+								if(aData.workStatus == "Original" && (aData.typeDoc == "TS" )){
+									$('td:eq(8)', nRow)
+									.html(
+											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileOriginalTS('
+													+ (aData.rvFileId)
+													+ '); "><i class="fa fa-download"></i></a>')
+									
+									.append(
+											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="return cancelFile('
+													+ (aData.workId)
+													+ '); "><i class="fa fa-close" aria-hidden="true"></i></a>');
+		
+								}
+								
+								if(aData.workStatus == "Original" && (aData.typeDoc == "AS" )){
+									$('td:eq(8)', nRow)
+									.html(
+											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileOriginalAS('
+													+ (aData.rvFileId)
+													+ '); "><i class="fa fa-download"></i></a>')
+		
+									.append(
+											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="return cancelFile('
+													+ (aData.workId)
+													+ '); "><i class="fa fa-close" aria-hidden="true"></i></a>');
+								}
+								
+								
+							},
+							"sAjaxSource" : "fetchTSASRevisedList/" + workId,
+
+							"columns" : [ {
+								"data" : "index",
+								"bSortable" : false
+							}, 
+							{
+								"data" : "workStatus",
+								"bSortable" : false
+							},
+						
+							{
+								"data" : "typeDoc",
+								"bSortable" : false
+							}, {
+								"data" : "rvOrderNo",
+								"bSortable" : false
+							}, {
+								"data" : "rvOrderDate",
+								"bSortable" : false
+							}, {
+								"data" : "rvAmt",
+								"bSortable" : false
+							}, 
+							{
+								"data" : "rvRemarks", 
+								"bSortable" : false
+							} ,
+							{
+								"data" : "tsAsSataus",
+								"bSortable" : false
+							},
+							{
+								"data" : null,
+								"bSortable" : false
+							} ],
+						});
+	}
+
+	function downloadFile(fileId) {
+		return $('#page-ts-div').scope().downloadDocumentTSRevised(fileId);
+	}
+	
+	function cancelFile(workId) {
+		return $('#page-ts-div').scope().cancelFile(workId);
+	}
+	
+	function cancelFileTS(Id) {
+		return $('#page-ts-div').scope().cancelFileTS(Id);
+	}
+	
+	function cancelFileAS(Id) {
+		return $('#page-ts-div').scope().cancelFileAS(Id);
+	}
+	
+	function downloadFileOriginalTS(fileId) {
+		return $('#page-ts-div').scope().downloadDocumentTS(fileId);
+	}
+	
+	
+	function downloadFileOriginalAS(fileId) {
+		return $('#page-ts-div').scope().downloadDocumentAS(fileId);
+	}
+	
+	
+
+	////Work Progress 
+	var responseIndex = null;
+	function fetchProgressImagesList(workId) {
+		//	console.log("fetchProgressImagesList==== " + fetchProgressImagesList)
+		t = $("#dynamic-wp-table")
+				.DataTable(
+						{
+							"processing" : true,
+							"serverSide" : true,
+							"sort" : "position",
+							//bStateSave variable you can use to save state on client cookies: set value "true" 
+							"bStateSave" : false,
+							//Default: Page display length
+							"iDisplayLength" : 10,
+							"bInfo" : false,
+							"searching" : false,
+							"iPage" : false,
+							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+							"iDisplayStart" : 0,
+							"pagingType" : "full_numbers",
+							"aaSorting" : [],
+
+							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
+								$('td:eq(7)', nRow)
+								.html('');
+								if(aData.moreImage == false){
+								if (aData.workStatusId == 10) {
+									$('td:eq(7)', nRow)
+											.html(
+													'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileWS('
+															+ (aData.documentId)
+															+ '); "><i class="fa fa-download"></i></a>');
+									
+								}
+								
+								$('td:eq(7)', nRow)
+								.append(
+										'<button class="btn btn-xs btn-warning" type="button"   title="Download File" onclick="return downloadFileWSDocumnt('+(aData.documentId)+',\'' + aData.workSubStatusNameE + '\' )"> <i class="fa fa-eye" ></i> </button>');
+						
+								}
+								else{
+									$('td:eq(7)', nRow)
+								    .append(
+								        '<button class="btn btn-xs btn-warning" type="button" title="Download File" onclick="return openDiv(' + aData.documentId + ', \'' + aData.createdDate + '\')"> <i class="fa fa-file-image-o"></i> </button>'
+								    );
+									}
+								
+								if(aData.workStatusId == 9) {
+									$('td:eq(7)', nRow).html('<span >-</span>');
+								}
+							},
+							"sAjaxSource" : "fetchProgressImagesList/" + workId,
+
+							"columns" : [ {
+								"data" : "indexWS",
+								"bSortable" : false
+
+							}, {
+								"data" : "workStatusNameE",
+								"bSortable" : false
+							}, {
+								"data" : "workSubStatusNameE",
+								"bSortable" : false
+							}, {
+								"data" : "reasonDelay",
+								"bSortable" : false
+							}, /* {
+																				"data" : "workSubDelayReason",
+																				"bSortable" : false
+																			}, */{
+								"data" : "actionTakenDelay",
+								"bSortable" : false
+							}, {
+								"data" : "remarks",
+								"bSortable" : false,
+							    "render": function(data, type, row) {
+							        // Check if moreImage is true and replace the remarks value
+							        if (row.moreImage === true) {
+							            return '--'; // Return "--" if moreImage is true
+							        }
+							        return data; // Otherwise, return the original remarks value
+							    }
+							}, {
+								"data" : "createdDate",
+								"bSortable" : false
+							}, {
+								"data" : null,
+								"bSortable" : false
+							} ],
+						});
+		
+		
+	}
+
+	
+	function openDiv(workId, createdDate) {
+	    // Find the div you want to display. You can also dynamically create it.
+	    var div = $('#myDiv'); // Assuming you have a div with id="myDiv"
+	    
+	    // Set some content inside the div (optional)
+	     
+
+		angular.element("#dynamic-wp-table").scope().fetchImageByCreatedDate(createdDate);
+		
+	    // Show the div (make it visible)
+	    div.show(); // If div is initially hidden via CSS
+      
+	    return false; // Prevent any default action (if applicable)
+	}
+	function closeDiv() {
+	    $('#myDiv').hide(); // Hide the div
+	}
+	
+	function downloadFileWS(fileId) {
+	//	closeDiv();
+		return $('#page-wp-div').scope().downloadDocumentWSPro(fileId);
+	}
+	function downloadFileWSDocumnt(fileId,workSubStatusNameE) {
+	//	closeDiv();
+		return $('#page-wp-div').scope().downloadDocumentIdWSPro(fileId,workSubStatusNameE);
+	}
+	
+	<!-- Button trigger modal -->
+	
+
+	
+	
+	
+	////Work Expenses
+	var ex = null;
+	function fetchExpensesDataList(workId) {
+		//	console.log("fetchExpensesDataList===========")
+
+		ex = $("#dynamic-ex-table").DataTable({
+			"processing" : true,
+			"serverSide" : true,
+			"sort" : "position",
+			//bStateSave variable you can use to save state on client cookies: set value "true" 
+			"bStateSave" : false,
+			//Default: Page display length
+			"iDisplayLength" : 10,
+			"bInfo" : false,
+			"searching" : false,
+			"iPage" : true,
+			//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+			"iDisplayStart" : 0,
+			"pagingType" : "full_numbers",
+			"aaSorting" : [],
+
+			/* "fnCreatedRow" : function(nRow, aData, iDataIndex) {
+				
+				$('td:eq(3)', nRow).html('<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileWS('+(aData.documentId)+'); "><i class="fa fa-download"></i></a>');
+				
+			}, */
+			"fnServerParams" : function(aoData) {
+
+				aoData.push({
+					"name" : "year",
+					"value" : $('#year').val()
+				});
+				/* aoData.push( { "name": "financialYear", "value": $('#financialYear').val()}); */
+
+			},
+			"sAjaxSource" : "fetchExpensesDataList/" + workId,
+
+			"columns" : [ {
+				"data" : "index",
+				"bSortable" : false
+
+			}, {
+				"data" : "totalExpensess",
+				"bSortable" : false
+			}, {
+				"data" : "expensessUptoMarch",
+				"bSortable" : false
+			}, {
+				"data" : "expensessCurrentFy",
+				"bSortable" : false
+			}, {
+				"data" : "year",
+				"bSortable" : false
+			}, {
+				"data" : "createdDate",
+				"bSortable" : false
+			} ],
+		});
+	}
+	function exDraw() {
+		ex.draw();
+	}
+
+	//]]>
+</script>
+<div>
+	<ol class="breadcrumb">
+		<!-- 	<li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li> -->
+
+		<li class="breadcrumb-item"><a><span th:text="#{home}">Home</span></a></li>
+
+		<li class="breadcrumb-item"><a href="#manageOngoingWorks"><span
+				th:text="#{manageWorks}">Manage Work</span></a></li>
+		<li class="breadcrumb-item active"><span>View &amp; Update
+				Work </span></li>
+		<li class="breadcrumb-item active"><span><b> WorkId :-
+					{{workData.id}} </b></span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row" data-ng-init="loadWorkDetails(mode);">
+				<div class="col-md-12">
+					<!-- 	<form id="multistepsform">
+  progressbar
+  <ul id="progressbar">
+    <li class="active">Account Setup</li>
+    <li>Personal Details</li>
+    <li>Social Profiles</li>
+    <li>Dummy-1</li>
+    <li>Dummy-2</li>
+    <li>Dummy-3</li>
+
+  </ul>
+  <fieldset>
+     
+    <input type="button" name="next" class="next action-button" value="Next" />
+  </fieldset>
+    </form>
+   -->
+
+					<div class="card">
+						<div class="card-header top-header">
+
+							<!-- <span style="float: right;">Work No.: {{workData.workNo}}</span>
+ -->
+							<!-- <i class="fa fa-wpforms"></i> <span>Update Work</span>
+							<li  class="breadcrumb-item"><a href="#dashboard"><span
+				             th:text="${roleName}"></span></a></li> -->
+						</div>
+						<div class="col-md-12">
+							<div data-ng-if="responseObject.errorMessage != null"
+								class="text-danger">
+								<strong>Error!</strong>
+								<p>{{responseObject.errorMessage}}</p>
+							</div>
+						</div>
+
+						<div class="wizard bg-white mb-3">
+							<div class="wizard-inner">
+
+
+								<ul class="nav nav-tabs nav-justified border-0 bg-white"
+									role="tablist">
+									<li role="presentation" class="nav-item"><a href=".step1"
+										data-toggle="tab" aria-controls="step1" role="tab"
+										title="Step 1" class="nav-link active"> <span
+											class="fa fa-file-text-o"></span> <span>Work Details <em
+												class="count"></em>
+										</span>
+														
+									</a></li>
+
+
+									
+
+									<li 
+										th:if="${( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN') }" role="presentation"
+										class="nav-item"><a href=".step3" data-toggle="tab"
+										aria-controls="step3" role="tab" title="Step 3"
+										class="nav-link   stopVald"> <span class="fa fa-map-o"></span>
+											<span>Tender Details <em class="count"></em>
+										</span>
+									</a></li>
+
+									<li 
+										th:if="${( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN')}" role="presentation"
+										class="nav-item"><a href=".step4" data-toggle="tab"
+										aria-controls="step4" role="tab" title="Step 4"
+										class="nav-link  stopVald"> <span
+											class="fa fa-credit-card"
+											data-ng-click="scrollStatusChange();"></span> <span>Contractor’s
+												Details <em class="count"></em>
+										</span>
+									</a></li>
+
+									<li 
+										th:if="${ ( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN')}" role="presentation"
+										class="nav-item"><a href=".step5" data-toggle="tab"
+										aria-controls="step5" role="tab" title="Step 5"
+										class="nav-link  stopVald"> <span
+											class="fa fa-credit-card"></span> <span>Work Progress
+												Details<em class="count"></em>
+										</span>
+									</a></li>
+
+									<li 
+										th:if="${ ( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN')}" role="presentation"
+										class="nav-item"><a href=".step6" data-toggle="tab"
+										aria-controls="step6" role="tab" title="Step 6"
+										class="nav-link  stopVald"> <span
+											class="fa fa-credit-card"></span> <span> Completion
+												Certificate<em class="count"></em>
+										</span>
+									</a></li>
+									<li role="presentation" class="nav-item"><a href=".step2"
+																		data-toggle="tab" aria-controls="step2" role="tab"
+																		title="Step 2" class="nav-link  "> <span
+																			class="fa fa-road"></span> <span>DM Remark<em
+																				class="count"></em>
+																		</span>
+																	</a></li> 
+
+
+
+
+
+
+
+
+
+									<!-- <li role="presentation" class="nav-item"><a href=".step6"
+										data-toggle="tab" aria-controls="step6" role="tab"
+										title="Step 6" class="nav-link  stopVald"> <span
+											class="fa fa-credit-card"></span> <span> Completion
+												Certificate<em class="count"></em>
+										</span>
+									</a></li> -->
+								</ul>
+							</div>
+
+
+							<!-- <div class="d-flex flex-wrap justify-content-center">
+									<div class="wp">
+										<strong>Total Work Completion Percentage:</strong> <span>{{workData.totalWorkCompletionPercentage}}</span>
+									</div>
+									<div class="wp" data-ng-show="workData.workTypeBean.workTypeId=='1'">
+										<strong>Total Work Sanctioned (In KM):</strong> <span>{{workData.totalLengthSanctionedInKm}}</span>
+									</div>
+									<div class="wp" data-ng-show="workData.workTypeBean.workTypeId=='1'">
+										<strong>Total Work Completed (In KM):</strong> <span>{{workData.totalWorkProgressInKm}}</span>
+									</div>
+								</div> -->
+
+							<div class="tab-content">
+								<!-- /tab1 -->
+								<div class="tab-pane active step1" role="tabpanel" id="step1">
+									<div
+										th:if="${roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_SU'  || roleName =='ROLE_DM' || roleName == 'ROLE_CEO' }">
+										<div
+											th:replace="common/work/editWorkDetail :: edit_workDetails"></div>
+									</div>
+									<div
+										th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT' ||  roleName=='ROLE_DEPT_DISTRICT' || roleName == 'ROLE_CEO' }">
+										<div
+											th:replace="common/work/viewWorkDetails:: view_workDetails"></div>
+									</div>
+
+								</div>
+
+								<!-- /tab2 -->
+								 
+
+								<!-- /tab3 -->
+								<div class="tab-pane  step3" role="tabpanel" id="step3">
+									<div
+										th:if="${(roleName=='ROLE_SU'  ||roleName=='ROLE_DM' ||roleName=='ROLE_SAU' )    }">
+										<div
+											th:replace="common/work/viewTenderDetails :: view_TenderDetails"></div>
+									</div>
+									<div
+										th:if="${roleName=='ROLE_DISTRICT'  || roleName=='ROLE_DEPARTMENT'}">
+										<div th:replace="common/work/editTender :: edit_Tender"></div>
+									</div>
+								</div>
+
+								<!-- /tab4 -->
+								<div class="tab-pane  step4" role="tabpanel" id="step4">
+									<div th:if="${ roleName==null}">
+										<div
+											th:replace="common/work/viewContractorDetails :: view_ContractorDetails"></div>
+									</div>
+									<div
+										th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT' || roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_SU'  ||roleName=='ROLE_DM' ||  roleName=='ROLE_DEPT_DISTRICT'}">
+										<div
+											th:replace="common/work/editContractorDetails :: edit_contractorDetails"></div>
+									</div>
+								</div>
+
+
+								<!-- /tab5 -->
+								<div class="tab-pane  step5" role="tabpanel" id="step5">
+									<div
+										th:if="${ roleName=='ROLE_SU'  ||roleName=='ROLE_DM' ||  roleName=='ROLE_DEPT_DISTRICT' }">
+										<div
+											th:replace="common/work/viewWorkProgressDetails :: view_WorkProgressDetails"></div>
+									</div>
+									<div
+										th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT'  || roleName=='ROLE_DEPARTMENT'}">
+										<div
+											th:replace="common/work/editWorkProgress :: edit_workProgress"></div>
+									</div>
+
+								</div>
+
+								<!-- /tab6 -->
+								<div class="tab-pane  step6" role="tabpanel" id="step6">
+									<div
+										th:if="${roleName=='ROLE_SU'  ||roleName=='ROLE_DM' ||  roleName=='ROLE_DEPT_DISTRICT' }">
+										<div th:replace="common/work/viewCCDetails :: view_CCDetails"></div>
+									</div>
+									<div
+										th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT' || roleName=='ROLE_DEPARTMENT'}">
+										<div th:replace="common/work/editCCDetails :: edit_CCDetails"></div>
+									</div>
+								</div>
+								<div class="tab-pane  step2" role="tabpanel" id="step2">
+																	<div
+																		th:if="${roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_DM'  ||roleName=='ROLE_SYSTEM_ADMIN' }">
+																		<div
+																			th:replace="common/work/viewDmRemarks :: view_dmRemark"></div>
+																	</div>
+																	<div
+																		th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT' ||  roleName=='ROLE_DEPT_DISTRICT' }">
+																		<div
+																			th:replace="common/work/editDmRemarks :: edit_dmRemark"></div>
+																	</div>
+																</div> 
+
+
+
+
+
+							</div>
+
+						</div>
+
+
+					</div>
+
+
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+
+</div>
+<div class="modal fade bd-example-modal-lg" id="exampleModal"
+	tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">
+					Work No. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :-
+					{{workDataCC.workNo}} <br /> Progress Level :-
+					{{workDataProgress.workSubStatusNameE}}
+				</h5>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div id="imageset" class="modal-body">
+				<div class="image-box">
+                        
+					<img src="{{imageurl}}"
+						class="img-fluid" data-target="#add-sor-popup_1"
+						data-toggle="modal" />
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+<div class="modal fade bd-example-modal-lg" id="imageenlargemodal"
+	tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">
+					Work No. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :-
+					{{workDataCC.workNo}} <br /> Progress Level :-
+					{{workDataProgress.workSubStatusNameE}}
+				</h5>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div id="imageset" class="modal-body">
+				<div class="image-box">
+                        
+					<img src="{{imageurl}}"
+						class="img-fluid" data-target="#add-sor-popup_1"
+						data-toggle="modal" />
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+<script>
+	var current_fs, next_fs, previous_fs;
+	var left, opacity, scale;
+	var animating;
+	$(".next").click(
+			function() {
+				if (animating)
+					return false;
+				animating = true;
+
+				current_fs = $(this).parent();
+				next_fs = $(this).parent().next();
+				$("#progressbar li").eq($("fieldset").index(next_fs)).addClass(
+						"active");
+				next_fs.show();
+				current_fs.animate({
+					opacity : 0
+				}, {
+					step : function(now, mx) {
+						scale = 1 - (1 - now) * 0.2;
+						left = now * 50 + "%";
+						opacity = 1 - now;
+						current_fs.css({
+							transform : "scale(" + scale + ")",
+							position : "absolute"
+						});
+						next_fs.css({
+							left : left,
+							opacity : opacity
+						});
+					},
+					duration : 800,
+					complete : function() {
+						current_fs.hide();
+						animating = false;
+					},
+					easing : "easeInOutBack"
+				});
+			});
+
+	$(".previous").click(
+			function() {
+				if (animating)
+					return false;
+				animating = true;
+
+				current_fs = $(this).parent();
+				previous_fs = $(this).parent().prev();
+				$("#progressbar li").eq($("fieldset").index(current_fs))
+						.removeClass("active");
+
+				previous_fs.show();
+				current_fs.animate({
+					opacity : 0
+				}, {
+					step : function(now, mx) {
+						scale = 0.8 + (1 - now) * 0.2;
+						left = (1 - now) * 50 + "%";
+						opacity = 1 - now;
+						current_fs.css({
+							left : left
+						});
+						previous_fs.css({
+							transform : "scale(" + scale + ")",
+							opacity : opacity
+						});
+					},
+					duration : 800,
+					complete : function() {
+						current_fs.hide();
+						animating = false;
+					},
+					easing : "easeInOutBack"
+				});
+			});
+
+	$(".submit").click(function() {
+		return false;
+	});
+</script>
+
+</html>

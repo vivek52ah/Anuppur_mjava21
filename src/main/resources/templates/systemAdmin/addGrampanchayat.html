@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+</head>
+<script type="text/javascript">
+	//<![CDATA[
+	function check_pass() {
+		if (document.getElementById('password').value
+				&& document.getElementById('confirmPassword').value) {
+			if (document.getElementById('password').value == document
+					.getElementById('confirmPassword').value) {
+				document.getElementById('submit').disabled = false;
+				document.getElementById('passwordError').style.display = 'none';
+			} else {
+				document.getElementById('submit').disabled = true;
+				document.getElementById('passwordError').style.display = 'block';
+			}
+		}
+	}
+	//]]>
+</script>
+
+<style>
+
+
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 7px rgb(0 0 0 / 70%);border-radius:7px
+}
+
+
+
+</style>
+<div>
+	<ol class="breadcrumb">
+
+		<li class="breadcrumb-item"><a href="#manageGrampanchayat" ><span
+				>Manage Gram Panchayat</span></a></li>
+
+		<li class="breadcrumb-item active"><span  data-ng-hide="gpData.gramPanchayatId != null">Add
+				Gram Panchayat</span><span  data-ng-hide="gpData.gramPanchayatId == null " data-ng-init="loadGrampanchayatDetails();">Edit
+				Gram Panchayat</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-wpforms"></i> <span  data-ng-show="gpData.gramPanchayatId == null">Add
+								Gram Panchayat</span><span  data-ng-show=" gpData.gramPanchayatId != null">Edit 
+								Gram Panchayat</span>
+						</div>
+						<form data-ng-submit="addGP(GPForm.$valid)" name="GPForm"
+							novalidate="novalidate" data-ng-init="">
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-12">
+										<div data-ng-if="responseObject.errorMessage != null"
+											class="text-danger">
+											<strong>Error!</strong>
+											<p>{{responseObject.errorMessage}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+								<div class="form-group col-sm-4">
+										<label><span>Gram Panchayat Name</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" name="gpName"
+											maxlength="100"  data-ng-model="gpData.gramPanchayatName"
+											 id="gpName" required="required"
+											autofocus="autofocus" />
+										<div data-ng-show="GPForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="GPForm.gpName.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													>Gram panchayat  Name</span>
+												
+											</p>
+										</div>
+								</div> 
+								
+								 
+								<div class="form-group col-sm-4">
+										<label><span>Gram Panchayat Name Hindi </span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" name="gpnamehindi"
+											maxlength="100"  data-ng-model="gpData.gramPanchayatkNameH"
+											 id="gpnamehindi" required="required"
+											autofocus="autofocus" />
+										<div data-ng-show="GPForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="GPForm.gpnamehindi.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													>Hindi Name</span>
+												
+											</p>
+										</div>
+								</div>
+								<div class="form-group col-sm-4">
+										<label><span>Gram Panchayat Code</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" name="gpCode" required="required"
+											maxlength="100"  data-ng-model="gpData.gramPanchayatCode"
+											 id="gpCode" 
+											autofocus="autofocus" />
+										<div data-ng-show="GPForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="GPForm.gpCode.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													>GP CODE</span>
+												
+											</p>
+										</div>
+								</div> 
+								<div class="form-group col-sm-4">
+										<label><span>Tehsil  Code</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" name="tehsilcode" required="required"
+											maxlength="100"  data-ng-model="gpData.tehsilCode"
+											 id="tehsilcode"
+											autofocus="autofocus" />
+										<div data-ng-show="GPForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="GPForm.tehsilcode.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													>Tehsil code</span>
+												
+											</p>
+										</div>
+								</div> 
+								
+								<div class="form-group col-sm-4">
+										<label><span>District</span><span class="aestrick">&#42;</span></label>
+										<select data-ng-disabled="isDisabled" class="form-control" id="district" 
+										 data-ng-init="loadDistrictMP();" data-ng-model="gpData.districtCode"
+											data-ng-change="gpData.blockCode == null;loadBlockByDistrict2(gpData.districtCode)"
+											 name="district" required="required">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="district in districtMP | orderBy : 'districtName'"
+												value="{{district.districtCode}}">{{district.districtName}}</option>
+										</select>
+										<div data-ng-show="GPForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="GPForm.district.$error.required">
+												<span >Please Select </span> <span
+													>District</span>
+												
+											</p>
+										</div>
+									</div>
+								
+								<div class="form-group col-sm-4">
+										<label><span>Block </span></label>
+										<select class="form-control" data-ng-model="gpData.blockCode" name="block"
+											data-ng-change="" required="required"
+											id="block" >
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="block in blocks | orderBy : 'blockName'"
+												value="{{block.blockCode}}">{{block.blockName}}</option>
+										</select>
+										<div data-ng-show="GPForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="GPForm.block.$error.required">
+												<span >Please Select</span> <span
+													>Block</span>
+												
+											</p>
+										</div>
+									</div>
+								</div>
+								
+
+
+								</div>
+								
+								<div  class="card-footer text-right">
+								<button type="submit" class="btn btn-sm btn-primary"    id="submit">
+									<span th:text="#{submit}">Submit</span>
+								</button>
+								<!-- <button type="reset" class="btn btn-sm btn-danger">Reset</button> -->
+							</div>
+						</form>
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+</div>
+</html>

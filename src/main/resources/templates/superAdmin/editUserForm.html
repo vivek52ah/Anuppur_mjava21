@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+</head>
+<script type="text/javascript">
+	
+</script>
+
+<style>
+
+
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 7px rgb(0 0 0 / 70%);border-radius:7px
+}
+
+
+
+</style>
+<div>
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item"><a href="#manageusers"><span
+				th:text="#{manageUsers}">Manage Users</span></a></li>
+		<li class="breadcrumb-item active"><span th:text="#{editUser}">Edit
+				User</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid" data-ng-init="loadUserDetails()">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-wpforms"></i> <span th:text="#{editUser}">Edit
+								User</span>
+						</div>
+						<form data-ng-submit="editUser(userForm.$valid)" name="userForm"
+							novalidate="novalidate" data-ng-init="loadUserForm()">
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-12">
+										<div data-ng-if="responseObject.errorMessage != null"
+											class="text-danger">
+											<strong>Error!</strong>
+											<p>{{responseObject.errorMessage}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="form-group col-sm-4">
+										<label><span>First Name</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" name="firstName"
+											maxlength="100" required="required"
+											data-ng-model="userData.firstName" id="firstName"
+											autofocus="autofocus" />
+
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.firstName.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													th:text="#{firstName}">First Name</span>
+											</p>
+										</div>
+									</div>
+
+
+									<div class="form-group col-sm-4">
+										<label><span>Last Name</span><span class="aestrick">&#42;</span></label>
+
+										<input type="text" class="form-control" name="lastName"
+											maxlength="100" required="required"
+											data-ng-model="userData.lastName" id="lastName"
+											autofocus="autofocus" />
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.lastName.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													th:text="#{lastName}">Last Name</span>
+											</p>
+										</div>
+									</div>
+
+
+									<!-- <div class="form-group col-sm-6">
+										<label for="User Name"><span th:text="#{userName}">User
+												Name</span><span class="aestrick">&#42;</span></label> <input type="text"
+											class="form-control" id="username" required="required"
+											data-ng-model="userData.username" name="username"
+											maxlength="30" />
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.username.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													th:text="#{userName}">User Name</span>
+											</p>
+										</div>
+									</div> -->
+									<div class="form-group col-sm-4">
+										<label><span>Email (User Id)</span><span
+											class="aestrick">&#42;</span></label> <input required="required"
+											class="form-control" type="email"
+											data-ng-model="userData.emailId" name="emailId"
+											maxlength="50" disabled="disabled" />
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.emailId.$error.required">
+												<span>Please enter Email Id</span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="userForm.emailId.$error.email">
+											<span>Please enter valid Email Id</span>
+										</p>
+									</div>
+									<div class="form-group col-sm-4">
+										<label><span>Mobile No.</span><span class="aestrick">&#42;</span></label>
+										<input required="required" class="form-control digits-only"
+											type="text" data-ng-model="userData.mobileNo" name="mobileNo"
+											data-ng-pattern="/^[6-9][0-9]{9}$/" maxlength="10" />
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.mobileNo.$error.required">
+												<span>Please enter Mobile No.</span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="userForm.mobileNo.$error.pattern">
+											<span>Please enter valid Mobile No.</span>
+										</p>
+
+									</div>
+
+						<!-- 			<div class="form-group col-sm-4">
+										<label><span>User Type</span><span class="aestrick">&#42;</span></label>
+										<select name="userType" class="form-control"
+											data-ng-init="loadUserTypes();loadOfficeTypesByUserType(userData.userTypeId);"
+											data-ng-model="userData.userTypeId"
+											data-ng-change="userData.userTypeId!=null;userData.officeTypeId=null;loadOfficeTypesByUserType(userData.userTypeId);"
+											required="required">
+											<option value="" disabled="disabled">Select User
+												Type</option>
+											<option data-ng-repeat="userType in userTypes"
+												value="{{userType.userTypeId}}">{{userType.userType}}</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.userType.$error.required">
+												<span>Please select User Type</span>
+											</p>
+										</div>
+									</div> -->
+										<!-- <div class="form-group col-sm-4" >
+										<label><span th:text="#{Designation}">Designation</span><span class="aestrick">&#42;</span></label>
+										<select name="userType" class="form-control"
+											data-ng-init="loadUserTypes()"
+											data-ng-model="userData.userTypeId"
+										
+											required="required">
+											<option value="" disabled="disabled">Select 
+												Designation</option>
+											<option data-ng-repeat="userType in userTypes"
+												value="{{userType.userTypeId}}">{{userType.userType}}</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.userType.$error.required">
+												<span>Please select User Type</span>
+											</p>
+										</div>
+									</div> -->
+									<div class="form-group col-sm-4" >
+										<label><span th:text="#{Designation}">Designation</span><span class="aestrick">&#42;</span></label>
+										<select name="userType" class="form-control"
+											data-ng-init="loadDesignation()"
+											data-ng-model="userData.designationId"
+										
+											required="required">
+											<option value="" disabled="disabled">Select 
+												Designation</option>
+											<option data-ng-repeat="ud in userDesignation"
+												value="{{ud.id}}">{{ud.designationNameEnglish}}</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.userType.$error.required">
+												<span>Please select User Type</span>
+											</p>
+										</div>
+									</div>
+									<!-- 
+									
+									 -->
+
+
+								<!-- 	<div class="form-group col-sm-4">
+
+										<label><span>Office Type</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control" required="required"
+											data-ng-init="loadOfficeTypes();loadRolesByUserTypeOfficeType(userData.userTypeId,userData.officeTypeId);"
+											name="officeType" data-ng-model="userData.officeTypeId"
+											data-ng-change="userData.userTypeId!=null;userData.officeTypeId!=null;userData.role.roleCode=null;loadRolesByUserTypeOfficeType(userData.userTypeId,userData.officeTypeId);"
+											id="officeType">
+
+
+											<option value="" disabled="disabled">Select</option>
+											<option data-ng-repeat="officeType in officeTypes"
+												value="{{officeType.officeTypeId}}">{{officeType.officeTypeName}}</option>
+										</select>
+
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.officeType.$error.required">
+												<span>Please select Office Type</span>
+											</p>
+										</div>
+									</div> -->
+								</div>
+
+								<div class="row">
+
+
+
+				<!-- 					<div class="form-group col-sm-4" data-ng-init="loadUserRoles()">
+
+
+										<label><span>Role</span><span class="aestrick">&#42;</span></label>
+										<select name="role" class="form-control"
+											data-ng-model="userData.role.roleCode" required="required">
+											<option value="" disabled="disabled">Select Role</option>
+											<option
+												data-ng-repeat="role in roles | filter:{roleCode:'!ROLE_SYSTEM_ADMIN'}"
+												value="{{role.roleCode}}">{{role.roleName}}</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.role.$error.required">
+												<span>Please select Role</span>
+											</p>
+										</div>
+
+									</div> -->
+
+									<!-- <div class="form-group col-sm-4" data-ng-init="loadAgencies()"
+										data-ng-show="userData.role.roleCode=='ROLE_DISTRICT' || userData.role.roleCode=='ROLE_SAU'">
+										<label><span>Construction Agency</span><span
+											class="aestrick">&#42;</span></label> <select class="form-control"
+											data-ng-model="userData.implementationAgencyId" name="agency"
+											id="agency"
+											data-ng-required="userData.role.roleCode=='ROLE_DISTRICT' || userData.role.roleCode=='ROLE_SAU'">
+											<option value="" disabled="disabled">Select</option>
+											<option
+												data-ng-repeat="agency in agencies | orderBy : 'implementationAgencyNameE'"
+												value="{{agency.implementationAgencyId}}">{{agency.implementationAgencyNameE}}</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.agency.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span
+													th:text="#{agency}">Construction Agency</span>
+											</p>
+										</div>
+									</div> -->
+
+									<!-- <div class="form-group col-sm-4">
+										<label><span>Official E-mail</span><span
+											class="aestrick">&#42;</span></label> <input required="required"
+											class="form-control" type="email"
+											data-ng-model="userData.officialEmailId" name="officialEmailId"
+											maxlength="50" />
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.officialEmailId.$error.required">
+												<span>Please enter Official Email Id</span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="userForm.officialEmailId.$error.email">
+											<span>Please enter valid Official Email Id</span>
+										</p>
+									</div>
+									<div class="form-group col-sm-3">
+										<label><span>Official Phone</span> <span class="aestrick">&#42;</span></label>
+										<input class="form-control"
+											type="text" data-ng-model="userData.officialPhone" name="officialPhone"  maxlength="12"  required="required"/>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.officialPhone.$error.required">
+												<span>Please enter Official Phone.</span>
+											</p>
+										</div>
+									</div> -->
+
+									<!-- <div class="form-group col-sm-4"
+										data-ng-show="userData.role.roleCode!='ROLE_SUPER_ADMIN'">
+										<label><span>Designation</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control"
+											data-ng-required="userData.role.roleCode!='ROLE_SUPER_ADMIN'"
+											data-ng-model="userData.designationId" name="designation"
+											id="designation">
+											<option value="" disabled="disabled">-Select-</option>
+											<option data-ng-repeat="designation in designations"
+												value="{{designation.id}}">{{designation.designation}}</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.designation.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Designation</span>
+											</p>
+										</div>
+									</div> -->
+									<!-- <div class="form-group col-sm-4"
+										data-ng-show="userData.role.roleCode=='ROLE_ENGINEER'">
+										<label><span>Sub Engineer</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control"
+											data-ng-required="userData.role.roleCode=='ROLE_ENGINEER'"
+											data-ng-model="userData.subEnggId" name="subEngg"
+											id="subEngg">
+											<option value="" disabled="disabled">-Select-</option>
+											<option data-ng-repeat="sub in subEngg | orderBy : 'subEnggName'"
+												value="{{sub.subEnggId}}">{{sub.subEnggNameAndImplAgency}}</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.subEngg.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Sub
+													Engineer</span>
+											</p>
+										</div>
+									</div> -->
+								<!-- 	<div class="form-group col-sm-4"
+										data-ng-init="loadDistricts();"
+										data-ng-show="userData.role.roleCode=='ROLE_DISTRICT' || userData.role.roleCode=='ROLE_DEPT_DISTRICT'">
+										<label><span>District</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control"
+											data-ng-model="userData.districtId" name="district"
+											id="district"
+											data-ng-required="userData.role.roleCode=='ROLE_DISTRICT' ||userData.role.roleCode=='ROLE_DEPT_DISTRICT'">
+											<option value="" disabled="disabled">Select</option>
+											<option
+												data-ng-repeat="district in districts | orderBy : 'districtName'"
+												value="{{district.districtId}}">{{district.districtName}}</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.district.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span
+													th:text="#{district}">District</span>
+											</p>
+										</div>
+									</div> -->
+									<!-- <div class="form-group col-sm-4"
+										data-ng-init="loadDivisions();"
+										data-ng-show="userData.role.roleCode=='ROLE_DEPARTMENT'">
+										<label><span>Division</span><span class="aestrick">&#42;</span></label>
+										<select class="form-control"
+											data-ng-model="userData.divisionId" name="division"
+											id="district"
+											data-ng-required="userData.role.roleCode=='ROLE_DEPARTMENT'">
+											<option value="" disabled="disabled">Select</option>
+											<option
+												data-ng-repeat="division in divisions | orderBy : 'divisionName'"
+												value="{{division.divisionId}}">{{division.divisionName}}</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.division.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span>Division</span>
+											</p>
+										</div>
+									</div> -->
+									<div class="form-group col-sm-4" >
+										<label><span>Status</span><span class="aestrick">&#42;</span></label>
+										<select name="status" class="form-control"
+											data-ng-model="userData.status" required="required">
+											<option value="" disabled="disabled">Select Status</option>
+											<option value="Active">Active</option>
+											<option th:if="${roleName=='ROLE_DEPARTMENT' } "  value="InActive">InActive</option>
+											<option th:if="${roleName=='ROLE_SYSTEM_ADMIN' } " value="Pending">Pending</option>
+										</select>
+										<div data-ng-show="userForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="userForm.status.$error.required">
+												<span>Please select Status</span>
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer text-right">
+								<button type="submit" class="btn btn-sm btn-success" id="submit">
+									<span th:text="#{submit}">Submit</span>
+								</button>
+								<!-- <button type="reset" class="btn btn-sm btn-danger">Reset</button> -->
+							</div>
+						</form>
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+</div>
+</html>

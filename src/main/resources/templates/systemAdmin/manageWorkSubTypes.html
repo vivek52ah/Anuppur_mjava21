@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+</head>
+<script type="text/javascript">
+	/*<![CDATA[*/
+	//Plug-in to fetch page data 
+	jQuery.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings) {
+		return {
+			"iStart" : oSettings._iDisplayStart,
+			"iEnd" : oSettings.fnDisplayEnd(),
+			"iLength" : oSettings._iDisplayLength,
+			"iTotal" : oSettings.fnRecordsTotal(),
+			"iFilteredTotal" : oSettings.fnRecordsDisplay(),
+			"iPage" : oSettings._iDisplayLength === -1 ? 0 : Math
+					.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+			"iTotalPages" : oSettings._iDisplayLength === -1 ? 0 : Math
+					.ceil(oSettings.fnRecordsDisplay()
+							/ oSettings._iDisplayLength)
+		};
+	};
+	var t = null;
+	function fetchWorkSubTypes() {
+		t = $("#dynamic-table")
+				.DataTable(
+						{
+							"processing" : true,
+							"serverSide" : true,
+							"sort" : "position",
+							//bStateSave variable you can use to save state on client cookies: set value "true" 
+							"bStateSave" : false,
+							//Default: Page display length
+							"iDisplayLength" :10,
+							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+							"iDisplayStart" : 0,
+							"pagingType" : "full_numbers",
+							"aaSorting" : [],
+							/* "dom" : 'Blrtip', */
+							"dom" : "<'row'<'col-12 datatbl-top'lB>>"
+									+ "<'row'<'col-md-6'r><'col-md-6'>>"
+									+ "<'row'<'col-md-12't>><'row'<'col-md-6'i><'col-md-6'p>>",
+							"buttons" : [
+									{
+										extend : 'excelHtml5',
+										title : 'WorkSubtype_data',
+										text : '<span class="fa fa-file-excel-o"></span> Excel Export',
+										exportOptions : {
+											columns : [ 0, 1]
+										}
+									}, ],
+							"lengthMenu" : [ [ 10, 25, 50, 100000 ],
+									[ 10, 25, 50, "All" ] ],
+
+							"fnDrawCallback" : function() {
+
+								angular.element('#StartOrFinishSpinnerId')
+										.scope().startOrStopSpinner(false);
+
+								//Get page numer on client. Please note: number start from 0 So
+								//for the first page you will see 0 second page 1 third page 2...
+								//Un-comment below alert to see page number
+								//alert("Current page number: "+this.fnPagingInfo().iPage);    
+							},
+							"fnServerParams" : function(aoData) {
+							
+                              aoData.push({
+									"name" : "searchBoxVal",
+									"value" : $('#searchBox').val().trim()
+								});
+							},
+							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
+								$('td:eq(2)', nRow)
+										.html(
+												'<a class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="View/Edit" href="#editWorkSubTypes/'+encryptFunc(aData.workSubTypeId)+'"><i class="fa fa-pencil"></i></a>');
+								$('td:eq(2)', nRow)
+										.append(
+												'<a onclick="return deleteWorkSubTypes('
+														+ aData.workSubTypeId
+														+ ');" href="" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash-o"></i></a> ');
+							},
+							"fnRowCallback" : function(nRow, aData,
+									iDisplayIndex, iDisplayIndexFull) {
+								/* $('td:eq(0)', nRow)
+										.html(
+												(this.fnPagingInfo().iPage
+								 * this.fnPagingInfo().iLength + (iDisplayIndex + 1))); */
+							},
+
+							"language" : {
+								searchPlaceholder : "Name"
+							},
+							"sAjaxSource" : "fetchWorkSubTypes",
+
+							"columns" : [ {
+								"data" : "index",
+								"bSortable" : false
+							},{
+								"mData" : "workSubTypeNameE",
+								"bSortable" : false,
+								mRender: function (mData, type, row) {
+									var dn=row.workSubTypeNameE
+			  	            		if(null== dn){
+			  	            			dn="-";
+			  	            		}
+			  	            		return dn; 
+			  	            	} 
+								
+							},
+							{
+								"mData" : null,
+								"bSortable" : false
+							} ],
+
+						});
+	}
+	$(function() {
+		$('.datatbl-top')
+				.append(
+						'<div class="dt-buttons btn-group ml-1"><a class="btn btn-secondary" href="#addWorkSubTypes"> <span >Add Sub Work Type</span></a></div>')
+	});
+	function deleteWorkSubTypes(workSubtypeId) {
+		//debugger;
+		/* return angular.element(document.getElementById('CommonController')) */
+		return $('#page-div').scope().deleteWorkSubTypes(workSubtypeId)
+	}
+	
+	function reDraw() {
+		t.draw();
+	}
+	$('#filter-btn').click(function() {
+		$('#filters').fadeToggle(300);
+	});
+	$('.filter-close').click(function(e) {
+		e.preventDefault();
+		$(this).parent('#filters').fadeOut(300);
+	});
+	$('#applyFilters').click(function(e) {
+		//e.preventDefault();
+		$('#filters').fadeOut(300);
+		//$('#searchForm').submit();
+	});
+	var filter_box = $('#filters');
+	$(document).mouseup(function(e) {
+		if (!filter_box.is(e.target) && filter_box.has(e.target).length === 0) {
+			$('#filters:visible').fadeOut('300');
+		}
+	});
+	/*]]>*/
+</script>
+
+
+<div id="StartOrFinishSpinnerId"></div>
+
+<div id="page-div">
+	<!-- Breadcrumb -->
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item active"><span>Manage
+			Sub Work Type </span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row"   data-ng-init="loadWorkSubtypes();">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-folder-open-o"></i> <span>Work Sub Type
+								List</span>
+						</div>
+						<div class="card-body">
+							<div class="pr">
+								<form name="searchForm" novalidate="novalidate" id="searchForm"
+									data-ng-submit="searchBySearchBox()">
+									<div class="row">
+										<div class="input-group mb-3 col-md-6 filter-box">
+											<input type="text" class="form-control" id="searchBox"
+												placeholder="Search by Work Sub Type Name"
+												data-ng-model="searchBox" maxlength="100" />
+											<div class="btn-group pr">
+												<button class="btn btn-secondary" type="submit"
+													title="Search">
+													<i class="fa fa-search"></i>
+												</button>
+												<button class="btn btn-secondary" type="reset"
+													data-ng-click="resetFunction()" title="Reset">
+													<i class="fa fa-refresh"></i>
+												</button>
+												<!-- <button class="btn btn-secondary" id="filter-btn"
+													title="Filter" type="button">
+													<i class="fa fa-filter"></i>
+												</button> -->
+												<div id="filters">
+													<a href="" class="filter-close"><i
+														class="icon-close icons"></i></a>
+												</div>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<div data-ng-if="responseObject.successMessage != null"
+										class="text-success">
+										<strong>Success!</strong>
+										<p>{{responseObject.successMessage}}</p>
+									</div>
+								</div>
+							</div>
+							<div class="table-responsive responsive-md">
+								<table id="dynamic-table"
+									class="table table-striped table-bordered table-hover table-outline">
+									<thead class="thead-default">
+										<tr>
+											<th><span>S.No.</span></th>
+												<th><span>Work Sub Type Name</span></th>
+											<th nowrap="nowrap"><span th:text="#{action}">Action</span></th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+
+	</div>
+	<!-- /.container-fluid -->
+</div>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+</head>
+<script type="text/javascript">
+	//<![CDATA[
+	function check_pass() {
+		if (document.getElementById('password').value
+				&& document.getElementById('confirmPassword').value) {
+			if (document.getElementById('password').value == document
+					.getElementById('confirmPassword').value) {
+				document.getElementById('submit').disabled = false;
+				document.getElementById('passwordError').style.display = 'none';
+			} else {
+				document.getElementById('submit').disabled = true;
+				document.getElementById('passwordError').style.display = 'block';
+			}
+		}
+	}
+	//]]>
+</script>
+
+<style>
+
+
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 7px rgb(0 0 0 / 70%);border-radius:7px
+}
+
+
+
+</style>
+<div>
+	<ol class="breadcrumb">
+
+		<li class="breadcrumb-item"><a href="#manageBlock"><span
+				>Manage Blocks</span></a></li>
+
+		<li class="breadcrumb-item active"><span  data-ng-hide=" blockData.blockId !=  null">Add
+				Block</span><span  data-ng-hide="blockData.blockId == null" data-ng-init="loadBlockDetails()">Edit
+				Block</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-wpforms"></i> <span  data-ng-show=" blockData.blockId == null">Add
+								Block</span><span  data-ng-show=" blockData.blockId != null">Edit 
+								Block</span>
+						</div>
+						<form data-ng-submit="addBlock(blockForm.$valid)" name="blockForm"
+							novalidate="novalidate" data-ng-init="">
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-12">
+										<div data-ng-if="responseObject.errorMessage != null"
+											class="text-danger">
+											<strong>Error!</strong>
+											<p>{{responseObject.errorMessage}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+								<div class="form-group col-sm-4">
+										<label><span>Block Name</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" name="blockName" required="required"
+											maxlength="100"  data-ng-model="blockData.blockName"
+											 id="blockName"
+											autofocus="autofocus" />
+										<div data-ng-show="blockForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="blockForm.blockName.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													>Block  Name</span>
+												
+											</p>
+										</div>
+								</div> 
+									<div class="form-group col-sm-4">
+										<label><span>Block Name Hindi</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" name="blockNameh" required="required"
+											maxlength="100"  data-ng-model="blockData.blockNameH"
+											 id="blockNameh"
+											autofocus="autofocus" />
+										<div data-ng-show="blockForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="blockForm.blockNameh.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													>Hindi Name</span>
+												
+											</p>
+										</div>
+								</div>
+								 
+								<div class="form-group col-sm-4">
+										<label><span>Block Code</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" name="blockCode" required="required"
+											maxlength="100"  data-ng-model="blockData.blockCode"
+											 id="blockCode"
+											autofocus="autofocus" />
+										<div data-ng-show="blockForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="blockForm.blockCode.$error.required">
+												<span th:text="#{pleaseEnter}">Please enter</span> <span
+													>Block  Code</span>
+												
+											</p>
+										</div>
+								</div>
+								
+								<div class="form-group col-sm-4">
+										<label><span>District</span><span class="aestrick">&#42;</span></label>
+										<select data-ng-disabled="isDisabled" class="form-control" id="district" 
+										 data-ng-init="loadDistrictMP();" data-ng-model="blockData.districtCode"
+											
+											 name="district" required="required">
+											<option value="" disabled="disabled">--Select--</option>
+											<option data-ng-repeat="district in districtMP | orderBy : 'districtName'"
+												value="{{district.districtCode}}">{{district.districtName}}</option>
+										</select>
+										<div data-ng-show="blockForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="blockForm.district.$error.required">
+												<span>Please Select </span> <span
+													> District</span>
+												
+											</p>
+										</div>
+									</div>
+								
+								</div>
+								
+
+
+								</div>
+								
+								<div  class="card-footer text-right">
+								<button type="submit" class="btn btn-sm btn-primary"    id="submit">
+									<span th:text="#{submit}">Submit</span>
+								</button>
+								<!-- <button type="reset" class="btn btn-sm btn-danger">Reset</button> -->
+							</div>
+						</form>
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+</div>
+</html>

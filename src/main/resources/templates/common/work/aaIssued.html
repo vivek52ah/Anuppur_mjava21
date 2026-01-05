@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+<style>
+/* Model CSS */
+.modalbg {
+	background: #3a5892 !important
+}
+
+thead th {
+	color: #fff;
+	background-color: #09A9F7;
+}
+
+.modal-dialog {
+	max-width: 75%; /* Adjust as needed */
+	width: auto;
+}
+
+.modal-content {
+	max-height: 90vh; /* Adjust as needed */
+	overflow-y: auto; /* Enables scrolling if content overflows */
+}
+
+.scrollable-table-container {
+	max-height: 400px; /* Set a max height for the table container */
+	overflow-y: auto; /* Adds vertical scrollbar */
+	overflow-x: hidden; /* Prevents horizontal scrolling */
+}
+
+.table {
+	width: 100%;
+	/* Ensure the table spans the full width of the container */
+	table-layout: fixed; /* Optional: Fixes the table layout */
+}
+
+/* Optional: Set specific widths for each column */
+/* .table th:nth-child(1), .table td:nth-child(1) {
+	width: 50px; 
+}
+
+.table th:nth-child(2), .table td:nth-child(2) {
+	width: 200px; 
+}
+
+.table th:nth-child(3), .table td:nth-child(3) {
+	width: 200px; 
+}
+
+.table th:nth-child(4), .table td:nth-child(4) {
+	width: 100px;
+}
+
+.table th:nth-child(5), .table td:nth-child(5) {
+	width: 120px;
+}
+
+.table th:nth-child(6), .table td:nth-child(6) {
+	width: 150px; 
+}
+
+.table th:nth-child(7), .table td:nth-child(7) {
+	width: 100px; 
+}
+
+.table th:nth-child(8), .table td:nth-child(8) {
+	width: 100px; 
+} */
+.table th, .table td {
+	word-wrap: break-word;
+	word-break: break-all;
+	white-space: normal;
+}
+
+/* #dynamic-table tr td:first-child {
+	white-space: nowrap;
+}
+
+#dynamic-table tr td:nth-child(4) {
+	min-width: 200px;
+}
+ */
+/* Model CSS End */
+.card {
+	margin-bottom: 1.5rem;
+	box-shadow: 0 0 7px rgb(0 0 0/ 70%);
+	border-radius: 7px
+}
+
+.btn.btn-secondary {
+	box-shadow: 0px 0px 7px rgb(0 0 0/ 10%);
+}
+
+btn-xs.btn-primary {
+	box-shadow: 0px 0px 20px rgb(0 0 0/ 30%);
+}
+
+input#searchBox {
+	box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+}
+
+li#dynamic-table_first {
+	box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+}
+
+li#dynamic-table_previous {
+	box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+}
+
+a.page-link {
+	box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+}
+
+select#workType {
+	box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+}
+
+select#financialYear {
+	box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
+}
+</style>
+</head>
+<script type="text/javascript" th:inline="javascript">
+	/*<![CDATA[*/
+	//Plug-in to fetch page data 
+	jQuery.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings) {
+		return {
+			"iStart" : oSettings._iDisplayStart,
+			"iEnd" : oSettings.fnDisplayEnd(),
+			"iLength" : oSettings._iDisplayLength,
+			"iTotal" : oSettings.fnRecordsTotal(),
+			"iFilteredTotal" : oSettings.fnRecordsDisplay(),
+			"iPage" : oSettings._iDisplayLength === -1 ? 0 : Math
+					.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+			"iTotalPages" : oSettings._iDisplayLength === -1 ? 0 : Math
+					.ceil(oSettings.fnRecordsDisplay()
+							/ oSettings._iDisplayLength)
+		};
+	};
+	var t = null;
+	var role = [[${roleName}]];
+	var division =[[${division}]]
+	
+	function fetchWorksList() {
+
+		t = $("#dynamic-table")
+				.DataTable(
+						{
+							"processing" : true,
+							"serverSide" : true,
+							"sort" : "position",
+							//bStateSave variable you can use to save state on client cookies: set value "true" 
+							"bStateSave" : false,
+							//Default: Page display length
+							"iDisplayLength" : 10,
+							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+							"iDisplayStart" : 0,
+							"pagingType" : "full_numbers",
+							"aaSorting" : [],
+							/* "dom" : 'Blrtip', */
+							"dom" : "<'row'<'col-12 datatbl-top'lB>>"
+									+ "<'row'<'col-md-6'r><'col-md-6'>>"
+									+ "<'row'<'col-md-12't>><'row'<'col-md-6'i><'col-md-6'p>>",
+							"buttons" : [
+									{
+										extend : 'excelHtml5',
+										title : 'Work_data',
+										text : '<span class="fa fa-file-excel-o"></span> Excel Export',
+										exportOptions : {
+											columns : [0, 1, 2, 3, 4, 5, 6, 7]
+										}
+									}, ],
+							"lengthMenu" : [ [ 10, 25, 50, 100000 ],
+									[ 10, 25, 50, "All" ] ],
+
+							"fnDrawCallback" : function() {
+
+								angular.element('#StartOrFinishSpinnerId')
+										.scope().startOrStopSpinner(false);
+
+								//Get page numer on client. Please note: number start from 0 So
+								//for the first page you will see 0 second page 1 third page 2...
+								//Un-comment below alert to see page number
+								//alert("Current page number: "+this.fnPagingInfo().iPage);    
+							},
+							"fnServerParams" : function(aoData) {
+								//aoData.push( { "name": "districtName", "value": $('#districtId').val()});
+								aoData.push({
+									"name" : "searchBoxVal",
+									"value" : $('#searchBox').val().trim()
+								});
+								
+								aoData.push( { "name": "workType", "value": $('#workType').val()});
+								aoData.push( { "name": "financialYear", "value": $('#financialYear').val()}); 
+								aoData.push( { "name": "divisionId", "value": $('#divisionId').val()});
+								aoData.push( { "name": "districtId", "value": $('#districtId').val()});
+								aoData.push( { "name": "workStatusId", "value": $('#workStatusId').val()});
+								aoData.push( { "name": "workSubTypeId", "value": $('#workSubTypeId').val()});
+							},
+							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
+								
+								
+									 
+									 
+									 $('td:eq(9)', nRow)
+										.html(
+												'<a class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="Edit" href="#editWork/'+aData.id+'"><i class="fa fa-pencil"></i></a>');
+										 
+	
+									
+							 if (role=='ROLE_DEPARTMENT' ||role=='ROLE_SYSTEM_ADMIN' ||role=='ROLE_SU'){
+									
+									$('td:eq(9)', nRow)
+									.append(
+											'<a onclick="return deleteWork('
+													+ aData.id
+													+ ');" href="" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash-o"></i></a> ');
+							 }
+									
+							 
+							 /* if(aData.workStatusId==25){
+									$('td:eq(8)', nRow)
+									.append(
+											'<a class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="top" title="Print AS" href="#printSelectedAS/'+aData.parentAdminSanctionId+'"><i class="fa fa-print"></i></a>');
+									
+									} */
+							
+							},
+							"fnRowCallback" : function(nRow, aData,
+									iDisplayIndex, iDisplayIndexFull) {
+								/* $('td:eq(0)', nRow)
+										.html(
+												(this.fnPagingInfo().iPage
+								 * this.fnPagingInfo().iLength + (iDisplayIndex + 1))); */
+							},
+
+							"language" : {
+								searchPlaceholder : "workName"
+							},
+							"sAjaxSource" : "fetchWorksList",
+
+							"columns" : [ {
+								"data" : "index",
+								"bSortable" : false
+							}, {
+								"data" : "workNo",
+								"bSortable" : false
+							}, {
+								"data" : "workName",
+								"bSortable" : false
+							}, {
+								"data" : "workType",
+								"bSortable" : false
+							}, {
+								"data" : "financialYear",
+								"bSortable" : false
+							},{
+								"data" : "districtName",
+								"bSortable" : false
+							},{
+								"data" : "implementationAgency",
+								"bSortable" : false
+							},{
+								"data" : "workSubTypeName",
+								"bSortable" : false     
+							},{
+								"data" : "workStatus",
+								"bSortable" : false    
+							},{
+								"data" : null,
+								"bSortable" : false
+							}
+							],
+						});
+	}
+	
+	function deleteWork(id) {
+
+			return $('#page-div').scope().deleteWork(id);
+	}
+	function reDraw() {
+		t.draw();
+	}
+
+	$('#filter-btn').click(function() {
+		$('#filters').fadeToggle(300);
+	});
+	$('.filter-close').click(function(e) {
+		e.preventDefault();
+		$(this).parent('#filters').fadeOut(300);
+	});
+	 $('#applyFilters').click(function(e) {
+		e.preventDefault();
+		$(this).parent('#filters').fadeOut(300);
+		$('#searchForm').submit();
+	}); 
+	var filter_box = $('#filters');
+	$(document).mouseup(function(e) {
+		if (!filter_box.is(e.target) && filter_box.has(e.target).length === 0) {
+			$('#filters:visible').fadeOut('300');
+		}
+	});
+
+	/*]]>*/
+</script>
+
+<div id="StartOrFinishSpinnerId"></div>
+
+<div id="page-div">
+	<!-- Breadcrumb -->
+	<ol class="breadcrumb">
+		<!-- <li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li> -->
+
+		<li class="breadcrumb-item"><a><span th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item active"><span>Manage Works</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row" data-ng-init="loadOngoingWorkList();">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-folder-open-o"></i> <span>Manage Works </span>
+							<!-- 	<li  class="breadcrumb-item"><a href="#dashboard"><span
+				             th:text="${roleName}"></span></a></li> -->
+						</div>
+
+
+
+						<div class="card-body">
+
+
+
+
+							<div class="pr">
+								<form name="searchForm" novalidate="novalidate" id="searchForm">
+									<fieldset class="legend-border">
+										<legend class="legend-border">Filters</legend>
+
+										<div class="row">
+											<div class="form-group col-sm-4">
+												<input type="text" class="form-control" id="searchBox"
+													name="searchBox" placeholder="Search by Work Name"
+													data-ng-model="workName"
+													data-ng-change="reloadJqueryDatatable();" maxlength="100" />
+
+
+											</div>
+
+											<!-- <div class="row" data-ng-show="${roleName=='ROLE_DEPARTMENT'}">
+											<div class="form-group col-sm-3" data-ng-init="reloadJqueryDatatable();" >
+											
+											</div>
+											</div> -->
+
+											<div class="form-group col-sm-4">
+												<select class="form-control" id="workType"
+													data-ng-model="workData.workType"
+													data-ng-init="loadWorkTypes();"
+													data-ng-change="reloadJqueryDatatable();" name="workType">
+													<option value="" disabled="disabled">--Select Work
+														Type--</option>
+													<option data-ng-repeat="workType in workTypes | orderBy : 'workTypeNameE'"
+														value="{{workType.workTypeNameE}}">{{workType.workTypeNameE}}</option>
+												</select>
+
+											</div>
+
+
+
+
+											<div class="form-group col-sm-4">
+												<select class="form-control" id="financialYear"
+													data-ng-model="workData.financialYear"
+													data-ng-init="loadFinancialYears();"
+													data-ng-change="reloadJqueryDatatable();"
+													name="financialYear">
+													<option value="" disabled="disabled">--Select
+														Financial Year--</option>
+													<option
+														data-ng-repeat="financialYearName in financialYears | orderBy : 'financialYearName'"
+														value="{{financialYearName.financialYearName}}">{{financialYearName.financialYearName}}</option>
+												</select>
+											</div>
+
+
+
+											<div class="form-group col-sm-4">
+												<select class="form-control" id="divisionId"
+													data-ng-model="workData.divisionId"
+													data-ng-init="loadDivisions();"
+													data-ng-change="reloadJqueryDatatable(); loadDistrictByDivision(workData.divisionId);" name="divisionId">
+													<option value="" disabled="disabled">--Select
+														Division--</option>
+													<option data-ng-repeat="divisionName in divisions | orderBy : 'divisionName'"
+														value="{{divisionName.divisionId}}">{{divisionName.divisionName}}</option>
+												</select>
+											</div>
+
+
+
+											<div class="form-group col-sm-4">
+												<select class="form-control" id="districtId"
+													data-ng-model="workData.districtId"
+													data-ng-change="reloadJqueryDatatable();" name="districtId">
+													<option value="" disabled="disabled">--Select
+														District--</option>
+													<option data-ng-repeat="districtName in districts | orderBy : 'districtName'"
+														value="{{districtName.districtId}}">{{districtName.districtName}}</option>
+												</select>
+											</div>
+											
+											
+											<div class="form-group col-sm-4">
+												<select class="form-control" id="workStatusId"
+													data-ng-model="workData.workStatusId"
+													data-ng-init="loadWorkStatus1();"
+													data-ng-change="reloadJqueryDatatable();"
+													name="workStatusId">
+													<option value="" disabled="disabled">--Select
+														Work Status--</option>
+													<option
+														data-ng-repeat="worksStatusName in worksStatus | orderBy : 'workStatusNameE'"
+														value="{{worksStatusName.workStatusId}}">{{worksStatusName.workStatusNameE}}</option>
+												</select>
+											</div>
+											
+											<div class="form-group col-sm-4">
+												<select class="form-control" id="workSubTypeId"
+													data-ng-model="workData.workSubTypeId"
+													data-ng-init="loadWorkSubTypes();"
+													data-ng-change="reloadJqueryDatatable();"
+													name="workSubTypeId">
+													<option value="" disabled="disabled">--Select
+														Work Sub Type--</option>
+													<option
+														data-ng-repeat="workSubTypesName in workSubTypes | orderBy : 'workSubTypeNameE'"
+														value="{{workSubTypesName.workSubTypeId}}">{{workSubTypesName.workSubTypeNameE}}</option>
+												</select>
+											</div>
+											
+											
+
+											<!-- <div class="form-group col-sm-4">    
+												<input id="searchByDivision" name="searchByDivision"
+													data-ng-model="division"></input> <select name="divisionbb"
+													id="divisionbb" class="form-control"
+													data-ng-model="workData.divisionId">
+
+													<option
+														data-ng-repeat="division in divisions | orderBy : 'divisionName'"
+														value="{{division.divisionId}}">{{division.divisionName}}</option>
+												</select>
+
+											</div>
+ -->
+
+										</div>
+
+
+
+
+
+
+									</fieldset>
+								</form>
+							</div>
+
+
+							<div class="table-responsive responsive-md">
+								<table id="dynamic-table"
+									class="table table-striped table-bordered table-hover table-outline">
+
+
+									<thead class="thead-default">
+										<tr>
+
+											<th><span>S.No</span></th>
+
+											<th><span>Work ID</span></th>
+											<th nowrap="nowrap">Work Name</th>
+											<th><span>Work Type</span></th>
+											<th><span>Financial Year</span></th>
+											<!-- <th><span>Administrative Sanction No.</span></th> -->
+											<!-- <th><span>Scheme</span></th> -->
+											<!-- <th nowrap="nowrap" width='10%'><span>Work
+													Category</span></th> -->
+											<th><span>District</span></th>
+											<!-- <th><span>Block</span></th> -->
+											<!-- <th><span>Gram Panchayat</span></th> -->
+											<!-- <th><span>Village</span></th>
+											<th><span>ULB</span></th>
+											<th><span>Ward</span></th>
+											<th><span>LC</span></th>
+											<th style="display: none;"><span>Khasra No.</span></th> -->
+
+											<th><span>Construction Agency</span></th>
+											<th><span>Work Sub Type Name</span></th>
+											<th><span>Current Work Status</span></th>
+											<th nowrap="nowrap"><span th:text="#{action}">Action</span></th>
+
+											<!-- For excel export -->
+											<!-- <th style="display: none;"><span>TS No.</span></th>
+											<th style="display: none;"><span>TS Date</span></th>
+											<th style="display: none;"><span>TS Amount</span></th>
+											<th style="display: none;"><span>AS No.</span></th>
+											<th style="display: none;"><span>AS Date</span></th>
+											<th style="display: none;"><span>AS Amount</span></th>
+											<th><span>IA Sub Office</span></th> -->
+
+											<!-- <th><span>Vidhansabha Period</span></th>
+											<th><span>MLA</span></th>
+											<th style="display: none;"><span>Recommendation
+													No.</span></th>
+											<th style="display: none;"><span>Recommendation
+													Date</span></th>
+											<th style="display: none;"><span>First
+													installment amount</span></th>
+											<th style="display: none;"><span>Second
+													installment order Number</span></th>
+											<th style="display: none;"><span>Second
+													installment Date</span></th>
+											<th style="display: none;"><span>Second
+													installment amount</span></th>
+											<th style="display: none;"><span>Completion
+													Certificate Number</span></th>
+											<th style="display: none;"><span>Completion
+													Certificate Date</span></th>
+											<th style="display: none;"><span>Completion Date</span></th> -->
+										</tr>
+									</thead>
+								</table>
+							</div>
+
+
+							<div class="row">
+								<div class="col-md-12">
+									<div data-ng-if="responseObject.successMessage != null"
+										class="text-success">
+										<strong>Success!</strong>
+										<p>{{responseObject.successMessage}}</p>
+									</div>
+								</div>
+							</div>
+
+							<!--Sumit made  -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+						</div>
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+
+	</div>
+	<!-- /.container-fluid -->
+</div>
+<div class="container">
+	<!-- Trigger the modal with a button -->
+	<!-- <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+ -->
+	<!-- Modal -->
+	<div class="modal show" id="myModal" role="dialog"
+		th:if="${roleName=='ROLE_SAU' || roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_SU'}">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<!-- <div class="modal-header modalbg">
+					<h4 class="modal-title">BG/FDR Expiration Alert</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div> -->
+				<div class="modal-body">
+					<div data-ng-init="loadWorkTenderEndDate();">
+						<div data-ng-if="workTenderDate.length > 0">
+							<div class="scrollable-table-container">
+								<table
+									class="table table-responsive table-striped table-bordered table-hover table-outline">
+									<thead>
+										<tr>
+											<th width="5%">S.No</th>
+											<th width="10%">Work ID</th>
+											<th width="15%">Work Name</th>
+											<th width="10%">Financial Year</th>
+											<th width="14%">Construction Agency</th>
+											<th width="14%">Current Work Status</th>
+											<th width="8%">Start Date</th>
+											<th width="8%">End Date</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr data-ng-repeat="tender in workTenderDate">
+											<td>{{tender.index}}</td>
+											<td>{{tender.workNo}}</td>
+											<td>{{tender.workName}}</td>
+											<td>{{tender.financialYear}}</td>
+											<td>{{tender.implementationAgency}}</td>
+											<td>{{tender.workStatusNameE}}</td>
+											<td>{{tender.startDate}}</td>
+											<td>{{tender.endDate}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div data-ng-if="workTenderDate.length == 0">No tenders
+							available.</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
+</div>
+
+<script type="text/javascript">
+    $("document").ready (function() {
+        $('#myModal').modal('show');
+    });
+</script>
+</html>

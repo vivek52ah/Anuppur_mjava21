@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" data-ng-app="dms"
+	xmlns:sec="http://www.springframework.org/security/tages">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="Referrer-Policy: unsafe-url" value="no-referrer | same-origin" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="referrer" content="no-referrer" />
+	<meta http-equiv="Content-Security-Policy"
+		content="script-src 'self' 'unsafe-inline' 'unsafe-eval'; form-action 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; media-src 'none'; connect-src 'self'" />
+
+	<link rel="shortcut icon" th:href="@{/assets/img/favicon.ico}" type="image/x-icon" />
+
+	<link rel="icon" th:href="@{/assets/img/favicon.ico}" type="image/x-icon" />
+
+
+	<!--==========New style integration================== -->
+
+
+	<link rel="stylesheet" th:href="@{/new-assets/css/bootstrap.min.css}" />
+	<link rel="stylesheet" th:href="@{/new-assets/css/fontawesome.min.css}" />
+	<link rel="stylesheet" th:href="@{/new-assets/css/magnific-popup.min.css}" />
+	<!-- Slick Slider -->
+	<link rel="stylesheet" th:href="@{/new-assets/css/slick.min.css}" />
+
+	<link rel="stylesheet" th:href="@{/new-assets/css/modern-ticker.css}" />
+	<!-- Theme Custom CSS -->
+	<link rel="stylesheet" th:href="@{/new-assets/css/style.css}" />
+	<link th:href="@{/new-assets/css/jquery.fancybox.min.css}" rel="stylesheet" />
+
+	<!--=============== New style integration================ -->
+	<script th:src="@{new-assets/js/jquery.min.js}"></script>
+<style>
+
+		.col-sm-12.controls.text-center {
+			position: relative;
+			z-index: 999999;
+		}
+
+		section.header_bg {
+			z-index: 1
+		}
+
+		#login-wrap2 .panel-heading {
+			display: flex;
+			justify-content: space-between;
+		}
+		
+		.mt-round .mt-label {
+    background:#065192;
+    color: #fff;
+    padding: 0 20px;
+    text-transform: capitalize;
+    font-size: 14px;
+}
+.mt-label:after {
+    content: '';
+    position: absolute;
+    border-left: 6px solid #970101;
+    border-top: 6px solid #003858;
+    border-bottom: 6px solid #003858;
+    left: 100%;
+    top: 12px;
+    z-index: 1;
+}
+.mt-round .mt-label {
+ clip-path: polygon(0% 0%, 100% 0, 85% 50%, 100% 100%, 0% 100%);
+    z-index: 9;
+}
+
+/* Nav dropdown hover open */
+.nav-item.nav-dropdown:hover > .nav-dropdown-items {
+    display: block !important;
+    position: absolute; /* keeps it from pushing other content */
+    background: white;
+    z-index: 1000;
+    min-width: 200px; /* ensure proper width */
+    width: auto; /* adjust to content size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* optional nice look */
+}
+
+/* Hide by default */
+.nav-dropdown-items {
+    display: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item.nav-dropdown:hover > .nav-dropdown-items {
+    display: block !important;
+    position: absolute;
+    background: #065192;
+    z-index: 1000;
+    min-width: 200px;
+    width: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding-left: 15px;
+    min-height: 60px;margin-top: -1px;
+}
+
+li#a2 a {
+    padding-top: 5px!important;
+}
+    
+    li#a2 ul li a:hover {
+    color: #feaf1d;
+}
+li#a2 ul li a {
+    margin-top: 15px;
+}
+	</style>
+</head>
+
+<body> <!-- onload="loadThematicMap();" -->
+	<div class="boxed_wrapper">
+
+
+		<!--Start header style one area-->
+		<!--==============================
+Mobile Menu
+============================== -->
+	<div class="themeholy-menu-wrapper">
+		<div class="themeholy-menu-area text-center">
+			<button class="themeholy-menu-toggle"><i class="fal fa-times"></i></button>
+			<div class="mobile-logo">
+				<a href="index.html"><img width="80" th:src="@{/new-assets/img/logo.png}" alt="Plumer" /></a>
+			</div>
+			<div class="themeholy-mobile-menu">
+				<ul>
+					<li class="">
+						<a href="login">Home</a>
+
+					</li>
+
+					<!-- <li class="menu-item-has-children"> -->
+					<li id="stmn2"  class="menu-item-has-children">
+						<a href="aboutUs">About Site</a>
+						<!-- <ul class="sub-menu">
+
+							<li><a href="#">objective</a></li>
+							<li><a href="#">Vision &amp; Mission</a></li>
+						</ul> -->
+					</li>
+					<li class="">
+						<a href="contactUs">Contact Us</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+
+	<header class="themeholy-header header-layout1 header-layout2">
+		<div class="header-top">
+			<div class="container themeholy-container">
+				<div class="row justify-content-center justify-content-lg-between align-items-center gy-2">
+					<div class="col-auto d-none d-lg-block" style="margin-top:0px;height: 31px">
+						<ul>
+							<li>
+								<div class="social-links">
+								<a href="#">-A</a>
+									<a href="#">A</a>
+									<a href="#">A+</a>
+									
+									<a href="#">Screen Reader</a>
+									<a  href="#">Skip to main content</a>
+									<a id="stmn" href="#">Skip to navigation</a>
+									
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="col-auto">
+						<div class="header-links">
+							<ul>
+								<li>
+								<a href="#"> हिंदी</a>
+									<a href="#">English</a>
+								<a href="#" title=""><i class="fas fa-solid fa-square black same-size"></i></a>
+									<a href="#" title=""> <i class="fas fa-solid fa-square white same-size"></i></a>
+								</li>
+								
+
+
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="sticky-wrapper">
+			<div class="menu-area">
+				<div class="container themeholy-container">
+					<div class="row align-items-center justify-content-between">
+						<div class="col-auto">
+							<div class="header-logo">
+								<a href="login" title="logo">
+									<img width="80" th:src="@{new-assets/img/logo.png}" alt="logo" />
+									<div class="logo-text">
+										<h3>Anuppur</h3>
+
+										<h6 class="">Civil Works Management System</h6>
+										
+									</div>
+								</a>
+							</div>
+
+						</div>
+
+						<div class="col-auto">
+							<div class="hidden-xs hidden-sm">
+								
+								<div class="">
+								<a id="login-btn" href="#" class="samebtn" data-bs-toggle="modal" data-bs-target="#myloginModal">Login<i class="fa-solid fa-right-to-bracket"></i></a>
+									
+									<a class="" data-bs-toggle="dropdown"></a>
+
+									<div class="modal" id="myloginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+					aria-hidden="true" data-backdrop="static">
+										<div class="modal-dialog modal-dialog-centered" role="document">
+											<div class="modal-content">
+							<div class="modal-body">
+							<div id="login-wrap2" class="">
+							<div class="panel panel-default">
+							<div class="panel-heading" style="border-bottom: 1px solid #00000052;">
+																<div class="panel-title">Sign In</div>
+																<button type="button" class="btn btn-danger" data-bs-dismiss="modal">X</button>
+															</div>
+															<div style="padding-top: 30px" class="panel-body">
+								<div class="d-flex flex-column">
+									<form method="post" id="loginform" class="form-horizontal" role="form"
+										th:action="@{/login}">
+
+										<div class="alert alert-success alert-dismissible show login_info" role="alert" th:if="${message != null}">
+											<strong>Success!</strong>
+											<span th:text="${message}">Success message!</span>
+											 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+										</div>
+
+										<div class="alert alert-danger  alert-dismissible show login_info" role="alert" th:if="${error != null}">
+											<strong>Error!</strong>
+											<span th:text="${error}">Error message!</span>
+											 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+										</div>
+										<div class="input-group mb-3 icnn">
+											<span class="input-group-text"><i class="fa fa-user"></i></span> <input
+												type="text" name="username" required="required" class="form-control"
+												id="username" placeholder="Username/EmailId" autofocus="autofocus"
+												maxlength="100" autocomplete="off" />
+										</div>
+										<div class="input-group mb-3 icnn">
+											<span class="input-group-text"><i class="fa fa-unlock-alt"></i></span>
+											<input name="password" type="password" class="form-control" id="password"
+												placeholder="Password" required="required" maxlength="20"
+												autocomplete="off" />
+										</div>
+										<div class="input-group mb-3">
+													<span class="input-group-prepend"><i
+															class="mdi mdi-pencil"></i></span> <input name="captchaText"
+														id="captchaText" type="hidden" maxlength="4" autocomplete="off"
+														required="required" class="form-control"
+														placeholder="Captcha" value="123456" />
+												</div>
+										<!--  <div class="row" >
+										
+											<div class="mar_left_captcha grid_set">
+											<div class="">
+												<img class="mtop10" id="captcha_id" name="imgCaptcha" th:src="@{/captcha?type=login}"
+													height="40" /> 
+													</div>
+													<div>
+													<a href="#">
+													<span
+														onclick="document.getElementById('captcha_id').src = 'captcha?' + Math.random() + '&amp;type=login';  return false">
+														<i class="fa fa-refresh black"></i>
+													</span>
+												</a>
+											</div>
+											<div class="">
+												<div class="input-group mb-3">
+													<span class="input-group-prepend"><i
+															class="mdi mdi-pencil"></i></span> <input name="captchaText"
+														id="captchaText" type="text" maxlength="4" autocomplete="off"
+														required="required" class="form-control"
+														placeholder="Captcha" value="123456" />
+												</div>
+											</div>
+										</div>
+										</div>  -->
+
+										<div class="text-center">
+											<button type="submit" id="btn-login"
+												class="btn samebtn loginbtn">Login<i class="fa-solid fa-right-to-bracket"></i></button>
+										</div>
+<div class="col-12">
+								<a th:href="@{/forgotpassword}" class="btn btn-link px-0"> <span>Forgot
+										password?</span>
+								</a>
+
+							</div>
+									</form>
+
+
+								</div></div>
+							</div></div></div>
+							<sec:crsfInput />
+
+							
+
+						</div>
+										</div>
+									</div>
+
+
+
+
+								</div>
+
+
+
+
+
+							</div>
+						</div>
+
+
+					</div>
+				</div>
+				<section class="header_bg">
+					<div class="container">
+						<div class="col">
+
+							<div class="menu-wrap">
+								<div class="row">
+									<div class="col text-end text-xl-start">
+										<nav class="main-menu d-none d-lg-inline-block">
+											<ul>
+												<li class="">
+													<a href="login">Home</a>
+
+												</li>
+
+													<!-- <li class="menu-item-has-children"> -->
+												<li id="stmn2" class="">
+													<a  href="aboutUs">About Site</a>
+													<!-- <ul class="sub-menu">
+
+														<li><a href="#">objective</a></li>
+														<li><a href="#">Vision &amp; Mission</a></li>
+
+
+
+
+
+													</ul> -->
+												</li>
+												
+												<li id="a2" class="nav-item nav-dropdown nav-dropdownnew2">
+													<a class="nav-link nav-dropdown-toggle" href="#"> <i
+														class="fa fa-pencil-square-o" aria-hidden="true"></i>
+														Downloads
+													</a>
+													<ul class="nav-dropdown-items openbox2">
+														<li><a th:href="@{/awms_production.apk}" >Download Mobile App</a></li>
+													</ul>
+												</li>
+												
+												<li class="">
+													<a href="contactUs">Contact Us</a>
+												</li>
+											</ul>
+										</nav>
+										<button type="button" class="themeholy-menu-toggle d-block d-lg-none"><i
+												class="far fa-bars"></i></button>
+									</div>
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>
+
+		
+		<section class="what-we-do-area">
+
+			<div class="container">
+
+				<div class="row">
+
+					<div class="col-md-12">
+
+					<div class="pt-50 pb-40" id="about-sec">
+					<div class="container">
+			<div class="row align-items-center">
+
+				<div class="col-xl-8">
+					<div class="title-area mb-30">
+							<div class="sec-title style-two">
+							<h2 class="sec-title">Contact Us</h2>
+							<hr/>
+							</div>
+							<h6>Anuppur Civil Work Management System</h6>
+							
+							<p> 
+								<b>Collectorate Office:</b> Kotma Road, Anuppur <br />
+									District- Anuppur (M.P.), Pin - 484224 <br />
+								<b>Phone:</b> 07659-222979 <br />
+								<b>Email:</b> ceozpanu@mp.gov.in <br />
+								<b>Website:</b> <a href="https://anuppur-wms.mp.gov.in" target="_blank">https://anuppur-wms.mp.gov.in</a>
+							</p>
+							</div></div></div></div>
+						
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		</div>
+	<!--==============================
+Footer Area
+==============================-->
+	<footer class="footer-wrapper footer-layout2 relative">
+
+		<div class="container">
+
+			<div class="footer-right">
+
+				<div class="widget-area2">
+					<div class="row justify-content-between">
+						<div class="col-sm-6 col-md-auto">
+							<div class="widget widget_nav_menu footer-widget">
+								<h3 class="widget_title">Useful Links</h3>
+								<div class="menu-all-pages-container">
+									<ul class="menu">
+										
+											<li><a href="#">Events</a></li>
+												<li><a href="#">Press Release</a></li>
+												<li><a href="#">Videos</a></li>
+
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-auto">
+							<div class="widget widget_nav_menu footer-widget">
+								<h3 class="widget_title">Help &amp; Support</h3>
+								<div class="menu-all-pages-container">
+									<ul class="menu">
+										<li><a href="#">Right to Information</a></li>
+										<li><a href="#">Disclaimer</a></li>
+										<li><a href="#">FAQ</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-auto">
+							<div class="widget footer-widget">
+								<h3 class="widget_title">Contact Us</h3>
+								<div class="themeholy-widget-contact">
+									<div class="info-box">
+										<div class="info-box_icon">
+											<i class="fas fa-location-dot"></i>
+										</div>
+										<p class="info-box_text text-left">
+											Kotma Road, Anuppur <br/>
+											District - Anuppur (M.P.), Pin - 484224
+										</p>
+									</div>
+									<div class="info-box">
+										<div class="info-box_icon">
+											<i class="fas fa-phone"></i>
+										</div>
+										<p class="info-box_text">
+											<a href="#" class="info-box_link">07659-222979</a>
+										</p>
+									</div>
+									<div class="info-box">
+										<div class="info-box_icon">
+											<i class="fas fa-envelope"></i>
+										</div>
+										<p class="info-box_text">
+											<a href="#" class="info-box_link">ceozpanu@mp.gov.in</a>
+										</p>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="copyright-wrap">
+			<div class="footer-top">
+
+				<ul class="footer_links12">
+					<li><a href="#">Terms and Conditions</a></li>
+					<li><a href="#">Copyright Policy</a></li>
+					<li><a href="#">Privacy Policy</a></li>
+					<li><a href="#">Feedback</a></li>
+					<li><a href="#">Site Map</a></li>
+
+				</ul>
+			</div>
+			<div class="container">
+				<div class="row justify-content-between align-items-center">
+					<div class="col-lg-6">
+						<ul class="footer_links12 footer_links13">
+							<li><a href="#"><span id="ctl00_span_last_update">Last Update: 31/01/2025 </span></a></li>
+							<li><a href="#"><span id="ctl00_span_visitor_count" style="margin-left: 10px;">Visitor
+										Count:999</span></a></li>
+
+
+						</ul>
+					</div>
+					<div class="col-lg-6">
+						<p class="copyright-text text-right">Copyright <i class="fal fa-copyright"></i> 2025 <a
+								href="#">MPSeDC (CoE)</a>. All Rights Reserved.</p>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+
+	</footer>
+
+	<!-- Scroll To Top -->
+	<div class="scroll-top">
+		<svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+			<path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"
+				style="transition: stroke-dashoffset 10ms linear 0s; stroke-dasharray: 307.919, 307.919; stroke-dashoffset: 307.919;">
+			</path>
+		</svg>
+	</div>
+
+	<div id="calendar-diary">
+		<span class="titles_cls"><i class="fa fa-calendar" aria-hidden="true"></i> <span class="">Diary / calendar
+				2025</span></span>
+		<a href="http://diary.mp.gov.in/" target="_blank" title="Diary/Calendar 2025"
+			style="display: inline-block;text-align: left;vertical-align: top;margin-left:-5px;">
+			<img th:src="@{/new-assets/img/dairy-img.jpg}" alt="dairy-img" />
+			 <label class="year-title">2025</label>
+        <span style="display: block; text-align: center;margin-top:-40px;"></span> 
+        <span style="font-size: 12px;margin-left: 12px;" class="btn btn-primar">Diary / calendar 2024</span>
+		</a>
+	</div>
+
+
+	<div class="social">
+      <ul>
+        <li class="twitter"><a href="#">Twitter <i class="fa-brands fa-twitter"></i></a></li>
+        <li class="facebook"><a href="#">Facebook <i class="fa-brands fa-facebook"></i></a></li>
+        <li class="youtube"><a href="#">Youtube <i class="fa-brands fa-youtube"></i></a></li>
+        <li class="instagram"><a href="#">Instagram <i class="fa-brands fa-instagram"></i></a></li>
+      </ul>
+    </div>
+	<!--********************************
+Code End  Here 
+******************************** -->
+
+
+
+
+	<!--==========New style integration================== -->
+
+	<!-- Jquery -->
+
+
+	<!-- Slick Slider -->
+	<script th:src="@{new-assets/js/slick.min.js}"></script>
+	<!-- Bootstrap -->
+	<script th:src="@{new-assets/js/bootstrap.min.js}"></script>
+	<!-- Magnific Popup -->
+	<script th:src="@{new-assets/js/jquery.magnific-popup.min.js}"></script>
+	<!-- Counter Up -->
+	<script th:src="@{new-assets/js/jquery.counterup.min.js}"></script>
+	<!-- Range Slider -->
+	<script th:src="@{new-assets/js/jquery-ui.min.js}"></script>
+	<!-- Isotope Filter -->
+	<script th:src="@{new-assets/js/imagesloaded.pkgd.min.js}"></script>
+	<script th:src="@{new-assets/js/isotope.pkgd.min.js}"></script>
+	<script th:src="@{new-assets/js/jquery.modern-ticker.min.js}"></script>
+
+
+	<!-- Main Js File -->
+	<script th:src="@{new-assets/js/main.js}"></script>
+	<script th:src="@{new-assets/js/jquery.bootstrap.newsbox.min.js}" type="text/javascript"></script>
+	<!-- ===================== -->
+	<script th:src="@{new-assets/js/jquery.fancybox.min.js}"></script>
+	<!--==========New style integration================== -->
+
+
+
+
+
+
+		<script th:src="@{/js/sha256.js}"></script>
+	<script>
+
+		$(document).ready(function () {
+
+			$('#btn-login').click(function () {
+				if ($.trim($('#username').val()
+					.trim()) == ''
+					|| $
+						.trim($(
+							'#password')
+							.val()
+							.trim()) == '')
+					/*|| $.trim($(
+						'#captchaText')
+						.val().trim()) == '')*/ {
+					//alert("Please enter User Name and Password");
+				} else {
+					var hashObj = new jsSHA(
+						"SHA-256", "TEXT",
+						"1");
+					hashObj.update($(
+						'#password').val()
+						.trim());
+					$("#password")
+						.val(
+							hashObj
+								.getHash("HEX"));
+				}
+			});
+		});
+	</script>
+	
+	<script>
+	$("#stmn,#stmn2").click(function() {
+	    $('html, body').animate({
+	        scrollTop: $(".modern-ticker").offset().top
+	    }, 2000);
+	});
+	</script>
+</body>
+
+</html>

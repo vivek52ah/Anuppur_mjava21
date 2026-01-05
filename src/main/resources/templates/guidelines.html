@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="Referrer-Policy: unsafe-url" value="no-referrer | same-origin" />
+	<!-- responsive meta -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<!-- For IE -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta http-equiv="Content-Security-Policy"
+		content="script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'none'; object-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/css; font-src 'self'; media-src 'none'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; " />
+
+	<link rel="shortcut icon" th:href="@{/assets/img/favicon.ico}" type="image/x-icon" />
+	<link rel="icon" th:href="@{/assets/img/favicon.ico}" type="image/x-icon" />
+	<title>:: DHS - Monitoring System ::</title>
+	<link rel="stylesheet" th:href="@{/dhs/css/line-awesome.min.css}" />
+	<style type="text/css">
+		i.las.commn-css {
+			height: 25px;
+			width: 25px;
+			background: #3f51b5;
+			text-align: center;
+			line-height: 25px;
+			color: rgb(255, 255, 255);
+			border-radius: 50%;
+			box-shadow: rgb(0 0 0 / 15%) 0px 0px 15px;
+			vertical-align: middle;
+			margin-right: 10px;
+		}
+	</style>
+	<style>
+		.what-we-do-area {
+			padding-top: 109px !important;
+			padding-bottom: 250px !important;
+			/* background: url([[@{/dhs/images/bg_1.png}]]) repeat-x bottom; */
+			background: url(../images/bg_1-1976a4f….png) repeat-x bottom;
+		}
+
+		p.conte {
+			font-size: 20px !important;
+			text-align: left;
+			font-family: sans-serif;
+		}
+	</style>
+
+	<!-- Bootstrap CSS -->
+	<!-- <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+<link rel="stylesheet" type="text/css"
+	th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" type="text/css"
+	th:href="@{/assets/css/materialdesignicons.min.css}" /> -->
+	<!-- fonts -->
+	<!-- <link rel="stylesheet" th:href="@{/assets/fonts/fonts.css}" /> -->
+	<!-- plugin -->
+	<!-- <link th:href="@{/assets/css/slick.css}" rel="stylesheet" />
+<link th:href="@{/assets/css/slick-theme.css}" rel="stylesheet" /> -->
+	<!-- Custom CSS -->
+	<!-- <link rel="stylesheet" th:href="@{/assets/css/main.css}" /> -->
+
+	<!-- master stylesheet -->
+	<link rel="stylesheet" th:href="@{/dhs/css/style.css}" />
+	<!-- Responsive stylesheet -->
+	<link rel="stylesheet" th:href="@{/dhs/css/responsive.css}" />
+
+
+
+	<script type="text/javascript">
+		/*<![CDATA[*/
+
+		function loadThematicMap() {
+			$.ajax({
+				url: "districtWiseWorkStatus?isThematicMap=true",
+				success: function (resp) {
+					LoadMap(resp);
+				},
+				error: function (msg) {
+					//alert(msg);
+				}
+			});
+		}
+		function LoadMap(dist_values) {
+			var url = null;
+			var tbl = jQuery.parseJSON(JSON.stringify(dist_values));
+			//var tbl=JSON.parse(dist_values);
+
+			url = "https://geoportal.mp.gov.in/thematicmap/GetThematicMap.svc/GetAllDistrictsMap";
+
+			var map = L.map('mapid', {
+				scrollWheelZoom: false,
+				attributionControl: false
+			}).setView([23.535331, 78.628386], 7);
+
+			map.addControl(new L.Control.Fullscreen());
+			map.isFullscreen() // Is the map fullscreen?
+			//map.toggleFullscreen() // Either go fullscreen, or cancel the existing fullscreen.
+
+			//`fullscreenchange` Event that's fired when entering or exiting fullscreen.
+			map.on('fullscreenchange', function () {
+				if (map.isFullscreen()) {
+					map.setView([23.535331, 78.628386], 7);
+					//console.log('entered fullscreen');
+				} else {
+					//map.setView([23.535331, 78.628386], 7);
+					//console.log('exited fullscreen');
+				}
+			});
+
+			var controlLoader = L.control.loader().addTo(map);
+			controlLoader.show();
+
+			$
+				.ajax({
+					url: url,
+					beforeSend: function () {
+
+						//$('#mapid').html('<div style="margin-top:150px;"><img src="${pageContext.request.contextPath}/resources/images/loading.gif" class="ajax-loader"></div>');
+					},
+					success: function (resp) {
+						var mapData = null;
+						var distArray = [];
+
+						mapData = JSON
+							.parse(resp.AttributeList[0].alldistrictsmap);
+
+						for (var i = 0; i < tbl.length; i++) {
+							for (var j = 0; j < mapData.features.length; j++) {
+								if (mapData.features[j].properties["Dist_Code"] == tbl[i].code) {
+									mapData.features[j].properties["District_Id"] = tbl[i].id;
+									mapData.features[j].properties["District_Name"] = tbl[i].name;
+									mapData.features[j].properties["Not_Started"] = tbl[i].count1;
+									mapData.features[j].properties["In_Progress"] = tbl[i].count2;
+									mapData.features[j].properties["On_Hold"] = tbl[i].count3;
+									mapData.features[j].properties["Completed"] = tbl[i].count4;
+									mapData.features[j].properties["Cancelled"] = tbl[i].count5;
+
+									distArray
+										.push(mapData.features[j].properties["Dist_Code"]);
+
+									//Code for Create Lable
+									var createLabelIcon = function (labelClass,
+										labelText) {
+										return L.divIcon({
+											className: labelClass,
+											html: labelText
+										})
+									}
+
+									var cnet = mapData.features[j].geometry.coordinates;
+									var poly = L.polygon(cnet).addTo(map);
+									var m = poly.getBounds().getCenter();
+									var marker = L.marker(
+										[m.lng, m.lat],
+										{
+											icon: createLabelIcon(
+												"textLabelclass",
+												tbl[i].name)
+										}).addTo(map);
+
+									//var marker = L.marker([district_map.features[i].geometry.coordinates[0][0][1], district_map.features[i].geometry.coordinates[0][0][0]]).addTo(map);
+									// marker.bindPopup('<b>' + tbl[i].name + '</b><br/>' +'Total Horizontal Clients/Links' + '<b>: ' + tbl[i].count + '</b>' +'<br/>' + 'Total Pending Requests' + '<b>: ' + tbl[i].count2 + '</b>');
+									break;
+								}
+							}
+						}
+
+						geojson = L.geoJson(mapData, {
+							style: GetThemeColor,
+							onEachFeature: onEachFeature
+						});
+
+						var legend = L.control({
+							position: 'bottomright'
+						});
+
+						legend.onAdd = function (map) {
+
+							var div = L.DomUtil.create('div', 'info legend');
+
+							//color = [1, 10, 20, 30, 40, 50];
+
+							div.innerHTML += 'Legends: <br><b>Completed Works</b>'
+								+ '<br>';
+							div.innerHTML += '<i style="background:'
+								+ getColor(0) + '"></i> ' + '0' + '<br>';
+							div.innerHTML += '<i style="background:'
+								+ getColor(1) + '"></i> ' + '1-75' + '<br>';
+
+							div.innerHTML += '<i style="background:'
+								+ getColor(77) + '"></i> ' + '76-150'
+								+ '<br>';
+
+							div.innerHTML += '<i style="background:'
+								+ getColor(152) + '"></i> ' + '151-225'
+								+ '<br>';
+
+							div.innerHTML += '<i style="background:'
+								+ getColor(227) + '"></i> ' + '226-300'
+								+ '<br>';
+
+							div.innerHTML += '<i style="background:'
+								+ getColor(302) + '"></i> ' + '301-375'
+								+ '<br>';
+							div.innerHTML += '<i style="background:'
+								+ getColor(376) + '"></i> ' + '375+'
+								+ '<br>';
+
+							div.innerHTML += '<i style="background:' + 'grey' + '"></i> '
+								+ 'Not applicable';
+
+							/*for (var i = 1; i < color.length; i++) {
+								div.innerHTML +=
+									'<i style="background:' + getColor(color[i]+1) + '"></i> ' +
+									color[i] + (color[i + 1] ? '&ndash;' + color[i + 1] + '<br>' : '+');
+							}*/
+
+							return div;
+						}
+
+						function highlightFeature(e) {
+							var layer = e.target;
+							var feature = layer.feature;
+
+							layer.setStyle({
+								weight: 5,
+								color: '#fff',
+								dashArray: '',
+								// fillOpacity: 0.5
+							});
+
+							var highlightStyle = {
+								color: '#2262CC',
+								weight: 3,
+								opacity: 0.6,
+								fillOpacity: 0.65,
+								fillColor: '#2262CC'
+							};
+
+							var defaultStyle = {
+								color: "#2262CC",
+								weight: 2,
+								opacity: 0.6,
+								fillOpacity: 0.1,
+								fillColor: "#2262CC"
+							};
+
+							if (!L.Browser.ie && !L.Browser.opera
+								&& !L.Browser.edge) {
+								layer.bringToFront();
+							}
+							info.update(layer.feature.properties);
+						}
+						function resetHighlight(e) {
+							geojson.resetStyle(e.target);
+							info.update();
+						}
+						function zoomToFeature(e) {
+							map.fitBounds(e.target.getBounds());
+						}
+
+						function GetThemeColor(feature) {
+							if (distArray.indexOf(feature.properties.Dist_Code) > -1) {
+								return {
+									fillColor: getColor(feature.properties.Completed),
+									weight: 2,
+									opacity: 1,
+									color: 'white',
+									dashArray: '3',
+									fillOpacity: 1,
+
+								};
+							} else {
+								return {
+									fillColor: "grey",
+									weight: 2,
+									opacity: 1,
+									color: 'white',
+									dashArray: '3',
+									fillOpacity: 1,
+
+								};
+							}
+
+						}
+
+						function getColor(d) {
+
+							return d > 375 ? '#008000'
+								: (d > 300 && d <= 375) ? '#00cc00'
+									: (d > 225 && d <= 300) ? '#99ff99'
+										: (d > 150 && d <= 225) ? '#ccffcc'
+											: (d > 75 && d <= 150) ? '#F79F81'
+												: (d > 0 && d <= 75) ? '#FA5858'
+													: '#DF0101';
+
+							//return '#b5e5c1';
+						}
+
+						function onEachFeature(feature, layer) {
+							if (distArray.indexOf(feature.properties.Dist_Code) > -1) {
+								layer.on({
+
+									dblclick: function () {
+										//window.open("themeticMapBlockWiseView?districtId=" + feature.properties.District_Id); 
+									},
+									mouseover: highlightFeature,
+									mouseout: resetHighlight,
+									click: zoomToFeature
+								});
+							}
+						}
+
+						var URL3 = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+						var OSM = L.tileLayer(URL3, {
+							maxZoom: 20,
+							minZoom: 6,
+							id: 'mapbox.streets-satellite'
+
+						});
+
+						var googleSat = L
+							.tileLayer(
+								'http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
+								{
+									maxZoom: 20,
+									minZoom: 6,
+									subdomains: ['mt0', 'mt1', 'mt2',
+										'mt3']
+								});
+
+						var DistBound = new L.LayerGroup([geojson])
+							.setZIndex(200);
+						var OSMMap = new L.LayerGroup([OSM]).setZIndex(400);
+						var GoogleMap = new L.LayerGroup([googleSat])
+							.setZIndex(600);
+
+						var baseLayers = {
+							"Open Street Map": OSMMap,
+							"Google Map": GoogleMap
+						};
+
+						var overlays = {
+							"District Boundaries": DistBound
+
+						};
+
+						L.control.layers(baseLayers, overlays).addTo(map);
+						map.addLayer(DistBound);
+						legend.addTo(map);
+
+						map.fitBounds(geojson.getBounds()).setMinZoom(7);
+						controlLoader.hide();
+
+						var info = L.control();
+						info.onAdd = function (map) {
+							this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+							this.update();
+							return this._div;
+						};
+
+						// method that we will use to update the control based on feature properties passed
+						info.update = function (props) {
+
+							this._div.innerHTML = (props ? '<b>'
+								+ 'District Name :' + props.District_Name
+								+ '</b><br />' + 'Completed Works: '
+								+ props.Completed + '</b><br />'
+								+ 'In Progress Works :' + props.In_Progress
+								+ '</b><br />' + 'On Hold Works: '
+								+ props.On_Hold + '</b><br />'
+								+ 'Cancelled Works: ' + props.Cancelled
+								+ '</b><br />' + 'Not Started Works: '
+								+ props.Not_Started + '</b><br />'
+								: 'Hover over District');
+
+						};
+
+						info.addTo(map);
+
+					},
+					error: function (msg) {
+						//alert(msg);
+						controlLoader.hide();
+					}
+
+				});
+
+		}
+	/*]]>*/
+	</script>
+</head>
+
+<body> <!-- onload="loadThematicMap();" -->
+	<div class="boxed_wrapper">
+
+		<!--Start Preloader -->
+		<!-- <div class="preloader"></div>
+ -->
+		<!--End Preloader -->
+		<section class="top-bar-area">
+			<div class="container">
+				<div class="row">
+
+					<div class="col-md-5 col-sm-3 col-xs-12 col-md-offset-7">
+						<div class="mainmenu-right-info">
+							<!-- <ul class="social-links">
+                            <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-vimeo" aria-hidden="true"></i></a></li>
+                        </ul> -->
+							<!--  <div class="free-quotes">
+                        <a href="https://play.google.com/store/apps/details?id=in.mpgov.mykit" class="btn-app mr-2" target="_blank" rel="noopener noreferrer" title="Play Store"> <img height="24" src="images/playstore.png"> 
+                                        <span class="">Download App on Google Play</span>
+                                        <span class="d-md-none d-inline"> </span>
+                                </a>
+                            </div> -->
+
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</section>
+		<!--Start header style one area-->
+		<header class="header-style-one-area">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-1 col-md-2 col-sm-6 col-xs-12">
+						<div class="logo">
+
+							<a href="login" class="logo"> <img th:src="@{/dhs/images/logo.png}" alt="Awesome Logo" />
+							</a>
+						</div>
+					</div>
+					<div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+						<h1 class="name">dhs - MONITORING SYSTEM</h1>
+					</div>
+
+
+				</div>
+			</div>
+		</header>
+		<!--End header style one area-->
+
+		<!--Start mainmenu area-->
+		<section class="mainmenu-area stricky">
+			<div class="container">
+				<div class="mainmenu-bg">
+					<div class="row">
+						<div class="col-md-9 col-sm-9 col-xs-12">
+							<!--Start mainmenu-->
+							<nav class="main-menu">
+								<div class="navbar-header">
+									<button type="button" class="navbar-toggle" data-toggle="collapse"
+										data-target=".navbar-collapse">
+										<span class="icon-bar"></span> <span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+									</button>
+								</div>
+								<div class="navbar-collapse collapse clearfix">
+									<ul class="navigation clearfix">
+										<li><a href="login"><i class="las la-home commn-css"></i>Home</a></li>
+										<!-- <li><a href="#.html">About us</a></li> -->
+										<!-- <li><a href="#.html">User Manual </a></li> -->
+										<!-- <li><a target="_blank" href="https://app.powerbi.com/view?r=eyJrIjoiMTA4MzVjOTEtMjY1Ny00MmE1LThmZTQtNWQ4MzZjNmFkOTQ0IiwidCI6IjYzMzI3N2ExLTFmMDctNGU5Mi04MDQwLWNiOGNkYmQ2NTQxNCJ9">Dashboard</a></li> -->
+										<li><a target="_self" href="aboutUs"><i
+													class="las la-podcast commn-css"></i>About us</a></li>
+										<li><a target="_self" href="guidelines1"><i
+													class="las la-clipboard commn-css"></i>Guidelines</a></li>
+										<li><a target="_self" href="contactUs"><i
+													class="las la-address-card commn-css"></i>Contact Us</a></li>
+										<!--  <li><a target="_blank" href="https://app.powerbi.com/view?r=eyJrIjoiOWVhNzg4NjMtOTM4MC00YjEyLWI3N2ItNzViZTI0NTA0NWQwIiwidCI6IjYzMzI3N2ExLTFmMDctNGU5Mi04MDQwLWNiOGNkYmQ2NTQxNCJ9"><i class="las la-atom commn-css"></i>Dashboard</a></li>-->
+										<li><a target="_blank"
+												href="http://PBIRS_dhs:Test%40123@analytics.mp.gov.in:8080/Reports/powerbi/PBIRS_dhs/MLA%20Lads%20Dashboard%20MIS?rs:Command=Render&amp;rc:Toolbar=false"><i
+													class="las la-atom commn-css"></i>Dashboard</a></li>
+
+									</ul>
+								</div>
+							</nav>
+							<!--End mainmenu-->
+						</div>
+
+
+						<div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+							<div class="mainmenu-right-info mainmenu-right-info_n1">
+								<div class="free-quotes mar_right">
+									<!-- <a href="#"  class="btn-app mr-2" >User Manual</a> -->
+									<a href="#" class="btn-app mr-2" data-toggle="modal" data-target="#modal1">Login</a>
+								</div>
+
+							</div>
+						</div>
+
+						<!--  <div class="col-md-4 col-sm-3 col-xs-12">
+                    <div class="mainmenu-right-info">
+                        <ul class="social-links">
+                            <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-vimeo" aria-hidden="true"></i></a></li>
+                        </ul>
+                        <div class="free-quotes">
+                            <a href="#">GET FREE QUOTES</a>
+                        </div>  
+                    </div>
+                </div> -->
+
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--End mainmenu area-->
+
+		<!--Start rev slider wrapper-->
+
+		<!--End rev slider wrapper-->
+		<section class="what-we-do-area">
+
+			<div class="container">
+
+				<div class="row">
+
+					<div class="col-md-12">
+
+						<div class="text-box">
+							<div class="sec-title style-two">
+								<h1>Guidelines</h1>
+								<div class="icon-holder">
+									<img th:src="@{/dhs/images/title-icon.png}" alt="Icon" />
+								</div>
+
+							</div>
+							<ul>
+								<li>
+
+									<div class="text-holder">
+										<!--  <h3>SUSTAINABLE</h3> -->
+										<table class="table">
+											<tr>
+												<th>क्र.</th>
+												<th>शीर्षक</th>
+												<th>डाउनलोड</th>
+											</tr>
+											<tr>
+												<td>1</td>
+												<td>विधानसभा निर्वाचन क्षेत्र विकास योजना-मार्गदर्शिका 2013</td>
+												<td><a style="color:red"
+														href="guidelines/विधानसभा निर्वाचन क्षेत्र विकास योजना-मार्गदर्शिका 2013.pdf"
+														title="Click here" target="_blank">Click here</a></td>
+											</tr>
+											<tr>
+												<td>2</td>
+												<td>विधानसभा निर्वाचन क्षेत्र विकास योजना-मार्गदर्शिका 2011</td>
+												<td><a style="color:red"
+														href="guidelines/विधानसभा निर्वाचन क्षेत्र विकास योजना-मार्गदर्शिका 2011.pdf"
+														title="Click here" target="_blank">Click here</a></td>
+											</tr>
+										</table>
+										<br />
+
+									</div>
+								</li>
+
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--Start Brand area-->
+
+		<!--End Brand area-->
+
+		<!--Start welcome area-->
+
+		<!--End welcome area-->
+
+		<!--Start fact counter area-->
+		<!-- <section class="fact-counter-area"
+			th:style="'background:url('+ @{/dhs/images/bg.jpg} +');'">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<div id="mapid"
+							style="min-height: 680px; text-align: center; position: relative; box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, 0.2); -webkit-box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, 0.2);"></div>
+
+					</div>
+						<iframe sandbox="allow-same-origin allow-scripts" th:src="@{/dhs/https://app.powerbi.com/view?r=eyJrIjoiYzgwZWFiNjktM2E0MS00ZmFmLWI5ZDMtODMxOWRlMGY2ZDRiIiwidCI6IjYzMzI3N2ExLTFmMDctNGU5Mi04MDQwLWNiOGNkYmQ2NTQxNCJ9}" width="100%" height="700" allowfullscreen="allowfullscreen"></iframe>
+				</div>
+			</div>
+		</section> -->
+		<!--End fact counter area-->
+
+
+
+		<!--Start cleaning centre area-->
+
+		<!--Start End centre area-->
+
+		<!--Start latest blog area-->
+
+		<!--End latest blog area-->
+
+		<!--Start footer area-->
+
+		<!--End footer area-->
+
+		<!--Start footer bottom area-->
+
+		<!--End footer bottom area-->
+
+		<!--Start copyright area-->
+		<section class="copyright-area">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="copyright-text text-center">
+							<p>COPYRIGHT © 2021. ALL RIGHTS RESERVED.</p>
+							<p>
+								<a href="#">DESIGNED &amp; DEVELOPED BY CENTER OF EXCELLENCE
+									(COE), MAP_IT. </a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--End copyright area-->
+
+		<!--Scroll to top-->
+		<div class="scroll-to-top scroll-to-target" data-target="html">
+			<span class="fa fa-angle-up"></span>
+		</div>
+		<div id="login-wrap">
+			<section>
+				<!-- login -->
+				<div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+					aria-hidden="true" data-backdrop="static">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content">
+							<div class="modal-body">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<i class="fa fa-times-circle"></i>
+								</button>
+								<div class="form-title text-center">
+									<h3>Login</h3>
+									<!-- <p>Already Registered User</p> -->
+								</div>
+								<div class="d-flex flex-column">
+									<form method="post" id="loginform" class="form-horizontal" role="form"
+										th:action="@{/login}">
+
+										<div class="text-success login_info" th:if="${message != null}">
+											<strong>Success!</strong>
+											<p th:text="${message}">Success message!</p>
+										</div>
+
+										<div class="text-danger login_info" th:if="${error != null}">
+											<strong>Error!</strong>
+											<p th:text="${error}">Error message!</p>
+										</div>
+										<div class="input-group mb-3">
+											<span class="input-group-text"><i class="las la-user-tie"></i></span> <input
+												type="text" name="username" required="required" class="form-control"
+												id="username" placeholder="Username/EmailId" autofocus="autofocus"
+												maxlength="30" autocomplete="off" />
+										</div>
+										<div class="input-group mb-3">
+											<span class="input-group-text"><i class="las la-key"></i></span>
+											<input name="password" type="password" class="form-control" id="password"
+												placeholder="Password" required="required" maxlength="20"
+												autocomplete="off" />
+										</div>
+										<div class="row">
+											<div class="col-md-5 d-flex mar_left_captcha">
+												<img id="captcha_id" name="imgCaptcha" th:src="@{/captcha?type=login}"
+													height="40" /> <a href="#">
+													<span
+														onclick="document.getElementById('captcha_id').src = 'captcha?' + Math.random() + '&amp;type=login';  return false">
+														<i class="fa fa-refresh black"></i>
+													</span>
+												</a>
+											</div>
+											<div class="col-md-7">
+												<div class="input-group mb-3">
+													<span class="input-group-prepend"><i
+															class="mdi mdi-pencil"></i></span> <input name="captchaText"
+														id="captchaText" type="text" maxlength="4" autocomplete="off"
+														required="required" class="form-control"
+														placeholder="Captcha" />
+												</div>
+											</div>
+										</div>
+										<!-- <div class="row">
+                                            <div class="col-sm-6 form-group">
+                                                <img id="captcha_id" name="imgCaptcha" width="150" th:src="@{/dhs//captcha?type=login" /> <span onclick="document.getElementById('captcha_id').src = 'captcha?' + Math.random() + '&amp;type=login';  return false" class="refresh"><i class="las la-sync"></i></span>
+                                            </div>
+                                            <div class="col-sm-6 form-group">
+
+                                                <input name="captchaText" id="captchaText" type="text" maxlength="6" autocomplete="off" required="required" class="form-control" placeholder="Captcha" />
+                                            </div>
+                                        </div> -->
+										<div class="text-center">
+											<button type="submit" id="btn-login"
+												class="btn btn-info py-2 px-5">Login</button>
+										</div>
+										<input type="hidden" name="_csrf"
+											value="17f8c70b-bad4-427e-9cf0-39a8221628d1" />
+									</form>
+
+
+								</div>
+							</div>
+
+							<div class="signup-section">
+								<!--  <a href="#!" data-dismiss="modal" data-toggle="modal"
+                								data-target="#modal2">Forgot Password</a> -->
+								<!-- <a href="/forgotpassword"> <span>Forgot
+                                        password?</span></a> <a href="/registrationForm"> <span>New
+                                        User</span></a> -->
+								<!--  <a href="#"> New User</a>-->
+							</div>
+
+						</div>
+
+					</div>
+				</div>
+
+
+
+			</section>
+		</div>
+
+
+		<!-- main jQuery -->
+		<script th:src="@{/dhs/js/jquery.min.js}"></script>
+		<!-- Wow Script -->
+		<script th:src="@{/dhs/js/wow.min.js}"></script>
+		<!-- bootstrap -->
+		<script th:src="@{/dhs/js/bootstrap.min.js}"></script>
+		<!-- bx slider -->
+		<!-- <script th:src="@{/dhs/js/jquery.bxslider.min.js}"></script>
+ -->
+		<!-- count to -->
+		<!-- <script th:src="@{/dhs/js/jquery.countTo.js}"></script> -->
+		<!-- owl carousel -->
+		<script th:src="@{/dhs/js/owl.carousel.min.js}"></script>
+		<!-- validate -->
+		<!-- <script th:src="@{/dhs/js/validation.js}"></script> -->
+		<!-- mixit up -->
+		<!-- <script th:src="@{/dhs/js/jquery.mixitup.min.js}"></script>
+ -->
+		<!-- easing -->
+		<script th:src="@{/dhs/js/jquery.easing.min.js}"></script>
+		<!-- gmap helper -->
+
+		<script th:src="@{/dhs/js/jquery.prettyPhoto.js}"></script>
+		<script th:src="@{/dhs/js/jquery.bootstrap-touchspin.js}"></script>
+		<!-- jQuery timepicker js -->
+		<script th:src="@{/dhs/assets/timepicker/timePicker.js}"></script>
+		<!-- Bootstrap select picker js -->
+		<!-- Bootstrap bootstrap touchspin js -->
+		<!-- jQuery ui js -->
+		<!-- Language Switche  -->
+
+
+		<!-- revolution slider js -->
+		<script th:src="@{/dhs/assets/revolution/js/jquery.themepunch.tools.min.js}"></script>
+		<script th:src="@{/dhs/assets/revolution/js/jquery.themepunch.revolution.min.js}"></script>
+		<script th:src="@{/dhs/assets/revolution/js/extensions/revolution.extension.carousel.min.js}"></script>
+		<script th:src="@{/dhs/assets/revolution/js/extensions/revolution.extension.kenburn.min.js}"></script>
+		<script th:src="@{/dhs/assets/revolution/js/extensions/revolution.extension.layeranimation.min.js}"></script>
+		<script th:src="@{/dhs/assets/revolution/js/extensions/revolution.extension.migration.min.js}"></script>
+		<script th:src="@{/dhs/assets/revolution/js/extensions/revolution.extension.navigation.min.js}"></script>
+		<script th:src="@{/dhs/assets/revolution/js/extensions/revolution.extension.parallax.min.js}"></script>
+		<script th:src="@{/dhs/assets/revolution/js/extensions/revolution.extension.slideanims.min.js}"></script>
+		<script th:src="@{/dhs/assets/revolution/js/extensions/revolution.extension.video.min.js}"></script>
+
+
+
+		<!-- thm custom script -->
+		<script th:src="@{/dhs/js/custom.js}"></script>
+
+	</div>
+	<script th:src="@{/js/sha256.js}"></script>
+
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+		$('#btnlogin').click(function () {
+			$('#loginbox').fadeToggle(300);
+		});
+		var log_box = $('#loginbox,#btnlogin');
+		$(document).mouseup(function (e) {
+			if (!log_box.is(e.target) && log_box.has(e.target).length === 0) {
+				$('#loginbox:visible').fadeOut('300');
+			}
+		});
+		/*]]>*/
+
+		$(document)
+			.ready(
+				function () {
+
+					if ($('.login_info').length) {
+						$('#loginbox').show();
+					}
+
+					$('#btn-login')
+						.click(
+							function () {
+								if ($.trim($('#username').val()
+									.trim()) == ''
+									|| $
+										.trim($(
+											'#password')
+											.val()
+											.trim()) == ''
+									|| $.trim($(
+										'#captchaText')
+										.val().trim()) == '') {
+									//alert("Please enter User Name and Password");
+								} else {
+									var hashObj = new jsSHA(
+										"SHA-256", "TEXT",
+										"1");
+									hashObj.update($(
+										'#password').val()
+										.trim());
+									$("#password")
+										.val(
+											hashObj
+												.getHash("HEX"));
+								}
+							});
+				});
+	</script>
+</body>
+
+</html>

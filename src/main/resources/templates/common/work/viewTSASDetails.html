@@ -1,0 +1,417 @@
+<div th:fragment="view_TSASDetails">
+	<form name="workFormName" id="workFormName" novalidate="novalidate"
+		enctype="multipart/form-data">
+
+		<div class="card">
+
+
+
+			<div class="card-header">
+				<span>Administrative Approval Details</span>
+			</div>
+			<div class="card-body">
+				<div class="row">
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asOrderNo}">AA Order No. </span><span
+							class="aestrick">&#42;</span></label> <input disabled="disabled"
+							type="text" class="form-control" id="asNo" required="required"
+							data-ng-model="workDataTS.asNo" name="asNo" />
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asNo.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsDispatchNumber}"> Administrative Sanction
+									No</span>
+							</p>
+						</div>
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asOrderDate}">AA Order Date
+						</span><span class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker1"
+							data-target-input="nearest">
+							<input disabled="disabled" type="text"
+								class="form-control datetimepicker-input"
+								data-target="#datetimepicker1" name="asDate" required="required"
+								placeholder="DD/MM/YYYY" data-ng-model="workDataTS.asDate"
+								id="asDate" autocomplete="off" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker1" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+						</div>
+
+						<div data-ng-show="workFormName.$submitted">
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asDate.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{technicalSanctionDate}">Administrative
+									Sanction Date</span>
+							</p>
+						</div>
+
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asAmount}">AA Amount (In
+								Lacs )</span><span class="aestrick">&#42;</span></label>
+						<textarea disabled="disabled" class="form-control" id="asAmt"
+							required="required" data-ng-model="workDataTS.asAmt" name="asAmt"></textarea>
+                                <span><b>(Amount should be less then 99.99 crore)</b></span>
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asAmt.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{asAmount}">Administrative Sanction Amount(In
+									Lacs)</span>
+							</p>
+						</div>
+
+
+
+
+
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<div class="form-group">
+							<label> <span th:text="#{uploadASSanctionFile}">Upload
+									Administrative Approval File</span> <span class="aestrick">&#42;</span>
+							</label> <input disabled="disabled" required="required" type='file'
+								accept=".pdf" class="form-control" data-file-model="AdPdfFile"
+								name="AsPdfFile" id="AsPdfFile" /> <span><b>(pdf file with max size 30 mb)</b></span>
+
+							<p class="help-block" data-ng-show="workDataTS.asFileId!=null">
+								<span th:text="#{downloadCurrentFile}"></span> <a
+									style="cursor: pointer;"
+									data-ng-click="downloadDocumentAS(workDataTS.asFileId)"> <img
+									th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+								</a>
+							</p>
+							<!-- <p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorLd &amp;&amp; !workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorLd">
+								<span>Uploaded file format does not supported</span>
+							</p>
+ -->
+							<div data-ng-show="workFormName.$submitted">
+								<div data-ng-show="workDataTS.asFileId==null ">
+									<p class="help-block" style="color: red;"
+										data-ng-show="noFileError">
+										<span>Please upload the file</span>
+									</p>
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<label><span>Remarks</span><span class="aestrick">&#42;</span></label>
+						<textarea disabled="disabled" class="form-control" id="asRemarks"
+							required="required" data-ng-model="workDataTS.asRemarks"
+							name="asRemarks"></textarea>
+						<div data-ng-show="workForm.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asRemarks.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Remarks</span>
+							</p>
+						</div>
+					</div>
+
+
+				<!-- 	<div class="form-group col-sm-4"
+						data-ng-hide="workDataTS.workStatus=='notAsIssued'">
+
+
+						<label><span>Current Work Status</span></label>
+						<textarea id="workStatus" required="required"
+							data-ng-model="workDataTS.workStatus" name="workStatus" rows="1"
+							cols="30" disabled="disabled" class="w100"></textarea>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.workStatus.$error.required">
+								<span th:text="#{pleaseSelect}">Please select</span> <span>Current
+									Work Status</span>
+							</p>
+						</div>
+					</div> -->
+
+
+
+
+
+				</div>
+			</div>
+
+
+			<div class="card-header">
+				<span>Transaction Sanction Details</span>
+			</div>
+			<div class="card-body">
+				<div class="row">
+
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsOrderNo}">TS Order No. </span><span
+							class="aestrick">&#42;</span></label> <input type="text"
+							disabled="disabled" class="form-control" id="tsNo"
+							required="required" data-ng-model="workDataTS.tsNo" name="tsNo" />
+						<input type="hidden" data-ng-model="workDataTS.workId" />
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsNo.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsDispatchNumber}"> technical Sanction No</span>
+							</p>
+						</div>
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsOrderDate}">TS Order Date
+						</span><span class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker3"
+							data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input"
+								disabled="disabled" data-target="#datetimepicker3" name="tsDate"
+								required="required" placeholder="DD/MM/YYYY"
+								data-ng-model="workDataTS.tsDate" id="startingDate"
+								autocomplete="off" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker3" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+						</div>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsDate.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{technicalSanctionDate}">Technical Sanction
+									Date</span>
+							</p>
+						</div>
+
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsAmount}">TS Amount (In
+								Lacs )</span><span class="aestrick">&#42;</span></label>
+						<textarea disabled="disabled" class="form-control" id="tsAmt"
+							required="required" data-ng-model="workDataTS.tsAmt" name="tsAmt"></textarea>
+                          <span><b>(Amount should be less then 99.99 crore)</b></span>
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsAmt.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsAmount}">Technical Sanction Amount(In Lacs)</span>
+							</p>
+						</div>
+
+
+
+
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<div class="form-group">
+							<label> <span th:text="#{uploadTechnicalSanctionFile}">Upload
+									Technical Sanction File</span> <span class="aestrick">&#42;</span>
+							</label> <input required="required" type='file' accept=".pdf"
+								disabled="disabled" class="form-control"
+								data-file-model="ldPdfFile" name="ldPdfFile" id="ldPdfFile" />
+							<span><b>(pdf file with max size 30 mb)</b></span>
+
+							<p class="help-block" data-ng-show="workDataTS.tsFileId!=null">
+								<span th:text="#{downloadCurrentFile}"></span> <a
+									style="cursor: pointer;"
+									data-ng-click="downloadDocumentTS(workDataTS.tsFileId)"> <img
+									th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+								</a>
+							</p>
+							<!-- <p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorLd &amp;&amp; !workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p> -->
+
+							<!-- <p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorLd">
+								<span>Uploaded file format does not supported</span>
+							</p> -->
+
+							<div data-ng-show="workFormName.$submitted">
+								<div data-ng-show="workDataTS.tsFileId==null">
+									<p class="help-block" style="color: red;"
+										data-ng-show="noFileError">
+										<span>Please upload the file</span>
+									</p>
+								</div>
+
+							</div>
+
+
+						</div>
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<label><span>Remarks</span><span class="aestrick">&#42;</span></label>
+						<textarea disabled="disabled" class="form-control" id="tsRemarks"
+							required="required" data-ng-model="workDataTS.tsRemarks"
+							name="tsRemarks"></textarea>
+						<div data-ng-show="workForm.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsRemarks.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Remarks</span>
+							</p>
+						</div>
+					</div>
+
+
+
+
+
+
+				</div>
+				<!--/.row-->
+
+
+				<!-- 2nd Row start -->
+
+
+
+
+			</div>
+
+
+
+		</div>
+
+		<div class="tab-footer text-right" hidden="hidden"
+			th:if="${roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_SU'  ||roleName=='ROLE_SYSTEM_ADMIN' }">
+			<button type="submit" class="btn  btn-success  next-button"
+				id="draftTSbtn"
+				data-ng-click="finalSubmit=false;saveTSDraft=true;saveTSNext=false;">
+				<i class="las la-file-alt"></i> Save As Draft
+			</button>
+			<button type="submit" class="btn btn-primary next-button nexxt"
+				id="finalTStbtn"
+				data-ng-click="finalSubmit=false;saveTSDraft=true;saveTSNext=true;">
+				Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
+			</button>
+		</div>
+
+
+	</form>
+
+	<div id="page-ts-div" data-ng-show="successRespondeTS=='success'">
+		<div style="margin-top: 10px">
+
+			<div class="animated fadeIn">
+
+				<div class="row">
+
+					<div class="col-md-12">
+
+						<div class="card">
+
+							<div class="card-header">
+								<i class="fa fa-folder-open-o"></i> <span>TS &amp; AS
+									Revised List </span>
+							</div>
+
+							<div class="card-body">
+
+
+								<!-- 
+								  <input  class="form-control" id="searchBox"
+													name="searchBox" 
+													type="hidden" data-ng-model="workDataTS.workId"
+													data-ng-change="reloadJqueryDatatable();" maxlength="100" />
+									<div class="pr">
+									<div class="row">
+											<div class="form-group col-sm-3">
+												<input type="text" class="form-control" id="searchBox"
+													name="searchBox" placeholder="Search by Work Name"
+													data-ng-model="workName"
+													data-ng-change="reloadJqueryDatatable();" maxlength="100" />
+
+
+											</div>
+
+
+										</div> 
+												</div>
+										-->
+
+
+								<div class="table-responsive responsive-md">
+									<table id="dynamic-ts-table"
+										class="table table-striped table-bordered table-hover table-outline">
+
+
+										<thead class="thead-default">
+											<tr>
+
+												<th><span>S.No</span></th>
+												<th><span>TS/AS Type</span></th>
+												<th><span>Type of Document</span></th>
+												<th nowrap="nowrap">Revised Order No.</th>
+												<th><span>Revised Order Date</span></th>
+												<th><span>Revised Amount(In Lacs)</span></th>
+												<th><span>Remarks</span></th>
+												<th><span>Status</span></th>
+												<th><p class="help-block">
+														<span nowrap="nowrap">Download Revised File</span>
+														<!--  <a data-ng-show="rvFileId!=null"
+									style="cursor: pointer;"
+									data-ng-click="downloadDocumentASRev(rvFileId)"> <img
+									th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+								</a> -->
+													</p></th>
+
+
+												
+
+
+
+											</tr>
+										</thead>
+									</table>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>

@@ -1,0 +1,167 @@
+<div th:fragment="view_dmRemark">
+	<div
+		th:if="${(roleName =='ROLE_DEPARTMENT' || roleName =='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName == 'ROLE_CEO' ) }">
+		<form
+			data-ng-submit="saveOrUpdateDmRemarks(workForm.$valid,dmattachment)"
+			name="workForm" id="workFormId" novalidate="novalidate"
+			enctype="multipart/form-data">
+
+			<div class="card">
+				<div class="card-header" th:if="${( roleName == 'ROLE_DM' )}">
+					<span>DM Remarks</span>
+				</div>
+				<div class="card-body">
+
+
+					<div class="card-header"
+						th:if="${( roleName == 'ROLE_DM' ||  roleName == 'ROLE_CEO' )}"
+						data-ng-hide="workDataR.DmRemakrs == null">Remarks By DM</div>
+
+					<div class="card-body"
+						th:if="${(roleName == 'ROLE_DM' )}"
+						>
+                         <div class="row">
+						<div class="col-sm-9">
+							<label>Remark<span class="text-danger">*</span></label>
+							<textarea class="form-control" maxlength="1000"
+								required="required" id="remark"
+								data-ng-model="workDataR.remakr" name="remakr" rows="7"
+								placeholder="Remarks" th:readonly="${roleName != 'ROLE_DM'}"></textarea>
+     
+							
+						</div>
+						<div class="col-sm-3">
+							<label>Uplaod Attachment </label>
+							<input type='file' accept="image/*,.pdf" class="form-control"
+															 required="required"
+															file-model="dmattachment" name="dmremarksAttachment" id="dmremarksAttachment" />
+															<span data-ng-show="workDataR.documentId==null"><b>(pdf file with max size 30 mb)</b></span>
+												
+												
+															<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorDM &amp;&amp; workForm.$submitted">
+								<span>Uploaded file size does not supported</span>
+							</p>
+
+						
+						</div>
+						</div>
+						
+					</div>
+
+
+
+
+					<div class="tab-footer text-right" th:if="${roleName == 'ROLE_DM'}">
+
+						<button type="submit" class="btn btn-primary next-button nexxt"
+							id="finaltbtn"
+							data-ng-click="finalSubmit=false;saveAsDraft=true;saveAndNext=true;">
+							Save <span class="fa fa-arrow-circle-right"></span>
+						</button>
+
+					</div>
+                
+
+
+				</div>
+
+                <div class="card-header" data-ng-init="loadDmRemarksForWorkId()">
+					<span>DM Remarks History</span>
+				</div>
+				<style>
+				  .table-responsive-wrapper {
+				    overflow-x: auto;
+				    max-width: 100%;
+				  }
+
+				  .table td {
+				    word-wrap: break-word;
+				    white-space: normal;
+				  }
+				</style>
+
+				<div class="card-body">
+				  <div class="table-responsive-wrapper">
+				    <table class="table table-bordered table-striped">
+				      <thead>
+				        <tr>
+				          <th>S.No</th>
+				          <th>Remark</th>
+				          <th>Remark Date</th>
+				          <th>Attachment</th>
+				          <th th:if="${( roleName == 'ROLE_DM')}">Action</th>
+				        </tr>
+				      </thead>
+				      <tbody>
+				        <tr data-ng-repeat="remark in dmremarkslist track by $index">
+				          <td>{{ $index + 1 }}</td>
+				          <td>{{ remark.remark }}</td>
+				          <td>{{ remark.createdDate | date: 'dd-MM-yyyy hh:mm:ss a' }}</td>
+				          <td >
+							<a data-ng-if="remark.documentId!=null" class="btn btn-primary" target="blank" ng-click="openAttachmentModal(remark.documentId)">
+							  View Attachment
+							</a>
+
+				           
+				          </td>
+				          <td th:if="${( roleName == 'ROLE_DM')}">
+							
+							  <button type="button" class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)">
+							    Delete
+							  </button>
+							  <button type="button" class="btn btn-danger btn-sm" data-ng-click="getRemarksDetails(remark.id)">
+							  						    Edit
+							  						  </button>
+
+				          </td>
+				        </tr>
+				      </tbody>
+				    </table>
+				  </div>
+				</div>
+
+
+
+
+
+			</div>
+
+
+
+
+
+		</form>
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-lg" role="document"> <!-- modal-lg to give space for PDF preview -->
+		    <div class="modal-content">
+		    
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="myModalLabel">View Attachment</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+
+			  <div class="modal-body" style="height: 500px;">
+			    <!-- PDF preview -->
+			
+
+				<img ng-if="previewUrlad" 
+				        ng-src="{{previewUrlad}}" 
+				         style="width: 100%; height: auto; max-height: 100%; display: block; margin: 0 auto;"  />
+			  </div>
+
+			  <div class="modal-footer">
+			    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+			    <a class="btn btn-primary" data-ng-click="downloadRemakrsDocument(dmRemarksId)" target="_blank">Download Now</a>
+			  </div>
+
+		      
+		    </div>
+		  </div>
+		</div>
+
+
+	</div>
+</div>

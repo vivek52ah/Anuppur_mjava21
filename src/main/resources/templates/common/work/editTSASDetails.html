@@ -1,0 +1,877 @@
+<div th:fragment="edit_TSASDetails">
+	<form
+		data-ng-submit="createTSASWorkData(workFormName.$valid,ldPdfFile,AdPdfFile, 'Edit')"
+		name="workFormName" id="workFormName" novalidate="novalidate" 
+		enctype="multipart/form-data" >
+
+		<div class="card">
+
+
+
+			<div class="card-header">
+				<span>Administrative Approval Details</span>
+			</div>
+			<div class="card-body">
+				<div class="row">
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asOrderNo}"></span><span
+							class="aestrick">&#42;</span></label> <input type="text"
+							class="form-control" id="asNo" required="required"
+							data-ng-model="workDataTS.asNo" name="asNo" />
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asNo.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{asOrderNo}"></span>
+							</p>
+						</div>
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asOrderDate}">AA Order Date
+						</span><span class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker4"
+							data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input"
+								data-target="#datetimepicker4" name="asDate" required="required"
+								placeholder="DD/MM/YYYY" data-ng-model="workDataTS.asDate"
+								id="asDate" autocomplete="off" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker4" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+						</div>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asDate.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{asOrderDate}"></span>
+							</p>
+						</div>
+
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asAmount}">AA Amount (In
+								Lacs )</span> <span class="aestrick">&#42;</span></label> 
+								<input type="text"
+							class="form-control number-OnlyTwoDecimal" id="asAmt"
+							data-ng-model="workDataTS.asAmt" name="asAmt" required="required"
+							min="0" data-ng-pattern="/^[0-9]{4}$+(\[0-9]{1,2})?$/" step="0.01" />
+							<span></span>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asAmt.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{asAmount}"></span>
+							</p>
+
+							<div>
+								<div data-ng-show="workDataTS.asAmt!=null">
+									<p class="help-block" style="color: red;">
+										<span class="help-block"
+											data-ng-show="!workFormName.asAmt.$valid"> Add Max.
+											Two Decimal! </span>
+									</p>
+								</div>
+							</div>
+						</div>
+
+
+
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<div class="form-group">
+							<label> <span th:text="#{uploadASSanctionFile}">Upload
+									Administrative Approval File</span> <span class="aestrick">&#42;</span>
+							</label> <input type='file' accept=".pdf" data-ng-disabled="workDataTS.asFileId!=null"
+								class="form-control" data-file-model="AdPdfFile"
+								name="AsPdfFile" id="AsPdfFile" /> <span data-ng-show="workDataTS.asFileId==null"><b>(pdf file with max size 30 mb)</b></span>
+
+							<p class="help-block" data-ng-show="workDataTS.asFileId!=null">
+								<span th:text="#{downloadCurrentFile}"></span> <a
+									style="cursor: pointer;"
+									data-ng-click="downloadDocumentAS(workDataTS.asFileId)"> <img
+									th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+								</a>
+							</p>
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorAd &amp;&amp; !workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileSizeErrorAd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file size does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorAd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file format does not supported</span>
+							</p>
+
+							<div data-ng-show="workFormName.$submitted">
+								<div data-ng-show="workDataTS.asFileId==null ">
+									<p class="help-block" style="color: red;"
+										data-ng-show="noFile2Error">
+										<span th:text="#{pleaseUploadFile}"></span>
+									</p>
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+
+					<!-- <div class="form-group col-sm-4">
+						<label><span>Remarks</span><span class="aestrick">&#42;</span></label>
+						<textarea class="form-control" id="asRemarks" required="required"
+							data-ng-model="workDataTS.asRemarks" name="asRemarks"></textarea>
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asRemarks.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{remarks}"></span>
+							</p>
+						</div>
+					</div> -->
+					
+					
+					<div class="form-group col-sm-4">
+						<label><span>Remarks</span><span class="aestrick">&#42;</span></label>
+						<textarea class="form-control" id="asRemarks" required="required"
+							data-ng-model="workDataTS.asRemarks" name="asRemarks"
+							maxlength="1001"
+							></textarea>
+						<div
+							data-ng-show="workFormName.$submitted || workFormName.asRemarks.$touched || workDataTS.asRemarks.length > 1000">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asRemarks.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Remarks</span>
+							</p>
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.asRemarks.$error.maxLength">
+								<span>Remarks cannot exceed 1000 characters</span>
+							</p>
+						</div>
+					</div>
+
+
+					<!-- <div class="form-group col-sm-4"
+						data-ng-hide="workDataTS.workStatus=='notAsIssued'">
+
+
+						<label><span>Current Work Status</span></label>
+						<textarea id="workStatus" required="required" name="workStatus"
+							data-ng-model="workDataTS.workStatus" rows="1" cols="30"
+							disabled="disabled"  class="w100">AS Issued</textarea>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.workStatus.$error.required">
+								<span th:text="#{pleaseSelect}">Please select</span> <span>Current
+									Work Status</span>
+							</p>
+						</div>
+					</div> -->
+
+
+
+
+
+				</div>
+			</div>
+
+
+			<div class="card-header">
+				<span>Technical Sanction Details</span>
+
+			</div>
+			<div class="card-body">
+				<div class="row">
+
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsOrderNo}">TS Order No. </span></label> <input type="text"
+							class="form-control" id="tsNo" 
+							data-ng-model="workDataTS.tsNo" name="tsNo" /> <input
+							type="hidden" data-ng-model="workDataTS.workId" />
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsNo.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsOrderNo}"> </span>
+							</p>
+						</div>
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsOrderDate}">TS Order Date
+						</span></label>
+						<div class="input-group date" id="datetimepicker3"
+							data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input"
+								data-target="#datetimepicker3" name="tsDate"
+								placeholder="DD/MM/YYYY" data-ng-model="workDataTS.tsDate"
+								id="startingDate" autocomplete="off" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker3" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+						</div>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsDate.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsOrderDate}"></span>
+							</p>
+						</div>
+
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsAmount}">TS Amount (In
+								Lacs )</span></label> <input type="text"
+							class="form-control number-OnlyTwoDecimal" id="tsAmt"
+							data-ng-model="workDataTS.tsAmt" name="tsAmt" min="0"
+							data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+                           <span></span>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsAmt.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsAmount}"></span>
+							</p>
+
+
+							<div>
+								<div data-ng-show="workDataTS.tsAmt!=null">
+									<p class="help-block" style="color: red;">
+										<span class="help-block"
+											data-ng-show="!workFormName.tsAmt.$valid"> Add Max.
+											Two Decimal! </span>
+									</p>
+								</div>
+
+							</div>
+						</div>
+
+
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<div class="form-group">
+							<label> <span th:text="#{uploadTechnicalSanctionFile}">Upload
+									Technical Sanction File</span>
+							</label> <input type='file' accept=".pdf" class="form-control" data-ng-disabled="workDataTS.tsFileId!=null"
+								data-file-model="ldPdfFile" name="ldPdfFile" id="ldPdfFile" />
+							<span data-ng-show="workDataTS.tsFileId==null"><b>(pdf file with max size 30 mb)</b></span>
+
+							<p class="help-block" data-ng-show="workDataTS.tsFileId!=null">
+								<span th:text="#{downloadCurrentFile}"></span> <a
+									style="cursor: pointer;"
+									data-ng-click="downloadDocumentTS(workDataTS.tsFileId)"> <img
+									th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+								</a>
+							</p>
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorLd &amp;&amp; !workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorLd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileSizeErrorLd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file size does not supported</span>
+							</p>
+
+							<div data-ng-show="workFormName.$submitted">
+								<div data-ng-show="workDataTS.tsFileId==null">
+									<p class="help-block" style="color: red;"
+										data-ng-show="noFileError">
+										<span th:text="#{pleaseUploadFile}"></span>
+									</p>
+								</div>
+
+							</div>
+
+
+						</div>
+					</div>
+
+
+					<!-- <div class="form-group col-sm-4">
+						<label><span>Remarks</span></label>
+						<textarea class="form-control" id="tsRemarks"
+							data-ng-model="workDataTS.tsRemarks" name="tsRemarks"></textarea>
+
+						<div data-ng-show="workFormName.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsRemarks.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{remarks}"></span>
+							</p>
+						</div>
+
+
+					</div> -->
+
+			<div class="form-group col-sm-4">
+						<label><span>Remarks</span></label>
+						<textarea class="form-control" id="tsRemarks" 
+							data-ng-model="workDataTS.tsRemarks" name="tsRemarks"
+							maxlength="1001"
+							></textarea>
+						<div
+							data-ng-show="workFormName.$submitted || workFormName.tsRemarks.$touched || workDataTS.tsRemarks.length > 1000">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsRemarks.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>Remarks</span>
+							</p>
+							<p class="help-block" style="color: red;"
+								data-ng-show="workFormName.tsRemarks.$error.maxLength">
+								<span>Remarks cannot exceed 1000 characters</span>
+							</p>
+						</div>
+					</div>
+
+
+
+
+				</div>
+				<!--/.row-->
+
+
+				<!-- 2nd Row start -->
+
+
+
+
+			</div>
+
+
+
+		</div>
+
+		<div class="tab-footer text-right"
+			data-ng-show="workDataTender.workStatus=='notTenderIssued'"
+			th:if="${roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_SU'  ||roleName=='ROLE_SYSTEM_ADMIN' }">
+			<button type="submit" class="btn  btn-success  next-button" 
+				id="draftTSbtn" 
+				data-ng-click="finalSubmit=false;saveTSDraft=true;saveTSNext=false;">
+				<i class="las la-file-alt"></i> Save As Draft
+			</button>
+			<!-- <input type="text" data-ng-model="workDataTS.countId"/> -->
+			<button type="submit" class="btn btn-primary next-button nexxt"
+				id="finalTStbtn" 
+				data-ng-click="finalSubmit=false;saveTSDraft=true;saveTSNext=true;">
+				Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
+			</button>
+		</div>
+
+		
+
+	</form>
+
+
+	<form data-ng-show="successRespondeTS=='success'"
+		data-ng-submit="createRevisedCall(workRTSName.$valid,ldRevPdfFile,AdRevPdfFile, 'Edit')"
+		name="workRTSName" id="workRTSNameId" novalidate="novalidate"
+		enctype="multipart/form-data">
+
+
+
+		<div class="card" style="margin-top: 5px;" data-ng-show="workDataTS.countId != '0'">
+
+
+			<div class="card-header" data-ng-show="successRespondeTS=='success'">
+				<span>Revise Technical Sanction &amp; Administrative Approval</span>
+			</div>
+
+			<div class="card-body">
+				<div class="row">
+					<div class="form-group col-md-12">
+
+						<input type="radio" name="revised"
+							data-ng-model="workDataRTS.revisedStatus" value="0"
+							required="required" /> <span>Revise Technical Sanction
+							&nbsp;</span> <input type="radio" name="revised"
+							data-ng-model="workDataRTS.revisedStatus" value="1"
+							required="required" /> <span>Revise Administrative
+							Approval &nbsp;</span> <input type="radio" name="revised"
+							data-ng-model="workDataRTS.revisedStatus" value="2"
+							required="required" /> <span>Revise Technical Sanction
+							&amp; Administrative Approval</span>
+
+					</div>
+				</div>
+
+			</div>
+
+			<div class="card-header"
+				data-ng-show="workDataRTS.revisedStatus=='0' || workDataRTS.revisedStatus=='2'">
+				<span>Revise Technical Sanction Details</span>
+
+			</div>
+			<div class="card-body"
+				data-ng-show="workDataRTS.revisedStatus=='0' || workDataRTS.revisedStatus=='2'">
+				<div class="row">
+
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsRevOrderNo}">Revise TS
+								Order No. </span><span class="aestrick">&#42;</span></label> <input type="text"
+							class="form-control" id="tsRevNo" required="required"
+							data-ng-model="workDataRTS.tsRevNo" name="tsRevNo" /> <input
+							type="hidden" data-ng-model="workData.workId" /> <input
+							type="hidden" data-ng-model="workDataTS.id" />
+
+						<!--     <div data-ng-show="workDataRTS.revisedStatus=='0' || workDataRTS.revisedStatus=='2'">
+						<div data-ng-show="workRTSName.$submitted">
+						
+							<p class="help-block" style="color: red;"
+								data-ng-show="workRTSName.tsRevNo.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsOrderNo}"> </span>
+							</p>
+							</div>
+						</div> -->
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsRevOrderDate}">Revise TS
+								Order Date </span><span class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker14"
+							data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input"
+								data-target="#datetimepicker14" name="tsRevDate"
+								required="required" placeholder="DD/MM/YYYY"
+								data-ng-model="workDataRTS.tsRevDate" id="tsRevDate"
+								autocomplete="off" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker14" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+						</div>
+
+						<!--    <div data-ng-show="workDataRTS.revisedStatus=='0' || workDataRTS.revisedStatus=='2'">
+						<div data-ng-show="workRTSName.$submitted">
+						
+							<p class="help-block" style="color: red;"
+								data-ng-show="workRTSName.tsRevDate.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsRevOrderDate}"></span>
+							</p>
+						</div>
+						</div>
+ -->
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{tsRevAmount}">Revise TS
+								Amount (In Lacs )</span><span class="aestrick">&#42;</span></label> <input
+							type="number" class="form-control number-OnlyTwoDecimal"
+							id="tsRevAmt" required="required" min="0"
+							data-ng-model="workDataRTS.tsRevAmt" name="tsRevAmt"
+							data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+						<div data-ng-show="workRTSName.$submitted">
+							<div>
+								<p class="help-block" style="color: red;">
+									<span class="help-block"
+										data-ng-show="!workRTSName.tsRevAmt.$valid"> Add Max.
+										Two Decimal! </span>
+								</p>
+							</div>
+						</div>
+						<!--  <div data-ng-show="workDataRTS.revisedStatus=='0' || workDataRTS.revisedStatus=='2'">
+						<div data-ng-show="workRTSName.$submitted">
+						
+							<p class="help-block" style="color: red;"
+								data-ng-show="workRTSName.tsRevAmt.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{tsRevAmount}"></span>
+							</p>
+						</div>
+						</div> -->
+
+
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<div class="form-group">
+							<label> <span th:text="#{uploadRevTechnicalSanctionFile}">Revise
+									Upload Technical Sanction File</span> <span class="aestrick">&#42;</span>
+							</label> <input required="required" type='file' accept=".pdf"
+								class="form-control" data-file-model="ldRevPdfFile"
+								name="ldRevPdfFile" id="ldRevPdfFile" /> (<span
+								th:text="#{allowedPdfFormatOnly}"></span>)
+
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorRevLd &amp;&amp; !workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorRevLd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileSizeErrorRevLd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file size does not supported</span>
+							</p>
+
+							<div data-ng-show="workRTSName.$submitted ">
+								<div
+									data-ng-show="workDataRTS.revisedStatus=='0' || workDataRTS.revisedStatus=='2'">
+									<p class="help-block" style="color: red;"
+										data-ng-show="noFileError">
+										<span th:text="#{pleaseUploadFile}"></span>
+									</p>
+								</div>
+
+
+							</div>
+
+
+						</div>
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<label><span>Revise Remarks</span><span class="aestrick">&#42;</span></label>
+						<textarea class="form-control" id="tsRevRemarks"
+							required="required" data-ng-model="workDataRTS.tsRevRemarks"
+							name="tsRevRemarks"></textarea>
+						<!--   <div data-ng-show="workDataRTS.revisedStatus=='0' || workDataRTS.revisedStatus=='2'">
+						<div data-ng-show="workRTSName.$submitted">
+						
+							<p class="help-block" style="color: red;"
+								data-ng-show="workRTSName.tsRevRemarks.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{remarks}"></span>
+							</p>
+						</div>
+						</div>
+ -->
+
+					</div>
+
+
+
+
+
+
+				</div>
+				<!--/.row-->
+
+
+				<!-- 2nd Row start -->
+
+
+
+
+			</div>
+
+
+			<div class="card-header"
+				data-ng-show="workDataRTS.revisedStatus=='1' || workDataRTS.revisedStatus=='2'">
+				<span>Revise Administrative Approval Details</span>
+			</div>
+			<div class="card-body"
+				data-ng-show="workDataRTS.revisedStatus=='1' || workDataRTS.revisedStatus=='2'">
+				<div class="row">
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asRevOrderNo}"></span><span
+							class="aestrick">&#42;</span></label> <input type="text"
+							class="form-control" id="asRevNo" required="required"
+							data-ng-model="workDataRTS.asRevNo" name="asRevNo" />
+
+						<!-- 	<div data-ng-show="workDataRTS.revisedStatus=='1' || workDataRTS.revisedStatus=='2'">
+						<div data-ng-show="workRTSName.$submitted">
+					
+							<p class="help-block" style="color: red;"
+								data-ng-show="workRTSName.asRevNo.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{asOrderNo}"></span>
+							</p>
+						</div>
+						</div> -->
+					</div>
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asRevOrderDate}">Revise AA
+								Order Date </span><span class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker15"
+							data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input"
+								data-target="#datetimepicker15" name="asRevDate"
+								required="required" placeholder="DD/MM/YYYY"
+								data-ng-model="workDataRTS.asRevDate" id="asRevDate"
+								autocomplete="off" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker15" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+						</div>
+
+						<!--  <div data-ng-show="workDataRTS.revisedStatus=='1' || workDataRTS.revisedStatus=='2'">
+						<div data-ng-show="workRTSName.$submitted">
+						
+							<p class="help-block" style="color: red;"
+								data-ng-show="workRTSName.asRevDate.$error.required">
+								<span th:text="#{pleaseEnter}">Please enter</span> <span
+									th:text="#{asOrderDate}"></span>
+							</p>
+						</div>
+						</div>
+ -->
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<label><span th:text="#{asRevAmount}">Revise AA
+								Amount (In Lacs )</span> <span class="aestrick">&#42;</span></label> <input
+							type="number" class="form-control number-OnlyTwoDecimal"
+							id="asRevAmt" required="required"
+							data-ng-model="workDataRTS.asRevAmt" name="asRevAmt" min="0"
+							data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
+
+
+						<div data-ng-show="workRTSName.$submitted">
+							<div>
+								<p class="help-block" style="color: red;">
+									<span class="help-block"
+										data-ng-show="!workRTSName.asRevAmt.$valid"> Add Max.
+										Two Decimal! </span>
+								</p>
+							</div>
+						</div>
+						<!--      <div data-ng-show="workDataRTS.revisedStatus=='1' || workDataRTS.revisedStatus=='2'">
+						<div data-ng-show="workRTSName.$submitted">
+						
+							<p class="help-block" style="color: red;"
+								data-ng-show="workRTSName.asRevAmt.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{asAmount}"></span>
+							</p>
+						</div>
+						</div> -->
+
+
+
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<div class="form-group">
+							<label> <span th:text="#{uploadRevASSanctionFile}">Upload
+									Revise Administrative Approval File</span> <span class="aestrick">&#42;</span>
+							</label> <input required="required" type='file' accept=".pdf"
+								class="form-control" data-file-model="AdRevPdfFile"
+								name="AsRevPdfFile" id="AsRevPdfFile" /> (<span
+								th:text="#{allowedPdfFormatOnly}"></span>)
+
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorRevAd &amp;&amp; !workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p>
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorRevAd &amp;&amp; workFormName.$submitted">
+								<span>Uploaded File Format does not supported</span>
+							</p>
+
+
+							<p class="help-block" style="color: red;"
+								data-ng-show="fileSizeErrorRevAd  &amp;&amp; workFormName.$submitted">
+								<span>Uploaded file size does not supported</span>
+							</p>
+
+							<div data-ng-show="workRTSName.$submitted">
+								<div
+									data-ng-show="workDataRTS.revisedStatus=='1' || workDataRTS.revisedStatus=='2'">
+									<p class="help-block" style="color: red;"
+										data-ng-show="noFile2Error">
+										<span th:text="#{pleaseUploadFile}"></span>
+									</p>
+								</div>
+
+							</div>
+
+						</div>
+					</div>
+
+
+					<div class="form-group col-sm-4">
+						<label><span> Revise Remarks</span><span class="aestrick">&#42;</span></label>
+						<textarea class="form-control" id="asRevRemarks"
+							required="required" data-ng-model="workDataRTS.asRevRemarks"
+							name="asRevRemarks"></textarea>
+
+
+						<!-- 	<div data-ng-show="workDataRTS.revisedStatus=='1' || workDataRTS.revisedStatus=='2'">
+						<div data-ng-show="workRTSName.$submitted">
+						
+							<p class="help-block" style="color: red;"
+								data-ng-show="workRTSName.asRevRemarks.$error.required">
+								<span th:text="#{pleaseEnter}"></span> <span
+									th:text="#{remarks}"></span>
+							</p>
+						</div>
+						</div> -->
+					</div>
+
+				</div>
+			</div>
+
+
+		</div>
+
+		<div class="tab-footer text-right"
+			data-ng-show="workDataRTS.revisedStatus=='0' || workDataRTS.revisedStatus=='1'|| workDataRTS.revisedStatus=='2' ">
+			<button type="submit" class="btn  btn-success  next-button"
+				id="submit" data-ng-click="finalSubmit=false;" data-ng-show="workDataRTS.countId != '0'">
+				<i class="las la-file-alt"></i> Save
+			</button>
+
+		</div>
+
+
+
+		<div class="alert alert-success alert-dismissible" role="alert"
+			id="myAlert" data-ng-if="successResponseRevised=='success'">
+			<!-- <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> -->
+			<strong>Success! Revised Detail Added Now.</strong>
+		</div>
+
+
+
+	</form>
+	<div id="page-ts-div" data-ng-show="successRespondeTS=='success'">
+		<div style="margin-top: 10px">
+
+			<div class="animated fadeIn">
+
+				<div class="row">
+
+					<div class="col-md-12">
+
+						<div class="card">
+
+							<div class="card-header">
+								<i class="fa fa-folder-open-o"></i> <span>TS &amp; AA
+									Revised List </span>
+							</div>
+
+							<div class="card-body">
+
+
+								<!-- 
+								  <input  class="form-control" id="searchBox"
+													name="searchBox" 
+													type="hidden" data-ng-model="workDataTS.workId"
+													data-ng-change="reloadJqueryDatatable();" maxlength="100" />
+									<div class="pr">
+									<div class="row">
+											<div class="form-group col-sm-3">
+												<input type="text" class="form-control" id="searchBox"
+													name="searchBox" placeholder="Search by Work Name"
+													data-ng-model="workName"
+													data-ng-change="reloadJqueryDatatable();" maxlength="100" />
+
+
+											</div>
+
+
+										</div> 
+												</div>
+										-->
+
+
+								<div class="table-responsive responsive-md">
+									<table id="dynamic-ts-table"
+										class="table table-striped table-bordered table-hover table-outline">
+
+
+										<thead class="thead-default">
+											<tr>
+
+												<th><span>S.No</span></th>
+												<th><span>TS/AS Type</span></th>
+												<th><span>Type of Document</span></th>
+												<th nowrap="nowrap">Revised Order No.</th>
+												<th><span>Revised Order Date</span></th>
+												<th><span>Revised Amount(In Lacs)</span></th>
+												<th><span>Remarks</span></th>
+												<th><span>Status</span></th>
+												<th><p class="help-block">
+														<span nowrap="nowrap">Download Revised File</span>
+														<!--  <a data-ng-show="rvFileId!=null"
+									style="cursor: pointer;"
+									data-ng-click="downloadDocumentASRev(rvFileId)"> <img
+									th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+								</a> -->
+													</p></th>
+
+
+												
+
+
+
+											</tr>
+										</thead>
+									</table>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+
+
+</div>

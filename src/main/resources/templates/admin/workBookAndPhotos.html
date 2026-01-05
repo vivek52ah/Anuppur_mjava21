@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+<script type="text/javascript">
+	function imageClick(e) {
+
+		var $lightbox = $('#lightbox');
+		var $img = $('#' + e.id).find('img'), src = $img.attr('src'), alt = $img
+				.attr('alt');
+
+		$lightbox.find('.close').addClass('hidden');
+		$lightbox.find('img').attr('src', src);
+		$lightbox.find('img').attr('alt', alt);
+
+	}
+</script>
+</head>
+<script type="text/javascript">
+	//<![CDATA[
+	//]]>
+</script>
+<div>
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item active"><span>Work Book And
+				Photos</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-wpforms"></i> <span>Work Book And Photos</span>
+						</div>
+						<div class="card-body">
+							<form
+								data-ng-submit="fetchWorksForWorkBook(implementationAgencyId, subEnggId, designationId, workStatusName);"
+								name="form" novalidate="novalidate">
+								<div class="row">
+									<div class="form-group col-sm-4"
+										data-ng-init="loadDesignationsByRole('ROLE_DPO')">
+										<label><span>Department</span></label> <select
+											class="form-control" data-ng-model="designationId"
+											name="designation" id="designation"
+											data-ng-change="workData=''">
+											<option value="">--Select--</option>
+											<option data-ng-repeat="designation in designations"
+												value="{{designation.id}}">{{designation.designation}}</option>
+										</select>
+									</div>
+									<div class="form-group col-sm-4"
+										data-ng-init="loadImplementationAgencies()">
+										<label><span>Implementation Agency</span></label> <select
+											class="form-control" id="implementationAgency"
+											data-ng-model="implementationAgencyId"
+											name="implementationAgency"
+											data-ng-change="loadSubEnggByIA(implementationAgencyId);subEnggId='';workData=''">
+											<option value="">--Select--</option>
+											<option
+												data-ng-repeat="ia in implementationAgencies | orderBy : 'implementationAgencyNameE'"
+												value="{{ia.implementationAgencyId}}">{{ia.implementationAgencyNameE}}</option>
+										</select>
+									</div>
+									<div class="form-group col-sm-4">
+										<label><span>Sub Engineer</span></label> <select
+											class="form-control" id="subEngg" data-ng-model="subEnggId"
+											name="subEngg" data-ng-change="workData=''">
+											<option value="">--Select--</option>
+											<option
+												data-ng-repeat="sub in subEngg | orderBy : 'subEnggName'"
+												value="{{sub.subEnggId}}">{{sub.subEnggName}}</option>
+										</select>
+									</div>
+
+								</div>
+								<div class="row">
+									<div class="form-group col-sm-4"
+										data-ng-init="loadWorkStatus()">
+										<label><span>Work Status</span></label> <select
+											class="form-control" id="workStatusName"
+											data-ng-model="workStatusName" name="workStatusName">
+											<option value="">--Select--</option>
+											<option data-ng-repeat="status in workStatus"
+												value="{{status}}">{{status}}</option>
+										</select>
+									</div>
+									<div class="form-group col-sm-4">
+										<label><span>&nbsp;</span></label>
+										<p>
+											<button type="submit" class="btn btn-sm btn-primary"
+												id="submit">
+												<span th:text="#{submit}">Filter</span>
+											</button>
+											<button type="reset" class="btn btn-sm btn-danger">Reset</button>
+										</p>
+									</div>
+								</div>
+							</form>
+							<div class="table-responsive responsive-md"
+								data-ng-show="workData">
+								<table id="dynamic-table"
+									class="table table-striped table-bordered table-hover table-outline">
+									<thead class="thead-default">
+										<tr>
+											<th>Works List</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr
+											data-ng-repeat="data in workData | orderBy : '-photoCount'">
+											<td><div>
+													<div class="col-md-12">
+														<span>{{$index+1}}. <b>Work Name:</b>
+															{{data.workName}}
+														</span> <span><b>Scheme:</b> {{data.scheme}}</span>
+													</div>
+													<div class="col-md-12">
+														<span><b>Implementation Agency:</b>
+															{{data.implementationAgency}}</span> <span><b>Sub
+																Engineer:</b> {{data.subEnggName}}</span>
+													</div>
+													<div class="col-md-12">
+														<span><b>Status:</b> {{data.workStatus}}</span> <span><b>Year:</b>
+															{{data.financialYear}}</span> <span><b>AS Amt:</b>
+															{{data.asAmt}}</span>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<span>&nbsp;</span>
+												</div>
+												<div class="col-md-12">
+													<span><b>Stage 1 (Before Work) Photos</b></span>
+												</div>
+												<div class="col-md-12">
+													<div class="gallery">
+														<div data-ng-if="data.stage1Img1.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img1"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage1Img1.imgString}}" alt="img1" />
+															</a>
+															<p>Latitude: {{data.stage1Img1.latitude}}</p>
+															<p>Longitude: {{data.stage1Img1.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage1Img1.uploadDate}}</p>
+														</div>
+														<div class="" data-ng-if="data.stage1Img2.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img2"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage1Img2.imgString}}" alt="img2" />
+															</a>
+															<p>Latitude: {{data.stage1Img2.latitude}}</p>
+															<p>Longitude: {{data.stage1Img2.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage1Img2.uploadDate}}</p>
+														</div>
+														<div class="" data-ng-if="data.stage1Img3.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img3"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage1Img3.imgString}}" alt="img3" />
+															</a>
+															<p>Latitude: {{data.stage1Img3.latitude}}</p>
+															<p>Longitude: {{data.stage1Img3.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage1Img3.uploadDate}}</p>
+														</div>
+														<div class="" data-ng-if="data.stage1Img4.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img4"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage1Img4.imgString}}" alt="img4" />
+															</a>
+															<p>Latitude: {{data.stage1Img4.latitude}}</p>
+															<p>Longitude: {{data.stage1Img4.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage1Img4.uploadDate}}</p>
+														</div>
+														<div
+															data-ng-if="!data.stage1Img1.imgString &amp;&amp; !data.stage1Img2.imgString &amp;&amp;
+							!data.stage1Img3.imgString &amp;&amp; !data.stage1Img4.imgString">
+															No Photos Uploaded.</div>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<span><b>Stage 2 (During Work) Photos</b></span>
+												</div>
+												<div class="col-md-12">
+													<div class="gallery">
+														<div data-ng-if="data.stage2Img1.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img1"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage2Img1.imgString}}" alt="img1" />
+															</a>
+															<p>Latitude: {{data.stage2Img1.latitude}}</p>
+															<p>Longitude: {{data.stage2Img1.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage2Img1.uploadDate}}</p>
+														</div>
+														<div class="" data-ng-if="data.stage2Img2.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img2"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage2Img2.imgString}}" alt="img2" />
+															</a>
+															<p>Latitude: {{data.stage2Img2.latitude}}</p>
+															<p>Longitude: {{data.stage2Img2.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage2Img2.uploadDate}}</p>
+														</div>
+														<div class="" data-ng-if="data.stage2Img3.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img3"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage2Img3.imgString}}" alt="img3" />
+															</a>
+															<p>Latitude: {{data.stage2Img3.latitude}}</p>
+															<p>Longitude: {{data.stage2Img3.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage2Img3.uploadDate}}</p>
+														</div>
+														<div class="" data-ng-if="data.stage2Img4.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img4"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage2Img4.imgString}}" alt="img4" />
+															</a>
+															<p>Latitude: {{data.stage2Img4.latitude}}</p>
+															<p>Longitude: {{data.stage2Img4.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage2Img4.uploadDate}}</p>
+														</div>
+														<div
+															data-ng-if="!data.stage2Img1.imgString &amp;&amp; !data.stage2Img2.imgString &amp;&amp;
+							!data.stage2Img3.imgString &amp;&amp; !data.stage2Img4.imgString">
+															No Photos Uploaded.</div>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<span><b>Stage 3 (After Work) Photos</b></span>
+												</div>
+												<div class="col-md-12">
+													<div class="gallery">
+														<div data-ng-if="data.stage3Img1.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img1"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage3Img1.imgString}}" alt="img1" />
+															</a>
+															<p>Latitude: {{data.stage3Img1.latitude}}</p>
+															<p>Longitude: {{data.stage3Img1.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage3Img1.uploadDate}}</p>
+														</div>
+														<div class="" data-ng-if="data.stage3Img2.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img2"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage3Img2.imgString}}" alt="img2" />
+															</a>
+															<p>Latitude: {{data.stage3Img2.latitude}}</p>
+															<p>Longitude: {{data.stage3Img2.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage3Img2.uploadDate}}</p>
+														</div>
+														<div class="" data-ng-if="data.stage3Img3.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img3"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage3Img3.imgString}}" alt="img3" />
+															</a>
+															<p>Latitude: {{data.stage3Img3.latitude}}</p>
+															<p>Longitude: {{data.stage3Img3.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage3Img3.uploadDate}}</p>
+														</div>
+														<div class="" data-ng-if="data.stage3Img4.imgString">
+															<a href="" class="thumbnail" data-toggle="modal"
+																data-target="#lightbox" id="a_{{$index}}_img4"
+																onclick="imageClick(this);"> <img
+																src="{{data.stage3Img4.imgString}}" alt="img4" />
+															</a>
+															<p>Latitude: {{data.stage3Img4.latitude}}</p>
+															<p>Longitude: {{data.stage3Img4.longitude}}</p>
+															<p style="max-width: 185px">Upload Date/Time:
+																{{data.stage3Img4.uploadDate}}</p>
+														</div>
+														<div
+															data-ng-if="!data.stage3Img1.imgString &amp;&amp; !data.stage3Img2.imgString &amp;&amp;
+							!data.stage3Img3.imgString &amp;&amp; !data.stage3Img4.imgString">
+															No Photos Uploaded.</div>
+													</div>
+												</div></td>
+										</tr>
+									</tbody>
+									<tr data-ng-if="workData.length==0">
+										<td>No Record found.</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+</div>
+<div id="lightbox" class="modal fade" tabindex="-1" role="dialog"
+	aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<button type="button" class="close hidden" data-dismiss="modal"
+			aria-hidden="true">×</button>
+		<div class="modal-content">
+			<div class="modal-body">
+				<img src="" alt="" />
+			</div>
+		</div>
+	</div>
+</div>
+</html>

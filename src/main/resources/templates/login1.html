@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="utf-8" />
+<meta name="Referrer-Policy" value="no-referrer | same-origin"/>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://maps.googleapis.com; frame-src https://app.powerbi.com/; object-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; media-src 'none'; connect-src 'self'"/>
+	
+<link rel="shortcut icon" th:href="@{/assets/img/favicon.ico}"
+	type="image/x-icon" />
+<link rel="icon" th:href="@{/assets/img/favicon.ico}"
+	type="image/x-icon" />
+<title>:: DHS - Monitoring System ::</title>
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" />
+<link rel="stylesheet" type="text/css"
+	th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" type="text/css"
+	th:href="@{/assets/css/materialdesignicons.min.css}" />
+<!-- fonts -->
+<link rel="stylesheet" th:href="@{/assets/fonts/fonts.css}" />
+<!-- plugin -->
+<link th:href="@{/assets/css/slick.css}" rel="stylesheet" />
+<link th:href="@{/assets/css/slick-theme.css}" rel="stylesheet" />
+<!-- Custom CSS -->
+<link rel="stylesheet" th:href="@{/assets/css/main.css}" />
+
+
+</head>
+
+<body class="bgimage">
+	<div class="main">
+		<div class="main-content">
+			<!-- header -->
+			<div class="main-header">
+				<div class="logo-wrapper">
+					<div class="container">
+						<div class="row">
+							<div class="col-12  col-lg-8 pr">
+								<div class="logo-holder d-flex align-items-center">
+									<div class="logo">
+										<a href="#" title='DHS - Monitoring System'>
+											<img th:src="@{/assets/img/mplogo.png}"
+											alt="DHS - Monitoring System" />
+										</a>
+									</div>
+									<div class="logo-title">
+										<h1>DHS - Monitoring System</h1>
+										<p>Government of Madhya Pradesh</p>
+									</div>
+								</div>
+							</div>
+
+							<div
+								class="col-12 col-lg-4 ptoplg text-right d-flex flex-wrap flex-lg-nowrap justify-content-end align-items-center user-manual">
+								<a href="https://play.google.com/store/apps/details?id=in.mpgov.mykit" class="btn btn-app mr-2"
+									target="_blank" rel="noopener noreferrer" title="Play Store"> <img
+									th:src="@{/assets/img/playstore.png}" height="24"/> 
+									    <span class="d-md-inline d-none">Download App on Google Play </span>
+									    <span class="d-md-none d-inline">Get Mobile App  </span>
+								</a> 
+								<a th:href="@{/usermanual/User manual_UNNATI-DMS.pdf}" target="_blank" rel="noopener noreferrer"
+									class="btn btn-warning mr-2">User Manual</a>
+
+
+								<div class="pr">
+
+									<button class="btn btn-danger" id="btnlogin">
+										<em class="fa fa-lock"></em> Login
+									</button>
+
+									<div id="loginbox">
+										<h4>LOGIN</h4>
+										<form th:action="@{/login}" method="post">
+
+											<div class="text-success login_info"
+												th:if="${message != null}">
+												<strong>Success!</strong>
+												<p th:text="${message}">Success message!</p>
+											</div>
+
+											<div class="text-danger login_info" th:if="${error != null}">
+												<strong>Error!</strong>
+												<p th:text="${error}">Error message!</p>
+											</div>
+											<div class="input-group mb-3">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><em
+														class="mdi mdi-account"></em></span>
+												</div>
+												<input type="text" class="form-control"
+													placeholder="Username/EmailId" name="username" id="username"
+													required="required" autofocus="autofocus" maxlength="30"
+													autocomplete="off" />
+											</div>
+											<div class="input-group mb-3">
+												<div class="input-group-prepend">
+													<span class="input-group-text"><em
+														class="mdi mdi-lock"></em></span>
+												</div>
+												<input type="password" class="form-control"
+													placeholder="Password" name="password" id="password"
+													required="required" maxlength="20" autocomplete="off" />
+											</div>
+											<!--  <div class="captcha">
+                <img id="captcha_id" name="imgCaptcha" th:src="@{/assets/img/captcha.png}"/>
+                <a href="#" class="btn-refresh"><span class="mdi mdi-refresh"></span></a>
+              </div> -->
+											<div class="row">
+												<div class="col-md-5 d-flex">
+													<img id="captcha_id" name="imgCaptcha"
+														th:src="@{/captcha?type=login}" height="40" /> <a
+														href="#"> <span class="fa fa-refresh"
+														onclick="document.getElementById('captcha_id').src = 'captcha?' + Math.random() + '&amp;type=login';  return false" />
+													</a>
+												</div>
+												<div class="col-md-7">
+													<div class="input-group mb-3">
+														<span class="input-group-prepend"><i
+															class="mdi mdi-pencil"></i></span> <input name="captchaText"
+															id="captchaText" type="text" maxlength="4"
+															style="text-transform: uppercase;" autocomplete="off"
+															required="required" class="form-control"
+															placeholder="Captcha" />
+													</div>
+												</div>
+											</div>
+											<!-- <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><em class="mdi mdi-settings"></em></span>
+                </div>
+                <input type="text" class="form-control" placeholder="Enter Captcha"/>
+              </div> -->
+											<div class="">
+												<button id="btn-login" class="btn btn-danger btn-block"
+													type="submit">Login</button>
+												
+													<div class=" mt-3 text-center">
+														<a th:href="@{/forgotpassword}" class="fp"> <span>Forgot
+																password?</span>
+														</a>
+													</div>
+												
+											</div>
+										</form>
+									</div>
+								</div>
+
+							</div>
+						</div>
+						<!-- /.row -->
+					</div>
+				</div>
+			</div>
+			<!-- header end -->
+			<!-- banner -->
+			<div class="home-fixed-slider">
+				<div class="ptop">
+					<div class="container pr">
+					<div class="row">
+						<div class="col-md-12">
+						<div class="iframe-box">
+					<h3>Monitoring Status</h3>
+					<iframe sandbox="allow-same-origin allow-scripts"
+						src="https://app.powerbi.com/view?r=eyJrIjoiYzgwZWFiNjktM2E0MS00ZmFmLWI5ZDMtODMxOWRlMGY2ZDRiIiwidCI6IjYzMzI3N2ExLTFmMDctNGU5Mi04MDQwLWNiOGNkYmQ2NTQxNCJ9"
+						width="100%" height="700" allowfullscreen="allowfullscreen"></iframe>
+				</div>
+						</div>
+						
+					</div>
+					
+					</div>
+				</div>
+			</div>
+
+
+
+
+			<!-- banner end -->
+			<!-- <div class="counters">
+        <div class="container">
+          <div class="row borderd pr">
+            <div class="col-md-3 col-sm-6">
+              <div class="icon-trsp">
+                <div class="topicon bg-red">
+                  <span class="mdi mdi-file-pdf"></span>
+                </div>
+                <h4> Rs. 17,045.83</h4>
+                <a href="">Collection in 2018-2021</a>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="icon-trsp">
+                <div class="topicon bg-yellow">
+                  <span class="mdi mdi-trophy-outline"></span>
+                </div>
+                <h4> Rs. 11,37,93,390.73</h4>
+                <a href="">Total Collection</a>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="icon-trsp">
+                <div class="topicon bg-green">
+                  <span class="mdi mdi-account-card-details"></span>
+                </div>
+                <h4>12000</h4>
+                <a href="">Sanctioned Projects</a>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="icon-trsp">
+                <div class="topicon bg-orange">
+                  <span class="mdi mdi-chart-line"></span>
+                </div>
+                <h4>Rs. 56,30,45,400</h4>
+                <a href="">Allocated Amount</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+			<!-- <div class="aboutus pr">
+				<div class="container py-5">
+					<div class="row">
+						<div class="col-lg-6">
+							<h2 class="title-lg">About Us</h2>
+							<div class="abouttxt">District Mineral Foundations are
+								statutory bodies in India established by the State Governments
+								by notification. They derive their legal status from section 9B
+								of Mines and Minerals (Development and Regulation) Act, 1957 as
+								amended on 26 March 2015 as Mines and Minerals (Development and
+								Regulation) Amendment Act, 2015...</div>
+							<a href="" title="Read More" class="btn btn-dark btn-sm">Read
+								More <span class="mdi mdi-arrow-right"></span>
+							</a>
+						</div>
+						<div class="col-lg-6">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="member-box bred">
+										<div class="member-thumb">
+											<img th:src="@{/assets/img/cm.png}" />
+										</div>
+										<div class="member-description">
+											<h3>shri kamalnath</h3>
+											<p>Honourable Chief Minister, MP</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="member-box byellow">
+										<div class="member-thumb">
+											<img th:src="@{/assets/img/minister.png}" />
+										</div>
+										<div class="member-description">
+											<h3>shri govindsingh rajput</h3>
+											<p>Honourable Minister, MP</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> -->
+
+
+
+
+			<!-- <div class="reports2 pt-4 position-relative">
+			<div class="container">
+				<div class="">
+					<div class="row">
+						<div class="col-md-6">
+							<div class="panel mb-4">
+								<div class="panel-header bg-dgreen">
+									<span class="mdi mdi-checkbox-marked-outline"></span> District
+									Wise Work Status
+								</div>
+								<div class="panel-body">
+									<img th:src="@{/assets/img/chart-3.jpg}" alt="" height="400" />
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="panel mb-4">
+								<div class="panel-header bg-blue">
+									<span class="mdi mdi-chart-bar"></span> Graphical Work Status
+								</div>
+								<div class="panel-body">
+									<img th:src="@{/assets/img/chart-4.jpg}" alt="" height="400" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div> -->
+
+		</div>
+
+		<!--  partners -->
+		<div class="partners">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="logo-slider">
+							<div>
+								<a href="https://www.standupmitra.in/" target="_blank" rel="noopener noreferrer"
+									title="Stand Up India">
+									<div class="img-box">
+										<img th:src="@{/assets/img/standup-india.png}"
+											alt="Stand Up India" />
+									</div>
+								</a>
+							</div>
+							<div>
+								<a href="http://www.digitalindia.gov.in/" target="_blank" rel="noopener noreferrer"
+									title="Digital India">
+									<div class="img-box">
+										<img th:src="@{/assets/img/digital-india.png}"
+											alt="Digital India" />
+									</div>
+								</a>
+							</div>
+							<div>
+								<a href="https://www.mygov.in/" target="_blank" rel="noopener noreferrer"
+									title="MyGov: A Platform for Citizen Engagement towards Good Governance in India">
+									<div class="img-box">
+										<img th:src="@{/assets/img/my-gov.png}" alt="My Gov" />
+									</div>
+								</a>
+							</div>
+							<div>
+								<a href="https://www.mponline.gov.in/portal/" target="_blank" rel="noopener noreferrer"
+									title="MP Online">
+									<div class="img-box">
+										<img th:src="@{/assets/img/mp-online.png}" alt="MP Online" />
+									</div>
+								</a>
+							</div>
+							<div>
+								<a href="https://www.india.gov.in/" target="_blank" rel="noopener noreferrer"
+									title="National Portal of India">
+									<div class="img-box">
+										<img th:src="@{/assets/img/india-gov.png}"
+											alt="National Portal of India" />
+									</div>
+								</a>
+							</div>
+							<div>
+								<a href="https://data.gov.in/" target="_blank" rel="noopener noreferrer"
+									title="Data Government">
+									<div class="img-box">
+										<img th:src="@{/assets/img/data-gov.png}"
+											alt="Data Government" />
+									</div>
+								</a>
+							</div>
+							<div>
+								<a href="https://www.mapit.gov.in/" target="_blank" rel="noopener noreferrer"
+									title="MAP_IT">
+									<div class="img-box">
+										<img th:src="@{/assets/img/mapit.png}" alt="MAP_IT" />
+									</div>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- partners end-->
+		<!-- footer -->
+		<footer class="footer">
+			<a href="#" class="back-top" id="gotop" title="Scroll to top"> <span
+				class="fa fa-angle-up"></span>
+			</a>
+			<div class="footer-bottom">
+				<div class="container text-center">
+					Copyright © 2021. All Rights Reserved.<br /> Designed &amp;
+					developed by 
+					<a target="_blank" href="http://www.mapit.gov.in/?page=7vG6I3NGGec1YPQRwT3nWQ%3D%3D">Center of Excellence (CoE)</a>,
+					<a target="_blank" href="http://www.mapit.gov.in">MAP_IT</a>.<br/><br/>
+				</div>
+			</div>
+		</footer>
+
+		<!-- <div class="loading">
+      <span class="loader"></span>
+    </div> -->
+
+		<!-- footer end -->
+	</div>
+	<script th:src="@{/assets/js/jquery.min.js}"></script>
+	<script th:src="@{/assets/js/popper.min.js}"></script>
+	<script th:src="@{/assets/js/bootstrap.min.js}"></script>
+	<script th:src="@{/assets/js/slick.min.js}"></script>
+	<script th:src="@{/assets/js/custom.js}"></script>
+	<script th:src="@{/js/sha256.js}"></script>
+
+	<script type="text/javascript" th:inline="javascript">
+	/*<![CDATA[*/
+	$('#btnlogin').click(function() {
+		$('#loginbox').fadeToggle(300);
+	});
+	var log_box = $('#loginbox,#btnlogin');
+	$(document).mouseup(function(e) {
+		if (!log_box.is(e.target) && log_box.has(e.target).length === 0) {
+			$('#loginbox:visible').fadeOut('300');
+		}
+	});
+	/*]]>*/
+	
+		$(document)
+				.ready(
+						function() {
+						
+							if($('.login_info').length){
+								$('#loginbox').show();
+							}
+							
+							
+							$('#btn-login')
+									.click(
+											function() {
+												if ($.trim($('#username').val()
+														.trim()) == ''
+														|| $
+																.trim($(
+																		'#password')
+																		.val()
+																		.trim()) == ''
+														|| $.trim($(
+																'#captchaText')
+																.val().trim()) == '') {
+													//alert("Please enter User Name and Password");
+												} else {
+													var hashObj = new jsSHA(
+															"SHA-256", "TEXT",
+															"1");
+													hashObj.update($(
+															'#password').val()
+															.trim());
+													$("#password")
+															.val(
+																	hashObj
+																			.getHash("HEX"));
+												}
+											});
+						});
+	</script>
+</body>
+</html>

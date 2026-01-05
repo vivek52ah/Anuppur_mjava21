@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" data-ng-app="dms">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}"
+	type="image/x-icon" />
+<link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon" />
+
+<title>Registration Form</title>
+<link th:href="@{/css/font-awesome.min.css}" rel="stylesheet" />
+<link th:href="@{/css/simple-line-icons.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/fonts/fonts.css}" />
+<link th:href="@{/css/style.css}" rel="stylesheet" />
+<link th:href="@{/css/custom.css}" rel="stylesheet" />
+
+<link th:href="@{/css/angular-loading.css}" rel="stylesheet"
+	type="text/css" />
+<!-- Custom CSS -->
+<link rel="stylesheet" th:href="@{/assets/css/main.css}" />
+
+
+<script type="text/javascript">
+	//<![CDATA[
+	
+	function check_pass() {
+
+		if (document.getElementById('password').value
+				&& document.getElementById('confirmPassword').value) {
+			if (document.getElementById('password').value == document
+					.getElementById('confirmPassword').value) {
+				document.getElementById('submit').disabled = false;
+				document.getElementById('passwordError').style.display = 'none';
+			} else {
+				document.getElementById('submit').disabled = true;
+				document.getElementById('passwordError').style.display = 'block';
+			}
+		}
+	}
+	//]]>
+</script>
+<!-- <script th:src="@{/angular/customdirective.js}"></script> -->
+<script type="text/javascript">
+	//<![CDATA[
+
+	function readURL(input, id) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+
+			reader.onload = function(e) {
+				$('#' + id).attr('src', e.target.result);
+			}
+
+			reader.readAsDataURL(input.files[0]);
+		}
+	}
+	//]]>
+</script>
+
+</head>
+
+<body data-ng-controller="RegistrationController" dw-loading="sample-1"
+	dw-loading-options="{text: 'Loading....'}" class="bgimage">
+	<div class="main">
+		<div class="main-content">
+			<div class="main-header">
+				<div class="logo-wrapper">
+					<div class="container">
+						<div class="row">
+							<div class="col-12  col-lg-8 pr">
+								<div class="logo-holder d-flex align-items-center">
+									<div class="">
+										<a href="#" title="DHS - Monitoring System">
+											<img alt="DHS - Monitoring System"
+											th:src="@{/assets/img/mplogo.png}" />
+										</a>
+									</div>
+									<div class="logo-title">
+										<h1>DHS - Monitoring System</h1>
+										<p>Government of Madhya Pradesh</p>
+									</div>
+								</div>
+							</div>
+
+							<div
+								class="col-12 col-lg-4 text-right d-flex flex-wrap flex-lg-nowrap justify-content-end align-items-center user-manual">
+								<a class="btn btn-danger" th:href="@{/login}"> <em
+									class="fa fa-home"></em> Back to Home
+								</a>
+							</div>
+						</div>
+						<!-- /.row -->
+					</div>
+				</div>
+			</div>
+			<div class="ptop">
+				<div class="container">
+					<div class="row">
+
+						<div class="col-md-12">
+							<div class="card mt-2">
+								<div class="card-header">Registration Form</div>
+
+
+								<div class="col-md-12">
+									<div data-ng-if="responseObject.errorMessage != null"
+										class="text-danger">
+										<strong></strong>
+										<p>{{responseObject.errorMessage}}</p>
+									</div>
+								</div>
+								<div class="col-md-12">
+									<div data-ng-if="responseObject.successMessage != null"
+										class="text-success">
+										<strong></strong>
+										<p>{{responseObject.successMessage}}</p>
+									</div>
+								</div>
+
+
+								<form data-ng-submit="addRegistration(regForm.$valid)"
+									name="regForm">
+									<div class="card-body">
+										
+										<div class="row">
+											<div class="form-group col-sm-4">
+												<label><span>First Name</span><span class="aestrick">&#42;</span></label>
+												<input type="text" class="form-control alpha-only-space-dot" id="firstName"
+													required="required" data-ng-model="regData.firstName"
+													name="name" maxlength="100" />
+												<div data-ng-show="regForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="regForm.firstName.$error.required">
+														<span th:text="#{pleaseEnter}">Please enter</span> <span>
+															First Name</span>
+													</p>
+												</div>
+											</div>
+
+											<div class="form-group col-sm-4">
+												<label><span>Last Name</span><span class="aestrick">&#42;</span></label>
+												<input type="text" class="form-control alpha-only-space-dot" id="lastName"
+													required="required" data-ng-model="regData.lastName"
+													name="name" maxlength="100" />
+												<div data-ng-show="regForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="regForm.name.$error.required">
+														<span th:text="#{pleaseEnter}">Please enter</span> <span>
+															Last Name</span>
+													</p>
+												</div>
+											</div>
+											
+											<div class="form-group col-sm-4">
+										<label><span>Mobile No</span> <span class="aestrick">&#42;</span>
+										</label> <input required="required" class="form-control digits-only"
+											type="text" id="contactNo"
+											data-ng-model="regData.contactNo"
+											name="contactNo" data-ng-pattern="/^(\+\d{1,3}[- ]?)?\d{10}$/"
+											maxlength="10" />
+										<div data-ng-show="regForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="regForm.contactNo.$error.required">
+												<span>Please enter Mobile No.</span>
+											</p>
+										</div>
+										<p class="help-block" style="color: red;"
+											data-ng-show="regForm.contactNo.$error.pattern">
+											<span>Please enter valid Mobile No.</span>
+										</p>
+
+									</div>
+											
+											
+											
+
+										</div>
+										
+										
+
+
+										<!-- <h6 class="title-sm">
+											<strong>Work Location</strong>
+										</h6> -->
+										<div class="row">
+											<!-- <div class="form-group col-sm-3" data-ng-init="loadWorkForm()">
+										<label><span>District</span><span class="aestrick">&#42;</span></label>
+										<input type="text" class="form-control" id="district"
+											required="required" data-ng-model="regData.districtName"
+											name="district" data-ng-readonly="true" />
+										<div data-ng-show="workForm.$submitted">
+											<p class="help-block" style="color: red;"
+												data-ng-show="workForm.district.$error.required">
+												<span th:text="#{pleaseSelect}">Please select</span> <span
+													th:text="#{district}">District</span>
+											</p>
+										</div>
+									</div> -->
+
+											<div class="form-group col-sm-4"
+												data-ng-init="loadDistricts();">
+												<label><span>District</span><span class="aestrick">&#42;</span></label>
+												<select class="form-control"
+													data-ng-model="regData.districtId" name="district"
+													data-ng-change="loadULBById(regData.districtId);loadPCsByDistrictId(regData.districtId);loadLCsByDistrict(regData.districtId);
+													loadBlocksByDistrictId(regData.districtId);regData.ulb=null;regData.lcId='';regData.mlaName='';mlas='';"
+													id="district">
+													<option value="" disabled="disabled">--Select--</option>
+													<option
+														data-ng-repeat="district in districts | orderBy : 'districtName'"
+														value="{{district.districtId}}">{{district.districtName}}</option>
+												</select>
+												<div data-ng-show="regForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="regForm.district.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span
+															th:text="#{district}">District</span>
+													</p>
+												</div>
+											</div>
+
+											<div class="form-group col-sm-4">
+												<label><span>Legislative Constituency </span><span
+													class="aestrick">&#42;</span></label> <select class="form-control"
+													id="lc" required="required" data-ng-model="regData.lcId"
+													data-ng-change="loadMLAs(regData.lcId);workData.mla='';regData.mlaName='';"
+													name="lc">
+													<option value="" disabled="disabled">--Select--</option>
+													<option data-ng-repeat="lc in lcs | orderBy : 'lcName'"
+														value="{{lc.lcId}}">{{lc.lcName}}</option>
+													<!-- <option value="SIDHI">Sidhi</option> -->
+												</select>
+												<div data-ng-show="regForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="regForm.lc.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span>Legislative
+															Constituency</span>
+													</p>
+												</div>
+											</div>
+
+											<div class="form-group col-sm-4">
+												<label><span>Name of MLA </span><span
+													class="aestrick">&#42;</span></label> <select class="form-control"
+													id="mlaName" required="required"
+													data-ng-model="regData.mlaName"
+													data-ng-change="loadMLAsNumber(regData.lcId);workData.mla='';"
+													name="mlaName">
+													<option value="" disabled="disabled">--Select--</option>
+													<option data-ng-repeat="mla in mlas"
+														value="{{mla.mlaName}}">{{mla.mlaName}}</option>
+												</select>
+												<div data-ng-show="regForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="regForm.mlaName.$error.required">
+														<span th:text="#{pleaseSelect}">Please select</span> <span>MLA
+															name</span>
+													</p>
+												</div>
+											</div>
+
+											<!-- <div class="form-group col-sm-6 col-md-3">
+												<label><span>MLA Contact No</span><span
+													class="aestrick">&#42;</span></label> <input type="text"
+													class="form-control" id="authorizePersonName"
+													required="required" data-ng-disabled="true"
+													data-ng-model="regData.contactNo" name="name"
+													maxlength="100" />
+												<div data-ng-show="regForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="regForm.name.$error.required">
+														<span th:text="#{pleaseEnter}">Please enter</span> <span>
+															Last Name</span>
+													</p>
+												</div>
+											</div> -->
+											
+										</div>
+										
+										
+
+
+										<div class="row">
+											
+
+
+
+
+
+											
+
+
+
+
+											
+										</div>
+
+										
+										<hr />
+										<div class="row">
+											<div class="form-group mb-3 col-sm-6">
+												<label><span th:text="#{password}">Password</span><span
+													class="aestrick">&#42;</span></label> <input required="required"
+													class="form-control" type="password"
+													data-ng-model="regData.password" name="password"
+													maxlength="20" id="password" onkeyup="check_pass();"
+													placeholder="Password" AUTOCOMPLETE="off" />
+												<div data-ng-show="regForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="regForm.password.$error.required">
+														<span th:text="#{pleaseEnter}">Please enter</span> <span
+															th:text="#{password}">Password</span>
+													</p>
+												</div>
+											</div>
+											<div class="form-group mb-3 col-sm-6">
+												<label><span th:text="#{confirmPassword}">Confirm
+														Password</span><span class="aestrick">&#42;</span></label> <input
+													required="required" class="form-control" type="password"
+													data-ng-model="regData.confirmPassword"
+													name="confirmPassword" maxlength="20" id="confirmPassword"
+													onkeyup="check_pass();" placeholder="Confirm Password"
+													AUTOCOMPLETE="off" />
+												<div data-ng-show="regForm.$submitted">
+													<p class="help-block" style="color: red;"
+														data-ng-show="regForm.confirmPassword.$error.required">
+														<span th:text="#{pleaseEnter}">Please enter</span> <span
+															th:text="#{confirmPassword}">Confirm Password</span>
+													</p>
+												</div>
+												<p class="help-block" style="color: red; display: none;"
+													id="passwordError">
+													<span th:text="#{passwordError}">Password and
+														Confirm Password doesn't match</span>
+												</p>
+											</div>
+										</div>
+										<div data-ng-init="emailIdVerified='no'">
+											<div class="title-sm">
+												<span th:text="#{emailDetail}"> Email Detail</span><i
+													data-ng-show="emailIdVerified=='yes'"
+													class="fa fa-check check" aria-hidden="true"></i>
+											</div>
+
+											<div
+												data-ng-init="showEmailOtpDetails='no';showNotForEmail='no'">
+
+
+
+												<div class="row">
+													<div class="col-md-12">
+														<span
+															data-ng-show="showNotForEmail=='yes' &amp;&amp; showVerificationMessage()"
+															class="message" th:text="#{otpEmailIdVerification}">OTP
+															will be sent to below Email Id for verification</span>
+													</div>
+												</div>
+
+												<span data-ng-show="showNotForEmail=='no'"><label
+													th:text="#{emailId}">Email Id (अपना मेल आई डी दर्ज
+														करें )</label></span>
+												<div class="row">
+													<div class="form-group col-md-4">
+														<div class="">
+															<input type="text" class="form-control" maxlength="45"
+																name="emailId" data-ng-disabled="emailIdVerified=='yes'"
+																data-ng-blur="checkEmailIdExists();"
+																data-ng-change="validateEmail();checkEmailIdExists()"
+																th:placeholder="#{enterValidEmailID}"
+																data-ng-model="regData.emailId" required="required" />
+															<div
+																data-ng-show="regForm.$submitted || emailIdError || emailIdValidError">
+																<p class="help-block" style="color: red;"
+																	data-ng-show="regForm.emailId.$error.required || emailIdError">
+																	<span th:text="#{pleaseEnterEmailId}">Please
+																		Enter Email Id</span>
+																</p>
+																<p class="help-block" style="color: red;"
+																	data-ng-show="emailIdValidError">
+																	<span th:text="#{pleaseEnterValidEmailId}">Please
+																		Enter Valid Email Id</span>
+																</p>
+															</div>
+															<div data-ng-show="emailIdDuplicateError">
+																<p class="help-block" style="color: red;">
+																	<span th:text="#{emailIdAlreadyRegistered}">This
+																		Email Id Already Registered.</span>
+																</p>
+															</div>
+
+														</div>
+
+
+													</div>
+													<div class="form-group col-md-4"
+														data-ng-show="showEmailOtpDetails=='no' &amp;&amp; emailIdVerified=='no'">
+														<button class="btn btn-info" type="button"
+															data-ng-click="generateOTPForEmailId()">
+															<span th:text="#{verifyEmailId}">Verify Email Id</span>
+														</button>
+													</div>
+
+
+													<div class="col-lg-4"
+														data-ng-show="showEmailOtpDetails=='yes'">
+														<input type="text" class="form-control digits-only"
+															th:placeholder="#{enterOTP}" data-ng-model="emailIdOtp" />
+														<div data-ng-show="emailIdOtpError">
+															<p class="help-block" style="color: red;">
+																<span th:text="#{pleaseEnterOTP}">Please Enter
+																	OTP</span>
+															</p>
+														</div>
+													</div>
+													<div class="col-lg-4"
+														data-ng-show="showEmailOtpDetails=='yes'">
+														<button class="btn btn-info" type="button"
+															data-ng-click="submitOTPForEmailId()">
+															<span th:text="#{submitOTP}">Submit OTP</span>
+														</button>
+														<button type="button" class="btn btn-danger"
+															data-ng-click="generateOTPForEmailId()">
+															<span th:text="#{resendOTP}">Resend OTP</span>
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+
+
+										<div data-ng-init="mobileNoVerified='no'" data-ng-show="regData.mlaName">
+											<div class="title-sm">
+												 <span
+													th:text="#{mlaAuth}">MLA Authentication</span><i
+													data-ng-show="mobileNoVerified=='yes'"
+													class="fa fa-check check" aria-hidden="true"></i>
+											</div>
+											<div data-ng-init="showMobileOtpDetails='no';showNotification='no'" data-ng-show="regData.mlaName">
+												<div class="row">
+   													<div class="col-md-12"><span data-ng-show="showNotification=='yes'"
+													class="message" th:text="#{otpMobileNoVerification}">OTP
+													will be sent to below Mobile No for verification</span>
+													</div>
+												</div>	
+													<span data-ng-show="showNotification=='no'"><label  th:text="#{mlaMobileNo}">MLA Mobile No.</label></span>
+												<div class="row">
+													<div class="col-lg-4">
+														<input type="text" class="form-control digits-only"
+															required="required" name="mobileNo" maxlength="10"
+															data-ng-disabled="mobileNoVerified=='yes';true"
+															th:placeholder="#{enterValidMobilNo}"
+															data-ng-model="regData.mobileNo" 
+															data-ng-change="checkMobileNoValid()" />
+														<div
+															data-ng-show="regForm.$submitted || mobileNoError">
+															<p class="help-block" style="color: red;"
+																data-ng-show="regForm.mobileNo.$error.required || mobileNoError">
+																<span th:text="#{pleaseEnterMobileNo}">Please
+																	Enter Mobile No.</span>
+															</p>
+														</div>
+														<div data-ng-show="mobileNoValidError">
+															<p class="help-block" style="color: red;">
+																<span th:text="#{pleaseEnterValidMobileNo}">Please
+																	Enter Valid Mobile No.</span>
+															</p>
+														</div>
+													</div>
+													<div class="col-lg-4" data-ng-show="showMobileOtpDetails=='no' &amp;&amp; mobileNoVerified=='no'">
+													<button class="btn btn-info" type="button"
+															data-ng-click="generateOTPForMobileNo()"
+															><span
+															th:text="#{verifyMobileNo}">Verify Mobile No.</span></button>
+													</div>
+													<!-- <div class="col-lg-2">
+       <img id="captcha_id" name="imgCaptcha"
+								th:src="@{/captcha?type=login}" /> <a href="#" class="refresh"><img
+								th:src="@{/img/refresh.ico}"
+								onclick="document.getElementById('captcha_id').src = 'captcha?' + Math.random() + '&amp;type=login';  return false" /></a>
+								</div>
+      <div class="col-lg-4"><input type="text" class="form-control" placeholder="Enter Captcha"/></div> -->
+												
+													
+													<div class="col-lg-4"
+														data-ng-show="showMobileOtpDetails=='yes'">
+														<input type="text" class="form-control digits-only"
+															th:placeholder="#{enterOTP}" data-ng-model="mobileNoOtp" />
+														<div data-ng-show="mobileNoOtpError">
+															<p class="help-block" style="color: red;">
+																<span th:text="#{pleaseEnterOTP}">Please Enter
+																	OTP</span>
+															</p>
+														</div>
+													</div>
+													<div class="col-lg-4" 
+														data-ng-show="showMobileOtpDetails=='yes'">
+														<button class="btn btn-info" type="button"
+															data-ng-click="submitOTPForMobileNo()"><span
+															th:text="#{submitOTP}">Submit OTP</span></button> 
+															<button class="btn btn-danger" type="button"
+															data-ng-click="generateOTPForMobileNo()"><span
+															th:text="#{resendOTP}">Resend OTP</span></button>
+													</div>
+
+												</div>
+											</div>
+										</div>
+
+
+									</div>
+									<div class="text-center card-footer">
+										<!-- <div class="col-6">
+											<button type="button" class="btn btn-main px-4">Submit</button>
+											<input type="submit" class="btn btn-main px-4"
+												value="Submit" id="submit" />
+										</div> -->
+										<button type="submit" class="btn px-3 btn-success" id="submit">
+											<span th:text="#{submit}">Submit</span>
+										</button>
+									</div>
+
+								</form>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <div th:replace="fragments/loginfooter :: footer" /> -->
+		<!-- footer -->
+		<footer class="footer">
+			<div class="footer-bottom">
+				<div class="container text-center">
+					Copyright © 2021. All Rights Reserved.<br /> Designed &amp;
+					developed by Center of Excellence (CoE), MAP_IT.
+				</div>
+			</div>
+		</footer>
+	</div>
+	<!-- Bootstrap and necessary plugins -->
+	<script th:src="@{/js/jquery.min.js}"></script>
+	<script th:src="@{/js/popper.min.js}"></script>
+	<script th:src="@{/js/bootstrap.min.js}"></script>
+	<script th:src="@{/js/common.js}"></script>
+	<script th:src="@{/angular/angular.min.js}"></script>
+	<script th:src="@{/angular/angular-route.min.js}"></script>
+	<script th:src="@{/angular/angular-idle.min.js}"></script>
+	<script th:src="@{/js/ui-bootstrap-tpls-2.5.0.min.js}"></script>
+	<script th:src="@{/js/spin.js}"></script>
+	<script th:src="@{/angular/angular-loading.js}"></script>
+
+	<script th:src="@{/angular/RegistrationController.js}"></script>
+	<script th:src="@{/js/sha256.js}"></script>
+	<script type="text/javascript" th:inline="javascript">
+		function hash(val) {
+	
+			var hashObj = new jsSHA("SHA-256", "TEXT", "1");
+			hashObj.update(val);
+			return hashObj.getHash("HEX");
+		}
+	</script>
+</body>
+</html>

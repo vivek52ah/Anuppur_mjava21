@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<script th:src="@{/js/language.js}"></script>
+<style>
+#dynamic-table tr td:first-child {
+	white-space: nowrap;
+}
+
+#dynamic-table tr td:nth-child(4) {
+	min-width: 200px;
+}
+
+.card {
+	margin-bottom: 1.5rem;
+	box-shadow: 0 0 7px rgb(0 0 0/ 70%);
+	border-radius: 7px
+}
+
+.btn.btn-secondary {
+	box-shadow: 0px 0px 7px rgb(0 0 0/ 10%);
+}
+
+btn-xs.btn-primary {
+	box-shadow: 0px 0px 20px rgb(0 0 0/ 30%);
+}
+input#searchBox {
+    box-shadow: 0px 0px 12px rgb(0 0 0 / 8%);
+}
+li#dynamic-table_first {
+    box-shadow: 0px 0px 12px rgb(0 0 0 / 8%);
+}
+li#dynamic-table_previous {
+    box-shadow: 0px 0px 12px rgb(0 0 0 / 8%);
+}
+a.page-link {
+ box-shadow: 0px 0px 12px rgb(0 0 0 / 8%);
+}
+
+select#workType {
+ box-shadow: 0px 0px 12px rgb(0 0 0 / 8%);
+}
+
+select#financialYear {
+ box-shadow: 0px 0px 12px rgb(0 0 0 / 8%);
+}
+
+.tbl-vm tr td > input[type="text"] {
+    width: auto;
+}
+</style>
+</head>
+
+
+<div id="StartOrFinishSpinnerId"></div>
+
+<div id="page-div">
+	<!-- Breadcrumb -->
+	<ol class="breadcrumb">
+		<!-- <li class="breadcrumb-item"><a href="#dashboard"><span
+				th:text="#{home}">Home</span></a></li> -->
+				
+				<li class="breadcrumb-item"><a ><span
+				th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item active"><span>Division Wise Reports</span></li>
+
+		<!-- Breadcrumb Menu-->
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" data-ng-click="doTheBack()"><i
+					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12" data-ng-init="loadAgencyWiseWorkList('6');" >
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-folder-open-o"></i> <span>Division Wise Reports</span>
+							
+						</div>
+
+
+
+						<div class="card-body">
+
+
+
+
+							<div class="pr">
+								<form name="searchForm" novalidate="novalidate" id="searchForm">
+								
+								<div class="form-group col-sm-3">
+												<button type="submit" data-ng-click="exportAgencyWiseReportData('6');" 
+												  class="btn  btn-success text-center" >Export Data </button>
+												  
+												  </div>
+									
+								</form>
+							</div>
+
+
+							<div class="table-responsive responsive-md" data-ng-init="loadFinancialYear();">
+								<table
+													class="table table-striped table-bordered table-hover margin0 tbl-vm">
+								
+
+									
+									<thead class="thead-default">
+										<tr>
+										
+										   <th >S.No.</th>
+                                             <th width="30%">Division</th>
+											 <th width="30%">District</th>
+											<th >Number of Works</th>
+											<th width="20p%">Amount of AA</th>
+											
+									        <th>Total Expenditure Upto March 22 (Rs.)</th>
+											<th>Expenditure in year {{financialYear.financialYear}} (Rs.)</th>
+											<th>Up to Date Expenditure (Rs.)</th>
+											
+											<th>No of Works Handed Over in year {{financialYear.financialYear}}</th>
+											<th>No. of Completion in year {{financialYear.financialYear}}</th>
+											<th>Work Started</th>
+											<th>Not Started</th>
+											<th>Finish Level</th>
+											<th>Roof Level</th>
+											<th>Lintel Level</th>
+											<th>Plinth Level</th>
+											<th>Foundation Level</th>
+											<th>Site Not Selected</th>
+											<th>Tender Issued</th>
+											<th>Tender Awarded</th>
+
+											
+										</tr>
+										
+										
+										
+										
+									</thead>
+									
+									<tbody>
+									  
+									  
+									  <tr data-ng-repeat="item in items"
+															>
+															<td>{{$index+1}}</td>
+															
+															<td ><input 
+																type="text" disabled="disabled"
+																data-ng-model="item.division"  />
+																</td>
+																
+																
+																	
+															<td ><input 
+																type="text" disabled="disabled"
+																data-ng-model="item.district"  />
+																</td>
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.workCount" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.workContractrAmt" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.totalExpUptoMarch" />
+																</td>
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.totalExp" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.uptoDateAmt" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.handedOverStatus" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.completedStatus" />
+																</td>
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.workStarted" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.notStarted" />
+																</td>
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.finishLevelCount" />
+																</td>
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.roofLevel" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.lintelLevel" />
+																</td>
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.plinthLevel" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.foundationLevel" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.siteNotSelected" />
+																</td>
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.tenderIssue" />
+																</td>
+																
+																
+																<td ><input
+																type="text" disabled="disabled"
+																data-ng-model="item.tenderAwarded" />
+																</td>
+															
+															
+															</tr>
+									
+									
+									</tbody>
+								</table>
+							</div>
+
+
+							<div class="row">
+								<div class="col-md-12">
+									<div data-ng-if="responseObject.successMessage != null"
+										class="text-success">
+										<strong>Success!</strong>
+										<p>{{responseObject.successMessage}}</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--/.col-->
+			</div>
+			<!--/.row-->
+		</div>
+
+	</div>
+	<!-- /.container-fluid -->
+</div>
+</html>
