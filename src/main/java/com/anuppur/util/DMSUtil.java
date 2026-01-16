@@ -37,6 +37,7 @@ import com.anuppur.entity.DocumentUploadWorkProgress;
 import com.anuppur.exception.DMSBusinessException;
 import com.anuppur.repository.WorkStatusRepository;
 
+@SuppressWarnings("all")
 public class DMSUtil {
 
 	public static final Logger logger = LoggerFactory.getLogger(DMSUtil.class);

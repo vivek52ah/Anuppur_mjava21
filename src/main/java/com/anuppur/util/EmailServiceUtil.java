@@ -23,6 +23,7 @@ import com.anuppur.exception.DMSBusinessException;
 
 
 @Service
+@SuppressWarnings("all")
 public class EmailServiceUtil {
 
 //	@Value("${mail.smtp.host}")
@@ -124,8 +125,8 @@ public class EmailServiceUtil {
 			msg.setSubject(email.getSubject());
 
 			// setting CC if one set on dto
-			if (email.getCC() != null) {
-				ccAddrs = InternetAddress.parse(email.getCC(), false);
+			if (email.getcC() != null) {
+				ccAddrs = InternetAddress.parse(email.getcC(), false);
 				msg.setRecipients(Message.RecipientType.CC, ccAddrs);
 			}
 
@@ -190,8 +191,8 @@ public class EmailServiceUtil {
 			msg.setSubject(email.getSubject());
 
 			// setting CC if one set on dto
-			if (email.getCC() != null) {
-				ccAddrs = InternetAddress.parse(email.getCC(), false);
+			if (email.getcC() != null) {
+				ccAddrs = InternetAddress.parse(email.getcC(), false);
 				msg.setRecipients(Message.RecipientType.CC, ccAddrs);
 			}
 

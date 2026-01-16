@@ -14,6 +14,7 @@ import com.anuppur.bean.DmRemarksBean;
 import com.anuppur.bean.DocumentUploadDrawingDetailBean;
 import com.anuppur.bean.DocumentUploadWorkProgressBean;
 import com.anuppur.bean.ExpensesDataBean;
+import com.anuppur.bean.FinancialAgencyBean;
 import com.anuppur.bean.FinancialHeadBean;
 import com.anuppur.bean.FinancialYearBean;
 import com.anuppur.bean.GeoTaggingBean;
@@ -272,9 +273,9 @@ public interface CommonService {
 
 	List<DivisionBean> fetchDivisions();
 
-	WorkJson fetchWorksList(Pageable pageable, String workNo, String workName, String scheme, String workType,
-			String financialYear, String implementationAgency, String blockId, String workStatus, String districtName,
-			String divisionId, String searchByDivision, String workSubTypeId, String workStatusId, String workPriorityId, String financialHeadId, String vidhanSabhaId);
+	WorkJson fetchWorksList(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
+			List<Long> fyList, List<Long> agencyList, String blockId, String workStatus, String districtName,
+			String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList);
 
 	WorkJson fetchHandoverWorksList(Pageable pageable, String workNo, String workName, String scheme, String workType,
 			String financialYear, String implementationAgency, String blockId, String workStatus, String divisionId,
@@ -373,9 +374,9 @@ public interface CommonService {
 
 	List<BlockBean> fetchBlocksByDistirct2(String dId);
 
-	WorkJson fetchWorkForReport(Pageable pageable, String workNo, String workName, String scheme, String workType,
-			String financialYear, String Department, String implementationAgency, String blockId, String workStatus,
-			String districtName, String divisionId, String searchByDivision, String workSubTypeId, String workStatusId, String workPriorityId, String financialHeadId, String vidhanSabhaId);
+	WorkJson fetchWorkForReport(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
+			List<Long> fyList, String Department, List<Long> agencyList, String blockId, String workStatus,
+			String districtName, String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList);
 
 	List<departmentbean> fetchAllDepartment();
 
@@ -424,5 +425,17 @@ public interface CommonService {
 
 	List<UserBean> fetchAssignUser(Long implementationAgency);
 
-	List<String> getWorkNameSuggestions(String keyword);
+//	List<String> getWorkNameSuggestions(String keyword);
+
+	List<FinancialAgencyBean> fetchFinancialAgencyByWorkId(Long workId);
+
+	void updateFinancialAgencyCost(Long id, Double expenditure, Long workId);
+
+	String deleteByFinancailAgencyId(Long id);
+
+	List<String> getWorkNoSuggestions(String keyword);
+
+	List<FinancialAgencyBean> getFinancialAgenciesByWorkId(Long workId);
+
+	List<FinancialAgencyBean> getFinancialAgenciesExpenditureByWorkId(Long workId);
 }

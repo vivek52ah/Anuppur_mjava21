@@ -1,9 +1,5 @@
 package com.anuppur.bean;
 
-import java.util.List;
-
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.STIconSetType;
-
 public class AuthResponseBean {
 	private String userId;
 	private Long statusCode;

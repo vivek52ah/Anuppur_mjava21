@@ -50,7 +50,8 @@ public class DmRemarks  extends Auditable{
     @Column(name="enabled")
     private Short enabled;
     
-    
+    @Column(name = "department_remarks")
+    private String departmentRemarks;
     
     
     public Short getEnabled() {
@@ -92,4 +93,12 @@ public class DmRemarks  extends Auditable{
     public void setWorkId(Long workId) {
         this.workId = workId;
     }
+
+	public final String getDepartmentRemarks() {
+		return departmentRemarks;
+	}
+
+	public final void setDepartmentRemarks(String departmentRemarks) {
+		this.departmentRemarks = departmentRemarks;
+	}
 }

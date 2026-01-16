@@ -985,10 +985,10 @@ td {
 												Certificate<em class="count"></em>
 										</span>
 									</a></li>
-									<li role="presentation" class="nav-item"><a href=".step2"
+									<li th:if="${roleName=='ROLE_DEPARTMENT'  }" role="presentation" class="nav-item"><a href=".step2"
 																			data-toggle="tab" aria-controls="step2" role="tab"
 																			title="Step 2" class="nav-link  "> <span
-																				class="fa fa-road"></span> <span>DM Remarks<em
+																				class="fa fa-road"></span> <span>Department Remarks<em
 																					class="count"></em>
 																			</span>
 																		</a></li>

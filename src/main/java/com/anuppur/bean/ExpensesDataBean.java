@@ -1,7 +1,6 @@
 package com.anuppur.bean;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 public class ExpensesDataBean {
 	
@@ -116,7 +115,7 @@ public class ExpensesDataBean {
 		this.createdDate = createdDate;
 	}
 
-	public String createdBy;
+	private String createdBy;
 
 
 	public String getCreatedBy() {
@@ -127,6 +126,5 @@ public class ExpensesDataBean {
 		this.createdBy = createdBy;
 	}
 
-	
 
 }

@@ -394,7 +394,8 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 	$scope.reloadJqueryDatatable = function() {
 		$loading.start('sample-1');
-		reDraw();
+		//reDraw();
+		window.reloadJqueryDatatables();
 		$loading.finish('sample-1');
 
 	};
@@ -684,15 +685,22 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 		// Set dmStatus to 'Reject' when the user clicks the "Reject" button
 		$scope.workData.dmStatus = 2;
 	};
+	
+	
 
 	$scope.createWorkData = function(isValid, mode, ldPdfFile, AdPdfFile, form) {
 		//		alert("Call DM Login Remarks")
 		//$scope.workData.dmStatus =$scope.workData.dmStatus;
 
-		if (!isValid) {
+		/*if (!isValid) {
 
 			return false;
-		}
+		}*/
+
+
+
+
+
 
 
 
@@ -859,14 +867,75 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 			fd.append('gramPanchayatCode', $scope.workData.gramPanchayatCode);
 		}
 
-		if ($scope.workData.financialHeadId) {
-			fd.append('financialHeadId', $scope.workData.financialHeadId);
-		}
+//		if ($scope.workData.financialHeadId) {
+//			fd.append('financialHeadId', $scope.workData.financialHeadId);
+//		}
 
 		if ($scope.workData.vidhanSabhaId) {
 			fd.append('vidhanSabhaId', $scope.workData.vidhanSabhaId);
 		}
+		
+		
+		
+		
+		if ($scope.workDataRows && $scope.workDataRows.length > 0) {
+	
+	
+			if (!$scope.workData || !$scope.workData.asAmt) {
+				alert("AS Amount is missing!");
+				return false;
+			}
 
+			let asAmount = parseFloat($scope.workData.asAmt);
+			let totalCost = 0;
+
+			for (let index = 0; index < $scope.workDataRows.length; index++) {
+
+				let row = $scope.workDataRows[index];
+
+				if (row.financialHeadId && row.cost) {
+
+					let cost = parseFloat(row.cost);
+
+					// 🔥 Add cost to total
+					totalCost += cost;
+
+					// 🔥 Check total cost should not exceed AS amount
+					if (totalCost > asAmount) {
+						alert("Total cost (" + totalCost + ") cannot be greater than AS Amount (" + asAmount + ")");
+						return false;  // STOP SAVE
+					}
+
+					// Append only when valid
+					fd.append('financialHeads[' + index + '].financialHeadId', row.financialHeadId);
+					fd.append('financialHeads[' + index + '].cost', row.cost);
+					if(row.financialAgencyId){
+					fd.append('financialHeads[' + index + '].financialAgencyId', row.financialAgencyId);
+				}
+				}
+			}
+			
+			 fd.append('totalCost', totalCost);
+
+    console.log("Total Financial Heads Cost = " + totalCost);
+}
+		
+		
+
+	/*// Add dynamic financial head and cost rows
+		if ($scope.workDataRows && $scope.workDataRows.length > 0) {
+			$scope.workDataRows.forEach(function(row, index) {
+				if (row.financialHeadId && row.cost) {
+					fd.append('financialHeads[' + index + '].financialHeadId', row.financialHeadId);
+					fd.append('financialHeads[' + index + '].cost', row.cost);
+					
+					alert("financialHeadId" + row.financialHeadId)
+					alert("cost" + row.cost)
+				}
+			});
+		}*/
+		
+		
 
 		if (confirm("Are you sure you want to save the data?")) {
 			$scope.workData.dmStatus = $scope.workData.dmStatus;
@@ -1129,8 +1198,6 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 			//			alert("$scope.workDataTS.asRemarks " + $scope.workDataTS.asRemarks)
 			fd.append('asRemarks', $scope.workDataTS.asRemarks);
 		}
-
-
 
 		$loading.start('sample-1');
 
@@ -1837,33 +1904,8 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 		if ($scope.workData.isTenders == 1) {
-			if (!isValid) {
-				/*let errorDetails = [];
-			
-					// Iterate through all form controls
-					angular.forEach($scope.workTenderForm.$error, (fields, errorType) => {
-						fields.forEach(field => {
-							if (field.$invalid) {
-								errorDetails.push({
-									fieldName: field.$name,
-									errorType: errorType,
-								});
-							}
-						});
-					});
-				    
-					console.log(errorDetails);
-			
-					// Generate error messages
-					if (errorDetails.length > 0) {
-						const errorMessages = errorDetails.map(
-							error => `Field: ${error.fieldName}, Error: ${error.errorType}`
-						).join("\n");
-					    
-						alert("Form has the following errors:\n" + errorMessages);
-					} else {
-						alert("Unknown validation error.");
-					}*/
+			if (isValid) {
+				
 				return false;
 			}
 		}
@@ -1872,7 +1914,8 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 		if ($scope.workDataTender.workStatusId == '8') {
 
-			if ($scope.workData.isTenders == 1) {
+if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
+			
 				if (ldTdfFile) {
 					$scope.noFileError = (ldTdfFile) ? false : true;
 					var maxSizeUpload = 25000000;// in bytes (here 5 MB)
@@ -1893,30 +1936,11 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 						return false;
 					}
 				}
-			} else {
-				if (ldTdfFile) {
-					$scope.noFileError = (ldTdfFile) ? false : true;
-					var maxSizeUpload = 25000000;// in bytes (here 5 MB)
-					if (ldTdfFile) {
-						$scope.fileSizeErrorLT = (ldTdfFile.size > maxSizeUpload) ? true : false;
-					}
-					if ($scope.noFileError)
-						return false;
-					if ($scope.fileSizeErrorLT)
-						return false;
+			} 
+			
+	
 
-				} else {
-					//$scope.noFileError = true;
-					if ($scope.fileExtentionErrorLT)
-						return false;
-					if (!$scope.workDataTender.tenderFileId) {
-						alert("Please select PAC File");
-						return false;
-					}
-				}
-			}
-
-			if ($scope.workData.isTenders == 1) {
+			if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 				if (dTTTFile) {
 					$scope.noFileError = (dTTTFile) ? false : true;
 					var maxSizeUpload = 25000000;// in bytes (here 5 MB)
@@ -1936,26 +1960,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 				}
 
-			} else {
-				if (dTTTFile) {
-					$scope.noFileError = (dTTTFile) ? false : true;
-					var maxSizeUpload = 25000000;// in bytes (here 5 MB)
-					if (dTTTFile) {
-						$scope.fileSizeErrorDW = (dTTTFile.size > maxSizeUpload) ? true : false;
-					}
-					if ($scope.noFileErrorDW) return false;
-					if ($scope.fileSizeErrorDW) return false;
-
-				} else {//$scope.noFileError = true;
-					if ($scope.fileExtentionErrorDW)
-						return false;
-					if (!$scope.workData.drawingId) {
-						alert("Please select drawing File..");
-						return false;
-					}
-
-				}
-			}
+			} 
 
 
 			/*	ldTULFile
@@ -2137,6 +2142,14 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 				if ($scope.workDataTender.loaIssuedDate) {
 					fd.append('loaIssuedDate', $scope.workDataTender.loaIssuedDate)
 				}
+				
+						if ($scope.workDataTender.agreementDate) {
+				fd.append('agreementDate', $scope.workDataTender.agreementDate)
+			}
+			
+			if ($scope.workDataTender.agreementNo) {
+				fd.append('agreementNo', $scope.workDataTender.agreementNo)
+			}
 
 				$loading.start('sample-1');
 
@@ -2332,6 +2345,14 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 			if ($scope.workDataTender.loaIssuedDate) {
 				fd.append('loaIssuedDate', $scope.workDataTender.loaIssuedDate)
+			}
+			
+			if ($scope.workDataTender.agreementDate) {
+				fd.append('agreementDate', $scope.workDataTender.agreementDate)
+			}
+			
+			if ($scope.workDataTender.agreementNo) {
+				fd.append('agreementNo', $scope.workDataTender.agreementNo)
 			}
 
 			$loading.start('sample-1');
@@ -2860,6 +2881,13 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 							$scope.createWorkProExpensesData();
 						}
 					}
+					
+					
+					
+					if ($scope.workDataProgress.workStatusId == '10' || $scope.workDataProgress.workStatusId == '11') {
+						$scope.saveFinancialAgency();
+					}
+					
 
 					if ($scope.workDataProgress.workSubStatusId == "null" || $scope.workDataProgress.workSubStatusId == null || $scope.workDataProgress.workSubStatusId == undefined || $scope.workDataProgress.workSubStatusId == "" || $scope.workDataProgress.workSubStatusId == 0) {
 
@@ -2879,11 +2907,6 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 					}
-
-
-
-
-
 				}
 				$loading.finish('sample-1');
 			});
@@ -2919,9 +2942,9 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 
-		if (WProdfFile) {
+		/*if (WProdfFile) {
 			fd.append('file', WProdfFile);
-		}
+		}*/
 
 		if ($scope.workDataProgress.workSubStatusId) {
 
@@ -3440,7 +3463,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 			setTimeout(function() {
-				$('#workStatusId1').selectpicker('refresh');
+				$('#workStatusId').selectpicker('refresh');
 
 			}, 1000);
 			$loading.finish('sample-1');
@@ -3666,6 +3689,32 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 			$scope.workData.constituencyCode = $scope.workData.constituencyCode + "";
 			$scope.workData.financialHeadId = $scope.workData.financialHeadId + "";
 			$scope.workData.vidhanSabhaId = $scope.workData.vidhanSabhaId + "";
+			
+			
+			
+			// ===== FINANCIAL HEAD LIST FROM BACKEND =====
+			$scope.workDataRows = [];
+
+			if ($scope.workData.financialHeads && $scope.workData.financialHeads.length > 0) {
+
+				$scope.workData.financialHeads.forEach(function(item) {
+					$scope.workDataRows.push({
+						financialAgencyId : item.id + "",
+						financialHeadId: item.financialHeadId + "",
+						cost: item.cost,
+						totalCost: item.totalCost,
+						availableFinancialHeads: angular.copy($scope.financialHeadsOriginal)
+					});
+				});
+
+				// dropdown options update
+				$scope.updateAllAvailableFinancialHeads();
+
+			} else {
+				$scope.addRow();
+			}
+
+			
 
 			$scope.loadTSASDetails();
 			//	$scope.loadTenderDetails($scope.workData.workStatusId);
@@ -3676,6 +3725,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 				$scope.loadExpensesList($scope.workDataProgress.workId);
 				$scope.loadWorkProgressImagesList($scope.workDataProgress.workId);
 				$scope.loadTSASRevisedList($scope.workDataTS.workId);
+				$scope.loadWorkFinancialAgencyList($scope.workData.workId);
 
 
 			}
@@ -3685,6 +3735,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 				$scope.loadTSASRevisedList($scope.workDataTS.workId);
 				$scope.loadExpensesList($scope.workDataProgress.workId);
 				$scope.loadWorkProgressImagesList($scope.workDataProgress.workId);
+				$scope.loadWorkFinancialAgencyList($scope.workData.workId);
 			}
 			// $scope.loadExpensesList($scope.workDataProgress.workId); add by sumit 
 			//	$scope.loadExpensesList($scope.workDataProgress.workId);
@@ -4299,6 +4350,23 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 	};
+	
+$scope.loadWorkFinancialAgencyList = function(workId) {
+    $loading.start('sample-1');
+ //   alert("call Js " + workId);
+
+    // destroy previous instance
+    if ($.fn.DataTable.isDataTable("#dynamic-fa-table")) {
+        $("#dynamic-fa-table").DataTable().clear().destroy();
+    }
+
+    // initialize after small delay to let DOM render
+    $timeout(function() {
+        fetchFinancialAgency(workId);
+        $loading.finish('sample-1');
+    }, 100); // 100ms delay
+};
+
 
 	$scope.loadASWorksList = function() {
 
@@ -4668,7 +4736,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 			setTimeout(function() {
-				$('#workType').selectpicker('refresh');
+				$('#workType1').selectpicker('refresh');
 
 			}, 1000);
 			$loading.finish('sample-1');
@@ -5891,6 +5959,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 			var responsePromise = $http.get('deleteRemarks/' + id);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
+				 $window.location.reload();
 				$scope.loadDmRemarksForWorkId();
 				$loading.finish('sample-1');
 			});
@@ -7966,27 +8035,27 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 	}
 
 
-	$scope.saveOrUpdateDmRemarkss = function() {
-		//alert("call-------")
-		var dmRemarkData = {
-			id: $scope.workData.dmRemarkId || null,   // agar update hai to id, warna null
-			remark: $scope.workData.DmRemakrs,
-			workId: $scope.workData.id
-		};
-
-		$http.post('saveOrUpdate', dmRemarkData)
-			.then(function(response) {
-				if (response.data.successMessage) {
-					alert(response.data.successMessage);  // ya toast success
-				} else if (response.data.errorMessage) {
-					alert("Error: " + response.data.errorMessage);  // ya toast error
-				}
-
-			}, function(error) {
-				console.error('Error saving DM Remarks:', error);
-				alert('Something went wrong while saving remarks.');
-			});
-	};
+//	$scope.saveOrUpdateDmRemarkss = function() {
+//		//alert("call-------")
+//		var dmRemarkData = {
+//			id: $scope.workData.dmRemarkId || null,   // agar update hai to id, warna null
+//			remark: $scope.workData.DmRemakrs,
+//			workId: $scope.workData.id
+//		};
+//
+//		$http.post('saveOrUpdate', dmRemarkData)
+//			.then(function(response) {
+//				if (response.data.successMessage) {
+//					alert(response.data.successMessage);  // ya toast success
+//				} else if (response.data.errorMessage) {
+//					alert("Error: " + response.data.errorMessage);  // ya toast error
+//				}
+//
+//			}, function(error) {
+//				console.error('Error saving DM Remarks:', error);
+//				alert('Something went wrong while saving remarks.');
+//			});
+//	};
 
 	$scope.downloadRemakrsDocument = function(id) {
 		//console.log(" downloadDocument =" + documentId);
@@ -8001,7 +8070,12 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 			$scope.workDataR = data;
 			$scope.workDataR.remakr = data.remark;
 			$scope.workDataR.id = data.id;
+			$scope.workDataR.role = data.role;
+			$scope.workDataR.roleCode = data.roleCode;
 			//		$scope.workData.role = $scope.workD
+			console.log("EDIT DATA : ", data);
+console.log("EDIT ROLE : ", data.role);
+
 			$loading.finish('sample-1');
 		});
 	};
@@ -8060,20 +8134,38 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 	};
 
 
-	$scope.loadDmRemarksForWorkId = function() {
-		$loading.start('sample-1');
-		var response = $http.get('getDMRemarks/' + $routeParams.id);
+$scope.loadDmRemarksForWorkId = function(workId) {
 
-		response.success(function(data, status, headers, config) {
+   $scope.roleName = window.roleName;
+    if (!workId) {
+        alert("WorkId missing in load");
+        return;
+    }
 
-			$scope.dmremarkslist = data;
-			for (var i = 0; i < $scope.dmremarkslist.length; i++) {
-				var remark = $scope.dmremarkslist[i];
-				remark.createdDateObj = new Date(remark.createdDate);
-			} $loading.finish('sample-1');
-		});
-	}
+    $loading.start('sample-1');
 
+    // ✅ USE workId ARGUMENT
+    var response = $http.get('getDMRemarks/' + workId);
+
+    response.success(function(data) {
+
+        $scope.dmremarkslist = data;
+
+        for (var i = 0; i < data.length; i++) {
+            var remark = data[i];
+
+         remark.dmRemarks = remark.dmRemarks || '';
+
+
+            remark.createdDateObj = new Date(remark.createdDate);
+        }
+
+        $loading.finish('sample-1');
+    });
+};
+
+
+	
 	$scope.saveOrUpdateDmRemarks = function(isValid, dmattachment) {
 		//	alert("Call DM Login Remarks")
 		//$scope.workData.dmStatus =$scope.workData.dmStatus;
@@ -8115,12 +8207,29 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 		var formData = new FormData();
-		if ($scope.workData.id) {
+	//	alert("$scope.workDataR.id========== " + $scope.workDataR.id)
+		if ($scope.workDataR.id) {
 			formData.append("id", $scope.workDataR.id || '');
 		}
 		formData.append("remark", $scope.workDataR.remakr || '');
+	//	alert("$scope.workDataR.departmentRemarks ========== " + $scope.workDataR.departmentRemarks)
+		formData.append("departmentRemarks", $scope.workDataR.departmentRemarks || '');
+		var finalWorkId = null;
 
-		formData.append("workId", $routeParams.id || '');
+		if ($scope.workId) {
+			finalWorkId = $scope.workId;
+		} else if ($scope.workData && $scope.workData.workId) {
+			finalWorkId = $scope.workData.workId;
+		}
+
+		if (!finalWorkId) {
+			alert("WorkId missing!");
+			return;
+		}
+
+		// ✅ सिर्फ एक ही बार append होगा
+		formData.append("workId", finalWorkId);
+
 		formData.append("dmStatus", $scope.workDataR.dmStatus || '');
 		//alert(dmattachment)
 		if (dmattachment) {
@@ -8154,7 +8263,8 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 					$timeout(function() {
 						$rootScope.responseObject.successMessage = null;
 					}, 5000);
-					$scope.loadDmRemarksForWorkId()
+					$scope.loadDmRemarksForWorkId($scope.workId);
+
 					$scope.workDataR.remakr = "";
 					document.getElementById("dmremarksAttachment").value = null;
 
@@ -8181,7 +8291,6 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 	};
-
 
 	$scope.loadareaUserList = function() {
 
@@ -8480,7 +8589,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 	};
 
-
+ 
 	$scope.loadFinancialHead = function() {
 		$loading.start('sample-1');
 		$http.get('fetchFinancialHead')
@@ -8493,7 +8602,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 			setTimeout(function() {
-				$('#financialHeadId').selectpicker('refresh');
+				$('#financialHeadId1').selectpicker('refresh');
 
 			}, 1000);
 				
@@ -8516,7 +8625,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 			setTimeout(function() {
-				$('#vidhanSabhaId').selectpicker('refresh');
+				$('#vidhanSabhaId1').selectpicker('refresh');
 
 			}, 1000);
 				
@@ -8561,59 +8670,286 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 	}
 
 
-	$scope.suggestedWorkNames = [];
+	$scope.suggestedWorkNos = [];
 
-	$scope.loadWorkNameSuggestions = function(keyword) {
+	$scope.loadWorkNoSuggestions = function(keyword) {
+
 		if (!keyword || keyword.length < 2) {
-			$scope.suggestedWorkNames = [];
+			$scope.suggestedWorkNos = [];
 			return;
 		}
 
-		$http.get(getBaseUrl() + "/systemAdmin/suggestWorkNames?keyword=" + keyword)
+		$http.get(getBaseUrl() + "/systemAdmin/suggestWorkNos?keyword=" + keyword)
 			.then(function(response) {
-				$scope.suggestedWorkNames = response.data;
+				$scope.suggestedWorkNos = response.data;
 			}, function(err) {
 				console.error("Suggestion API Error:", err);
 			});
 	};
 
-	$scope.selectWorkName = function(name) {
-		$scope.workName = name;
-		$scope.suggestedWorkNames = [];   // hide dropdown
-		window.reloadJqueryDatatables();  // refresh table
+	$scope.selectWorkNo = function(no) {
+		$scope.workNo = no;
+		$scope.suggestedWorkNos = []; // hide dropdown
+		window.reloadJqueryDatatables(); // refresh table
 	};
 	
-	$scope.highlightSelected = function () {
-    var select = document.getElementById("financialYear1");
+	document.addEventListener("click", function(event) {
+    var isClickInside = event.target.closest("#searchBoxVal");   // input id
+    var isList = event.target.closest(".suggestion-list-box");   // UL class
+    
+    if (!isClickInside && !isList) {
+        $scope.suggestedWorkNos = [];
+        $scope.$apply();   // update HTML
+    }
+});
 
-    if ($scope.workData.financialYear.length > 0) {
-        select.classList.add("has-selection");  // Add blue background
+	
+
+
+
+$scope.workDataRows = []; // Dynamic rows
+$scope.financialHeadsOriginal = []; // Original list
+
+// Load financial heads from API
+$scope.loadFinancialHeadforAddAS = function() {
+    $loading.start('sample-1');
+    $http.get('fetchFinancialHead')
+        .then(function(response) {
+
+            $scope.financialHeadsOriginal = angular.copy(response.data);
+
+            // पहली row add करो
+            $scope.workDataRows = [];
+            $scope.addRow();
+
+            $loading.finish('sample-1');
+        });
+};
+
+
+// Add new row
+$scope.addRow = function () {
+    const newRow = {
+        financialHeadId: "",
+        cost: "",
+        availableFinancialHeads: angular.copy($scope.financialHeadsOriginal) // <-- Important
+    };
+
+    $scope.workDataRows.push(newRow);
+    $scope.updateAllAvailableFinancialHeads();
+};
+
+
+// Remove row
+//$scope.removeRow = function(index) {
+//    $scope.workDataRows.splice(index, 1);
+//    $scope.updateAllAvailableFinancialHeads();
+//};
+
+
+$scope.removeRow = function(index) {
+
+    let row = $scope.workDataRows[index];
+    let rowId = row.financialAgencyId || row.id;
+
+    if (rowId) {
+
+        $http.post("deleteFinancialAgencyRow?id=" + rowId)
+            .then(function (res) {
+
+                alert(res.data);
+
+                // Remove from UI
+                $scope.workDataRows.splice(index, 1);
+
+                // Refresh dropdowns
+                $scope.updateAllAvailableFinancialHeads();
+            });
+        $scope.workDataRows.splice(index, 1);
+
     } else {
-        select.classList.remove("has-selection"); // Remove blue when no selection
+
+        $scope.workDataRows.splice(index, 1);
+        $scope.updateAllAvailableFinancialHeads();
     }
 };
 
 
 
-/*$scope.suggestedWorkNames = [];
-$scope.selectedWorkNames = [];
+// Update available financial heads for **all rows**
+$scope.updateAllAvailableFinancialHeads = function () {
 
-$scope.loadWorkNameSuggestions = function(keyword) {
-    if (!keyword || keyword.length < 2) {
-        $scope.suggestedWorkNames = [];
-        setTimeout(() => $('#workNameMulti').selectpicker('refresh'), 50);
-        return;
-    }
+    // Already selected heads
+    const selectedIds = $scope.workDataRows
+        .filter(r => r.financialHeadId && r.financialHeadId !== "")
+        .map(r => parseInt(r.financialHeadId));
 
-    $http.get(getBaseUrl() + "/systemAdmin/suggestWorkNames?keyword=" + keyword)
-        .then(function(response) {
-            $scope.suggestedWorkNames = response.data;
+    // Update dropdown for each row
+    $scope.workDataRows.forEach(row => {
 
-            setTimeout(function() {
-                $('#workNameMulti').selectpicker('refresh');
-                $('#workNameMulti').selectpicker('open');  // auto-open (like FY)
-            }, 100);
+        row.availableFinancialHeads = $scope.financialHeadsOriginal.filter(fh =>
+            // Allow others except selected
+            selectedIds.indexOf(fh.id) === -1 ||
+            fh.id === parseInt(row.financialHeadId)
+        );
+    });
+};
+
+
+
+
+
+
+$scope.saveFinancialAgency = function () {
+//alert("Call---")
+    let dataList = [];
+
+    $("#dynamic-fa-table .cost-input").each(function () {
+
+        let id = $(this).data("id");
+         let workId = $(this).data("workid"); 
+         let financialHeadId = $(this).data("financialheadid");
+        let cost = $(this).data("cost");     // raw value
+        let value = $(this).val();           // raw input
+
+        // safe parse
+        cost = parseFloat(cost) || 0;
+        value = parseFloat(value) || 0;
+
+        console.log("ID:", id, "Cost:", cost, "Value:", value);
+
+        // FINAL VALIDATION
+        if (value > cost) {
+            alert("Expenditure cannot be greater than Cost.\nAllowed: " + cost + "\nEntered: " + value);
+            isValid = false;
+            return false;   // break loop
+        }
+
+
+        dataList.push({
+            id: id,
+            workId: workId,
+            financialHeadId: financialHeadId,
+            expenditure: value
         });
-};*/
+
+    });
+
+    $.ajax({
+        url: "saveFinancialAgencyEnteredCost",
+        method: "POST",
+        data: JSON.stringify(dataList),
+        contentType: "application/json",
+        success: function (res) {
+     //       alert("Data saved successfully!");
+        }
+    });
+
+}
+
+
+$scope.getTotalCost = function () {
+    let total = 0;
+
+    angular.forEach($scope.workDataRows, function (row) {
+        if (row.cost && !isNaN(row.cost)) {
+            total += parseFloat(row.cost);
+        }
+    });
+
+    return total.toFixed(2);
+};
+
+
+//--------added by aman start code
+	// AngularJS Controller for handling password expiry and sidebar visibility
+			$scope.verifyUserPasswordExpiry = function() {
+				// Show a loading indicator
+				$loading.start('sample-1');
+//alert("---");
+				$http.get('verifyUserPasswordExpiry')
+					.then(function(response) {
+						// Handle success response
+						if (response.status === 200) {
+							$scope.responseObject = response.data; // Assuming response.data contains ResponseObject
+    						  var roleCode = response.data.roleCode;
+    						 var targetUrl = getTargetUrlByRole(roleCode); // ⭐ ROLE BASED URL
+							// Check for expired password
+							if (response.data.successMessage.includes("Your password has expired")) {
+							//	alert('aaaaaaaa');
+								// Password is expired, hide the sidebar and redirect to change password page
+								alert("Your password has expired. Please Update your Password");
+								document.getElementById("sideNav").style.display = "none"; // Hide sidebar
+								window.location.href = '#/changepassword'; // Redirect to change password page
+
+							}
+							// Check for password about to expire
+							else if (response.data.successMessage.includes("Your password will expire")) {
+								//alert('bbbbb');
+								// Show confirmation dialog for the user to update the password
+								if (!$window.confirm(response.data.successMessage)) {
+									  window.location.href = targetUrl; // Redirect to dashboard if dismissed
+								}
+							}
+							// Password is still valid
+							else if (response.data.successMessage.includes("Your password is still valid")) {
+								//alert('ccccccc');
+								// Password is still valid, show the sidebar
+								document.getElementById("sideNav").style.display = "block"; // Show sidebar
+								  window.location.href = targetUrl;
+							}
+							else {
+								alert(response.data.successMessage);
+
+							}
+						}
+						$loading.finish('sample-1');
+					});
+			};
+
+
+function getTargetUrlByRole(roleCode) {
+
+    if (roleCode === 'ROLE_DM' || roleCode === 'ROLE_SYSTEM_ADMIN' || roleCode === 'ROLE_DEPARTMENT' || roleCode === 'ROLE_CEO') {
+        return '#/manageOngoingWorks';
+        
+}  else if ( roleCode === 'ROLE_DISTRICT') {
+        return '#/manageOngoingWorks';
+
+    } 
+
+    // fallback
+    return '/login';
+}
+
+	$scope.wrongCurrentPassword = false;
+$scope.currentPasswordChecked = false;
+
+$scope.checkCurrentPassword = function () {
+
+    if (!$scope.changePasswordData.currentPassword)
+        return;
+
+    var data = {
+        currentPassword: hash($scope.changePasswordData.currentPassword)
+    };
+
+    $http.post('validateCurrentPassword', data)
+        .success(function (response) {
+
+            if (response.errorMessage === 'INVALID_CURRENT_PASSWORD') {
+                $scope.wrongCurrentPassword = true;
+                $scope.currentPasswordChecked = false;
+            } else {
+                $scope.wrongCurrentPassword = false;
+                $scope.currentPasswordChecked = true;
+            }
+        })
+        .error(function () {
+            $scope.wrongCurrentPassword = false;
+        });
+};
+
+
 
 });

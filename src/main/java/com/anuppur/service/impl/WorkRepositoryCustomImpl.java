@@ -101,78 +101,109 @@ public class WorkRepositoryCustomImpl {
     }
 
 
-	public Page<Work> findAllByStatusNotDeleted(Pageable pageable, String workName, String workType,
-			String financialYear, String divisionName, String districtName, Integer workSubTypeIdInt,
-			String workStatusName, String implementationAgency) {
-		 CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-	        CriteriaQuery<Work> query = cb.createQuery(Work.class);
-	        Root<Work> work = query.from(Work.class);
-	        
-	        List<Predicate> predicates = new ArrayList<>();
+    
+    public Page<Work> findAllByStatusNotDeleted(Pageable pageable,
+            String workNo, List<Long> workTypeId, List<Long> financialYear,
+            Long districtId, List<Long> workStatusId, List<Long> agency,
+            List<Long> workPriority, List<Long> financialHead, List<Long> vidhanSabha) {
 
-	        // Only add conditions if parameters are not null or empty
-	        if (workName != null && !workName.isEmpty()) {
-	            predicates.add(cb.like(cb.lower(work.get("workName")), "%" + workName.toLowerCase() + "%"));
-	        }
-	        if (workType != null && !workType.isEmpty()) {
-	            predicates.add(cb.equal(work.get("workType"), workType));
-	        }
-	        if (financialYear != null && !financialYear.isEmpty()) {
-	            predicates.add(cb.equal(work.get("financialYear"), financialYear));
-	        }
-	        if (divisionName != null && !divisionName.isEmpty()) {
-	            predicates.add(cb.equal(work.get("divisionName"), divisionName));
-	        }
-	        if (districtName != null && !districtName.isEmpty()) {
-	            predicates.add(cb.equal(work.get("districtName"), districtName));
-	        }
-	        if (workSubTypeIdInt != null) {
-	            predicates.add(cb.equal(work.get("workSubtypeId"), workSubTypeIdInt));
-	        }
-	        if (workStatusName != null && !workStatusName.isEmpty()) {
-	            predicates.add(cb.equal(work.get("workStatus"), workStatusName));
-	        }
-	        if (implementationAgency != null && !implementationAgency.isEmpty()) {
-	            predicates.add(cb.equal(work.get("implementationAgency"), implementationAgency));
-	        }
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-	        // Condition 1: Only Active status
-	        predicates.add(cb.equal(work.get("status"), "Active"));
+        // Main query
+        CriteriaQuery<Work> query = cb.createQuery(Work.class);
+        Root<Work> work = query.from(Work.class);
 
-	        // Condition 2: (financial_year IS NOT NULL or scheme IS NOT NULL or work_head IS NOT NULL)
-	        Predicate financialSchemeWorkHeadCondition = cb.or(
-	            cb.isNotNull(work.get("financialYear")),
-	            cb.isNotNull(work.get("scheme")),
-	            cb.isNotNull(work.get("workHead"))
-	        );
+        List<Predicate> predicates = new ArrayList<>();
 
-	        // Condition 3: (fund_by_state IS NOT NULL or fund_by_others IS NOT NULL or fund_by_nhm IS NOT NULL or fund_by_ecrp2 IS NOT NULL)
-	        Predicate fundCondition = cb.or(
-	            cb.isNotNull(work.get("fundByState")),
-	            cb.isNotNull(work.get("fundByOthers")),
-	            cb.isNotNull(work.get("fundByNhm")),
-	            cb.isNotNull(work.get("fundByEcrp2"))
-	        );
+        // Filter: workName (partial match)
+        if (workNo != null && !workNo.isEmpty()) {
+            predicates.add(cb.like(cb.lower(work.get("workNo")), "%" + workNo.toLowerCase() + "%"));
+        }
 
-	        // Combine Conditions 2 and 3 using OR
-	        Predicate additionalCondition = cb.or(financialSchemeWorkHeadCondition, fundCondition);
-	        predicates.add(additionalCondition);
+        // Multiple values filters (List)
+        if (workTypeId != null && !workTypeId.isEmpty()) {
+            predicates.add(work.get("workType").in(workTypeId));
+        }
+        if (financialYear != null && !financialYear.isEmpty()) {
+            predicates.add(work.get("financialYear").in(financialYear));
+        }
+        if (workStatusId != null && !workStatusId.isEmpty()) {
+            predicates.add(work.get("workStatus").in(workStatusId));
+        }
+        if (agency != null && !agency.isEmpty()) {
+            predicates.add(work.get("implementationAgency").in(agency));
+        }
+        if (workPriority != null && !workPriority.isEmpty()) {
+            predicates.add(work.get("workPriorityId").in(workPriority));
+        }
+        if (financialHead != null && !financialHead.isEmpty()) {
+            predicates.add(work.get("financialHeadId").in(financialHead));
+        }
+        if (vidhanSabha != null && !vidhanSabha.isEmpty()) {
+            predicates.add(work.get("vidhanSabhaId").in(vidhanSabha));
+        }
 
-	        // Apply the predicates
-	        query.where(predicates.toArray(new Predicate[0]));
+        // Single value filter
+        if (districtId != null) {
+            predicates.add(cb.equal(work.get("districtId"), districtId));
+        }
 
-	        // Create a TypedQuery with pagination
-	        TypedQuery<Work> typedQuery = entityManager.createQuery(query);
-	        int totalRows = typedQuery.getResultList().size();
+        // Always only active records
+        predicates.add(cb.equal(work.get("status"), "Active"));
 
-	        // Apply pagination
-	        typedQuery.setFirstResult((int) pageable.getOffset());
-	        typedQuery.setMaxResults(pageable.getPageSize());
+        query.where(predicates.toArray(new Predicate[0]));
+        query.orderBy(cb.desc(work.get("id"))); // sort by ID descending
 
-	        List<Work> resultList = typedQuery.getResultList();
+        // Execute query with pagination
+        TypedQuery<Work> typedQuery = entityManager.createQuery(query);
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
+        List<Work> resultList = typedQuery.getResultList();
 
-	        return new PageImpl<>(resultList, pageable, totalRows);
-	    }
+        // Count query
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Work> countRoot = countQuery.from(Work.class);
+        List<Predicate> countPredicates = new ArrayList<>();
+
+        if (workNo != null && !workNo.isEmpty()) 
+            countPredicates.add(cb.like(cb.lower(countRoot.get("workNo")), "%" + workNo.toLowerCase() + "%"));
+        if (workTypeId != null && !workTypeId.isEmpty()) {
+            countPredicates.add(countRoot.get("workType").in(workTypeId));
+        }
+        if (financialYear != null && !financialYear.isEmpty()) {
+            countPredicates.add(countRoot.get("financialYear").in(financialYear));
+        }
+        if (workStatusId != null && !workStatusId.isEmpty()) {
+            countPredicates.add(countRoot.get("workStatus").in(workStatusId));
+        }
+        if (agency != null && !agency.isEmpty()) {
+            countPredicates.add(countRoot.get("implementationAgency").in(agency));
+        }
+        if (workPriority != null && !workPriority.isEmpty()) {
+            countPredicates.add(countRoot.get("workPriorityId").in(workPriority));
+        }
+        if (financialHead != null && !financialHead.isEmpty()) {
+            countPredicates.add(countRoot.get("financialHeadId").in(financialHead));
+        }
+        if (vidhanSabha != null && !vidhanSabha.isEmpty()) {
+            countPredicates.add(countRoot.get("vidhanSabhaId").in(vidhanSabha));
+        }
+        if (districtId != null) {
+            countPredicates.add(cb.equal(countRoot.get("districtId"), districtId));
+        }
+        countPredicates.add(cb.equal(countRoot.get("status"), "Active"));
+
+        countQuery.select(cb.count(countRoot))
+                .where(countPredicates.toArray(new Predicate[0]));
+        Long totalRows = entityManager.createQuery(countQuery).getSingleResult();
+
+        return new PageImpl<>(resultList, pageable, totalRows);
+    }
+
+
+    
+    
+    
 	
 	public Page<Work> fetchAllWorksByAgency(Pageable pageable, String workName, String workType,
 	        String financialYear, String agency, String divisionName, String districtName, 
@@ -314,147 +345,187 @@ public class WorkRepositoryCustomImpl {
 	}
 
 	
-	public Page<Work> fetchAllWorksByDistrict(Pageable pageable, String workName, String workType,
-	        String financialYear, String districtCode, String agency, String divisionName, 
-	        String districtName, Integer workSubTypeIdInt, String workStatusName, 
-	        String implementationAgency) {
-	    
+	public Page<Work> fetchAllWorksByDistrict(Pageable pageable, String workNo, List<Long> workTypeList,
+	        List<Long> fyList, String districtCode, List<Long> agencyList, Long divisionIds, Long districtIds,
+	        Integer workSubTypeIdInt, List<Long> statusList, List<Long> priorityList, List<Long> headList,
+	        List<Long> vsList) {
+
 	    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+	    // Main query
 	    CriteriaQuery<Work> query = cb.createQuery(Work.class);
 	    Root<Work> work = query.from(Work.class);
-	    
+
 	    List<Predicate> predicates = new ArrayList<>();
 
-	    if (workName != null && !workName.isEmpty()) {
-	        predicates.add(cb.like(cb.lower(work.get("workName")), "%" + workName.toLowerCase() + "%"));
+	    // Filters
+	    if (workNo != null && !workNo.isEmpty()) {
+	        predicates.add(cb.like(cb.lower(work.get("workNo")), "%" + workNo.toLowerCase() + "%"));
 	    }
-	    if (workType != null && !workType.isEmpty()) {
-	        predicates.add(cb.equal(work.get("workType"), workType));
+	    if (workTypeList != null && !workTypeList.isEmpty()) {
+	        predicates.add(work.get("workType").in(workTypeList));
 	    }
-	    if (financialYear != null && !financialYear.isEmpty()) {
-	        predicates.add(cb.equal(work.get("financialYear"), financialYear));
+	    if (fyList != null && !fyList.isEmpty()) {
+	        predicates.add(work.get("financialYear").in(fyList));
 	    }
 	    if (districtCode != null && !districtCode.isEmpty()) {
 	        predicates.add(cb.equal(work.get("districtCode"), districtCode));
 	    }
-	    if (agency != null && !agency.isEmpty()) {
-	        predicates.add(cb.equal(work.get("implementationAgency"), agency));
+	    if (agencyList != null && !agencyList.isEmpty()) {
+	        predicates.add(work.get("implementationAgency").in(agencyList));
 	    }
-	    if (divisionName != null && !divisionName.isEmpty()) {
-	        predicates.add(cb.equal(work.get("divisionName"), divisionName));
+	    if (divisionIds != null) {
+	        predicates.add(cb.equal(work.get("divisionId"), divisionIds));
 	    }
-	    if (districtName != null && !districtName.isEmpty()) {
-	        predicates.add(cb.equal(work.get("districtName"), districtName));
+	    if (districtIds != null) {
+	        predicates.add(cb.equal(work.get("districtId"), districtIds));
 	    }
 	    if (workSubTypeIdInt != null) {
 	        predicates.add(cb.equal(work.get("workSubtypeId"), workSubTypeIdInt));
 	    }
-	    if (workStatusName != null && !workStatusName.isEmpty()) {
-	        predicates.add(cb.equal(work.get("workStatus"), workStatusName));
+	    if (statusList != null && !statusList.isEmpty()) {
+	        predicates.add(work.get("workStatus").in(statusList));
 	    }
-	    if (implementationAgency != null && !implementationAgency.isEmpty()) {
-	        predicates.add(cb.equal(work.get("implementationAgency"), implementationAgency));
+	    if (priorityList != null && !priorityList.isEmpty()) {
+	        predicates.add(work.get("workPriorityId").in(priorityList));
+	    }
+	    if (headList != null && !headList.isEmpty()) {
+	        predicates.add(work.get("financialHeadId").in(headList));
+	    }
+	    if (vsList != null && !vsList.isEmpty()) {
+	        predicates.add(work.get("vidhanSabhaId").in(vsList));
 	    }
 
+	    // Always Active
 	    predicates.add(cb.equal(work.get("status"), "Active"));
 
-	    Predicate financialSchemeWorkHeadCondition = cb.or(
-	        cb.isNotNull(work.get("financialYear")),
-	        cb.isNotNull(work.get("scheme")),
-	        cb.isNotNull(work.get("workHead"))
-	    );
-	    
-	    Predicate fundCondition = cb.or(
-	        cb.isNotNull(work.get("fundByState")),
-	        cb.isNotNull(work.get("fundByOthers")),
-	        cb.isNotNull(work.get("fundByNhm")),
-	        cb.isNotNull(work.get("fundByEcrp2"))
-	    );
-	    
-	    Predicate additionalCondition = cb.or(financialSchemeWorkHeadCondition, fundCondition);
-	    predicates.add(additionalCondition);
-
 	    query.where(predicates.toArray(new Predicate[0]));
+	    query.orderBy(cb.desc(work.get("id"))); // sort by ID descending
 
+	    // Execute main query with pagination
 	    TypedQuery<Work> typedQuery = entityManager.createQuery(query);
-	    int totalRows = typedQuery.getResultList().size();
-
 	    typedQuery.setFirstResult((int) pageable.getOffset());
 	    typedQuery.setMaxResults(pageable.getPageSize());
-
 	    List<Work> resultList = typedQuery.getResultList();
+
+	    // Count query
+	    CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+	    Root<Work> countRoot = countQuery.from(Work.class);
+
+	    List<Predicate> countPredicates = new ArrayList<>();
+	    if (workNo != null && !workNo.isEmpty()) 
+	        countPredicates.add(cb.like(cb.lower(countRoot.get("workNo")), "%" + workNo.toLowerCase() + "%"));
+//	    if (workName != null && !workName.isEmpty()) countPredicates.add(cb.like(cb.lower(countRoot.get("workName")), "%" + workName.toLowerCase() + "%"));
+	    if (workTypeList != null && !workTypeList.isEmpty()) countPredicates.add(countRoot.get("workType").in(workTypeList));
+	    if (fyList != null && !fyList.isEmpty()) countPredicates.add(countRoot.get("financialYear").in(fyList));
+	    if (districtCode != null && !districtCode.isEmpty()) countPredicates.add(cb.equal(countRoot.get("districtCode"), districtCode));
+	    if (agencyList != null && !agencyList.isEmpty()) countPredicates.add(countRoot.get("implementationAgency").in(agencyList));
+	    if (divisionIds != null) countPredicates.add(cb.equal(countRoot.get("divisionId"), divisionIds));
+	    if (districtIds != null) countPredicates.add(cb.equal(countRoot.get("districtId"), districtIds));
+	    if (workSubTypeIdInt != null) countPredicates.add(cb.equal(countRoot.get("workSubtypeId"), workSubTypeIdInt));
+	    if (statusList != null && !statusList.isEmpty()) countPredicates.add(countRoot.get("workStatus").in(statusList));
+	    if (priorityList != null && !priorityList.isEmpty()) countPredicates.add(countRoot.get("workPriorityId").in(priorityList));
+	    if (headList != null && !headList.isEmpty()) countPredicates.add(countRoot.get("financialHeadId").in(headList));
+	    if (vsList != null && !vsList.isEmpty()) countPredicates.add(countRoot.get("vidhanSabhaId").in(vsList));
+	    countPredicates.add(cb.equal(countRoot.get("status"), "Active"));
+
+	    countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
+	    Long totalRows = entityManager.createQuery(countQuery).getSingleResult();
 
 	    return new PageImpl<>(resultList, pageable, totalRows);
 	}
 
-	public Page<Work> fetchAllWorksByDivision(Pageable pageable, String workName, String workType,
-	        String financialYear, Long divisionCode, String divisionName, String districtName, 
-	        Integer workSubTypeIdInt, String workStatusName, String implementationAgency) {
-	    
+
+	
+	
+	public Page<Work> fetchAllWorksByDivision(Pageable pageable, String workNo, List<Long> workTypeList,
+	        List<Long> fyList, Long districtIds, List<Long> statusList, List<Long> agencyList,
+	        String username, List<Long> priorityList, List<Long> headList, List<Long> vsList) {
+
 	    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+	    // Main query
 	    CriteriaQuery<Work> query = cb.createQuery(Work.class);
 	    Root<Work> work = query.from(Work.class);
-	    
+
 	    List<Predicate> predicates = new ArrayList<>();
 
-	    if (workName != null && !workName.isEmpty()) {
-	        predicates.add(cb.like(cb.lower(work.get("workName")), "%" + workName.toLowerCase() + "%"));
+	    // Filters
+	    if (workNo != null && !workNo.isEmpty()) {
+	        predicates.add(cb.like(cb.lower(work.get("workNo")), "%" + workNo.toLowerCase() + "%"));
 	    }
-	    if (workType != null && !workType.isEmpty()) {
-	        predicates.add(cb.equal(work.get("workType"), workType));
+	    if (workTypeList != null && !workTypeList.isEmpty()) {
+	        predicates.add(work.get("workType").in(workTypeList));
 	    }
-	    if (financialYear != null && !financialYear.isEmpty()) {
-	        predicates.add(cb.equal(work.get("financialYear"), financialYear));
+	    if (fyList != null && !fyList.isEmpty()) {
+	        predicates.add(work.get("financialYear").in(fyList));
 	    }
-	    if (divisionCode != null ) {
-	        predicates.add(cb.equal(work.get("divisionCode"), divisionCode));
+	    if (districtIds != null) {
+	        predicates.add(cb.equal(work.get("districtId"), districtIds));
 	    }
-	    if (divisionName != null && !divisionName.isEmpty()) {
-	        predicates.add(cb.equal(work.get("divisionName"), divisionName));
+	    if (statusList != null && !statusList.isEmpty()) {
+	        predicates.add(work.get("workStatus").in(statusList));
 	    }
-	    if (districtName != null && !districtName.isEmpty()) {
-	        predicates.add(cb.equal(work.get("districtName"), districtName));
+	    if (agencyList != null && !agencyList.isEmpty()) {
+	        predicates.add(work.get("implementationAgency").in(agencyList));
 	    }
-	    if (workSubTypeIdInt != null) {
-	        predicates.add(cb.equal(work.get("workSubtypeId"), workSubTypeIdInt));
+	    if (username != null && !username.isEmpty()) {
+	        predicates.add(cb.equal(work.get("createdBy"), username));
 	    }
-	    if (workStatusName != null && !workStatusName.isEmpty()) {
-	        predicates.add(cb.equal(work.get("workStatus"), workStatusName));
+	    if (priorityList != null && !priorityList.isEmpty()) {
+	        predicates.add(work.get("workPriorityId").in(priorityList));
 	    }
-	    if (implementationAgency != null && !implementationAgency.isEmpty()) {
-	        predicates.add(cb.equal(work.get("implementationAgency"), implementationAgency));
+	    if (headList != null && !headList.isEmpty()) {
+	        predicates.add(work.get("financialHeadId").in(headList));
+	    }
+	    if (vsList != null && !vsList.isEmpty()) {
+	        predicates.add(work.get("vidhanSabhaId").in(vsList));
 	    }
 
+	    // Always Active
 	    predicates.add(cb.equal(work.get("status"), "Active"));
 
-	    Predicate financialSchemeWorkHeadCondition = cb.or(
-	        cb.isNotNull(work.get("financialYear")),
-	        cb.isNotNull(work.get("scheme")),
-	        cb.isNotNull(work.get("workHead"))
-	    );
-	    
-	    Predicate fundCondition = cb.or(
-	        cb.isNotNull(work.get("fundByState")),
-	        cb.isNotNull(work.get("fundByOthers")),
-	        cb.isNotNull(work.get("fundByNhm")),
-	        cb.isNotNull(work.get("fundByEcrp2"))
-	    );
-	    
-	    Predicate additionalCondition = cb.or(financialSchemeWorkHeadCondition, fundCondition);
-	    predicates.add(additionalCondition);
-
 	    query.where(predicates.toArray(new Predicate[0]));
+	    query.orderBy(cb.desc(work.get("id"))); // sort by ID descending
 
+	    // Execute main query with pagination
 	    TypedQuery<Work> typedQuery = entityManager.createQuery(query);
-	    int totalRows = typedQuery.getResultList().size();
-
 	    typedQuery.setFirstResult((int) pageable.getOffset());
 	    typedQuery.setMaxResults(pageable.getPageSize());
-
 	    List<Work> resultList = typedQuery.getResultList();
+
+	    // Count query
+	    CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+	    Root<Work> countRoot = countQuery.from(Work.class);
+
+	    List<Predicate> countPredicates = new ArrayList<>();
+	    if (workNo != null && !workNo.isEmpty()) 
+	        countPredicates.add(cb.like(cb.lower(countRoot.get("workNo")), "%" + workNo.toLowerCase() + "%"));
+	  //  if (workName != null && !workName.isEmpty()) countPredicates.add(cb.like(cb.lower(countRoot.get("workName")), "%" + workName.toLowerCase() + "%"));
+	    if (workTypeList != null && !workTypeList.isEmpty()) countPredicates.add(countRoot.get("workType").in(workTypeList));
+	    if (fyList != null && !fyList.isEmpty()) countPredicates.add(countRoot.get("financialYear").in(fyList));
+	    if (districtIds != null) countPredicates.add(cb.equal(countRoot.get("districtId"), districtIds));
+	    if (statusList != null && !statusList.isEmpty()) countPredicates.add(countRoot.get("workStatus").in(statusList));
+	    if (agencyList != null && !agencyList.isEmpty()) countPredicates.add(countRoot.get("implementationAgency").in(agencyList));
+	    if (username != null && !username.isEmpty()) countPredicates.add(cb.equal(countRoot.get("createdBy"), username));
+	    if (priorityList != null && !priorityList.isEmpty()) countPredicates.add(countRoot.get("workPriorityId").in(priorityList));
+	    if (headList != null && !headList.isEmpty()) countPredicates.add(countRoot.get("financialHeadId").in(headList));
+	    if (vsList != null && !vsList.isEmpty()) countPredicates.add(countRoot.get("vidhanSabhaId").in(vsList));
+	    countPredicates.add(cb.equal(countRoot.get("status"), "Active"));
+
+	    countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
+	    Long totalRows = entityManager.createQuery(countQuery).getSingleResult();
 
 	    return new PageImpl<>(resultList, pageable, totalRows);
 	}
+
+
+
+	
+
+
+	
+	
 
 		
 }

@@ -122,14 +122,14 @@ public class UserBean {
 
 	private String divisionName;
 	
-	private String AssignDate;
+	private String assignDate;
 
-	public String getAssignDate() {
-		return AssignDate;
+	public final String getAssignDate() {
+		return assignDate;
 	}
 
-	public void setAssignDate(String assignDate) {
-		AssignDate = assignDate;
+	public final void setAssignDate(String assignDate) {
+		this.assignDate = assignDate;
 	}
 
 	public Long getId() {

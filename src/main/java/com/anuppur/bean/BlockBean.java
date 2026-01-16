@@ -18,9 +18,6 @@ public class BlockBean {
 
 	private DistrictBean district;
 
-	public BlockBean() {
-	}
-
 	public Long getBlockId() {
 		return blockId;
 	}

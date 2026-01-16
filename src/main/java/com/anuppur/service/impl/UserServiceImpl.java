@@ -3,6 +3,7 @@ package com.anuppur.service.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -360,6 +361,7 @@ public class UserServiceImpl implements UserService {
 			
 			if(userEntity!=null){
 				userEntity.setPassword(changePassword.getPassword());
+				userEntity.setLastPasswordUpdatedOn((new Date()));	//added by aman for password expired
 				userRepository.save(userEntity);
 			}
 		}catch (Exception e) {

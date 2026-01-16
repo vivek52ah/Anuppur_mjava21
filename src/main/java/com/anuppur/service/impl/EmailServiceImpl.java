@@ -134,8 +134,8 @@ public class EmailServiceImpl {
 			msg.setSubject(email.getSubject());
 
 			// setting CC if one set on dto
-			if (email.getCC() != null) {
-				ccAddrs = InternetAddress.parse(email.getCC(), false);
+			if (email.getcC() != null) {
+				ccAddrs = InternetAddress.parse(email.getcC(), false);
 				msg.setRecipients(Message.RecipientType.CC, ccAddrs);
 			}
 

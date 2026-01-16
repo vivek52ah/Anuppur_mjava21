@@ -12,19 +12,20 @@ import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.mail.internet.ContentDisposition;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.http.HttpRequest;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -43,10 +44,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,6 +70,7 @@ import com.anuppur.bean.DmRemarksBean;
 import com.anuppur.bean.DocumentUploadDrawingDetailBean;
 import com.anuppur.bean.DocumentUploadWorkProgressBean;
 import com.anuppur.bean.ExpensesDataBean;
+import com.anuppur.bean.FinancialAgencyBean;
 import com.anuppur.bean.FinancialHeadBean;
 import com.anuppur.bean.FinancialYearBean;
 import com.anuppur.bean.GeoTaggingBean;
@@ -105,8 +107,6 @@ import com.anuppur.bean.WorkTypeBean;
 import com.anuppur.bean.YearStatusBean;
 import com.anuppur.bean.departmentbean;
 import com.anuppur.constants.DMSConstants;
-import com.anuppur.entity.AreaOfficerRecord;
-import com.anuppur.entity.DocumentUploadWorkProgress;
 import com.anuppur.entity.Users;
 import com.anuppur.entity.Work;
 import com.anuppur.json.BlockJson;
@@ -126,7 +126,6 @@ import com.anuppur.repository.FinancialYearRepository;
 import com.anuppur.repository.UserRepository;
 import com.anuppur.repository.WorkCategoryRepository;
 import com.anuppur.repository.WorkRepository;
-import com.anuppur.repository.areaofficerrecordRepository;
 import com.anuppur.response.ResponseObject;
 import com.anuppur.service.CommonService;
 import com.anuppur.service.SuperAdminService;
@@ -141,17 +140,16 @@ import groovyjarjarcommonscli.ParseException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Cell;
-
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.ColumnText;
@@ -648,6 +646,20 @@ public class CommonController extends BaseController {
 		return response;
 	}
 
+	
+	//convert multiple ids by sumit 
+	public List<Long> convertToList(String input) {
+	    if (input == null || input.trim().isEmpty()) {
+	    return Collections.emptyList();
+	    }
+
+	    return Arrays.stream(input.split(","))
+	                 .map(Long::parseLong)
+	                 .collect(Collectors.toList());
+	}
+
+	
+	
 	// Method to fetch the list of ongoing works with filters and pagination.
 	@RequestMapping(value = "/fetchWorksList", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchWorksList(HttpServletRequest request) {
@@ -656,9 +668,10 @@ public class CommonController extends BaseController {
 		logger.info("User - {}, Role - {} - Fetching OngoingWorks List", user.getUsername(), user.getAuthorities());
 
 		String scheme = request.getParameter("scheme");
-		String workType = request.getParameter("workType");
+		String workType = request.getParameter("workType1");
 		System.err.println("workType "  + workType);
-		String financialYear = request.getParameter("financialYear");
+	//	financialYear1
+		String financialYear = request.getParameter("financialYear1");
 		System.err.println("financialYear "  + financialYear);
 		String implementationAgency = request.getParameter("implementationAgency");
 		System.err.println("implementationAgency "  + implementationAgency);
@@ -671,19 +684,33 @@ public class CommonController extends BaseController {
 		System.err.println("workStatusId "  + workStatusId);
 		String workSubTypeId = request.getParameter("workSubTypeId");
 		String workPriorityId = request.getParameter("workPriorityId");
-		String financialHeadId = request.getParameter("financialHeadId");
-		String vidhanSabhaId = request.getParameter("vidhanSabhaId");
+		String financialHeadId = request.getParameter("financialHeadId1");
+		String vidhanSabhaId = request.getParameter("vidhanSabhaId1");
 		String sSortCol = request.getParameter("iSortCol_0");
 		String sSortDir = request.getParameter("sSortDir_0");
 		String sColName = request.getParameter("mDataProp_" + sSortCol);
+		
+		
+		
+		List<Long> fyList = convertToList(financialYear);
+		List<Long> workTypeList = convertToList(workType);
+		List<Long> agencyList = convertToList(implementationAgency);
+		List<Long> statusList = convertToList(workStatusId);
+		List<Long> priorityList = convertToList(workPriorityId);
+		List<Long> headList = convertToList(financialHeadId);
+		List<Long> vsList = convertToList(vidhanSabhaId);
+	//	List<Integer> districtList = convertToList(districtId);
+	//	List<Integer> divisionList = convertToList(divisionId);
+	//	List<Integer> workSubTypeList = convertToList(workSubTypeId);
+
 
 		// Fetch the page number from client
 		Integer pageNumber = 0;
 
 		// Fetch search parameter
-		String searchParameterWorkName = request.getParameter("searchBoxVal");
+		//String searchParameterWorkName = request.getParameter("searchBoxVal");
 		// String searchParameterAsNo = request.getParameter("searchBoxValAsNo");
-		String searchParameterWorkNo = request.getParameter("searchBoxValWorkNo");
+		String searchParameterWorkNo = request.getParameter("searchBoxVal");
 
 		// String searchByDivision= request.getParameter("searchByDivision");
 
@@ -710,19 +737,19 @@ public class CommonController extends BaseController {
 
 		WorkJson workJson = commonService.fetchWorksList(pageable,
 				!StringUtils.isEmpty(searchParameterWorkNo) ? searchParameterWorkNo : null,
-				!StringUtils.isEmpty(searchParameterWorkName) ? searchParameterWorkName : null,
-				!StringUtils.isEmpty(scheme) ? scheme : null, !StringUtils.isEmpty(workType) ? workType : null,
-				!StringUtils.isEmpty(financialYear) ? financialYear : null,
-				!StringUtils.isEmpty(implementationAgency) ? implementationAgency : null,
+				!StringUtils.isEmpty(searchParameterWorkNo) ? searchParameterWorkNo : null,
+				!StringUtils.isEmpty(scheme) ? scheme : null, workTypeList,
+						fyList,
+						agencyList,
 				!StringUtils.isEmpty(blockId) ? blockId : null, !StringUtils.isEmpty(workStatus) ? workStatus : null,
 				!StringUtils.isEmpty(districtId) ? districtId : null,
 				!StringUtils.isEmpty(divisionId) ? divisionId : null,
 				!StringUtils.isEmpty(searchByDivision) ? searchByDivision : null,
 				!StringUtils.isEmpty(workSubTypeId) ? workSubTypeId : null,
-				!StringUtils.isEmpty(workStatusId) ? workStatusId : null,
-				!StringUtils.isEmpty(workPriorityId) ? workPriorityId: null,
-				!StringUtils.isEmpty(financialHeadId) ? financialHeadId: null,
-				!StringUtils.isEmpty(vidhanSabhaId) ? vidhanSabhaId: null
+						statusList,
+						priorityList,
+						headList,
+						vsList
 								
 				);
 
@@ -2714,9 +2741,18 @@ public class CommonController extends BaseController {
 			try (InputStream is = new FileInputStream(file); OutputStream os = response.getOutputStream()) {
 
 				// MIME type of the file (set as generic binary)
-				response.setContentType("application/octet-stream");
+			//	response.setContentType("application/octet-stream");
 				// Response header for file download
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+		//		response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+				
+				
+				
+				
+				String contentType = request.getServletContext().getMimeType(file.getName());
+				if (contentType == null) {
+				    contentType = "image/jpeg"; // default
+				}
+				response.setContentType(contentType);
 
 				// Read from the file and write into the response
 				byte[] buffer = new byte[1024];
@@ -4166,8 +4202,8 @@ public class CommonController extends BaseController {
 		logger.info("User - {}, Role - {} - Fetching OngoingWorks List", user.getUsername(), user.getAuthorities());
 
 		String scheme = request.getParameter("scheme");
-		String workType = request.getParameter("workType");
-		String financialYear = request.getParameter("financialYear");
+		String workType = request.getParameter("workType1");
+		String financialYear = request.getParameter("financialYear1");
 		String implementationAgency = request.getParameter("implementationAgency");
 		String blockId = request.getParameter("blockId");
 		String department = request.getParameter("department");
@@ -4177,11 +4213,20 @@ public class CommonController extends BaseController {
 		String workStatusId = request.getParameter("workStatusId");
 		String workSubTypeId = request.getParameter("workSubTypeId");
 		String workPriorityId = request.getParameter("workPriorityId");
-		String financialHeadId = request.getParameter("financialHeadId");
-		String vidhanSabhaId = request.getParameter("vidhanSabhaId");
+		String financialHeadId = request.getParameter("financialHeadId1");
+		String vidhanSabhaId = request.getParameter("vidhanSabhaId1");
 		String sSortCol = request.getParameter("iSortCol_0");
 		String sSortDir = request.getParameter("sSortDir_0");
 		String sColName = request.getParameter("mDataProp_" + sSortCol);
+		
+		
+		List<Long> fyList = convertToList(financialYear);
+		List<Long> workTypeList = convertToList(workType);
+		List<Long> agencyList = convertToList(implementationAgency);
+		List<Long> statusList = convertToList(workStatusId);
+		List<Long> priorityList = convertToList(workPriorityId);
+		List<Long> headList = convertToList(financialHeadId);
+		List<Long> vsList = convertToList(vidhanSabhaId);
 
 		// Fetch the page number from client
 		Integer pageNumber = 0;
@@ -4216,19 +4261,19 @@ public class CommonController extends BaseController {
 		WorkJson workJson = commonService.fetchWorkForReport(pageable,
 				!StringUtils.isEmpty(searchParameterWorkNo) ? searchParameterWorkNo : null,
 				!StringUtils.isEmpty(searchParameterWorkName) ? searchParameterWorkName : null,
-				!StringUtils.isEmpty(scheme) ? scheme : null, !StringUtils.isEmpty(workType) ? workType : null,
-				!StringUtils.isEmpty(financialYear) ? financialYear : null,
+				!StringUtils.isEmpty(scheme) ? scheme : null, workTypeList,
+						fyList,
 				!StringUtils.isEmpty(department) ? department : null,
-				!StringUtils.isEmpty(implementationAgency) ? implementationAgency : null,
+						agencyList,
 				!StringUtils.isEmpty(blockId) ? blockId : null, !StringUtils.isEmpty(workStatus) ? workStatus : null,
 				!StringUtils.isEmpty(districtId) ? districtId : null,
 				!StringUtils.isEmpty(divisionId) ? divisionId : null,
 				!StringUtils.isEmpty(searchByDivision) ? searchByDivision : null,
 				!StringUtils.isEmpty(workSubTypeId) ? workSubTypeId : null,
-				!StringUtils.isEmpty(workStatusId) ? workStatusId : null,
-				!StringUtils.isEmpty(workPriorityId) ? workPriorityId : null,
-				!StringUtils.isEmpty(financialHeadId) ? financialHeadId : null,
-				!StringUtils.isEmpty(vidhanSabhaId) ? vidhanSabhaId : null);
+						statusList,
+						priorityList,
+						headList,
+						vsList);
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(workJson);
@@ -4481,69 +4526,267 @@ public class CommonController extends BaseController {
 	@Autowired
 	private CommonServiceImpl commonServiceImpl;
 
-	@RequestMapping(value = "manageOngoingWorks/downloadAllWorksExcel", method = RequestMethod.GET)
-	public void downloadAllWorksExcel(HttpServletResponse response) {
-		try (Workbook workbook = new XSSFWorkbook()) {
-			response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-			response.setHeader("Content-Disposition", "attachment; filename=work_Data.xlsx");
+//	@RequestMapping(value = "manageOngoingWorks/downloadAllWorksExcel", method = RequestMethod.GET)
+//	public void downloadAllWorksExcel(@RequestParam("workId") Long workId,HttpServletResponse response) {
+//		System.err.println("workId------------- " + workId);
+//		try (Workbook workbook = new XSSFWorkbook()) {
+//			response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+//			response.setHeader("Content-Disposition", "attachment; filename=work_Data.xlsx");
+//
+//			List<Work> works = workRepository.findById(workId);
+//
+//			Sheet sheet = workbook.createSheet("Works");
+//
+//			String[] headers = { "Index", "Work Unique Id", "Work Name", "FY of Sanction", "Executive Agency", "AS Date", "Total AS Amount (In Lakhs)", "Work Type",  "District Name",
+//					 "Work Sub Type Name", "Work Status", "Head", "Scheme", "Division Name",
+//					"Year Of Administrative Approval", 
+//					 "Work Order Date", "Time Line In Months",
+//					"Total Expenditure Till Date", "Level Of Completion", "Contractor Name", "SOR", "Tender Percentage",
+//					"Above/Below" };
+//
+//			// Header row
+//			Row headerRow = sheet.createRow(0);
+//			for (int i = 0; i < headers.length; i++) {
+//				headerRow.createCell(i).setCellValue(headers[i]);
+//			}
+//
+//			int rowNum = 1;
+//			int index = 1;
+//			for (Work work : works) {
+//				WorkBean bean = commonServiceImpl.convertWorkEntityToBeans1(work, null); // ✅ Convert entity to bean
+//				// System.err.println("bean.getImplementationAgency()===== " +
+//				// bean.getImplementationAgency());
+//				Row row = sheet.createRow(rowNum++);
+//				row.createCell(0).setCellValue(index++);
+//				row.createCell(1).setCellValue(nullToDash(bean.getWorkNo()));
+//				row.createCell(2).setCellValue(nullToDash(bean.getWorkName()));
+//				row.createCell(3).setCellValue(nullToDash(bean.getFinancialYearName()));
+//				row.createCell(4).setCellValue(nullToDash(bean.getImplementationAgencyName()));
+//				row.createCell(5).setCellValue(nullToDash(bean.getDateOfAdministrativeApproval()));
+//				row.createCell(6).setCellValue(nullToDash(bean.getAmountOfAdministrativeApproval()));
+////				row.createCell(3).setCellValue(nullToDash(bean.getWorkTypeName()));
+////				row.createCell(5).setCellValue(nullToDash(bean.getDistrictName()));
+////				row.createCell(7).setCellValue(nullToDash(bean.getWorkSubTypeName()));
+////				row.createCell(8).setCellValue(nullToDash(bean.getWorkStatusName()));
+////				row.createCell(9).setCellValue(nullToDash(bean.getHead()));
+////				row.createCell(10).setCellValue(nullToDash(bean.getScheme()));
+////				row.createCell(11).setCellValue(nullToDash(bean.getDivisionName()));
+////				row.createCell(12).setCellValue(nullToDash(bean.getYearOfAdministrativeApproval()));
+////				
+////				row.createCell(15).setCellValue(nullToDash(bean.getWorkOrderDate()));
+////				row.createCell(16).setCellValue(nullToDash(bean.getTimeLineInMonths()));
+////				row.createCell(17).setCellValue(nullToDash(bean.getTotalExpeditureTillDate()));
+////				row.createCell(18).setCellValue(nullToDash(bean.getLevelOfCompletion()));
+////				row.createCell(19).setCellValue(nullToDash(bean.getContractorName()));
+////				row.createCell(20).setCellValue(nullToDash(bean.getSor()));
+////				row.createCell(21).setCellValue(nullToDash(bean.getTenderParcentage()));
+////				row.createCell(22).setCellValue(nullToDash(bean.getAboveBelow()));
+//			}
+//
+//			ServletOutputStream outputStream = response.getOutputStream();
+//			workbook.write(outputStream);
+//			outputStream.flush(); // ✅ Important
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			throw new RuntimeException("Failed to generate Excel file: " + e.getMessage());
+//		}
+//	}
+	
+	private byte[] downloadImageByDocumentId(Long documentId) {
+	    try {
+	        String filePath =
+	            commonService.fetchDownloadDocumentWSPro(documentId);
 
-			List<Work> works = workRepository.findAllActiveWorks();
+	        if (filePath == null) return null;
 
-			Sheet sheet = workbook.createSheet("Works");
+	        File file = new File(filePath);
+	        if (!file.exists() || file.length() == 0) return null;
 
-			String[] headers = { "Index", "Work No", "Work Name", "Work Type", "Financial Year", "District Name",
-					"Implementation Agency", "Work Sub Type Name", "Work Status", "Head", "Scheme", "Division Name",
-					"Year Of Administrative Approval", "Date Of Administrative Approval",
-					"Amount Of Administrative Approval", "Work Order Date", "Time Line In Months",
-					"Total Expenditure Till Date", "Level Of Completion", "Contractor Name", "SOR", "Tender Percentage",
-					"Above/Below" };
-
-			// Header row
-			Row headerRow = sheet.createRow(0);
-			for (int i = 0; i < headers.length; i++) {
-				headerRow.createCell(i).setCellValue(headers[i]);
-			}
-
-			int rowNum = 1;
-			int index = 1;
-			for (Work work : works) {
-				WorkBean bean = commonServiceImpl.convertWorkEntityToBeans1(work, null); // ✅ Convert entity to bean
-				// System.err.println("bean.getImplementationAgency()===== " +
-				// bean.getImplementationAgency());
-				Row row = sheet.createRow(rowNum++);
-				row.createCell(0).setCellValue(index++);
-				row.createCell(1).setCellValue(nullToDash(bean.getWorkNo()));
-				row.createCell(2).setCellValue(nullToDash(bean.getWorkName()));
-				row.createCell(3).setCellValue(nullToDash(bean.getWorkTypeName()));
-				row.createCell(4).setCellValue(nullToDash(bean.getFinancialYearName()));
-				row.createCell(5).setCellValue(nullToDash(bean.getDistrictName()));
-				row.createCell(6).setCellValue(nullToDash(bean.getImplementationAgencyName()));
-				row.createCell(7).setCellValue(nullToDash(bean.getWorkSubTypeName()));
-				row.createCell(8).setCellValue(nullToDash(bean.getWorkStatusName()));
-				row.createCell(9).setCellValue(nullToDash(bean.getHead()));
-				row.createCell(10).setCellValue(nullToDash(bean.getScheme()));
-				row.createCell(11).setCellValue(nullToDash(bean.getDivisionName()));
-				row.createCell(12).setCellValue(nullToDash(bean.getYearOfAdministrativeApproval()));
-				row.createCell(13).setCellValue(nullToDash(bean.getDateOfAdministrativeApproval()));
-				row.createCell(14).setCellValue(nullToDash(bean.getAmountOfAdministrativeApproval()));
-				row.createCell(15).setCellValue(nullToDash(bean.getWorkOrderDate()));
-				row.createCell(16).setCellValue(nullToDash(bean.getTimeLineInMonths()));
-				row.createCell(17).setCellValue(nullToDash(bean.getTotalExpeditureTillDate()));
-				row.createCell(18).setCellValue(nullToDash(bean.getLevelOfCompletion()));
-				row.createCell(19).setCellValue(nullToDash(bean.getContractorName()));
-				row.createCell(20).setCellValue(nullToDash(bean.getSor()));
-				row.createCell(21).setCellValue(nullToDash(bean.getTenderParcentage()));
-				row.createCell(22).setCellValue(nullToDash(bean.getAboveBelow()));
-			}
-
-			ServletOutputStream outputStream = response.getOutputStream();
-			workbook.write(outputStream);
-			outputStream.flush(); // ✅ Important
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Failed to generate Excel file: " + e.getMessage());
-		}
+	        return Files.readAllBytes(file.toPath());
+	    } catch (Exception e) {
+	        return null; // ❗ Excel kabhi fail nahi hoga
+	    }
 	}
+
+
+
+	private void addImageToCell(
+	        Workbook workbook,
+	        Sheet sheet,
+	        Drawing<?> drawing,
+	        CreationHelper helper,
+	        byte[] imageBytes,
+	        int rowNum,
+	        int colNum
+	) {
+	    try {
+	        if (imageBytes == null || imageBytes.length == 0) return;
+
+	        int pictureIdx = workbook.addPicture(
+	            imageBytes,
+	            Workbook.PICTURE_TYPE_JPEG
+	        );
+
+	        ClientAnchor anchor = helper.createClientAnchor();
+	        anchor.setCol1(colNum);
+	        anchor.setRow1(rowNum);
+	        anchor.setCol2(colNum + 1);
+	        anchor.setRow2(rowNum + 1);
+
+	        drawing.createPicture(anchor, pictureIdx);
+
+	        sheet.getRow(rowNum).setHeightInPoints(120);
+	        sheet.setColumnWidth(colNum, 35 * 256);
+
+	    } catch (Exception e) {
+	    	 logger.error("Error occurred while processing request" + e.getMessage());
+	    }
+	}
+
+	
+	
+	@RequestMapping(value = "manageOngoingWorks/downloadAllWorksExcel", method = RequestMethod.GET)
+	public void exportWorkExcel(@RequestParam("workId") Long workId, HttpServletResponse response) {
+		
+		
+		// 🔥 Excel download controller ke start me
+		 response.setContentType(
+			        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+			    );
+			    response.setHeader(
+			        "Content-Disposition",
+			        "attachment; filename=work_report.xlsx"
+			    );
+
+
+		
+			    Workbook workbook = new XSSFWorkbook();
+		
+	    try  {
+	     //   response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	     //   response.setHeader("Content-Disposition", "attachment; filename=work_Data.xlsx");
+
+	        List<Work> works = workRepository.findById(workId);
+
+	        Sheet sheet = workbook.createSheet("Works");
+	        String[] headers = { "S.No.", "Work Unique Id", "Work Name", "FY of Sanction", "Executive Agency",
+	                "AS Date", "Total AS Amount (In Lakhs)", "Fund 1 Cost (Lakh)", "Fund 2 Cost (Lakh)", "Fund 3 Cost (Lakh)", "Agreement Date", "Completion Date as par Agreement",
+	                "Fund 1 Exp (Lakh)",  "Fund 2 Exp (Lakh)",
+	                 "Fund 3 Exp (Lakh)", "Total Expenditure Till Date", "Physical Status", 
+	                 "Level Of Completion", "Departmental Remarks", "DM Remarks",
+	                  "Last Photo", "Second Last Photo"};
+
+	        Row headerRow = sheet.createRow(0);
+	        for (int i = 0; i < headers.length; i++) {
+	            headerRow.createCell(i).setCellValue(headers[i]);
+	        }
+	        
+	        
+	        
+	        CreationHelper helper = workbook.getCreationHelper();
+	        Drawing<?> drawing = sheet.createDrawingPatriarch();
+
+	        sheet.setColumnWidth(20, 25 * 256);
+	        sheet.setColumnWidth(21, 25 * 256);
+
+	        int rowNum = 1;
+	        int index = 1;
+	        for (Work work : works) {
+	        	
+
+	        	
+	            WorkBean bean = commonServiceImpl.convertWorkEntityToBeans1(work, null);
+	            Row row = sheet.createRow(rowNum++);
+	            row.createCell(0).setCellValue(index++);
+	            row.createCell(1).setCellValue(nullToDash(bean.getWorkNo()));
+	            row.createCell(2).setCellValue(nullToDash(bean.getWorkName()));
+	            row.createCell(3).setCellValue(nullToDash(bean.getFinancialYearName()));
+	            row.createCell(4).setCellValue(nullToDash(bean.getImplementationAgencyName()));
+	            row.createCell(5).setCellValue(nullToDash(bean.getDateOfAdministrativeApproval()));
+	            row.createCell(6).setCellValue(bean.getAmountOfAdministrativeApproval() != null ? bean.getAmountOfAdministrativeApproval().toString() : "-");
+	            row.createCell(7).setCellValue(bean.getFund1());
+	            row.createCell(8).setCellValue(bean.getFund2());
+	            row.createCell(9).setCellValue(bean.getFund3());
+	            row.createCell(10).setCellValue(nullToDash(bean.getAgreementDate()));
+	            row.createCell(11).setCellValue(nullToDash(bean.getDateOfCompletion()));
+	            row.createCell(12).setCellValue(bean.getFund1Exp());
+	            row.createCell(13).setCellValue(bean.getFund2Exp());
+	            row.createCell(14).setCellValue(bean.getFund3Exp());
+	            row.createCell(15).setCellValue(nullToDash(bean.getTotalExpeditureTillDate()));
+	            row.createCell(16).setCellValue(nullToDash(bean.getWorkStatusName()));
+	            row.createCell(17).setCellValue(nullToDash(bean.getLevelOfCompletion()));
+	            row.createCell(18).setCellValue(nullToDash(bean.getDepartmentRemarks()));
+	            row.createCell(19).setCellValue(nullToDash(bean.getDmRemakrs()));
+	            
+	           
+	           
+	          
+	            
+	            // ===== LAST PHOTO =====
+	            if (bean.getLastPhotoDocumentId() != null) {
+
+	            	byte[] imageBytes =
+	            		    downloadImageByDocumentId(bean.getLastPhotoDocumentId());
+
+	            		if (imageBytes != null && imageBytes.length > 0) {
+	            		    addImageToCell(
+	            		        workbook,
+	            		        sheet,
+	            		        drawing,
+	            		        helper,
+	            		        imageBytes,
+	            		        row.getRowNum(),
+	            		        20
+	            		    );
+	            		}
+	            }
+
+
+	            if (bean.getSecondLastPhotoDocumentId() != null) {
+
+	            	byte[] imageBytes =
+	            		    downloadImageByDocumentId(bean.getSecondLastPhotoDocumentId());
+
+	            		if (imageBytes != null && imageBytes.length > 0) {
+	            		    addImageToCell(
+	            		        workbook,
+	            		        sheet,
+	            		        drawing,
+	            		        helper,
+	            		        imageBytes,
+	            		        row.getRowNum(),
+	            		        21
+	            		    );
+	            		}
+	              
+	            }
+	        }
+	      //  workbook.write(response.getOutputStream());
+	        ServletOutputStream out = response.getOutputStream();
+	        workbook.write(out);
+	        out.flush();
+	        
+
+	    } catch (IOException e) {
+	    	logger.error("Error occurred while processing request" + e.getMessage());
+	        throw new RuntimeException("Failed to generate Excel file", e);
+	    }finally {
+	        try {
+	            workbook.close();
+	        } catch (Exception e) {
+	            // ignore
+	        }
+	    }
+
+	}
+
+	
+	
+	
+	
+	
+	
+	
 
 	private String nullToDash(Object value) {
 		return value == null ? "-" : value.toString();
@@ -4687,7 +4930,7 @@ public class CommonController extends BaseController {
 	        document.close();
 
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	    	logger.error("Error occurred while processing request" + e.getMessage());
 	        throw new RuntimeException("Failed to generate PDF file: " + e.getMessage());
 	    }
 	}
@@ -4699,11 +4942,12 @@ public class CommonController extends BaseController {
 
 	
 	
-	@PostMapping( value="saveOrUpdate" )
+	@PostMapping( value="saveOrUpdate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	//@ResponseBody
 	public ResponseObject saveOrUpdateDmRemarks( DmRemarksBean bean) {
 	    ResponseObject response = new ResponseObject();
 
+	    
 	    String result = commonService.addOrUpdateDmRemark(bean);
 
 	    if ("success".equals(result)) {
@@ -4853,9 +5097,172 @@ public class CommonController extends BaseController {
 	}
 
 	
-	  @GetMapping("/suggestWorkNames")
+	  @GetMapping("/suggestWorkNos")
 	    public ResponseEntity<List<String>> suggestWorkNames(@RequestParam String keyword) {
-	        List<String> names = commonService.getWorkNameSuggestions(keyword);
+	        List<String> names = commonService.getWorkNoSuggestions(keyword);
 	        return ResponseEntity.ok(names);
 	    }
+	  
+	  
+	  
+	  @GetMapping("/fetchFinancialAgency/{workId}")
+	  public ResponseEntity<Map<String, Object>> fetchFinancialAgency(
+	          @PathVariable Long workId,
+	          HttpServletRequest request) {
+
+	      System.err.println("work id " + workId);
+
+	      int start = Integer.parseInt(request.getParameter("start"));  
+	      int length = Integer.parseInt(request.getParameter("length")); 
+	      int draw = Integer.parseInt(request.getParameter("draw"));    
+
+	      List<FinancialAgencyBean> fullList = commonService.fetchFinancialAgencyByWorkId(workId);
+
+	      int total = fullList.size();
+	      int end = Math.min(start + length, total);
+
+	      List<FinancialAgencyBean> paginatedList = fullList.subList(start, end);
+
+	      // --------- Optional: index add ---------
+	      int indexCounter = start + 1;
+	      for (FinancialAgencyBean bean : paginatedList) {
+	          bean.setIndex(indexCounter++);
+	      }
+	      // ---------------------------------------
+
+	      Map<String, Object> response = new HashMap<>();
+	      response.put("draw", draw);
+	      response.put("recordsTotal", total);
+	      response.put("recordsFiltered", total);
+	      response.put("data", paginatedList);  // <--- IMPORTANT (new format)
+
+	      return ResponseEntity.ok(response);
+	  }
+
+
+	  @PostMapping("/saveFinancialAgencyEnteredCost")
+	  public ResponseEntity<String> saveFinancialAgencyEnteredCost(
+	          @RequestBody List<FinancialAgencyBean> list) {
+
+	      for (FinancialAgencyBean bean : list) {
+	    	  
+	          commonService.updateFinancialAgencyCost(bean.getId(), bean.getExpenditure(), bean.getWorkId());
+	      }
+
+	      return ResponseEntity.ok("success");
+	  }
+
+	  
+	  @PostMapping("/deleteFinancialAgencyRow")
+	  public String deleteFinancialAgencyRow(@RequestParam Long id) {
+	      return commonService.deleteByFinancailAgencyId(id);
+	      
+	  }
+
+	  @GetMapping("/getFinancingAgencyList/{workId}")
+	  public List<FinancialAgencyBean> getFinancingAgencyList(@PathVariable Long workId) {
+	      return commonService.getFinancialAgenciesByWorkId(workId);
+	  }
+	  
+	  @GetMapping("/getFinancingAgencyExpenditureList/{workId}")
+	  public List<FinancialAgencyBean> getFinancingAgencyExpenditureList(@PathVariable Long workId) {
+	      return commonService.getFinancialAgenciesExpenditureByWorkId(workId);
+	  }
+	  
+	  
+	// --------------------added by aman start code
+		 // Java Spring Controller for checking password expiry and sending response
+		 	@RequestMapping(value = "/verifyUserPasswordExpiry", method = RequestMethod.GET)
+		 	@ResponseBody
+		 	public ResponseEntity<ResponseObject> verifyUserPasswordExpiry() {
+		 	    ResponseObject response = new ResponseObject(); 
+		 	   user = DMSUtil.getUserDetail();
+		 	  //  User user = getUserDetail();
+		 		Users userInfo = userService.findByUserName(user.getUsername());
+		 	 //   Users userInfo = commonService.findUserById(user.getUsername());
+		 		  String role = SecurityContextHolder.getContext()
+		                    .getAuthentication()
+		                    .getAuthorities()
+		                    .iterator()
+		                    .next()
+		                    .getAuthority();   // e.g. ROLE_ADMIN, ROLE_USER
+
+		 	    // Check if the user has no password or last password updated date is null
+		 	    if (userInfo == null || userInfo.getLastPasswordUpdatedOn() == null) {
+		 	        response.setSuccessMessage("Your password has expired. Please Update your Password");
+		 	      // response.setRoleCode(role);
+		 	        return new ResponseEntity<>(response, HttpStatus.OK);
+		 	    }
+		 	    
+		 	    // Get the last password update date
+		 	    Date lastPasswordUpdated = userInfo.getLastPasswordUpdatedOn();
+		 	    
+		 	    // Set expiration period (e.g., 31 days)
+		 	    int expirationPeriod = 31; // Password expires after 31 days
+		 	    Calendar calendar = Calendar.getInstance();
+		 	    calendar.setTime(lastPasswordUpdated);
+		 	    calendar.add(Calendar.DAY_OF_YEAR, expirationPeriod); // Add expiration period to the last updated date
+		 	    Date passwordExpiryDate = calendar.getTime();
+		 	    
+		 	    // Get the current date
+		 	    Date currentDate = new Date();
+		 	    
+		 	    // Calculate the difference in days between the current date and the password expiry date
+		 	    long diffInMillis = passwordExpiryDate.getTime() - currentDate.getTime();
+		 	    long remainingDays = diffInMillis / (1000 * 60 * 60 * 24); // Convert milliseconds to days
+		 	    
+		 	    // Determine the response message based on password expiration
+		 	    if (remainingDays <= 0) {
+		 	    	 response.setRoleCode(role);
+		 	        response.setSuccessMessage("Your password has expired. Please Update your Password");
+		 	    } else {
+		 	        if (remainingDays <= 3) {
+		 	        	 response.setRoleCode(role);
+		 	            response.setSuccessMessage("Your password will expire in " + remainingDays + " days. Do you want to update the password?");
+		 	        } else {
+		 	        	 response.setRoleCode(role);
+		 	            // Password is still valid and not close to expiration
+		 	            response.setSuccessMessage("Your password is still valid.");
+		 	            return new ResponseEntity<>(response, HttpStatus.OK); // Return 200 OK for valid password
+		 	        }
+		 	    }
+		 	    
+		 	    // Return the response with the appropriate success message
+		 	    return new ResponseEntity<>(response, HttpStatus.OK);
+		 	}
+		
+			@RequestMapping(value = "/validateCurrentPassword", method = RequestMethod.POST)
+			public ResponseObject validateCurrentPassword(@RequestBody ChangePasswordBean currentpassword) {
+
+			    ResponseObject response = new ResponseObject();
+
+			    User user = DMSUtil.getUserDetail();
+			    Users userEntity = userService.findByUserName(user.getUsername());
+
+			    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+			    // Wrong current password
+			    if (!passwordEncoder.matches(currentpassword.getCurrentPassword(), userEntity.getPassword())) {
+			        response.setErrorMessage("INVALID_CURRENT_PASSWORD");
+			        return response;
+			    }
+
+			    //  Correct current password
+			    response.setSuccessMessage("VALID_CURRENT_PASSWORD");
+			    return response;
+			}
+			
+			@RequestMapping(value = "/userchangepassword", method = RequestMethod.GET)
+			public ModelAndView viewUserChangePasswordForm(HttpServletRequest request) {
+
+				user = DMSUtil.getUserDetail();
+				logger.info("User - " + user.getUsername() + ", Role - " + user.getAuthorities()
+						+ " - Displaying Change password page");
+
+				ModelAndView modelAndView = new ModelAndView("common/userchangepassword");
+				return modelAndView;
+
+			}
+			
+			// aman end code
 }

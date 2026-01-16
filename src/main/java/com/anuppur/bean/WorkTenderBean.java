@@ -1,7 +1,8 @@
 package com.anuppur.bean;
 
 import java.math.BigDecimal;
-import java.util.Date;
+
+
 import org.springframework.web.multipart.MultipartFile;
 
 public class WorkTenderBean {
@@ -37,6 +38,10 @@ public class WorkTenderBean {
 	private String reTenderDate;
 
 	private String loaIssuedDate;
+	
+	private String agreementDate;
+	
+	private String agreementNo;
 
 	public String getTenderCalledDate() {
 		return tenderCalledDate;
@@ -396,6 +401,22 @@ public class WorkTenderBean {
 
 	public void setFinancialYear(Long financialYear) {
 		this.financialYear = financialYear;
+	}
+
+	public final String getAgreementDate() {
+		return agreementDate;
+	}
+
+	public final void setAgreementDate(String agreementDate) {
+		this.agreementDate = agreementDate;
+	}
+
+	public final String getAgreementNo() {
+		return agreementNo;
+	}
+
+	public final void setAgreementNo(String agreementNo) {
+		this.agreementNo = agreementNo;
 	}
 	
 	

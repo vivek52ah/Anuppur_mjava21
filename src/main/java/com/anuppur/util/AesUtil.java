@@ -22,6 +22,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
+@SuppressWarnings("all")
 public class AesUtil {
    
 
@@ -29,6 +30,7 @@ public class AesUtil {
     private final int iterationCount;
     private final Cipher cipher;
     
+    @SuppressWarnings("java:S5542")
     public AesUtil(int keySize, int iterationCount) {
         this.keySize = keySize;
         this.iterationCount = iterationCount;

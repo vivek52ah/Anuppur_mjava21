@@ -1,6 +1,7 @@
 package com.anuppur.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +18,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.springframework.data.annotation.CreatedBy;
 
@@ -283,7 +286,18 @@ public class Users extends Auditable implements Serializable {
 	 * public void setOfficialPhone(String officialPhone) { this.officialPhone =
 	 * officialPhone; }
 	 */
+	@Column(name = "last_password_updated_on")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastPasswordUpdatedOn;
+
 	
+	public Date getLastPasswordUpdatedOn() {
+		return lastPasswordUpdatedOn;
+	}
+
+	public void setLastPasswordUpdatedOn(Date lastPasswordUpdatedOn) {
+		this.lastPasswordUpdatedOn = lastPasswordUpdatedOn;
+	}
 	
 	
 }

@@ -114,6 +114,12 @@ public class WorkTender extends Auditable implements Serializable {
 
 	@Column(name = "loa_issued_date")
 	private String loaIssuedDate;
+	
+	@Column(name = "agreement_date")
+	private String agreementDate;
+	
+	@Column(name = "agreement_no")
+	private String agreementNo;
 
 	public String getTenderCalledDate() {
 		return tenderCalledDate;
@@ -299,6 +305,23 @@ public class WorkTender extends Auditable implements Serializable {
 		this.documentUploadUa = documentUploadUa;
 	}
 
+	public final String getAgreementDate() {
+		return agreementDate;
+	}
+
+	public final void setAgreementDate(String agreementDate) {
+		this.agreementDate = agreementDate;
+	}
+
+	public final String getAgreementNo() {
+		return agreementNo;
+	}
+
+	public final void setAgreementNo(String agreementNo) {
+		this.agreementNo = agreementNo;
+	}
+
+	
 	
 
 }
