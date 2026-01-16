@@ -127,8 +127,7 @@ public static final Logger logger = LoggerFactory.getLogger(CertificateUtil.clas
 				}
 			}
 		} catch (Exception e) {
-			logger.error("En exception has occured inside isValidDsc Method:::::"+e);
-			e.printStackTrace();
+			logger.error("En exception has occured inside isValidDsc Method:::::"+e.getMessage());
 			return false;
 		}
 		logger.info("Exit isValidDsc Method ::::"+valid);

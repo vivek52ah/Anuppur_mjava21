@@ -4,6 +4,7 @@ package com.anuppur.repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.anuppur.bean.WorkExcelProjection;
 import com.anuppur.entity.ImplementationAgency;
 import com.anuppur.entity.Work;
 
@@ -1420,10 +1422,66 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 							    List<Long> findUserIdsByImplementationAgency(@Param("agencyId") Long agencyId);
 
 								
-								 @Query("SELECT DISTINCT a.workName FROM Work a " +
-								            "WHERE a.status <> 'Deleted' AND LOWER(a.workName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-								            "ORDER BY a.workName ASC")
-								    List<String> searchWorkNameSuggestions(@Param("keyword") String keyword);
+								@Query("SELECT a.workNo FROM Work a " +
+									       "WHERE a.status <> 'Deleted' AND LOWER(a.workNo) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+									       "ORDER BY a.workNo ASC")
+									List<String> searchWorkNoSuggestions(@Param("keyword") String keyword);
+
+								
+								
+								
+								
+								@Query(value =
+										"SELECT " +
+										" w.id, w.work_no, w.work_name, " +
+
+										/* ===== Fund 1 ===== */
+										" (SELECT fa.cost FROM t_work_financial_agency fa " +
+										"   WHERE fa.work_id = w.id ORDER BY fa.id DESC LIMIT 1) AS Fund1, " +
+
+										" (SELECT fa.expenditure FROM t_work_financial_agency fa " +
+										"   WHERE fa.work_id = w.id ORDER BY fa.id DESC LIMIT 1) AS Fund1_Exp, " +
+
+										/* ===== Fund 2 ===== */
+										" (SELECT fa.cost FROM t_work_financial_agency fa " +
+										"   WHERE fa.work_id = w.id ORDER BY fa.id DESC LIMIT 1 OFFSET 1) AS Fund2, " +
+
+										" (SELECT fa.expenditure FROM t_work_financial_agency fa " +
+										"   WHERE fa.work_id = w.id ORDER BY fa.id DESC LIMIT 1 OFFSET 1) AS Fund2_Exp, " +
+
+										/* ===== Fund 3 ===== */
+										" (SELECT fa.cost FROM t_work_financial_agency fa " +
+										"   WHERE fa.work_id = w.id ORDER BY fa.id DESC LIMIT 1 OFFSET 2) AS Fund3, " +
+
+										" (SELECT fa.expenditure FROM t_work_financial_agency fa " +
+										"   WHERE fa.work_id = w.id ORDER BY fa.id DESC LIMIT 1 OFFSET 2) AS Fund3_Exp, " +
+
+										/* ===== Last Photo ===== */
+										" (SELECT dp.id FROM document_upload_workprogress_details dp " +
+										"   WHERE dp.work_id = w.id ORDER BY dp.created_date DESC LIMIT 1) AS last_photo_id, " +
+
+										/* ===== Second Last Photo ===== */
+										" (SELECT dp.id FROM document_upload_workprogress_details dp " +
+										"   WHERE dp.work_id = w.id ORDER BY dp.created_date DESC LIMIT 1 OFFSET 1) AS second_last_photo_id " +
+
+										" FROM t_work w " +
+										" WHERE w.id = :workId",
+										nativeQuery = true)
+										Object findWorkWithFundsAndPhotos(@Param("workId") Long workId);
+
+
+
+
+
+
+								List<Work> findById(Long workId);
+
+
+
+
+
+
+
 								
 								
 }

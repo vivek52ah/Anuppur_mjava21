@@ -8,7 +8,7 @@ public class FileArrBean {
 
 	private String otherDocDate;
 
-	private String fileArr[];
+	private String[] fileArr;
 
 	public Long getNoOfDocs() {
 		return noOfDocs;

@@ -2,6 +2,7 @@ package com.anuppur.bean;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +31,7 @@ public class TSASWorkBean {
 	private String asRemarks;
 	private Long workStatus;
 	private String status;
+	private List<FinancialAgencyBean> financialHeads;
 
 	public Long getWorkRequestStatusId() {
 		return workRequestStatusId;
@@ -215,6 +217,14 @@ public class TSASWorkBean {
 
 	public void setModifiyDate(String modifiyDate) {
 		this.modifiyDate = modifiyDate;
+	}
+
+	public final List<FinancialAgencyBean> getFinancialHeads() {
+		return financialHeads;
+	}
+
+	public final void setFinancialHeads(List<FinancialAgencyBean> financialHeads) {
+		this.financialHeads = financialHeads;
 	}
 
 	

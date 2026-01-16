@@ -22,22 +22,10 @@
 		<!-- <div id="wrapper"> -->
 		<div th:replace="fragments/header :: header_after_login" />
 		<div class="app-body">
-			<div class="sidebar">
+			<div class="sidebar" id="sideNav">
 				<nav class="sidebar-nav">
 					<ul class="nav">
 
-						<!-- <li
-							th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DEPARTMENT' ||  roleName=='ROLE_DEPT_DISTRICT' || roleName=='ROLE_SU'} "
-							class="nav-item active navigation"><a class="nav-link"  href="https://app.powerbi.com/view?r=eyJrIjoiNDU1NzFiN2UtY2VmZC00ZThiLWFiZDQtNTVjNThhZjMwNGFhIiwidCI6IjFmZGY3ODQyLTQ2NzgtNDZhZS1hMjc0LWMwM2UyYzY0MDk4ZCJ9" > <i
-								class="fa fa-tachometer" aria-hidden="true" ></i> <span
-								th:text="#{dashboard}"> Dashboard (Beta)</span></a></li> -->
-						<!-- <li
-							th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DEPARTMENT' ||  roleName=='ROLE_DEPT_DISTRICT' || roleName=='ROLE_SU'} "
-							class="nav-item active navigation"><a class="nav-link"
-							href="https://app.powerbi.com/view?r=eyJrIjoiNDU1NzFiN2UtY2VmZC00ZThiLWFiZDQtNTVjNThhZjMwNGFhIiwidCI6IjFmZGY3ODQyLTQ2NzgtNDZhZS1hMjc0LWMwM2UyYzY0MDk4ZCJ9"
-							target="_blank"> <i class="fa fa-tachometer"
-								aria-hidden="true"></i> <span> Dashboard </span></a></li>
- -->
 
 
 
@@ -194,7 +182,7 @@
 							</ul></li>
 
 						<li id="a2" class="nav-item nav-dropdown nav-dropdownnew2"
-							th:if="${roleName=='ROLE_DM' || roleName=='ROLE_SYSTEM_ADMIN' }"><a
+							th:if="${roleName=='ROLE_DM' || roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DEPARTMENT'}"><a
 							class="nav-link nav-dropdown-toggle" href="#"> <i
 								class="fa fa-file-word-o" aria-hidden="true"></i><span
 								>Reports</span></a>
@@ -224,18 +212,18 @@
 										class="icon-arrow-right-circle"></i><span>Works Report</span></a></li> -->
 
 								<li class="nav-item"
-									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' } "><a
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName=='ROLE_DEPARTMENT'} "><a
 									class="nav-link" href="#reports"><i
 										class="icon-arrow-right-circle"></i><span> Works Report</span></a></li>
 										
 										<li class="nav-item"
-									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' } "><a
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName=='ROLE_DEPARTMENT'} "><a
 									class="nav-link" href="#inspectionReport"><i
 										class="icon-arrow-right-circle"></i><span>Inspection Report</span></a></li>
 
 
 									<li class="nav-item"
-									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' } "><a
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName=='ROLE_DEPARTMENT'} "><a
 									class="nav-link" href="#workExpenditureReport"><i
 										class="icon-arrow-right-circle"></i><span>Work Expenditure Report</span></a></li>
 

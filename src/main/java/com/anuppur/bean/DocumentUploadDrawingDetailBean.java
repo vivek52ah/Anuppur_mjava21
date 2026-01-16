@@ -1,10 +1,6 @@
 package com.anuppur.bean;
 
 import java.util.Date;
-import java.util.List;
-
-import javax.mail.Multipart;
-
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -12,16 +8,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocumentUploadDrawingDetailBean {
 	
 	
-	private Long Id;
+	private Long id;
 
 	
 	private String documentName;
 	
-	//private List<MultipartFile>files;
+	
 	
 	private MultipartFile drawingFile;
 	
-	//private List<String> drawingFileStatus;
+
 	
 	private String drawingStatus;
 	
@@ -48,13 +44,13 @@ public class DocumentUploadDrawingDetailBean {
 	}
 
 
-	public Long getId() {
-		return Id;
+	public final Long getId() {
+		return id;
 	}
 
 
-	public void setId(Long id) {
-		Id = id;
+	public final void setId(Long id) {
+		this.id = id;
 	}
 
 

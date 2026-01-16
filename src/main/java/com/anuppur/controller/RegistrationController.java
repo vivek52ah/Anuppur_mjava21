@@ -156,13 +156,8 @@ public class RegistrationController {
 			Long lcId) throws DMSBusinessException {
 
 		// String randomPassword = RandomStringUtils.randomAlphanumeric(6);
-		char[] ch = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-		String otp1 = RandomStringUtils.random(6, 0, ch.length, false, false, ch);
 		SecureRandom secureRandom = new SecureRandom();
-		//SecureRandom secureRandom = new SecureRandom();
-
-		// Generate a 6-digit OTP by ensuring it's between 100000 and 999999
-		int otp = 100000 + secureRandom.nextInt(900000);  // 6-digit number
+	    int otp = 100000 + secureRandom.nextInt(900000);
 
 		commonService.saveOrUpdateOtp(mobileNo, otp);
 		String fullName = firstName + " " + lastName;

@@ -62,32 +62,32 @@ AuthenticationSuccessHandler {
 			       }
 			       if(role.equals("ROLE_DEPARTMENT")) {
 			    	   //logger.info("i am in role butwy ");
-				       targetUrl = "/systemAdmin/home#/manageOngoingWorks"; // Example URL for AREA_OFFICER
+				       targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
 				       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
 				       return;
 				       }
 			       if(role.equals("ROLE_DM")) {
 			    	   //logger.info("i am in role butwy ");
-				       targetUrl = "/systemAdmin/home#/manageOngoingWorks"; // Example URL for AREA_OFFICER
+				       targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
 				       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
 				       return;
 				       }
 			       
 			       if(role.equals("ROLE_CEO")) {
 			    	   //logger.info("i am in role butwy ");
-				       targetUrl = "/systemAdmin/home#/manageOngoingWorks"; // Example URL for AREA_OFFICER
+				       targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
 				       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
 				       return;
 				       }
 			       
 			       if(role.equals("ROLE_SYSTEM_ADMIN")) {
-			    	   targetUrl = "/systemAdmin/home#/manageOngoingWorks"; // Example URL for AREA_OFFICER
+			    	   targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
 				       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
 				       return;
 			       }
 		
 		    if( DMSConstants.ROLE_SYSTEM_ADMIN.equals(role) || DMSConstants.ROLE_ADMIN.equals(role) || DMSConstants.ROLE_DEPARTMENT.equals(role)|| DMSConstants.ROLE_DEPT_DISTRICT.equals(role) || DMSConstants.ROLE_AGENCY_ADMIN.equals(role) || DMSConstants.ROLE_DM.equals(role) || DMSConstants.ROLE_CEO.equals(role) ) {
-				targetUrl = "/systemAdmin/home#/manageOngoingWorks";
+				targetUrl = "/systemAdmin/home#/changepassword";
 				break;
 			} 
 		     

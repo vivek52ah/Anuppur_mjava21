@@ -163,8 +163,7 @@ public class NotificationServiceImpl implements NotificationService {
 						// smsBean.setSmsText("Dear Yousra shafiq, Your One Time password is 123456 for
 						// login. - SARTHAK Lite");
 
-						logger.info("User Registration SMS Text is >>>>" + smsBean.getSmsText() + "mobile..."
-								+ userBean.getMobileNo());
+						
 
 						smsUtil.sendSingleUnicodeSMSCDAC(smsBean);
 						// smsUtil.fetchSamagraData();

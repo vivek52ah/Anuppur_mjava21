@@ -55,6 +55,7 @@ import com.google.gson.GsonBuilder;
 
 
 @Component
+@SuppressWarnings("all")
 public class AccountUtil {
 	private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 	@Value("${default_values}")

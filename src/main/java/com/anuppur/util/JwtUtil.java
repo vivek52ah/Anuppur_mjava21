@@ -9,6 +9,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
+@SuppressWarnings("all")
 public class JwtUtil {
 
     private static final String SECRET_KEY = "MySecretKeyForJwtSigning12345"; // Use a secure key

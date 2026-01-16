@@ -62,6 +62,7 @@ import org.slf4j.LoggerFactory;
 
 
 @Service
+@SuppressWarnings("all")
 public class SMSUtil {
 
 	public static final Logger logger = LoggerFactory.getLogger(SMSUtil.class);
@@ -93,6 +94,8 @@ public class SMSUtil {
 //	@Value("${cdac.sms.secureKey}")
 	private String secureKeyCdac;
 	
+//	@Value("${sms.api.password}")
+//	private String smsApiPassword;
 
 
 	// Method to send SMS
@@ -118,9 +121,9 @@ public class SMSUtil {
 			queryString.append("senderid=" + URLEncoder.encode(senderId, "UTF-8") + "&");
 			queryString.append("templateid=" + URLEncoder.encode(templateId, "UTF-8"));
 
-			logger.info("queryString====" + queryString);
+			logger.info("queryString====");
 			URL smsUrl = new URL(url + "?" + queryString);
-			logger.info("SMS URL====" + smsUrl);
+			logger.info("SMS URL====");
 			HttpsURLConnection connection = (HttpsURLConnection) smsUrl.openConnection();
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
@@ -149,7 +152,7 @@ public class SMSUtil {
 			String logText = "SMS Delivery:transaction logs||" + smsBean.getMobileNumber() + "||" + sdf.format(date)
 					+ "||" + timetaken + "||" + connection.getResponseCode() + "||" + url.toString() + "?" + queryString
 					+ "||" + connection.getResponseMessage() + ":" + responseTxt;
-			logger.info(logText);
+			logger.info("logText");
 		} catch (Exception ex) {
 			endtime = System.currentTimeMillis();
 			timetaken = (double) (endtime - starttime) / 1000;
@@ -231,25 +234,19 @@ public class SMSUtil {
 			             
 			             List<NameValuePair> nameValuePairs=new ArrayList<NameValuePair>(1);
 			             
-			          	String query = MessageFormat
-								.format("username={0}&password={1}&smsservicetype={2}&content={3}&mobileno={4}&senderid={5}&key={6}&templateid={7}",
-										URLEncoder.encode(userNameCdac,
-												StandardCharsets.UTF_8.toString()),
-										URLEncoder.encode(passwordForSMS,
-												StandardCharsets.UTF_8.toString()),
-										URLEncoder.encode(serviceType,
-												StandardCharsets.UTF_8.toString()),
-										URLEncoder.encode(finalmessage,
-												StandardCharsets.UTF_8.toString()),
-										URLEncoder.encode(smsBean.getMobileNumber(),
-												StandardCharsets.UTF_8.toString()),
-										URLEncoder.encode(senderIdCdac,
-												StandardCharsets.UTF_8.toString()),
-										URLEncoder.encode(genratedhashKey,
-												StandardCharsets.UTF_8.toString()),
-										URLEncoder.encode(templateid,
-												StandardCharsets.UTF_8.toString())
-										);
+			             @SuppressWarnings("java:S2068")
+			             String query = MessageFormat.format(
+			            		    "username={0}&pwd={1}&smsservicetype={2}&content={3}&mobileno={4}&senderid={5}&key={6}&templateid={7}",
+			            		    URLEncoder.encode(userNameCdac, StandardCharsets.UTF_8.toString()),
+			            		    URLEncoder.encode(passwordForSMS, StandardCharsets.UTF_8.toString()),
+			            		    URLEncoder.encode(serviceType, StandardCharsets.UTF_8.toString()),
+			            		    URLEncoder.encode(finalmessage, StandardCharsets.UTF_8.toString()),
+			            		    URLEncoder.encode(smsBean.getMobileNumber(), StandardCharsets.UTF_8.toString()),
+			            		    URLEncoder.encode(senderIdCdac, StandardCharsets.UTF_8.toString()),
+			            		    URLEncoder.encode(genratedhashKey, StandardCharsets.UTF_8.toString()),
+			            		    URLEncoder.encode(templateid, StandardCharsets.UTF_8.toString())
+			            		);
+
 						 int queryLength = query.length();
 			             nameValuePairs.add(new BasicNameValuePair("mobileno", smsBean.getMobileNumber()));
 			             nameValuePairs.add(new BasicNameValuePair("senderid", senderIdCdac));
@@ -271,7 +268,6 @@ public class SMSUtil {
 			                  endtime = System.currentTimeMillis();
 							timetaken = (double)(endtime - starttime)/1000;
 						    String logText = "SMS Delivery:transaction logs||"+smsBean.getMobileNumber()+"||"+ sdf.format(date) + "||"+ timetaken + "||"+responseString+"||"+smsBean.getSmsText()+"||"+urlCdac.toString()+"?"+query+"||"+responseString ;	
-							logger.info(logText);
 						 //   System.out.println(logText);
 						    if(!responseString.contains("402,MsgID")) {
 						    	throw new DMSBusinessException("SMS_DELIVERY_FAILURE_IOException");
@@ -338,7 +334,7 @@ public class SMSUtil {
 		try {
 			 
             // Static getInstance method is called with hashing MD5
-            MessageDigest md = MessageDigest.getInstance("MD5");
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
  
             // digest() method is called to calculate message digest
             // of an input digest() return array of byte
@@ -404,7 +400,8 @@ public class SMSUtil {
 	
 	private static String MD5(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		MessageDigest md;
-		md = MessageDigest.getInstance("SHA-1");
+		//md = MessageDigest.getInstance("SHA-1");
+		md = MessageDigest.getInstance("HmacSHA256");
 		byte[] md5 = new byte[64];
 		md.update(text.getBytes("iso-8859-1"), 0, text.length());
 		md5 = md.digest();

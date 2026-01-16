@@ -105,7 +105,7 @@ private Long expId;
 		this.createdDate = createdDate;
 	}
 
-	public String createdBy;
+	private String createdBy;
 
 
 	public String getCreatedBy() {

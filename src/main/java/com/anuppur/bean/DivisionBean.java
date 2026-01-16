@@ -8,9 +8,6 @@ public class DivisionBean {
 
 	private Short enabled;
 
-	public DivisionBean() {
-	}
-
 	public Long getDivisionId() {
 		return divisionId;
 	}

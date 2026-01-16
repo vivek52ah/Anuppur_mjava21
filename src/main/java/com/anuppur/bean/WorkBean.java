@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.Data;
 
 public class WorkBean {
 
@@ -35,7 +34,9 @@ public class WorkBean {
     
     private Boolean isGeoTagged;
     
-    
+	private String agreementDate;
+	
+	private String agreementNo;
        
 	public Boolean getIsGeoTagged() {
 		return isGeoTagged;
@@ -70,16 +71,17 @@ public class WorkBean {
 	}
 
 	
-	private String DmRemarks;
+	private String dmRemarks;
 	
-	
-	
-	public String getDmRemarks() {
-		return DmRemarks;
+	private String departmentRemarks;
+
+
+	public final String getDmRemarks() {
+		return dmRemarks;
 	}
 
-	public void setDmRemarks(String dmRemarks) {
-		DmRemarks = dmRemarks;
+	public final void setDmRemarks(String dmRemarks) {
+		this.dmRemarks = dmRemarks;
 	}
 
 
@@ -127,6 +129,23 @@ public class WorkBean {
 	
 	
 	private BigDecimal lastExpenditure;
+	
+	
+	 private Double fund1;
+	    private Double fund1Exp;
+	    private Double fund2;
+	    private Double fund2Exp;
+	    private Double fund3;
+	    private Double fund3Exp;
+
+	    private String lastPhoto;
+	    private String secondLastPhoto;
+	    
+	    private Long lastPhotoDocumentId;
+	    private Long secondLastPhotoDocumentId;
+	    private String dateOfCompletion;
+
+	
 	
 	public Boolean getIsDisabledDep() {
 		return isDisabledDep;
@@ -238,6 +257,8 @@ public class WorkBean {
 	private String levelOfCompletion;
 	private Date assignDate;
 	private String modifiedDate;
+	private List<FinancialAgencyBean> financialHeads;
+	private Double totalCost;
 
 	public String getDateOfAdministrativeApproval() {
 		return dateOfAdministrativeApproval;
@@ -1257,6 +1278,138 @@ public class WorkBean {
 	public final void setLastExpenditure(BigDecimal lastExpenditure) {
 		this.lastExpenditure = lastExpenditure;
 	}
+
+	public final List<FinancialAgencyBean> getFinancialHeads() {
+		return financialHeads;
+	}
+
+	public final void setFinancialHeads(List<FinancialAgencyBean> financialHeads) {
+		this.financialHeads = financialHeads;
+	}
+
+	public final Double getTotalCost() {
+		return totalCost;
+	}
+
+	public final void setTotalCost(Double totalCost) {
+		this.totalCost = totalCost;
+	}
+
+	public final String getAgreementDate() {
+		return agreementDate;
+	}
+
+	public final void setAgreementDate(String agreementDate) {
+		this.agreementDate = agreementDate;
+	}
+
+	public final String getAgreementNo() {
+		return agreementNo;
+	}
+
+	public final void setAgreementNo(String agreementNo) {
+		this.agreementNo = agreementNo;
+	}
+
+
+	public final String getDepartmentRemarks() {
+		return departmentRemarks;
+	}
+
+	public final void setDepartmentRemarks(String departmentRemarks) {
+		this.departmentRemarks = departmentRemarks;
+	}
+
+	public final Double getFund1() {
+		return fund1;
+	}
+
+	public final void setFund1(Double fund1) {
+		this.fund1 = fund1;
+	}
+
+	public final Double getFund1Exp() {
+		return fund1Exp;
+	}
+
+	public final void setFund1Exp(Double fund1Exp) {
+		this.fund1Exp = fund1Exp;
+	}
+
+	public final Double getFund2() {
+		return fund2;
+	}
+
+	public final void setFund2(Double fund2) {
+		this.fund2 = fund2;
+	}
+
+	public final Double getFund2Exp() {
+		return fund2Exp;
+	}
+
+	public final void setFund2Exp(Double fund2Exp) {
+		this.fund2Exp = fund2Exp;
+	}
+
+	public final Double getFund3() {
+		return fund3;
+	}
+
+	public final void setFund3(Double fund3) {
+		this.fund3 = fund3;
+	}
+
+	public final Double getFund3Exp() {
+		return fund3Exp;
+	}
+
+	public final void setFund3Exp(Double fund3Exp) {
+		this.fund3Exp = fund3Exp;
+	}
+
+	public final String getLastPhoto() {
+		return lastPhoto;
+	}
+
+	public final void setLastPhoto(String lastPhoto) {
+		this.lastPhoto = lastPhoto;
+	}
+
+	public final String getSecondLastPhoto() {
+		return secondLastPhoto;
+	}
+
+	public final void setSecondLastPhoto(String secondLastPhoto) {
+		this.secondLastPhoto = secondLastPhoto;
+	}
+
+	public final Long getLastPhotoDocumentId() {
+		return lastPhotoDocumentId;
+	}
+
+	public final void setLastPhotoDocumentId(Long lastPhotoDocumentId) {
+		this.lastPhotoDocumentId = lastPhotoDocumentId;
+	}
+
+	public final Long getSecondLastPhotoDocumentId() {
+		return secondLastPhotoDocumentId;
+	}
+
+	public final void setSecondLastPhotoDocumentId(Long secondLastPhotoDocumentId) {
+		this.secondLastPhotoDocumentId = secondLastPhotoDocumentId;
+	}
+
+	public final String getDateOfCompletion() {
+		return dateOfCompletion;
+	}
+
+	public final void setDateOfCompletion(String dateOfCompletion) {
+		this.dateOfCompletion = dateOfCompletion;
+	}
+
+	
+	
 
 
 

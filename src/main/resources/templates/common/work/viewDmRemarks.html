@@ -1,6 +1,19 @@
 <div th:fragment="view_dmRemark">
 	<div
 		th:if="${(roleName =='ROLE_DEPARTMENT' || roleName =='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName == 'ROLE_CEO' ) }">
+		<!-- Put this in the page that includes your fragment, above angular script includes -->
+		<script th:inline="javascript">
+		  /*<![CDATA[*/
+		 window.roleName = [[${roleName}]];
+		  /*]]>*/
+		</script>
+<style>
+	a.disabled {
+	  opacity: 0.5;
+	  cursor: not-allowed;
+	}
+
+</style>
 		<form
 			data-ng-submit="saveOrUpdateDmRemarks(workForm.$valid,dmattachment)"
 			name="workForm" id="workFormId" novalidate="novalidate"
@@ -18,23 +31,32 @@
 						data-ng-hide="workDataR.DmRemakrs == null">Remarks By DM</div>
 
 					<div class="card-body"
-						th:if="${(roleName == 'ROLE_DM' )}"
+						th:if="${(roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}"
 						>
                          <div class="row">
 						<div class="col-sm-9">
-							<label>Remark<span class="text-danger">*</span></label>
+							<label>Department Remark<span class="text-danger">*</span></label>
+							<!--<textarea class="form-control" maxlength="1000"
+							    required="required"
+							    data-ng-model="workDataR.remakr"
+							    placeholder="Remarks"
+							    data-ng-readonly="roleName !== workDataR.roleCode">
+							</textarea>-->
+							 <input type="hidden"
+                           id="workId"
+                           data-ng-model="workData.workId"/>
 							<textarea class="form-control" maxlength="1000"
-								required="required" id="remark"
-								data-ng-model="workDataR.remakr" name="remakr" rows="7"
-								placeholder="Remarks" th:readonly="${roleName != 'ROLE_DM'}"></textarea>
+															required="required" id="departmentRemarks"
+															data-ng-model="workDataR.departmentRemarks" name="departmentRemarks" rows="7"
+															placeholder="Department Remarks" th:readonly="${roleName != 'ROLE_DEPARTMENT'}"></textarea>
      
 							
 						</div>
 						<div class="col-sm-3">
 							<label>Uplaod Attachment </label>
 							<input type='file' accept="image/*,.pdf" class="form-control"
-															 required="required"
-															file-model="dmattachment" name="dmremarksAttachment" id="dmremarksAttachment" />
+																						 required="required"
+																						file-model="dmattachment" name="dmremarksAttachment" id="dmremarksAttachment" />
 															<span data-ng-show="workDataR.documentId==null"><b>(pdf file with max size 30 mb)</b></span>
 												
 												
@@ -52,9 +74,9 @@
 
 
 
-					<div class="tab-footer text-right" th:if="${roleName == 'ROLE_DM'}">
+					<div class="tab-footer text-right" th:if="${roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT'}">
 
-						<button type="submit" class="btn btn-primary next-button nexxt"
+						<button type="submit" class="btn btn-primary next-button nexxt" 
 							id="finaltbtn"
 							data-ng-click="finalSubmit=false;saveAsDraft=true;saveAndNext=true;">
 							Save <span class="fa fa-arrow-circle-right"></span>
@@ -66,7 +88,7 @@
 
 				</div>
 
-                <div class="card-header" data-ng-init="loadDmRemarksForWorkId()">
+                <div class="card-header" data-ng-if="workData.workId" data-ng-init="loadDmRemarksForWorkId(workData.workId)">
 					<span>DM Remarks History</span>
 				</div>
 				<style>
@@ -87,30 +109,41 @@
 				      <thead>
 				        <tr>
 				          <th>S.No</th>
-				          <th>Remark</th>
+						<!--  <th>User</th>
+						  <th>Role</th>-->
+						  <th>DM Remark</th>
+				          <th>Depaerment Remark</th>
 				          <th>Remark Date</th>
-				          <th>Attachment</th>
-				          <th th:if="${( roleName == 'ROLE_DM')}">Action</th>
+				          <!--<th>Attachment</th>-->
+				          <th th:if="${( roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}">Action</th>
 				        </tr>
 				      </thead>
 				      <tbody>
 				        <tr data-ng-repeat="remark in dmremarkslist track by $index">
 				          <td>{{ $index + 1 }}</td>
-				          <td>{{ remark.remark }}</td>
+						  <!--<td>{{ remark.createBy}}</td>
+						  <td>{{ remark.role}}</td>-->
+						  <td>{{ remark.remark || '-'}}</td>
+				          <td>{{ remark.departmentRemarks || '-'}}</td>
 				          <td>{{ remark.createdDate | date: 'dd-MM-yyyy hh:mm:ss a' }}</td>
-				          <td >
-							<a data-ng-if="remark.documentId!=null" class="btn btn-primary" target="blank" ng-click="openAttachmentModal(remark.documentId)">
-							  View Attachment
+				          <!--<td >
+							
+							<a class="btn btn-primary" target="_blank"
+							   ng-click="openAttachmentModal(remark.documentId)"
+							   ng-if="remark.documentId != null"
+							   ng-class="{'disabled': roleName !== remark.roleCode}"
+							   ng-style="{'pointer-events': (roleName !== remark.roleCode ? 'none' : 'auto')}">
+							   View Attachment
 							</a>
 
 				           
-				          </td>
-				          <td th:if="${( roleName == 'ROLE_DM')}">
+				          </td>-->
+				          <td >
 							
-							  <button type="button" class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)">
+							  <button type="button" data-ng-disabled="roleName != 'ROLE_DEPARTMENT'" class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)" >
 							    Delete
 							  </button>
-							  <button type="button" class="btn btn-danger btn-sm" data-ng-click="getRemarksDetails(remark.id)">
+							  <button type="button" data-ng-disabled="roleName != 'ROLE_DEPARTMENT'" class="btn btn-danger btn-sm" data-ng-click="getRemarksDetails(remark.id)">
 							  						    Edit
 							  						  </button>
 

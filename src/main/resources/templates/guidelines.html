@@ -68,21 +68,36 @@
 	<script type="text/javascript">
 		/*<![CDATA[*/
 
-		function loadThematicMap() {
-			$.ajax({
-				url: "districtWiseWorkStatus?isThematicMap=true",
-				success: function (resp) {
-					LoadMap(resp);
-				},
-				error: function (msg) {
-					//alert(msg);
-				}
-			});
+		
+					function loadThematicMap() {
+		    $.ajax({
+		        url: "districtWiseWorkStatus?isThematicMap=true",
+		        dataType: 'json',  // jQuery automatically parses response safely
+		        success: function(resp) {
+		            LoadMap(resp); // resp is already a safe JSON object
+		        },
+		        error: function(msg) {
+		            console.error(msg);
+		        }
+		    });
 		}
+		
+//		function loadThematicMap() {
+//			$.ajax({
+//				url: "districtWiseWorkStatus?isThematicMap=true",
+//				success: function (resp) {
+//					LoadMap(resp);
+//				},
+//				error: function (msg) {
+//					//alert(msg);
+//				}
+//			});
+//		}
 		function LoadMap(dist_values) {
 			var url = null;
-			var tbl = jQuery.parseJSON(JSON.stringify(dist_values));
+			//var tbl = jQuery.parseJSON(JSON.stringify(dist_values));
 			//var tbl=JSON.parse(dist_values);
+			var tbl=dist_values;
 
 			url = "https://geoportal.mp.gov.in/thematicmap/GetThematicMap.svc/GetAllDistrictsMap";
 
@@ -463,19 +478,12 @@
 								<div class="navbar-collapse collapse clearfix">
 									<ul class="navigation clearfix">
 										<li><a href="login"><i class="las la-home commn-css"></i>Home</a></li>
-										<!-- <li><a href="#.html">About us</a></li> -->
-										<!-- <li><a href="#.html">User Manual </a></li> -->
-										<!-- <li><a target="_blank" href="https://app.powerbi.com/view?r=eyJrIjoiMTA4MzVjOTEtMjY1Ny00MmE1LThmZTQtNWQ4MzZjNmFkOTQ0IiwidCI6IjYzMzI3N2ExLTFmMDctNGU5Mi04MDQwLWNiOGNkYmQ2NTQxNCJ9">Dashboard</a></li> -->
 										<li><a target="_self" href="aboutUs"><i
 													class="las la-podcast commn-css"></i>About us</a></li>
 										<li><a target="_self" href="guidelines1"><i
 													class="las la-clipboard commn-css"></i>Guidelines</a></li>
 										<li><a target="_self" href="contactUs"><i
 													class="las la-address-card commn-css"></i>Contact Us</a></li>
-										<!--  <li><a target="_blank" href="https://app.powerbi.com/view?r=eyJrIjoiOWVhNzg4NjMtOTM4MC00YjEyLWI3N2ItNzViZTI0NTA0NWQwIiwidCI6IjYzMzI3N2ExLTFmMDctNGU5Mi04MDQwLWNiOGNkYmQ2NTQxNCJ9"><i class="las la-atom commn-css"></i>Dashboard</a></li>-->
-										<li><a target="_blank"
-												href="http://PBIRS_dhs:Test%40123@analytics.mp.gov.in:8080/Reports/powerbi/PBIRS_dhs/MLA%20Lads%20Dashboard%20MIS?rs:Command=Render&amp;rc:Toolbar=false"><i
-													class="las la-atom commn-css"></i>Dashboard</a></li>
 
 									</ul>
 								</div>

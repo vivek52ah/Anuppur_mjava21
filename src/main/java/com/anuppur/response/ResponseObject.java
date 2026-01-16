@@ -9,6 +9,7 @@ public class ResponseObject {
 	private long id;
 	private String number;
 	private List<String> errorMsgList;
+	private String roleCode;
 
 	public List<String> getErrorMsgList() {
 		return errorMsgList;
@@ -49,5 +50,15 @@ public class ResponseObject {
 	public void setNumber(String number) {
 		this.number = number;
 	}
+
+	public final String getRoleCode() {
+		return roleCode;
+	}
+
+	public final void setRoleCode(String roleCode) {
+		this.roleCode = roleCode;
+	}
+	
+	
 
 }

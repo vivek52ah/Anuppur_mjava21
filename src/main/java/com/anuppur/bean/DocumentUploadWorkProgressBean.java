@@ -1,11 +1,8 @@
 package com.anuppur.bean;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class DocumentUploadWorkProgressBean {
 
@@ -16,15 +13,7 @@ public class DocumentUploadWorkProgressBean {
 	private int size;
 	private Long workStatusId;
 	private String workStatusNameE;
-	private String Imagepath;
-	
-	public String getImagepath() {
-		return Imagepath;
-	}
-
-	public void setImagepath(String imagepath) {
-		Imagepath = imagepath;
-	}
+	private String imagepath;
 
 	public String getLongitude() {
 		return longitude;
@@ -65,6 +54,14 @@ public class DocumentUploadWorkProgressBean {
 	
 	
     
+
+	public final String getImagepath() {
+		return imagepath;
+	}
+
+	public final void setImagepath(String imagepath) {
+		this.imagepath = imagepath;
+	}
 
 	public String getAddress() {
 		return address;

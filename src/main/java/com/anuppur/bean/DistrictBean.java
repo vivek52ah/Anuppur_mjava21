@@ -16,9 +16,6 @@ public class DistrictBean {
 	
 	private Integer index;
 
-	public DistrictBean() {
-	}
-
 	public Long getDistrictId() {
 		return districtId;
 	}

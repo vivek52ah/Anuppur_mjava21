@@ -22,6 +22,8 @@
 	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+	<script th:src="@{/js/bootstrap-select.min.js}"></script>
+	<script th:src="@{/js/bootstrap-select.js}"></script>
 
 <style>
 div#imageModal .modal-header h5:nth-child(2) {
@@ -108,11 +110,11 @@ a.page-link {
 	box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
 }
 
-select#workType {
+select#workType1 {
 	box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
 }
 
-select#financialYear {
+select#financialYear1 {
 	box-shadow: 0px 0px 12px rgb(0 0 0/ 8%);
 }
 
@@ -393,7 +395,168 @@ table.dataTable {
 
 
 
+		.neat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);   /* 👉 3 Columns */
+    grid-gap: 10px 20px;                     /* Row-gap  Column-gap */
+    margin-top: 10px;
+    padding: 10px;
+    background: #f7f7f7;
+    border-radius: 6px;
+}
+
+.neat-grid label {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px;
+}
+
+
 </style>
+
+
+
+
+		<script>
+	
+	setTimeout(function() {
+		$('#accountHeadId1').selectpicker();
+	}, 1000);
+	
+	$('#financialYear1').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select FY of Sanction--'
+	});
+	$('#workType1').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select Work Type--'
+	});
+	$('#workStatusId').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select Work Status--'
+	});
+	$('#implementationAgency').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select Executive Agency--'
+	});
+	$('#workPriorityId').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select Work Priority--'
+	});
+	$('#financialHeadId1').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select Financing Agency--'
+	});
+	$('#vidhanSabhaId1').selectpicker({
+		actionsBox : true,
+		noneSelectedText: '--Select Vidhan Sabha--'
+	});
+	
+	
+</script>
+
+<style>
+
+.dropdown-menu.show{width:100%!important}
+.dropdown-menu.show {
+    top: -35px !important;position:relative!important;
+}
+#fyId {
+    position: relative!important;
+}
+#wtId {
+    position: relative!important;
+}
+
+#wsId {
+    position: relative!important;
+}
+
+#iaId {
+    position: relative!important;
+}
+
+#wpId {
+    position: relative!important;
+}
+
+#fyhId {
+    position: relative!important;
+}
+
+#vsId {
+    position: relative!important;
+}
+
+div#bs-select-1 {
+    overflow: auto;
+    height: 200px!important;overflow-x:hidden!important;
+}
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 7px rgb(0 0 0 / 70%);border-radius:7px
+}
+
+.custom-select {
+    background-color: white;
+    color: black;
+    height: 120px;
+    font-size: 14px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* After Selection, Keep the Blue Background */
+.custom-select.has-selection {
+    background-color: blue !important;
+    color: white !important;
+}
+
+select#financialYear1 + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#workType1 + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#workStatusId + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#implementationAgency + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#workPriorityId + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#financialHeadId1 + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+select#vidhanSabhaId1 + button {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+
+ul.dropdown-menu.inner.show {
+    max-width: 200px!important;overflow:hidden!important
+}
+ul.dropdown-menu.inner.show li {
+    width: 276px !important;overflow:hidden!important
+}
+</style>
+
 
 </head>
 <body>
@@ -415,15 +578,13 @@ table.dataTable {
 								<form name="searchForm" novalidate="novalidate" id="searchForm">
 									<fieldset class="legend-border">
 										<legend class="legend-border">Filters</legend>
-										<div class="row">
-
+											<div class="row">
+							
 											<!-- Work Name -->
-										<div class="form-group col-sm-4" style="position:relative;">
-													<div class="form-group col-sm-4">
-								
-											</div>
-												<input type="text" class="form-control" placeholder="--Type Work Name--" id="searchBoxVal" name="searchBoxVal" ng-model="workName"
-													ng-change="loadWorkNameSuggestions(workName)" />
+											<div class="form-group col-sm-4" style="position:relative;">
+												
+												<input type="text" class="form-control" placeholder="--Work Unique ID--" id="searchBoxVal" name="searchBoxVal" ng-model="workNo"
+													ng-change="loadWorkNoSuggestions(workNo)" />
 											
 												<ul class="list-group" ng-show="suggestedWorkNames.length > 0">
 													<li class="list-group-item" ng-repeat="name in suggestedWorkNames" ng-click="selectWorkName(name)">
@@ -431,90 +592,133 @@ table.dataTable {
 													</li>
 												</ul>
 											</div>
-
+							
 											<!-- Financial Year -->
-										<div class="form-group col-sm-4">
-												<input type="text" class="form-control search-input" ng-model="financialYear"
-													placeholder="Search..." ng-change="updateFilter()" />
-												<select class="form-control" id="financialYear" data-ng-model="workData.financialYear"
-													data-ng-init="loadFinancialYears();" name="financialYear">
+										<div id="fyId" class="form-group col-sm-4" data-ng-init="loadFinancialYears();">
+												
+												<select multiple="multiple" class="form-control " id="financialYear1" data-ng-model="workData.financialYear"
+													 name="financialYear" data-live-search="true">
 													<option value="" disabled="disabled">--Select
 														Financial Year--</option>
-													<option data-ng-repeat="financialYearName in financialYears | filter:financialYear"
-														value="{{financialYearName.financialYearId}}">
+													<option data-ng-repeat="financialYearName in financialYears "
+														value="{{financialYearName.financialYearId}}"
+														data-ng-class="{'selected-option': isSelected(financialYearName.financialYearId)}">
 														{{financialYearName.financialYearName}}</option>
 												</select>
 											</div>
-
-
-
-
-											<!-- Work Status -->
+							
+											<!-- Department -->
+							
+							
+											<!--  	<option
+																					data-ng-repeat="divisionName in divisions | orderBy : 'divisionName'"
+																					value="{{divisionName.divisionId}}">{{divisionName.divisionName}}</option> -->
+							
+							
 											<div class="form-group col-sm-4">
-												<input type="text" class="form-control search-input" ng-model="worksStatu" placeholder="Search..."
-													ng-change="updateFilter()" />
-												<select class="form-control" id="workStatusId" data-ng-model="workData.workStatusId"
-													data-ng-init="loadWorkStatus1();" name="workStatusId">
+												
+												<select class="form-control" id="divisionId" data-ng-model="workData.divisionId"
+													data-ng-init="loadDivisionsWork();" name="divisionId" disabled="disabled">
+													<option value="" disabled="disabled">--Select
+														Division--</option>
+													<option value="3">Rewa</option>
+												</select>
+											</div>
+							
+											<!--  			<option
+																					data-ng-repeat="districtName in districts | orderBy : 'districtName'"
+																					value="{{districtName.districtId}}">{{districtName.districtName}}</option> -->
+							
+							
+							
+											<div class="form-group col-sm-4">
+											
+												<select class="form-control" id="districtId" data-ng-model="workData.districtId"
+													data-ng-init="loadDistrictsWork();" disabled="disabled"
+													data-ng-change="reloadJqueryDatatable();" name="districtId">
+													<option value="" disabled="disabled">--Select
+														District--</option>
+													<option value="49">Anuppur</option>
+												</select>
+											</div>
+											<div id="wtId" class="form-group col-sm-4">
+												
+												<select multiple="multiple" class="form-control" id="workType1" data-ng-model="workData.workType"
+													data-ng-init="loadWorkTypes();" data-ng-change="" name="workType" data-live-search="true">
+													<option value="" disabled="disabled">--Select Work
+														Type--</option>
+													<option data-ng-repeat="workType in workTypes | filter:workType"
+														value="{{workType.workTypeId}}" data-ng-class="{'selected-option': isSelected(workType.workTypeId)}">{{workType.workTypeNameE}}
+													</option>
+												</select>
+							
+											</div>
+							
+							
+											<!-- Work Status -->
+											<div id="wsId" class="form-group col-sm-4">
+												
+												<select multiple="multiple" class="form-control" id="workStatusId" data-ng-model="workData.workStatusId"
+													data-ng-init="loadWorkStatus1();" name="workStatusId" data-live-search="true">
 													<option value="" disabled="disabled">--Select Work
 														Status--</option>
-													<option data-ng-repeat="worksStatusName in worksStatus | filter:worksStatus"
-														value="{{worksStatusName.workStatusId}}">
+													<option data-ng-repeat="worksStatusName in worksStatus | filter:worksStatu"
+														value="{{worksStatusName.workStatusId}}"  data-ng-class="{'selected-option': isSelected(worksStatusName.workStatusId)}">
 														{{worksStatusName.workStatusNameE}}</option>
 												</select>
 											</div>
-
+							
 											<!-- Implementation Agency -->
-											<div class="form-group col-sm-4" data-ng-init="loadAgencies()">
-												<input type="text" class="form-control search-input" ng-model="implAgency" placeholder="Search..."
-													ng-change="updateFilter()" />
-												<select class="form-control" data-ng-model="workData.implementationAgency"
-													name="implementationAgency" id="implementationAgency">
+											<div id="iaId" class="form-group col-sm-4" data-ng-init="loadAgencies()">
+												
+												<select multiple="multiple" class="form-control" data-ng-model="workData.implementationAgency"
+													name="implementationAgency" id="implementationAgency" data-live-search="true">
 													<option value="" disabled="disabled">--Select
 														Agency--</option>
 													<option data-ng-repeat="agency in agencies | filter:implAgency"
-														value="{{agency.implementationAgencyId}}">
+														value="{{agency.implementationAgencyId}}" data-ng-class="{'selected-option': isSelected(agency.implementationAgencyId)}">
 														{{agency.implementationAgencyNameE}}</option>
 												</select>
 											</div>
-
-										<div class="form-group col-sm-4" data-ng-init="loadWorkPriority(); ">
-												<input type="text" class="form-control search-input" ng-model="priorityText" placeholder="Search..."
-													ng-change="updateFilter()" />
-												<select class="form-control" id="workPriorityId" data-ng-model="workData.workPriorityId"
-													name="workPriorityId">
+							
+							
+											<div id="wpId" class="form-group col-sm-4" data-ng-init="loadWorkPriority(); ">
+												
+												<select multiple="multiple" class="form-control" id="workPriorityId" data-ng-model="workData.workPriorityId"
+													name="workPriorityId" data-live-search="true">
 													<option value="" disabled="disabled">--Select Work Priority--
 													</option>
-													<option data-ng-repeat="priority in priorityies | filter:priorityText" value="{{priority.id}}">
+													<option data-ng-repeat="priority in priorityies | filter:priorityText" value="{{priority.id}}"
+													data-ng-class="{'selected-option': isSelected(priority.id)}">
 														{{priority.workPriorityName}}</option>
 												</select>
 											</div>
-
-										<div class="form-group col-sm-4" data-ng-init="loadFinancialHead();">
-												<input type="text" class="form-control search-input" ng-model="financialHeadText"
-													placeholder="Search..." ng-change="updateFilter()" />
-												<select class="form-control" data-ng-model="workData.financialHeadId" name="financialHeadId"
-													id="financialHeadId" required="required">
+							
+							
+											<div id="fyhId" class="form-group col-sm-4" data-ng-init="loadFinancialHead();">
+												
+												<select  multiple="multiple" class="form-control" data-ng-model="workData.financialHeadId" name="financialHeadId"
+													id="financialHeadId1" required="required" data-live-search="true">
 													<option value="" disabled="disabled">--Select Financial Head--
 													</option>
 													<option data-ng-repeat="financialHead in financialHeads | filter:financialHeadText"
-														value="{{financialHead.id}}">{{financialHead.financialHeadName}}
+														value="{{financialHead.id}}" data-ng-class="{'selected-option': isSelected(financialHead.id)}">{{financialHead.financialHeadName}}
 													</option>
 												</select>
 											</div>
-
-
-											<div class="form-group col-sm-4" data-ng-init="loadVidhanSabha();">
-												<input type="text" class="form-control search-input" ng-model="vidhanSabhaText"
-													placeholder="Search..." ng-change="updateFilter()" />
-												<select class="form-control" data-ng-model="workData.vidhanSabhaId" name="vidhanSabhaId"
-													id="vidhanSabhaId" required="required">
+							
+							
+											<div id="vsId" class="form-group col-sm-4" data-ng-init="loadVidhanSabha();">
+												
+												<select multiple="multiple" class="form-control" data-ng-model="workData.vidhanSabhaId" name="vidhanSabhaId"
+													id="vidhanSabhaId1" required="required" data-live-search="true">
 													<option value="" disabled="disabled">--Select Vidhan Sabha--</option>
 													<option data-ng-repeat="vidhanSabha in vidhanSabhas | filter:vidhanSabhaText"
-														value="{{vidhanSabha.id}}">{{vidhanSabha.vidhanSabhaName}}
+														value="{{vidhanSabha.id}}" data-ng-class="{'selected-option': isSelected(vidhanSabha.id)}">{{vidhanSabha.vidhanSabhaName}}
 													</option>
 												</select>
 											</div>
-
+							
 										</div>
 									</fieldset>
 								</form>
@@ -540,35 +744,36 @@ table.dataTable {
 							<br /> <br />
 							<div class="checkbox-container column-toggle-container neat-grid">
 
-    <label><input type="checkbox" class="col-toggle" data-column="0" checked="checked" /> S.No.</label>
-    <label><input type="checkbox" class="col-toggle" data-column="1" checked="checked" /> Work Unique ID</label>
-    <label><input type="checkbox" class="col-toggle" data-column="2" checked="checked" /> Work Name</label>
-    <label><input type="checkbox" class="col-toggle" data-column="3" checked="checked" /> Work Type</label>
+      <label><input type="checkbox" class="col-toggle" data-column="0" checked="checked" /> S.No.</label>
+   	 <label><input type="checkbox" class="col-toggle" data-column="1" checked="checked" /> Division</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="2" checked="checked" /> District</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="3" checked="checked" /> Work Unique ID</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="4" checked="checked" /> Work Name</label>
+     <label><input type="checkbox" class="col-toggle" data-column="5" checked="checked" /> Work Type</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="6" checked="checked" /> FY of Sanction</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="7" checked="checked" /> Executive Agency</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="8" checked="checked" /> Financing Agency</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Year of Administrative Sanction</label>
+    <label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> A.S. Date. </label>
+    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> Total A.S. Amount </label>
+    <label><input type="checkbox" class="col-toggle" data-column="12" checked="checked" /> Agreement Date </label>
+     <label><input type="checkbox" class="col-toggle" data-column="13" checked="checked" /> Agreement No </label>
+    <label><input type="checkbox" class="col-toggle" data-column="14" checked="checked" /> Work Order</label>
 
-    <label><input type="checkbox" class="col-toggle" data-column="4" checked="checked" /> FY of Sanction</label>
-    <label><input type="checkbox" class="col-toggle" data-column="5" checked="checked" /> District</label>
-    <label><input type="checkbox" class="col-toggle" data-column="6" checked="checked" /> Executive Agency</label>
-    <label><input type="checkbox" class="col-toggle" data-column="7" checked="checked" /> Division Name</label>
+    <label><input type="checkbox" class="col-toggle" data-column="15" checked="checked" /> Timeline (Months)</label>
+    <label><input type="checkbox" class="col-toggle" data-column="16" checked="checked" /> Total Expenditure (In Lakhs)</label>
+    <label><input type="checkbox" class="col-toggle" data-column="17" checked="checked" /> Physical Status</label>
+    <label><input type="checkbox" class="col-toggle" data-column="18" checked="checked" /> Level of Completion</label>
+    <label><input type="checkbox" class="col-toggle" data-column="19" checked="checked" /> Contractor Name</label>
 
-    <label><input type="checkbox" class="col-toggle" data-column="8" checked="checked" /> Year of Sanction</label>
-    <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Date Of Sanction</label>
-    <label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> Sanction Amount</label>
-    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> Work Order</label>
+    <label><input type="checkbox" class="col-toggle" data-column="20" checked="checked" /> SOR Year</label>
+    <label><input type="checkbox" class="col-toggle" data-column="21" checked="checked" /> Tender %</label>
+    
+    <label><input type="checkbox" class="col-toggle" data-column="22" checked="checked" /> Work Priority</label>
 
-    <label><input type="checkbox" class="col-toggle" data-column="12" checked="checked" /> Timeline (Months)</label>
-    <label><input type="checkbox" class="col-toggle" data-column="13" checked="checked" /> Total Expenditure</label>
-    <label><input type="checkbox" class="col-toggle" data-column="14" checked="checked" /> Completion Level</label>
-    <label><input type="checkbox" class="col-toggle" data-column="15" checked="checked" /> Contractor Name</label>
-
-    <label><input type="checkbox" class="col-toggle" data-column="16" checked="checked" /> SOR Year</label>
-    <label><input type="checkbox" class="col-toggle" data-column="17" checked="checked" /> Tender %</label>
-    <label><input type="checkbox" class="col-toggle" data-column="18" checked="checked" /> Current Status</label>
-    <label><input type="checkbox" class="col-toggle" data-column="19" checked="checked" /> Work Priority</label>
-
-    <label><input type="checkbox" class="col-toggle" data-column="20" checked="checked" /> Financing Agency</label>
-    <label><input type="checkbox" class="col-toggle" data-column="21" checked="checked" /> Vidhan Sabha</label>
-    <label><input type="checkbox" class="col-toggle" data-column="22" checked="checked" /> DM Remarks</label>
-    <label><input type="checkbox" class="col-toggle" data-column="23" checked="checked" /> Action</label>
+    <label><input type="checkbox" class="col-toggle" data-column="23" checked="checked" /> Vidhan Sabha</label>
+    <label><input type="checkbox" class="col-toggle" data-column="24" checked="checked" /> DM Remarks</label>
+    <label><input type="checkbox" class="col-toggle" data-column="25" checked="checked" /> Action</label>
 
 </div>
 
@@ -634,6 +839,15 @@ table.dataTable {
     // Else no context path (like in LIVE), return empty
     return '';
 } 
+   
+   
+	  function getMultiSelectValue(id) {
+		    let v = $(id).val();
+		    if (!v) return [];        // null → empty array
+		    if (Array.isArray(v)) return v;   // already array
+		    return [v];               // string → convert to array
+		}
+
 	   
     var table;
 
@@ -648,30 +862,33 @@ table.dataTable {
                 	
                 	
                 	d.searchBoxVal = $('#searchBoxVal').val().trim();
-                    d.workType = $('#workType').val();
-                    d.financialYear = $('#financialYear').val();
-                    d.divisionId = $('#divisionId').val();
-                    d.districtId = $('#districtId').val();
-                    d.workStatusId = $('#workStatusId').val();
-                    d.workSubTypeId = $('#workSubTypeId').val();
-                    d.department = $('#department').val();
-                    d.implementationAgency = $('#implementationAgency').val();
-                    d.workPriorityId = $('#workPriorityId').val();
-                    d.financialHeadId = $('#financialHeadId').val();
-                    d.vidhanSabhaId = $('#vidhanSabhaId').val();
+
+                	d.workType1 = getMultiSelectValue('#workType1').join(",");
+                	d.financialYear1 = getMultiSelectValue('#financialYear1').join(",");
+                	d.divisionId = getMultiSelectValue('#divisionId').join(",");
+                	d.districtId = getMultiSelectValue('#districtId').join(",");
+                	d.workStatusId = getMultiSelectValue('#workStatusId').join(",");
+                	d.workSubTypeId = getMultiSelectValue('#workSubTypeId').join(",");
+                	d.department = getMultiSelectValue('#department').join(",");
+                	d.implementationAgency = getMultiSelectValue('#implementationAgency').join(",");
+                	d.workPriorityId = getMultiSelectValue('#workPriorityId').join(",");
+                	d.financialHeadId1 = getMultiSelectValue('#financialHeadId1').join(",");
+                	d.vidhanSabhaId1 = getMultiSelectValue('#vidhanSabhaId1').join(",");
+
+
                     
                 	    
                 	    
                 	    
                 	    console.log("Sending filters to backend: ", {
                 	        searchBoxVal: d.searchBoxVal,
-                	        financialYear: d.financialYear,
+                	        financialYear1: d.financialYear1,
                 	        department: d.department,
                 	        workStatusId: d.workStatusId,
                 	        implementationAgency: d.implementationAgency,
                 	        workPriorityId: d.workPriorityId,
-                	        financialHeadId: d.financialHeadId,
-                	        vidhanSabhaId: d.vidhanSabhaId
+                	        financialHeadId1: d.financialHeadId1,
+                	        vidhanSabhaId1: d.vidhanSabhaId1
                 	    });
                 	    
                     d.iDisplayLength = d.length; // ✅ Already sent by DataTables
@@ -705,26 +922,30 @@ table.dataTable {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
                 },
-                { data: "workNo", title: "Work No", defaultContent: "-" },
-                { data: "workName", title: "Work Name", defaultContent: "-" },
-                { data: "workType", title: "Work Type", defaultContent: "-" },
-                { data: "financialYearName", title: "Financial Year", defaultContent: "-" },
-                { data: "districtName", title: "District", defaultContent: "-" },
-                { data: "implementationAgencyName", title: "Construction Agency", defaultContent: "-" },
-                { data: "divisionName", title: "Division Name", defaultContent: "-" },
-                { data: "yearOfAdministrativeApproval", title: "Year of Administrative Sanction", defaultContent: "-" },
-                { data: "dateOfAdministrativeApproval", title: "Date of Administrative Sanction", defaultContent: "-" },
-                { data: "amountOfAdministrativeApproval", title: "Amount of Administrative Sanction (Rs. in Lakh)", defaultContent: "-" },
-                { data: "workOrderDate", title: "Work Order", defaultContent: "-" },
-                { data: "timeLineInMonths", title: "Time Line in Months", defaultContent: "-" },
-                { data: "totalExpeditureTillDate", title: "Total Expenditure Till Date", defaultContent: "-" },
-                { data: "levelOfCompletion", title: "Level of Completion", defaultContent: "-" },
-                { data: "contractorName", title: "Contractor Name", defaultContent: "-" },
-                { data: "sor", title: "SOR Year", defaultContent: "-" },
-                { data: "tenderParcentage", title: "Tender Percentage", defaultContent: "-" },
-                { data: "workStatusName", title: "Current Physical Status", defaultContent: "-" },
-                { data: "workPriority", title: "Work Priority", defaultContent: "-" },
-                {data: "financialHeadName", title: "Financial Head", defaultContent: "-"},
+                {data: "divisionName", title: "Division", defaultContent: "-"},
+				{data: "districtName", title: "District", defaultContent: "-"},
+				{data: "workNo", title: "Work Unique ID", defaultContent: "-"},
+				{data: "workName", title: "Work Name", defaultContent: "-"},
+				{data: "workType", title: "Work Type", defaultContent: "-"},
+				{data: "financialYearName", title: "FY of Sanction", defaultContent: "-"},
+				
+				{data: "implementationAgencyName", title: "Executive Agency", defaultContent: "-"},
+				{data: "financialHeadName", title: "Financing Agency", defaultContent: "-"},
+				{data: "yearOfAdministrativeApproval", title: "Year of Administrative Sanction", defaultContent: "-"},
+				{data: "dateOfAdministrativeApproval", title: "A.S. Date", defaultContent: "-"},
+				{data: "amountOfAdministrativeApproval", title: "Total A.S. Amount ", defaultContent: "-"},
+				{data: "agreementDate", title: "Agreement Date", defaultContent: "-"},
+				{data: "agreementNo", title: "Agreement No", defaultContent: "-"},
+				{data: "workOrderDate", title: "Work Order", defaultContent: "-"},
+				{data: "timeLineInMonths", title: "Time Line in Months", defaultContent: "-"},
+				{data: "totalExpeditureTillDate", title: "Total Expenditure (In Lakhs)", defaultContent: "-"},
+				{data: "workStatusName", title: "Physical Status", defaultContent: "-"},
+				{data: "levelOfCompletion", title: "Level of Completion", defaultContent: "-"},
+				{data: "contractorName", title: "Contractor Name", defaultContent: "-"},
+				{data: "sor", title: "SOR Year", defaultContent: "-"},
+				{data: "tenderParcentage", title: "Tender Percentage", defaultContent: "-"},
+				{data: "workPriority", title: "Work Priority", defaultContent: "-"},
+				
 				{data: "vidhanSabhaName", title: "Vidhan Sabha", defaultContent: "-"},
 				{
 								    data: null,               // tell DataTables we will build the value ourselves
@@ -950,30 +1171,56 @@ table.dataTable {
 
 
 							<script>
-function resetFilters() {
-    // Reset form
-    document.getElementById("searchForm").reset();
+							function resetFilters() {
 
-    // Manually clear angular-bound model fields (if needed)
-    $('#searchBoxVal').val('');
-    $('#financialYear').val('');
-    $('#department').val('');
-    $('#workStatusId').val('');
-    $('#implementationAgency').val('');
-    $('#workType').val('');
-    $('#divisionId').val('');
-    $('#districtId').val('');
-    $('#workSubTypeId').val('');
-    $('#workPriorityId').val('');
-    $('#financialHeadId').val('');
-    $('#vidhanSabhaId').val('');
- 
-    
-    
+							    // AngularJS Scope
+							    var scope = angular.element(document.getElementById('searchForm')).scope();
 
-    // Reload the table
-    window.reloadJqueryDatatables();
-}
+							    scope.$apply(function () {
+
+							        // Reset MODEL values
+							        scope.searchBoxVal = "";
+							        scope.workData.financialYear1 = [];
+							        scope.workData.workType1 = [];
+							        scope.workData.workStatusId = [];
+							        scope.workData.workSubTypeId = [];
+							        scope.workData.department = [];
+							        scope.workData.implementationAgency = [];
+							        scope.workData.workPriorityId = "";
+							        scope.workData.financialHeadId1 = [];
+							        scope.workData.vidhanSabhaId1 = "";
+
+							        // ❌ Do NOT reset division/district
+							        // scope.workData.divisionId = scope.workData.divisionId;
+							        // scope.workData.districtId = scope.workData.districtId;
+							    });
+
+							    // Reset DOM inputs
+							    $('#searchBoxVal').val("");
+
+							    $('#financialYear1').val([]).trigger('change');
+							    $('#workType1').val([]).trigger('change');
+							    $('#workStatusId').val([]).trigger('change');
+							    $('#workSubTypeId').val([]).trigger('change');
+							    $('#financialHeadId1').val([]).trigger('change');
+							    $('#department').val([]).trigger('change');
+							    $('#implementationAgency').val([]).trigger('change');
+
+							    $('#workPriorityId').val("").trigger('change');
+							    $('#vidhanSabhaId1').val("").trigger('change');
+
+							    // ❌ Do NOT reset division/district DOM also
+							    // $('#divisionId').val(scope.workData.divisionId);
+							    // $('#districtId').val(scope.workData.districtId);
+
+							    // Clear session filters
+							    localStorage.removeItem("work_filters");
+
+							    // Reload DataTable
+							    window.reloadJqueryDatatables();
+							}
+
+
 
 
 let allChecked = true;
@@ -1005,179 +1252,125 @@ $('.col-toggle').on('change', function () {
 
 $(document).ready(function () {
 
-    const defaultSelect = [0, 1, 2, 6, 13, 14, 18, 22];
+	const defaultSelect = [0, 3, 4, 7, 10, 11, 12, 14, 16, 17, 18, 24];
+    const $checkboxes = $(".col-toggle");
+    const $dropdown = $("#add-column-list");
+    const $toggleBtn = $("#toggleAllColumns");
 
-    // -------------------------
-    // 1. Load saved columns from sessionStorage
-    // -------------------------
+    // -----------------------------
+    // Load saved state
+    // -----------------------------
     let savedCols = sessionStorage.getItem("selectedColumns");
-    savedCols = savedCols ? JSON.parse(savedCols) : null;
+    savedCols = savedCols ? JSON.parse(savedCols).map(x => parseInt(x)) : null;
 
-    $('.col-toggle').each(function () {
-        const colIdx = $(this).data('column');
+    $checkboxes.each(function () {
+        const idx = parseInt($(this).data("column"));
 
-        // If session has saved state → apply it
         if (savedCols) {
-            const isVisible = savedCols.includes(colIdx);
-            $(this).prop('checked', isVisible);
-            table.column(colIdx).visible(isVisible);
-        }
-        // Else first time → apply default selections
-        else {
-            if (defaultSelect.includes(colIdx)) {
-                $(this).prop('checked', true);
-                table.column(colIdx).visible(true);
-            } else {
-                $(this).prop('checked', false);
-                table.column(colIdx).visible(false);
-            }
-        }
-    });
-
-    table.columns.adjust().draw();
-
-
-    // -------------------------
-    // 2. User manual toggle
-    // -------------------------
-    $('.col-toggle').on('change', function () {
-        const colIdx = $(this).data('column');
-        const isVisible = $(this).is(':checked');
-
-        table.column(colIdx).visible(isVisible);
-        table.columns.adjust().draw();
-
-        saveStateToSession();
-    });
-
-
-    // -------------------------
-    // 3. Toggle All Button
-    // -------------------------
-    $('#toggleAllColumns').on('click', function () {
-        let allOn = $(this).text() === "Select All";
-
-        $('.col-toggle').each(function () {
-            const colIdx = $(this).data('column');
-            $(this).prop('checked', allOn);
-            table.column(colIdx).visible(allOn);
-        });
-
-        $(this).text(allOn ? "Deselect All" : "Select All");
-        table.columns.adjust().draw();
-
-        saveStateToSession();
-    });
-
-
-    // -------------------------
-    // 4. Save current state to sessionStorage
-    // -------------------------
-    function saveStateToSession() {
-        let selectedArr = [];
-
-        $('.col-toggle').each(function () {
-            const colIdx = $(this).data('column');
-            if ($(this).is(':checked')) {
-                selectedArr.push(colIdx);
-            }
-        });
-
-        sessionStorage.setItem("selectedColumns", JSON.stringify(selectedArr));
-    }
-
-});
-
-
-
-
-$(document).ready(function(){
-
-    // Initially hide divs corresponding to unchecked checkboxes
-    $('.col-toggle').each(function(){
-        let colIndex = $(this).data('column');
-        if(!$(this).is(':checked')){
-            $('.col-toggle[data-column="'+colIndex+'"]').parent().hide();
-        }
-    });
-
-    // Refresh the Add Column dropdown with unchecked columns
-    function refreshAddColumnList(){
-        let addList = $('#add-column-list');
-        addList.empty();
-        addList.append('<option value="">-- Select Column to Add --</option>');
-        $('.col-toggle').each(function(){
-            if(!$(this).is(':checked')){
-                let colIndex = $(this).data('column');
-                let colName = $(this).parent().text().trim();
-                addList.append('<option value="'+colIndex+'">'+colName+'</option>');
-            }
-        });
-    }
-
-    refreshAddColumnList();
-
-    // Add column from dropdown
-    // Add column from MULTI SELECT dropdown
-$('#add-column-list').change(function(){
-
-    let selectedValues = $(this).val();  // array milegi
-
-    if(!selectedValues || selectedValues.length === 0) return;
-
-    selectedValues.forEach(function(colIndex){
-        if(colIndex !== ""){
-            $('.col-toggle[data-column="'+colIndex+'"]').parent().show();
-        }
-    });
-
-    // Refresh dropdown list again so added ones disappear
-    refreshAddColumnList();
-
-    // Reset dropdown selection
-    $(this).val([]);
-});
-
-
-    // Optional: If you want checkboxes to still toggle div manually
-    $('.col-toggle').change(function(){
-        let colIndex = $(this).data('column');
-        if($(this).is(':checked')){
-            $('.col-toggle[data-column="'+colIndex+'"]').parent().show();
+            $(this).prop("checked", savedCols.includes(idx));
         } else {
-            $('.col-toggle[data-column="'+colIndex+'"]').parent().hide();
+            $(this).prop("checked", defaultSelect.includes(idx));
         }
-        refreshAddColumnList();
     });
 
-});
+    // -----------------------------
+    // MASTER REFRESH FUNCTION
+    // -----------------------------
+    function refreshAll() {
 
+        // 1) Checkbox → Column show/hide
+        $checkboxes.each(function () {
+            const idx = parseInt($(this).data("column"));
+            const isChecked = $(this).is(":checked");
 
+            table.column(idx).visible(isChecked);
+            // SHOW/HIDE checkbox div
+            $(this).parent().toggle(isChecked);
+        });
 
+        table.columns.adjust().draw();
 
-$(document).ready(function(){
+        // 2) Update dropdown → only unchecked columns
+        $dropdown.empty().append(`<option value="">-- Select Column to Add --</option>`);
 
-    // Your existing code runs as-is
-    // ----------------------------------------------
+        $checkboxes.each(function () {
+            if (!$(this).is(":checked")) {
+                let idx = $(this).data("column");
+                let name = $(this).parent().text().trim();
+                $dropdown.append(`<option value="${idx}">${name}</option>`);
+            }
+        });
 
-    // OPEN animated dropdown
+        // 3) Update Select All button text
+        const allChecked = $checkboxes.length === $checkboxes.filter(':checked').length;
+        $toggleBtn.text(allChecked ? "Deselect All" : "Select All");
+
+        // 4) Save state
+        saveState();
+    }
+
+    // -----------------------------
+    // Save selected columns
+    // -----------------------------
+    function saveState() {
+        let arr = [];
+        $checkboxes.each(function () {
+            if ($(this).is(':checked')) arr.push($(this).data("column"));
+        });
+        sessionStorage.setItem("selectedColumns", JSON.stringify(arr));
+    }
+
+    // INITIAL RUN
+    refreshAll();
+
+    // -----------------------------
+    // Checkbox toggle
+    // -----------------------------
+    $checkboxes.change(function () {
+        refreshAll();
+    });
+
+    // -----------------------------
+    // Dropdown Add Column
+    // -----------------------------
+    $dropdown.change(function () {
+        let selected = $(this).val();
+        if (!selected) return;
+
+        selected.forEach(function (colIdx) {
+            $checkboxes.filter(`[data-column="${colIdx}"]`).prop("checked", true);
+        });
+
+        $(this).val([]);  // reset
+        refreshAll();
+    });
+
+    // -----------------------------
+    // Select All / Deselect All
+    // -----------------------------
+    $toggleBtn.click(function () {
+        let doSelect = $(this).text() === "Select All";
+        $checkboxes.prop("checked", doSelect);
+        refreshAll();
+    });
+
+    // -----------------------------
+    // Dropdown Animation
+    // -----------------------------
     $("#dropdownBtn").click(function (e) {
         e.stopPropagation();
-        $("#dropdownContainer").slideToggle(150); 
+        $("#dropdownContainer").slideToggle(150);
     });
 
-    // CLOSE dropdown when clicking outside
     $(document).click(function () {
         $("#dropdownContainer").slideUp(150);
     });
 
-    // Stop closing when clicking inside dropdown
     $("#dropdownContainer").click(function (e) {
         e.stopPropagation();
     });
 
 });
-
 
 </script>
 

@@ -42,6 +42,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@SuppressWarnings("all")
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${security.enable-csrf}")

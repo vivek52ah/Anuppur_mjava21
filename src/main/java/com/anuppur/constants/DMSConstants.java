@@ -37,7 +37,6 @@ public interface DMSConstants {
 	
 	public static final String ROLE_SAU = "ROLE_SAU";
 	public static final String ROLE_SU = "ROLE_SU";
-	
 	//public static final String ROLE_DEPARTMENT = "ROLE_DEPARTMENT";
 	
 	public static final String ROLE_AGENCY_ADMIN = "ROLE_AGENCY_ADMIN";

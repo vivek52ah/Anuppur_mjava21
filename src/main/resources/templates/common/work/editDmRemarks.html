@@ -1,8 +1,8 @@
-<div th:fragment="edit_dmRemark">
+<div th:fragment="view_dmRemark">
 	<div
 		th:if="${(roleName =='ROLE_DEPARTMENT' || roleName =='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName == 'ROLE_CEO' ) }">
 		<form
-			data-ng-submit="saveOrUpdateDmRemarks(workForm.$valid,dmAttachment)"
+			data-ng-submit="saveOrUpdateDmRemarks(workForm.$valid,dmattachment)"
 			name="workForm" id="workFormId" novalidate="novalidate"
 			enctype="multipart/form-data">
 
@@ -18,7 +18,7 @@
 						data-ng-hide="workDataR.DmRemakrs == null">Remarks By DM</div>
 
 					<div class="card-body"
-						th:if="${(roleName == 'ROLE_DM' )}"
+						th:if="${(roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}"
 						>
                          <div class="row">
 						<div class="col-sm-9">
@@ -26,7 +26,7 @@
 							<textarea class="form-control" maxlength="1000"
 								required="required" id="remark"
 								data-ng-model="workDataR.remakr" name="remakr" rows="7"
-								placeholder="Remarks" th:readonly="${roleName != 'ROLE_DM'}"></textarea>
+								placeholder="Remarks" th:readonly="${roleName != 'ROLE_DM' &amp;&amp; roleName != 'ROLE_DEPARTMENT'}"></textarea>
      
 							
 						</div>
@@ -34,7 +34,16 @@
 							<label>Uplaod Attachment </label>
 							<input type='file' accept="image/*,.pdf" class="form-control"
 															 required="required"
-															file-model="dmAttachment" name="dmremarksAttachment" id="dmremarksAttachment" />
+															file-model="dmattachment" name="dmremarksAttachment" id="dmremarksAttachment" />
+															<span data-ng-show="workDataR.documentId==null"><b>(pdf file with max size 30 mb)</b></span>
+												
+												
+															<p class="help-block" style="color: red;"
+								data-ng-show="fileExtentionErrorDM &amp;&amp; workForm.$submitted">
+								<span>Uploaded file size does not supported</span>
+							</p>
+
+						
 						</div>
 						</div>
 						
@@ -43,7 +52,7 @@
 
 
 
-					<div class="tab-footer text-right" th:if="${roleName == 'ROLE_DM'}">
+					<div class="tab-footer text-right" th:if="${roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT'}">
 
 						<button type="submit" class="btn btn-primary next-button nexxt"
 							id="finaltbtn"
@@ -79,14 +88,16 @@
 				        <tr>
 				          <th>S.No</th>
 				          <th>Remark</th>
+						  <th>User</th>
 				          <th>Remark Date</th>
 				          <th>Attachment</th>
-				          <th th:if="${( roleName == 'ROLE_DM')}">Action</th>
+				          <th th:if="${( roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}">Action</th>
 				        </tr>
 				      </thead>
 				      <tbody>
 				        <tr data-ng-repeat="remark in dmremarkslist track by $index">
 				          <td>{{ $index + 1 }}</td>
+						  <td>{{ remark.createBy}}</td>
 				          <td>{{ remark.remark }}</td>
 				          <td>{{ remark.createdDate | date: 'dd-MM-yyyy hh:mm:ss a' }}</td>
 				          <td >
@@ -96,7 +107,7 @@
 
 				           
 				          </td>
-				          <td th:if="${( roleName == 'ROLE_DM')}">
+				          <td th:if="${( roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}">
 							
 							  <button type="button" class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)">
 							    Delete

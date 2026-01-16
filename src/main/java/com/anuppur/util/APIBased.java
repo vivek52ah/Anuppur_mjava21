@@ -10,12 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
@@ -26,15 +20,10 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.anuppur.service.impl.SystemAdminServiceImpl;
-
-import java.security.cert.X509Certificate;
-
-
+@SuppressWarnings("all")
 public class APIBased {
 	public static final Logger logger1 = LoggerFactory.getLogger(APIBased.class);
 	public static class DummyTrustManager implements X509TrustManager {

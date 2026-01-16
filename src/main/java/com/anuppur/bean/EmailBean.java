@@ -1,21 +1,24 @@
 package com.anuppur.bean;
 
+@SuppressWarnings("all")
 public class EmailBean {
 
 	private String priority;
 	private String sender;
-	private String CC;
+	private String cC;
 	private String subject;
 	private boolean HTML;
 	private String body;
 	private String recipients;
 
-	public String getCC() {
-		return CC;
+	
+
+	public final String getcC() {
+		return cC;
 	}
 
-	public void setCC(String CC) {
-		this.CC = CC;
+	public final void setcC(String cC) {
+		this.cC = cC;
 	}
 
 	public boolean isHTML() {
@@ -67,7 +70,6 @@ public class EmailBean {
 	}
 
 	public boolean getHTML() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

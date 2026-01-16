@@ -597,6 +597,126 @@
 						</div>
 					</div>
 
+<!-- //Sumit -->
+
+				<div class="form-group col-sm-4"
+				data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+							<label><span>Agreement No</span><span class="aestrick">&#42;</span></label>
+							<input class="form-control" id="agreementNo" required="required"
+								data-ng-model="workDataTender.agreementNo" name="agreementNo"
+								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null"/>
+							<div data-ng-show="workForm.$submitted">
+								<p class="help-block" style="color: red;"
+									data-ng-show="workTenderForm.agreementNo.$error.required">
+									<span th:text="#{pleaseEnter}">Please enter</span> <span>Agreement No</span>
+								</p>
+							</div>
+						</div>
+						
+						<div class="form-group col-sm-4"
+				data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+							<label><span>Agreement No</span></label>
+							<input class="form-control" id="agreementNo" required="required"
+								data-ng-model="workDataTender.agreementNo" name="agreementNo"
+								/>
+							<!-- <div data-ng-show="workForm.$submitted">
+								<p class="help-block" style="color: red;"
+									data-ng-show="workForm.workName.$error.required">
+									<span th:text="#{pleaseEnter}">Please enter</span> <span>Work
+										Name</span>
+								</p>
+							</div> -->
+						</div>
+
+
+
+
+
+
+
+					<div class="form-group col-sm-4"
+						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+						<label><span>Agreement
+								Date </span><span data-ng-show="workData.isTenders == 1"
+							class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker24"
+							data-target-input="nearest">
+
+							<input type="text" class="form-control datetimepicker-input"
+								data-target="#datetimepicker24" name="agreementDate"
+								required="required" placeholder="DD/MM/YYYY"
+								data-ng-model="workDataTender.agreementDate" id="agreementDate"
+								autocomplete="off"
+								data-ng-required="workDataTender.workStatusId=='8'"
+								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker24" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+
+
+
+						</div>
+
+						<div data-ng-show="workTenderForm.$submitted">
+							<div data-ng-show="workDataTender.workStatusId=='8'">
+								<p class="help-block" style="color: red;"
+									data-ng-show="workTenderForm.agreementDate.$error.required">
+									<span th:text="#{pleaseEnter}">Please enter</span> <span
+										>Agreement Date </span>
+								</p>
+							</div>
+						</div>
+					</div>
+
+
+					<div class="form-group col-sm-4"
+						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+						<label><span >Agreement
+								Date </span><span data-ng-show="workData.isTenders == 1"
+							class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker25"
+							data-target-input="nearest">
+
+							<input type="text" class="form-control datetimepicker-input"
+								data-target="#datetimepicker25" name="agreementDate"
+								data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders == 1"
+								placeholder="DD/MM/YYYY"
+								data-ng-model="workDataTender.agreementDate" id="agreementDate"
+								autocomplete="off" />
+
+
+							<div class="input-group-append input-group-addon"
+								data-target="#datetimepicker25" data-toggle="datetimepicker">
+								<div class="input-group-text">
+									<i class="fa fa-calendar"></i>
+								</div>
+							</div>
+
+
+
+						</div>
+
+						<div data-ng-show="workTenderForm.$submitted">
+							<div data-ng-show="workDataTender.workStatusId=='8'">
+								<p class="help-block" style="color: red;"
+									data-ng-show="workTenderForm.agreementDate.$error.required">
+									<span th:text="#{pleaseEnter}">Please enter</span> <span
+										>Agreement Date </span>
+								</p>
+							</div>
+						</div>
+					</div>
+
+
+
+
+
+
 
 					<div class="form-group col-sm-4" data-ng-init="loadSorYears()"
 						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">

@@ -52,6 +52,9 @@ public interface WorkProgressRepository  extends JpaRepository<WorkProgress, Lon
 		
 		@Query(value=" select ms.work_sub_status_name_e from t_work_progress twp left join mst_work_sub_status ms on ms.work_sub_status_id = twp.work_sub_status_id where twp.work_id =:id and twp.work_status_id = 10",nativeQuery=true)
 		String getLevelOfCompletion(@Param("id") Long id);
+		
+		@Query(value=" SELECT twp.date_completion as dateOfCommpletion FROM t_work_progress twp where twp.work_id =:id",nativeQuery = true)
+		String getDateOfCompletion(@Param("id") Long id);
 
 		@Query("SELECT w From WorkProgress w WHERE w.status = 'Active' ")
 		List<WorkProgress> getAllWork();

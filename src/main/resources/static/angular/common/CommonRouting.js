@@ -87,21 +87,9 @@ dms
 			templateUrl: 'addLegacyDataMapping',
 			controller : 'EEController'
 		     })
-			 
 			.when('/addNewWork', {
 				templateUrl: 'addNewWork',
 				controller : 'CommonController'
-			})
-			.when('/manageAgencyUser', {
-				templateUrl: 'manageAgencyUser',
-				controller: 'CommonController'
-
-			})
-
-			.when('/addAreaOfficer', {
-				templateUrl: 'addAreaOfficer',
-				controller: 'CommonController'
-
 			})
 			.when('/editOngoingWork/:id', {
 				templateUrl: function(params){ return 'editOngoingWork/' + params.id; }, 
@@ -268,7 +256,10 @@ dms
 				controller: 'SystemAdminController'
 			})
 			
-			
+			.when('/userchangepassword', {
+				templateUrl: 'userchangepassword',
+				controller: 'CommonController'
+			})
 
 			.otherwise({
 				redirectTo: '/'

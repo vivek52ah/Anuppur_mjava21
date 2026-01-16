@@ -664,6 +664,22 @@ td {
     		minDate : moment('01/01/1995', 'DD/MM/YYYY'),
     		format : 'DD/MM/YYYY'
     	});
+        
+        $('#datetimepicker24').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+        
+        $('#datetimepicker25').datetimepicker({
+			maxDate : moment(),
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
 
 	});
 	
@@ -1205,6 +1221,48 @@ td {
 	}
 
 	//]]>
+	
+	
+	function fetchFinancialAgency(workId) {
+	    $("#dynamic-fa-table").DataTable({
+	        "processing": true,
+	        "serverSide": true,
+	        "searching": false,
+	        "pagingType": "full_numbers",
+	        "aaSorting": [],
+	        "ajax": {
+	            "url": "fetchFinancialAgency/" + workId,
+	            "type": "GET",
+	            "dataSrc": function(json) {
+	                return json.data || []; // prevent undefined
+	            }
+	        },
+	        "columns": [
+	            {
+	                "data": null,
+	                "bSortable": false,
+	                "render": function(data, type, row, meta) {
+	                    return meta.row + meta.settings._iDisplayStart + 1;
+	                }
+	            },
+	            { "data": "financialAgencyName", "bSortable": false },
+	            { "data": "cost", "bSortable": false },
+	            { "data": "expenditure", "bSortable": false },
+	            { "data": "balance", "bSortable": false },
+	            {
+	                "data": "id",
+	                "bSortable": false,
+	                "render": function(data, type, row) {
+	                    return `<input type="text" class="form-control cost-input" data-id="${data}" data-workid="${row.workId}" data-financialheadid="${row.financialHeadId}" data-cost="${row.cost}"  value="${row.expenditure ?? ''}" />`;
+	                }
+	            }
+	        ]
+	    });
+	}
+
+
+	
+	
 </script>
 <div>
 	<ol class="breadcrumb">
@@ -1218,7 +1276,7 @@ td {
 		<li class="breadcrumb-item active"><span>View &amp; Update
 				Work </span></li>
 		<li class="breadcrumb-item active"><span><b> WorkId :-
-					{{workData.id}} </b></span></li>
+					{{workData.workNo}} </b></span></li>
 
 		<!-- Breadcrumb Menu-->
 		<li class="breadcrumb-menu d-md-down-none">
@@ -1291,7 +1349,7 @@ td {
 										class="nav-item"><a href=".step3" data-toggle="tab"
 										aria-controls="step3" role="tab" title="Step 3"
 										class="nav-link   stopVald"> <span class="fa fa-map-o"></span>
-											<span>Tender Details <em class="count"></em>
+											<span>Sanction Details <em class="count"></em>
 										</span>
 									</a></li>
 
@@ -1325,10 +1383,10 @@ td {
 												Certificate<em class="count"></em>
 										</span>
 									</a></li>
-									<li role="presentation" class="nav-item"><a href=".step2"
+									<li th:if="${roleName=='ROLE_DEPARTMENT'  }" role="presentation" class="nav-item"><a href=".step2"
 																		data-toggle="tab" aria-controls="step2" role="tab"
 																		title="Step 2" class="nav-link  "> <span
-																			class="fa fa-road"></span> <span>DM Remark<em
+																			class="fa fa-road"></span> <span>Department Remark<em
 																				class="count"></em>
 																		</span>
 																	</a></li> 
@@ -1368,7 +1426,7 @@ td {
 								<!-- /tab1 -->
 								<div class="tab-pane active step1" role="tabpanel" id="step1">
 									<div
-										th:if="${roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_SU'  || roleName =='ROLE_DM' || roleName == 'ROLE_CEO' }">
+										th:if="${roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_SU' || roleName == 'ROLE_CEO' }">
 										<div
 											th:replace="common/work/editWorkDetail :: edit_workDetails"></div>
 									</div>
@@ -1438,7 +1496,7 @@ td {
 								</div>
 								<div class="tab-pane  step2" role="tabpanel" id="step2">
 																	<div
-																		th:if="${roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_DM'  ||roleName=='ROLE_SYSTEM_ADMIN' }">
+																		th:if="${roleName=='ROLE_DEPARTMENT'  || roleName=='ROLE_SYSTEM_ADMIN' }">
 																		<div
 																			th:replace="common/work/viewDmRemarks :: view_dmRemark"></div>
 																	</div>

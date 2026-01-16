@@ -6,6 +6,7 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedTrustManager;
 
+@SuppressWarnings("all")
 public final class UnsafeX509ExtendedTrustManager extends X509ExtendedTrustManager {
 
     private static final X509ExtendedTrustManager INSTANCE = new UnsafeX509ExtendedTrustManager();

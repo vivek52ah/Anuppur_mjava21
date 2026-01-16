@@ -1,45 +1,40 @@
 package com.anuppur.bean;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-
 import org.springframework.web.multipart.MultipartFile;
-
-import com.anuppur.entity.DocumentUpload;
 
 public class DmRemarksBean {
 
-	
 	private Long id;
-	
+
+	private Integer index;
+
+	private String createdDate;
+
 	private String remark;
+
+	private Integer workId;
+
+	private MultipartFile dmattachment;
+
+	private Long documentId;
+
+	private String documentPath;
 	
-	 private Integer workId;
-   
-	 private MultipartFile dmattachment;
-	 
-	 private Long documentId;
-	 
-	 private String documentPath;
-	 
-	 
-	 public Long getDocumentId() {
+	private String createBy;
+	
+	private String role;
+	
+	private String roleCode;
+	
+	 private String departmentRemarks;
+
+	public Long getDocumentId() {
 		return documentId;
 	}
 
 	public void setDocumentId(Long documentId) {
 		this.documentId = documentId;
 	}
-
-	private Integer Index;
-	 
-	 
-	 private String createdDate;
-	 
-	 
-	 
-
-	
 
 	public String getCreatedDate() {
 		return createdDate;
@@ -49,12 +44,12 @@ public class DmRemarksBean {
 		this.createdDate = createdDate;
 	}
 
-	public Integer getIndex() {
-		return Index;
+	public final Integer getIndex() {
+		return index;
 	}
 
-	public void setIndex(Integer index) {
-		Index = index;
+	public final void setIndex(Integer index) {
+		this.index = index;
 	}
 
 	public MultipartFile getDmattachment() {
@@ -96,7 +91,38 @@ public class DmRemarksBean {
 	public void setDocumentPath(String documentPath) {
 		this.documentPath = documentPath;
 	}
+
+	public final String getCreateBy() {
+		return createBy;
+	}
+
+	public final void setCreateBy(String createBy) {
+		this.createBy = createBy;
+	}
+
+	public final String getRole() {
+		return role;
+	}
+
+	public final void setRole(String role) {
+		this.role = role;
+	}
+
+	public final String getRoleCode() {
+		return roleCode;
+	}
+
+	public final void setRoleCode(String roleCode) {
+		this.roleCode = roleCode;
+	}
+
+	public final String getDepartmentRemarks() {
+		return departmentRemarks;
+	}
+
+	public final void setDepartmentRemarks(String departmentRemarks) {
+		this.departmentRemarks = departmentRemarks;
+	}
+
 	
-	 
-	 
 }
