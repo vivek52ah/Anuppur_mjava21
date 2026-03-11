@@ -36,7 +36,7 @@
 						<input type="hidden" data-ng-model="workDataProgress.size"></input>
 						<select class="form-control" id="workStatus" required="required"
 							data-ng-model="workDataProgress.workStatusId"
-							data-ng-change="setBgColor(workDataProgress.workStatusId);workDataProgress.workStatusId!=null;workDataProgress.workSubStatusId=null;loadWorkSubStatusByWorkStatus(workData.workSubTypeId, workDataProgress.workStatusId);workDataProgress.remarks = null;"
+							data-ng-change="workDataProgress.workStatusId!=null;workDataProgress.workSubStatusId=null;loadWorkSubStatusByWorkStatus(workData.workSubTypeId, workDataProgress.workStatusId);workDataProgress.remarks = null;"
 							name="workStatus">
 							<!-- setBgColor(workDataProgress.workStatusId); -->
 							<option value="" disabled="disabled">--Select--</option>
@@ -258,7 +258,7 @@
 							name="perc"  />
 
 
-					</div> -->
+					</div> 
 
 					<div class="form-group col-sm-4"
 						data-ng-show="workDataProgress.workStatusId=='9' || (!workDataProgress.workSubStatusId=='9')">
@@ -266,12 +266,12 @@
 							class="aestrick">&#42;</span></label> <select class="form-control"
 							id="perc" required="required" disabled="disabled"
 							data-ng-model="workDataProgress.perc" name="perc">
-							<option disabled="disabled" value="">-- Select --</option>
-							<!-- Use ng-options to generate options -->
+							<option disabled="disabled" value="">Select</option>
+							
 
 						</select>
 
-					</div>
+					</div> -->
 
 
 
@@ -348,14 +348,7 @@
 					</div>
 
 
-					<script>	$('#datetimepicker5').datetimepicker({
-						 format: 'DD/MM/YYYY',                     // Date format
-				            //  useCurrent:true,            // Prevent default date selection
-				  minDate:new Date(1995,0,1), // Minimum date: January 1, 1995
-				  maxDate: new Date()                       // Maximum date: Today
-				  
-				 
-			});</script>
+			
 					<div class="form-group col-sm-4"
 						data-ng-show="workDataProgress.workStatusId=='10'">
 						<label><span>In case of Delay, Work Likely to be

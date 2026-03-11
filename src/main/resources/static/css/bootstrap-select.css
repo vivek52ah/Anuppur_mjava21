@@ -40,7 +40,7 @@ select.selectpicker {
 .bootstrap-select > .dropdown-toggle.bs-placeholder:hover,
 .bootstrap-select > .dropdown-toggle.bs-placeholder:focus,
 .bootstrap-select > .dropdown-toggle.bs-placeholder:active {
-  color: #999;
+  color: #525252;
 }
 .bootstrap-select > .dropdown-toggle.bs-placeholder.btn-primary,
 .bootstrap-select > .dropdown-toggle.bs-placeholder.btn-secondary,
@@ -111,8 +111,7 @@ select.selectpicker {
 }
 .bootstrap-select.form-control {
   margin-bottom: 0;
-  padding: 0;
-  border: none;
+  padding: 0; 
 }
 :not(.input-group) > .bootstrap-select.form-control:not([class*="col-"]) {
   width: 100%;

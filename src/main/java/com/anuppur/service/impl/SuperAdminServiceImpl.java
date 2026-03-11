@@ -210,12 +210,13 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 				users = userRepository.findByStatusNotIn(pageable, statusDeletedPendingVerification);*/
 			
 			if(users!=null){
+				
 				List<Users> entityList = users.getContent();
 				List<UserBean> beanList = new ArrayList<>();
 				if(entityList!= null && !entityList.isEmpty()){
 					
 					int index = pageable.getPageNumber()*pageable.getPageSize();
-					List<Users> dmusers  =   userRepository.findByDesignationIDAndStatusNotIn(3L, "Deleted");
+					//List<Users> dmusers  =   userRepository.findByDesignationIDAndStatusNotIn(3L, "Deleted");
 					
 					/*
 					 * for(Users use : dmusers) { if(be.getRolee().equals("ROLE_SYSTEM_ADMIN") &&

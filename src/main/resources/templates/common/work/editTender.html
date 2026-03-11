@@ -1,133 +1,165 @@
 <div th:fragment="edit_Tender">
 
 	<style>
-.flex12 {
-	display: flex;
-	white-space: nowrap;
+
+/* Work Status Tabs */
+.work-status-nav {
+    margin-top: 8px;
+    margin-bottom: 10px;
 }
 
-.mb5 {
-	margin-bottom: 1px !important
+.work-status-nav .nav-item {
+    margin-right: 22px;
+    margin-bottom: 6px;
 }
 
-.row.s1 {
-	width: 100%;
-	position: relative;
-	left: 15px;
-	top: -10px;
+.work-status-nav .nav-link {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: #495057;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease-in-out;
 }
-</style>
-<script>
-	function openModal(workId,userAssignee) {
-					
-					 window.currentWorkId = workId;  //
-					 window.currentUser =  userAssignee;
-					 currentu = userAssignee;
-					 //alert(window.currentUser)
-					 t2.draw();
-					// alert(workId)
-					// $('#exampleModal .modal-body').append('<p>Work ID: ' + workId + '</p>');
-					    // Open the modal using Bootstrap's modal method
-					    $('#exampleModal2').modal('show');
-				}
-				function assignUser(userId) {
-						 // alert(userId);
-							if(confirm("You are Assigning this User to work ")){
-								
-								angular.element("#dynamic-table2").scope().assignUser(window.currentWorkId,userId);
-								
-								 setTimeout(function () {
-								        $('#exampleModal2').modal('hide');
-								      t2.draw();
-									window.location.reload();
-								    }, 500);
-								
-							} 
-							
-							
-						};
-				     
-</script>
-	<form
+
+/* Hover */
+.work-status-nav .nav-link:hover {
+    background-color: #e9ecef;
+    color: #000;
+}
+
+/* Active Tab */
+.work-status-nav .nav-link.active {
+    background-color: #007bff!important;
+    color: #fff!important;
+    border-color: #007bff!important;
+    font-weight: 500!important;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.25);
+}
+/* White tick before active work status */
+.work-status-nav .nav-link.active {
+    position: relative;
+    padding-left: 36px; /* space for tick */
+}
+
+/* Tick icon */
+.work-status-nav .nav-link.active::before {
+    content: "✓";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}
+/* Arrow pointing to next step */
+.work-status-nav .nav-link.active::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -16px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 18px solid transparent;
+    border-bottom: 18px solid transparent;
+    border-left: 16px solid #0052db;
+    z-index: 2;
+}
+		.flex12 {
+			display: flex;
+			white-space: nowrap;
+		}
+
+		.mb5 {
+			margin-bottom: 1px !important
+		}
+
+		.row.s1 {
+			width: 100%;
+			position: relative;
+			left: 15px;
+			top: -10px;
+		}
+
+
+		#work Status style .work-status-radio {
+			white-space: nowrap;
+			/* 🔥 ek line */
+		}
+
+		.work-status-radio .radio-inline {
+			margin-right: 20px;
+			font-weight: 500;
+			cursor: pointer;
+		}
+	</style>
+	<script>
+		function openModal(workId, userAssignee) {
+
+			window.currentWorkId = workId;  //
+			window.currentUser = userAssignee;
+			currentu = userAssignee;
+			//alert(window.currentUser)
+			t2.draw();
+			// alert(workId)
+			// $('#exampleModal .modal-body').append('<p>Work ID: ' + workId + '</p>');
+			// Open the modal using Bootstrap's modal method
+			$('#exampleModal2').modal('show');
+		}
+		function assignUser(userId) {
+			// alert(userId);
+			if (confirm("You are Assigning this User to work ")) {
+
+				angular.element("#dynamic-table2").scope().assignUser(window.currentWorkId, userId);
+
+				setTimeout(function () {
+					$('#exampleModal2').modal('hide');
+					t2.draw();
+					window.location.reload();
+				}, 500);
+
+			}
+
+
+		};
+
+	</script>
+	<div class="container-fluid">
+		<form
 		data-ng-submit="createTenderAgreementData(workTenderForm,workTenderForm.$valid,ldTdfFile,dTTTFile,ldTULFile,ldUAFile);"
-		name="workTenderForm" id="workFormId" novalidate="novalidate"
-		enctype="multipart/form-data">
-
-
-
-
+		name="workTenderForm" id="workFormId" novalidate="novalidate" enctype="multipart/form-data">
+ 
 		<div class="card" data-ng-hide="workDataTS.workStatus=='notAsIssued'">
 			<div class="card-header">
 				<span>Tender And Agreement Details</span>
 			</div>
-			<div class="card-body">
-
-				<div class="row">
-					<div class="form-group col-sm-4"
-						data-ng-hide="workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'"
+			<div class="card-body border rounded m-3"> 
+					<div data-ng-hide="workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'"
 						data-ng-init="workDataTender.workStatusId=null;loadWorkStatusByFlag('3');">
-
-
-						<label><span>Work status</span><span data-ng-show="workData.isTenders == 1" class="aestrick">&#42;</span></label>
+						<label>
+							<span>Work status</span><span data-ng-show="workData.isTenders == 1"
+								class="aestrick">&#42;</span></label>
 						<input type="hidden" data-ng-model="workDataTender.workId"></input>
 						<input type="hidden" data-ng-model="workDataTender.workStatusId" />
-						<input type="hidden" data-ng-model="workData.isTenders1" /> <select
-							class="form-control" id="workStatus" required="required"
-							data-ng-model="workDataTender.workStatusId" name="workStatus">
+						<input type="hidden" data-ng-model="workData.isTenders1" />
+						<div class="work-status-tiles">
+<ul class="nav nav-pills work-status-nav">
+    <li class="nav-item"
+        ng-repeat="workStatus in worksStatus"
+        ng-if="workData.isTenders=='1' || workStatus.workStatusId=='8'">
 
-					<option value="" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId!='1'  &amp;&amp; workData.isTenders1=='0'">--select--</option>
-
-							<option value="" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId!='1'  &amp;&amp; workData.isTenders1=='1'">--select--</option>
-
-							<option value="1" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='1'  &amp;&amp; workData.isTenders1=='0'">--select--</option>
-
-							<option value="1" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='1'  &amp;&amp; workData.isTenders1=='1'">--select--</option>
-
-							<option value="3" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='3'  &amp;&amp; workData.isTenders1=='0' &amp;&amp; workData.isTenders=='0'">Tender
-								Called date</option>
-							<option value="3" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='3'  &amp;&amp; workData.isTenders1=='1' &amp;&amp; workData.isTenders=='0'">Tender
-								Called date</option>
-
-							<option value="4" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='4'  &amp;&amp; workData.isTenders1=='0' &amp;&amp; workData.isTenders=='0'">Tender
-								Received</option>
-							<option value="4" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='4'  &amp;&amp; workData.isTenders1=='1' &amp;&amp; workData.isTenders=='0'">Tender
-								Received</option>
-
-							<option value="14" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='14'  &amp;&amp; workData.isTenders1=='0' &amp;&amp; workData.isTenders=='0'">Re-Tender
-							</option>
-							<option value="14" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='14'  &amp;&amp; workData.isTenders1=='1' &amp;&amp; workData.isTenders=='0'">Re-Tender
-							</option>
-
-							<option value="7" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='7'  &amp;&amp; workData.isTenders1=='0' &amp;&amp; workData.isTenders=='0'">LoA
-								Issued</option>
-							<option value="7" disabled="disabled"
-								data-ng-if="workDataTender.workStatusId=='7'  &amp;&amp; workData.isTenders1=='1' &amp;&amp; workData.isTenders=='0'">LoA
-								Issued</option>
-
-							<option data-ng-repeat="workStatus in worksStatus "
-								value="{{workStatus.workStatusId}}"
-								data-ng-if="workStatus.workStatusId=='8' &amp;&amp; workData.isTenders=='0' &amp;&amp; workData.isTenders1=='1'">{{workStatus.workStatusNameE}}</option>
-
-
-							<option data-ng-repeat="workStatus in worksStatus "
-								value="{{workStatus.workStatusId}}"
-								data-ng-if="workStatus.workStatusId=='8' &amp;&amp; workData.isTenders=='0' &amp;&amp; workData.isTenders1=='0'">{{workStatus.workStatusNameE}}</option>
-
-							<option data-ng-repeat="workStatus in worksStatus "
-								value="{{workStatus.workStatusId}}"
-								data-ng-if="workData.isTenders=='1'">{{workStatus.workStatusNameE}}</option>
-						</select>
+        <a href="javascript:void(0)"
+           class="nav-link"
+           ng-class="{'active': workDataTender.workStatusId == workStatus.workStatusId}"
+           ng-click="workDataTender.workStatusId = workStatus.workStatusId">
+            {{workStatus.workStatusNameE}}
+        </a>
+    </li>
+</ul>
+						</div>
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.workStatus.$error.required">
@@ -136,21 +168,15 @@
 							</p>
 						</div>
 					</div>
-
-
-					<div class="form-group col-sm-4 "
-						data-ng-if="workDataTender.workStatusId=='8'">
+			 
+				<div class="row">
+					<div class="form-group col-sm-4 " data-ng-if="workDataTender.workStatusId=='8'">
 						<label><span>Re-Tender Count </span></label> <input type="number"
-							class="form-control number-OnlyTwoDecimal" id="workStatusCount"
-							disabled="disabled" data-ng-model="workDataTender.count"
-							name="workStatusCount" />
+							class="form-control number-OnlyTwoDecimal" id="workStatusCount" disabled="disabled"
+							data-ng-model="workDataTender.count" name="workStatusCount" />
 
 					</div>
-
 				</div>
-
-
-
 				<div class="row"
 					data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'">
 
@@ -159,8 +185,7 @@
 
 
 						<label><span>Current Work Status</span></label>
-						<textarea id="workStatusNew" name="workStatusNew"
-							data-ng-model="workDataTender.workStatusNameE"
+						<textarea id="workStatusNew" name="workStatusNew" data-ng-model="workDataTender.workStatusNameE"
 							disabled="disabled" class="w100"></textarea>
 
 
@@ -168,63 +193,22 @@
 
 
 
-
-
-
-					<div class="form-group col-sm-4"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+					<div class="form-group col-sm-4">
 						<label><span th:text="#{workOrderDate}">Work Order
-								Date </span><span data-ng-show="workData.isTenders == 1" class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker2"
-							data-target-input="nearest">
+								Date </span><span data-ng-show="workData.isTenders == 1 || workData.isTenders == true"
+								class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker2" data-target-input="nearest">
 
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker2" name="workOrderDate"
-								required="required" placeholder="DD/MM/YYYY"
-								data-ng-model="workDataTender.workOrderDate" id="workOrderDate"
-								autocomplete="off" data-ng-required="workDataTender.workStatusId=='8'"
-								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null" />
-
-
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker2" data-toggle="datetimepicker">
-								<div class="input-group-text">
-									<i class="fa fa-calendar"></i>
-								</div>
-							</div>
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2"
+								name="workOrderDate"
+								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
+								placeholder="DD/MM/YYYY" data-ng-model="workDataTender.workOrderDate" id="workOrderDate"
+								autocomplete="off"
+								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 
 
-
-						</div>
-					
-						<div data-ng-show="workTenderForm.$submitted">
-							<div data-ng-show="workDataTender.workStatusId=='8'">
-								<p class="help-block" style="color: red;"
-									data-ng-show="workTenderForm.workOrderDate.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span
-										th:text="#{workOrderDate}">Work Order Date </span>
-								</p>
-							</div>
-						</div>
-					</div>
-
-
-					<div class="form-group col-sm-4"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<label><span th:text="#{workOrderDate}">Work Order
-								Date </span><span data-ng-show="workData.isTenders == 1" class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker19"
-							data-target-input="nearest">
-
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker19" name="workOrderDate"
-								data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders == 1" placeholder="DD/MM/YYYY"
-								data-ng-model="workDataTender.workOrderDate" id="workOrderDate"
-								autocomplete="off" />
-
-
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker19" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker2"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -246,21 +230,21 @@
 					</div>
 
 
-					<div class="form-group col-sm-4 mb5"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+
+
+
+					<div class="form-group col-sm-4 mb5">
 						<div class="form-group">
 							<label> <span>Upload Work Order.</span> <span data-ng-show="workData.isTenders == 1"
-								class="aestrick">&#42;</span>
-							</label> <input required="required" type='file' accept=".pdf"
-								class="form-control" data-file-model="ldTdfFile"
+									class="aestrick">&#42;</span>
+							</label> <input
+								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; workDataTender.workStatusId=='8' workDataTender.tenderFileId == null"
+								type='file' accept=".pdf" class="form-control" data-file-model="ldTdfFile"
 								name="ldTdfFile" id="ldTdfFile"
-								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null
-								||workDataTender.tenderFileId!=null" />
+								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 							<div class="">
-								<p class="help-block"
-									data-ng-show="workDataTender.tenderFileId!=null">
-									<span th:text="#{downloadCurrentFile}"></span> <a
-										style="cursor: pointer;"
+								<p class="help-block" data-ng-show="workDataTender.tenderFileId!=null">
+									<span th:text="#{downloadCurrentFile}"></span> <a style="cursor: pointer;"
 										data-ng-click="downloadDocumentTender(workDataTender.tenderFileId)">
 										<img th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
 									</a>
@@ -273,7 +257,7 @@
 									data-ng-show="fileExtentionErrorLT &amp;&amp; !workTenderForm.$submitted">
 									<span>Uploaded File Format does not supported</span>
 								</p>
-								
+
 								<p class="help-block" style="color: red;"
 									data-ng-show="fileExtentionErrorLT &amp;&amp; workTenderForm.$submitted">
 									<span>Uploaded File Format does not supported</span>
@@ -283,77 +267,32 @@
 									<span>Uploaded file size does not supported</span>
 								</p>
 							</div>
-							<div >
-							<p class="help-block" style="color: red;" 
-								data-ng-show="ldTdfFile == null &amp;&amp;  workDataTender.tenderFileId == null &amp;&amp; workTenderForm.$submitted">
-								Please upload  Work order file</p>
-								</div>
-
-						</div>
-					</div>
-
-
-					<div class="form-group col-sm-4 mb5"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<div class="form-group">
-							<label> <span>Upload Work Order.</span> <span data-ng-show="workData.isTenders == 1"
-								class="aestrick">&#42;</span>
-							</label> <input data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders == 1" type='file' accept=".pdf"
-								class="form-control" data-file-model="ldTdfFile"
-								name="ldTdfFile" id="ldTdfFile" />
-							<div class="">
-								<p class="help-block"
-									data-ng-show="workDataTender.tenderFileId!=null">
-									<span th:text="#{downloadCurrentFile}"></span> <a
-										style="cursor: pointer;"
-										data-ng-click="downloadDocumentTender(workDataTender.tenderFileId)">
-										<img th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
-									</a>
-								</p>
-								<span data-ng-show="workDataTender.tenderFileId==null"><b>(pdf
-										file with max size 30 mb)</b></span>
-
-
+							<div>
 								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorLT &amp;&amp; !workTenderForm.$submitted">
-									<span>Uploaded File Format does not supported</span>
-								</p>
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorLT &amp;&amp; workTenderForm.$submitted">
-									<span>Uploaded File Format does not supported</span>
-								</p>
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileSizeErrorLT &amp;&amp; workTenderForm.$submitted">
-									<span>Uploaded file size does not supported</span>
-								</p>
+									data-ng-show="ldTdfFile == null &amp;&amp;  workDataTender.tenderFileId == null &amp;&amp; workTenderForm.$submitted &amp;&amp; (workData.isTenders == 1 || workData.isTenders == true)">
+									Please upload Work order file</p>
 							</div>
 
-<div data-ng-show="workData.isTenders == 1 ">
-							<p class="help-block" style="color: red;" 
-								data-ng-show="ldTdfFile == null &amp;&amp;  workDataTender.tenderFileId == null  &amp;&amp; workTenderForm.$submitted)">
-								Please upload  Work order file</p>
-</div>
-
 						</div>
 					</div>
 
 
-					<div class="form-group col-sm-4 mb5"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+
+					<div class="form-group col-sm-4 mb5">
 
 						<div class="form-group">
-							<label> <span>Upload Drawing</span><span data-ng-show="workData.isTenders == 1" class="aestrick">&#42;</span>
-							</label> <input required="required" type='file' accept=".pdf"
-								class="form-control" file-model="dTTTFile" name="dsFile"
+							<label> <span>Upload Drawing</span><span data-ng-show="workData.isTenders == 1"
+									class="aestrick">&#42;</span>
+							</label> <input
+								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
+								type='file' accept=".pdf" class="form-control" file-model="dTTTFile" name="dsFile"
 								id="dsFile"
-								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null ||  workDataTender.loaIssuedDate==null
-								||workData.drawingId!=null" />
+								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 							<div class="">
 								<p class="help-block" data-ng-show="workData.drawingId!=null">
-									<span th:text="#{downloadCurrentFile}"></span> <a
-										style="cursor: pointer;"
+									<span th:text="#{downloadCurrentFile}"></span> <a style="cursor: pointer;"
 										data-ng-click="downloadDocumentDW(workData.drawingId)"> <img
-										th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+											th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
 									</a>
 								</p>
 								<span data-ng-show="workData.drawingId==null"><b>(pdf
@@ -381,154 +320,70 @@
 							</div>
 
 							<p class="help-block" style="color: red;"
-								data-ng-show="dTTTFile == null &amp;&amp;  workData.drawingId == null &amp;&amp; workTenderForm.$submitted">
-								Please upload  Work order file</p>
+								data-ng-show="dTTTFile == null &amp;&amp;  workData.drawingId == null &amp;&amp; workTenderForm.$submitted &amp;&amp; (workData.isTenders == 1 || workData.isTenders == true)">
+								Please upload Work order file</p>
 						</div>
 					</div>
 
 
-					<div class="form-group col-sm-4 mb5"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
 
+
+
+
+
+					<div class="form-group col-sm-4 mb5">
 						<div class="form-group">
-							<label> <span>Upload Drawing</span><span data-ng-show="workData.isTenders == 1" class="aestrick">&#42;</span>
-							</label> <input required="required" type='file' accept=".pdf"
-								class="form-control" file-model="dTTTFile" name="dsFile"
-								id="dsFile" />
+							<label> <span>Upload LOA.</span><span data-ng-show="workData.isTenders == 1"
+									class="aestrick">&#42;</span>
+							</label> <input type='file' accept=".pdf" class="form-control" file-model="ldTULFile"
+								name="ldTULFile" id="ldTULFile"
+								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
+								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 							<div class="">
-								<p class="help-block" data-ng-show="workData.drawingId!=null">
-									<span th:text="#{downloadCurrentFile}"></span> <a
-										style="cursor: pointer;"
-										data-ng-click="downloadDocumentDW(workData.drawingId)"> <img
-										th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
+								<p class="help-block" data-ng-show="workDataTender.uLoiId!=null">
+									<span th:text="#{downloadCurrentFile}"></span> <a style="cursor: pointer;"
+										data-ng-click="downloadDocumentLOI(workDataTender.uLoiId)">
+										<img th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
 									</a>
 								</p>
-								<span data-ng-show="workData.drawingId==null"><b>(pdf
+								<span data-ng-show="workDataTender.uLoiId==null"><b>(pdf
 										file with max size 30 mb)</b></span>
 
 
-
-
-
 								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorDW &amp;&amp; !workTenderForm.$submitted">
+									data-ng-show="fileExtentionErrorLT &amp;&amp; !workTenderForm.$submitted">
 									<span>Uploaded File Format does not supported</span>
 								</p>
-
 								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorDW &amp;&amp; workTenderForm.$submitted">
-									<span>Uploaded file format does not supported</span>
+									data-ng-show="fileExtentionErrorLT &amp;&amp; workTenderForm.$submitted">
+									<span>Uploaded File Format does not supported</span>
 								</p>
-
 								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorDW &amp;&amp; workTenderForm.$submitted">
+									data-ng-show="fileSizeErrorLT &amp;&amp; workTenderForm.$submitted">
 									<span>Uploaded file size does not supported</span>
 								</p>
-
 							</div>
 
-<div data-ng-show="workData.isTenders == 1">
+
 							<p class="help-block" style="color: red;"
-								data-ng-show="dTTTFile == null &amp;&amp;  workData.drawingId == null &amp;&amp;  workTenderForm.$submitted">
-								Please upload  Work order file</p>
-			</div>					
-								
-						</div>
-					</div>
-
-
-
-
-					<div class="form-group col-sm-4 mb5"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<div class="form-group">
-							<label> <span>Upload LOA.</span> 
-							</label> <input type='file' accept=".pdf" class="form-control"
-								file-model="ldTULFile" name="ldTULFile" id="ldTULFile"
-								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null || workDataTender.loaIssuedDate==null
-								||workDataTender.uLoiId!=null" />
-							<div class="">
-								<p class="help-block" data-ng-show="workDataTender.uLoiId!=null">
-									<span th:text="#{downloadCurrentFile}"></span> <a
-										style="cursor: pointer;"
-										data-ng-click="downloadDocumentLOI(workDataTender.uLoiId)">
-										<img th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
-									</a>
-								</p>
-								<span data-ng-show="workDataTender.uLoiId==null"><b>(pdf
-										file with max size 30 mb)</b></span>
-
-
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorLT &amp;&amp; !workTenderForm.$submitted">
-									<span>Uploaded File Format does not supported</span>
-								</p>
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorLT &amp;&amp; workTenderForm.$submitted">
-									<span>Uploaded File Format does not supported</span>
-								</p>
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileSizeErrorLT &amp;&amp; workTenderForm.$submitted">
-									<span>Uploaded file size does not supported</span>
-								</p>
-							</div>
-
-							
-
+								data-ng-show="dTTTFile == null &amp;&amp;  workData.drawingId == null &amp;&amp; workTenderForm.$submitted &amp;&amp; (workData.isTenders == 1 || workData.isTenders == true)">
+								Please upload LOA file</p>
 
 						</div>
 					</div>
 
-					<div class="form-group col-sm-4 mb5"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+
+					<div class="form-group col-sm-4 mb5">
 						<div class="form-group">
-							<label> <span>Upload LOA.</span> 
-							</label> <input type='file' accept=".pdf" class="form-control"
-								file-model="ldTULFile" name="ldTULFile" id="ldTULFile" />
-							<div class="">
-								<p class="help-block" data-ng-show="workDataTender.uLoiId!=null">
-									<span th:text="#{downloadCurrentFile}"></span> <a
-										style="cursor: pointer;"
-										data-ng-click="downloadDocumentLOI(workDataTender.uLoiId)">
-										<img th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
-									</a>
-								</p>
-								<span data-ng-show="workDataTender.uLoiId==null"><b>(pdf
-										file with max size 30 mb)</b></span>
-
-
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorLT &amp;&amp; !workTenderForm.$submitted">
-									<span>Uploaded File Format does not supported</span>
-								</p>
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorLT &amp;&amp; workTenderForm.$submitted">
-									<span>Uploaded File Format does not supported</span>
-								</p>
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileSizeErrorLT &amp;&amp; workTenderForm.$submitted">
-									<span>Uploaded file size does not supported</span>
-								</p>
-							</div>
-
-						
-
-
-						</div>
-					</div>
-
-					<div class="form-group col-sm-4 mb5"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<div class="form-group">
-							<label> <span>Upload Agreement.</span> 
-							</label> <input type='file' accept=".pdf" class="form-control"
-								file-model="ldUAFile" name="ldUAFile" id="ldUAFile"
-								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null || workDataTender.loaIssuedDate==null
-								||workDataTender.uAId!=null" />
+							<label> <span>Upload Agreement.</span><span data-ng-show="workData.isTenders == 1"
+									class="aestrick">&#42;</span>
+							</label> <input type='file' accept=".pdf" class="form-control" file-model="ldUAFile"
+								name="ldUAFile" id="ldUAFile"
+								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
+								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 							<div class="">
 								<p class="help-block" data-ng-show="workDataTender.uAId!=null">
-									<span th:text="#{downloadCurrentFile}"></span> <a
-										style="cursor: pointer;"
+									<span th:text="#{downloadCurrentFile}"></span> <a style="cursor: pointer;"
 										data-ng-click="downloadDocumentAgreement(workDataTender.uAId)">
 										<img th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
 									</a>
@@ -551,82 +406,32 @@
 								</p>
 							</div>
 
-						
 
 
-						</div>
-					</div>
-
-					<div class="form-group col-sm-4 mb5"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<div class="form-group">
-							<label> <span>Upload Agreement.</span> 
-							</label> <input type='file' accept=".pdf" class="form-control"
-								file-model="ldUAFile" name="ldUAFile" id="ldUAFile" />
-							<div class="">
-								<p class="help-block" data-ng-show="workDataTender.uAId!=null">
-									<span th:text="#{downloadCurrentFile}"></span> <a
-										style="cursor: pointer;"
-										data-ng-click="downloadDocumentAgreement(workDataTender.uAId)">
-										<img th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
-									</a>
-								</p>
-								<span data-ng-show="workDataTender.uAId==null"><b>(pdf
-										file with max size 30 mb)</b></span>
-
-
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorLT &amp;&amp; !workTenderForm.$submitted">
-									<span>Uploaded File Format does not supported</span>
-								</p>
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileExtentionErrorLT &amp;&amp; workTenderForm.$submitted">
-									<span>Uploaded File Format does not supported</span>
-								</p>
-								<p class="help-block" style="color: red;"
-									data-ng-show="fileSizeErrorLT &amp;&amp; workTenderForm.$submitted">
-									<span>Uploaded file size does not supported</span>
-								</p>
-							</div>
-
-							<!-- <p class="help-block" style="color: red;"
-								data-ng-show="ldUAFile == null  &amp;&amp; workDataTender.uAId==null &amp;&amp; workTenderForm.$submitted">
-								Please upload  Agreement file</p> -->
-
+							<p class="help-block" style="color: red;"
+								data-ng-show="dTTTFile == null &amp;&amp;  workData.drawingId == null &amp;&amp; workTenderForm.$submitted &amp;&amp; (workData.isTenders == 1 || workData.isTenders == true)">
+								Please upload Agreement file</p>
 
 						</div>
 					</div>
 
-<!-- //Sumit -->
 
-				<div class="form-group col-sm-4"
-				data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-							<label><span>Agreement No</span><span class="aestrick">&#42;</span></label>
-							<input class="form-control" id="agreementNo" required="required"
-								data-ng-model="workDataTender.agreementNo" name="agreementNo"
-								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null"/>
-							<div data-ng-show="workForm.$submitted">
-								<p class="help-block" style="color: red;"
-									data-ng-show="workTenderForm.agreementNo.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span>Agreement No</span>
-								</p>
-							</div>
+					<!-- //Sumit -->
+
+					<div class="form-group col-sm-4">
+						<label><span>Agreement No</span><span class="aestrick">&#42;</span></label>
+						<input class="form-control" id="agreementNo" data-ng-model="workDataTender.agreementNo"
+							name="agreementNo"
+							data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
+							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+						<div data-ng-show="workTenderForm.$submitted">
+							<p class="help-block" style="color: red;"
+								data-ng-show="workTenderForm.agreementNo.$error.required">
+								<span th:text="#{pleaseSelect}">Please select</span> <span>Agreement No
+								</span>
+							</p>
 						</div>
-						
-						<div class="form-group col-sm-4"
-				data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-							<label><span>Agreement No</span></label>
-							<input class="form-control" id="agreementNo" required="required"
-								data-ng-model="workDataTender.agreementNo" name="agreementNo"
-								/>
-							<!-- <div data-ng-show="workForm.$submitted">
-								<p class="help-block" style="color: red;"
-									data-ng-show="workForm.workName.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span>Work
-										Name</span>
-								</p>
-							</div> -->
-						</div>
+					</div>
 
 
 
@@ -634,25 +439,23 @@
 
 
 
-					<div class="form-group col-sm-4"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+
+
+					<div class="form-group col-sm-4">
 						<label><span>Agreement
 								Date </span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker24"
-							data-target-input="nearest">
+								class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker24" data-target-input="nearest">
 
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker24" name="agreementDate"
-								required="required" placeholder="DD/MM/YYYY"
-								data-ng-model="workDataTender.agreementDate" id="agreementDate"
-								autocomplete="off"
-								data-ng-required="workDataTender.workStatusId=='8'"
-								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null" />
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker24"
+								name="agreementDate" placeholder="DD/MM/YYYY"
+								data-ng-model="workDataTender.agreementDate" id="agreementDate" autocomplete="off"
+								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
+								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker24" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker24"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -666,47 +469,7 @@
 							<div data-ng-show="workDataTender.workStatusId=='8'">
 								<p class="help-block" style="color: red;"
 									data-ng-show="workTenderForm.agreementDate.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span
-										>Agreement Date </span>
-								</p>
-							</div>
-						</div>
-					</div>
-
-
-					<div class="form-group col-sm-4"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<label><span >Agreement
-								Date </span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker25"
-							data-target-input="nearest">
-
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker25" name="agreementDate"
-								data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders == 1"
-								placeholder="DD/MM/YYYY"
-								data-ng-model="workDataTender.agreementDate" id="agreementDate"
-								autocomplete="off" />
-
-
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker25" data-toggle="datetimepicker">
-								<div class="input-group-text">
-									<i class="fa fa-calendar"></i>
-								</div>
-							</div>
-
-
-
-						</div>
-
-						<div data-ng-show="workTenderForm.$submitted">
-							<div data-ng-show="workDataTender.workStatusId=='8'">
-								<p class="help-block" style="color: red;"
-									data-ng-show="workTenderForm.agreementDate.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span
-										>Agreement Date </span>
+									<span th:text="#{pleaseEnter}">Please enter</span> <span>Agreement Date </span>
 								</p>
 							</div>
 						</div>
@@ -718,89 +481,75 @@
 
 
 
-					<div class="form-group col-sm-4" data-ng-init="loadSorYears()"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<label><span>SOR Year</span></label> <select class="form-control"
-							id="sorYear" data-ng-model="workDataTender.sorYear"
-							name="sorYear"
-							data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null"
-							>
+
+
+					<div class="form-group col-sm-4" data-ng-init="loadSorYears()">
+						<label><span>SOR Year</span></label> <select class="form-control" id="sorYear"
+							data-ng-model="workDataTender.sorYear" name="sorYear"
+							data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
+							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)">
 							<option value="" disabled="disabled">--Select--</option>
-							<option
-								data-ng-repeat="sorYear in sorYears | orderBy : 'sorYear'"
+							<option data-ng-repeat="sorYear in sorYears | orderBy : 'sorYear'"
 								value="{{sorYear.sorYearId}}">{{sorYear.sorYearName}}</option>
 						</select>
-						 	<div data-ng-show="workTenderForm.$submitted">
+						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.sorYear.$error.required">
 								<span th:text="#{pleaseSelect}">Please select</span> <span>SOR
 									Year</span>
 							</p>
-						</div> 
-					</div>
-
-					<div class="form-group col-sm-4" data-ng-init="loadSorYears()"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<label><span>SOR Year</span></label> <select class="form-control"
-							id="sorYear" data-ng-model="workDataTender.sorYear"
-							name="sorYear" >
-							<option value="" disabled="disabled" >--Select--</option>
-							<option
-								data-ng-repeat="sorYear in sorYears | orderBy : 'sorYear'"
-								value="{{sorYear.sorYearId}}">{{sorYear.sorYearName}}</option>
-						</select>
-						<!-- 	<div data-ng-show="workTenderForm.$submitted">
-							<p class="help-block" style="color: red;"
-								data-ng-show="workTenderForm.sorYear.$error.required">
-								<span th:text="#{pleaseSelect}">Please select</span> <span>SOR
-									Year</span>
-							</p>
-						</div> -->
+						</div>
 					</div>
 
 
-							
-					<div class="form-group col-sm-12" data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'" >
-						<label><span>Tender Percentage ?</span><span
-							class="aestrick">&#42;</span></label> <br /> <label class="radio-inline"
-							style="padding-right: 5px;"> <input type="radio"
-							name="isTender" checked="checked" data-ng-change="workDataTender.contractAmount=null"
-							data-ng-model="workData.isTender" value="1" data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders=='1'" />
+
+
+
+					<div class="form-group col-sm-12"
+						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+						<label><span>Tender Percentage ?</span><span class="aestrick">&#42;</span></label> <br /> <label
+							class="radio-inline" style="padding-right: 5px;"> <input type="radio" name="isTender"
+								checked="checked" data-ng-change="workDataTender.contractAmount=null"
+								data-ng-model="workData.isTender" value="1"
+								data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders=='1'"
+								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 							<span>Yes</span>
-						</label> <label class="radio-inline"> <input type="radio"  
-							name="isTender" data-ng-model="workData.isTender" value="0" data-ng-change="workDataTender.tenderPercentage =null;workDataTender.contractAmount = null"
-							data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders=='1'" /> <span>No</span>
+						</label> <label class="radio-inline"> <input type="radio" name="isTender"
+								data-ng-model="workData.isTender" value="0"
+								data-ng-change="workDataTender.tenderPercentage =null;workDataTender.contractAmount = null"
+								data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders=='1'"
+								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+							<span>No</span>
 						</label>
-						
+
 
 					</div>
 
 
 					<div class="form-group col-sm-4"
-						data-ng-show="workData.isTenders=='1' &amp;&amp; workDataTender.workStatusId=='8' &amp;&amp; workData.isTender == '1' "
-						>
+						data-ng-show="workData.isTenders=='1' &amp;&amp; workDataTender.workStatusId=='8' &amp;&amp; workData.isTender == '1' ">
 						<label><span th:text="#{tenderPer}">Tender
-								Percentage</span>(%) </label> <input type="text" data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTender == '1' &amp;&amp;  workData.isTenders=='1'  "
+								Percentage</span>(%)<span class="aestrick">&#42;</span> </label> <input type="text"
+							data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTender == '1' &amp;&amp;  workData.isTenders=='1'  "
 							class="form-control number-OnlyTwoDecimal" id="tenderPer" min="0"
-							data-ng-model="workDataTender.tenderPercentage"
-							data-ng-change="PercentageCaluculation();"
-							data-ng-paste="paste($event)"
-							data-ng-keydown="removeTagOnBackspace($event)" name="tenderPer"
-							data-ng-disabled="(workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null) &amp;&amp; workData.isTender =='0'" />
+							data-ng-model="workDataTender.tenderPercentage" data-ng-change="PercentageCaluculation();"
+							data-ng-paste="paste($event)" data-ng-keydown="removeTagOnBackspace($event)"
+							name="tenderPer"
+							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 						<!-- <div data-ng-show="workTenderForm.$submitted">
-
-							<p class="help-block" style="color: red;"
-								data-ng-show="workTenderForm.tenderPer.$error.required">
-								<span th:text="#{pleaseEnter}">Please enter</span> <span
-									th:text="#{tenderPer}">Tender Percentage</span>
-							</p>
-
-						</div> -->
+					
+												<p class="help-block" style="color: red;"
+													data-ng-show="workTenderForm.tenderPer.$error.required">
+													<span th:text="#{pleaseEnter}">Please enter</span> <span
+														th:text="#{tenderPer}">Tender Percentage</span>
+												</p>
+					
+											</div> -->
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.tenderPer.$error.required">
-								<span th:text="#{pleaseSelect}">Please enter</span> <span>Tender Percentage 
-									</span>
+								<span th:text="#{pleaseSelect}">Please enter</span> <span>Tender Percentage
+								</span>
 							</p>
 						</div>
 					</div>
@@ -810,45 +559,44 @@
 
 					<div class="form-group col-sm-4"
 						data-ng-show="workData.isTenders=='1' &amp;&amp; workDataTender.workStatusId=='8' &amp;&amp; workData.isTender=='1'">
-						<label><span> +/- </span><span
-							class="aestrick">&#42;</span> </label> <select class="form-control" data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTender == '1'   &amp;&amp;  workData.isTenders=='1' "
-							id="rateStatus" data-ng-model="workDataTender.rateStatus"
-							name="rateStatus" data-ng-change="PercentageCaluculation();"
-							data-ng-disabled="(workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null || workDataTender.loaIssuedDate==null) &amp;&amp; workData.isTender =='0'">
+						<label><span> +/- </span><span class="aestrick">&#42;</span> </label> <select
+							class="form-control"
+							data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTender == '1'   &amp;&amp;  workData.isTenders=='1' "
+							id="rateStatus" data-ng-model="workDataTender.rateStatus" name="rateStatus"
+							data-ng-change="PercentageCaluculation();"
+							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)">
 
 							<option value="" disabled="disabled">--Select--</option>
-							<option >Above</option>
+							<option>Above</option>
 							<option>Below</option>
 
 						</select>
 						<!-- <div data-ng-show="workTenderForm.$submitted">
-							<div data-ng-show="workDataTender.workStatusId=='8'">
-								<p class="help-block" style="color: red;"
-									data-ng-show="workTenderForm.rateStatus.$error.required">
-									<span th:text="#{pleaseSelect}">Please Select</span> <span
-										th:text="#{rate}">Rate</span>
-								</p>
-							</div>
-						</div> -->
-						
-						
+												<div data-ng-show="workDataTender.workStatusId=='8'">
+													<p class="help-block" style="color: red;"
+														data-ng-show="workTenderForm.rateStatus.$error.required">
+														<span th:text="#{pleaseSelect}">Please Select</span> <span
+															th:text="#{rate}">Rate</span>
+													</p>
+												</div>
+											</div> -->
+
+
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.contractAmount.$error.required">
 								<span th:text="#{pleaseSelect}">Please select</span> <span>Above below
-									</span>
+								</span>
 							</p>
 						</div>
 					</div>
 
-					<div class="form-group col-sm-4"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<label><span>PAC Amount (In Lacs )</span></label> <input type="text"
-							class="form-control" id="pacAmount" 
-							data-ng-model="workDataTender.pacAmount" min="0"
+					<div class="form-group col-sm-4">
+						<label><span>PAC Amount (In Lacs )</span></label> <input type="text" class="form-control"
+							id="pacAmount" data-ng-model="workDataTender.pacAmount" min="0"
 							data-ng-change="PercentageCaluculation();" name="pacAmount"
 							data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01"
-							data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null" />
+							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 
 
 
@@ -858,16 +606,16 @@
 							<div data-ng-show="workDataTender.workStatusId=='8'">
 								<p class="help-block" style="color: red;"
 									data-ng-show="workTenderForm.pacAmount.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span
-										th:text="#{pacAmount}">PAC Amount(In Lacs)</span>
+									<span th:text="#{pleaseEnter}">Please enter</span> <span th:text="#{pacAmount}">PAC
+										Amount(In
+										Lacs)</span>
 								</p>
 
 							</div>
 
 							<div data-ng-show="workDataTender.workStatusId=='8'">
 								<p class="help-block" style="color: red;">
-									<span class="help-block"
-										data-ng-show="!workTenderForm.pacAmount.$valid"> Add
+									<span class="help-block" data-ng-show="!workTenderForm.pacAmount.$valid"> Add
 										Max. Two Decimal! </span>
 								</p>
 							</div>
@@ -875,45 +623,17 @@
 					</div>
 
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<label><span>PAC Amount (In Lacs )</span></label> <input type="text"
-							class="form-control" id="pacAmount" 
-							data-ng-model="workDataTender.pacAmount" min="0"
-							data-ng-change="PercentageCaluculation();" name="pacAmount"
-							data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" />
 
-
-						<div data-ng-show="workTenderForm.$submitted">
-							<div data-ng-show="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders == 1">
-								<p class="help-block" style="color: red;"
-									data-ng-show="workTenderForm.pacAmount.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span
-										th:text="#{pacAmount}">PAC Amount(In Lacs)</span>
-								</p>
-
-							</div>
-
-							<div data-ng-show="workDataTender.workStatusId=='8'">
-								<p class="help-block" style="color: red;">
-									<span class="help-block"
-										data-ng-show="!workTenderForm.pacAmount.$valid"> Add
-										Max. Two Decimal! </span>
-								</p>
-							</div>
-						</div>
-					</div>
 
 
 					<div class="form-group col-sm-4"
 						data-ng-if="workData.isTenders=='1' &amp;&amp; workData.isTender == '1' ">
 						<label><span>Contract Amount (In Lacs )</span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label> <input type="text"
+								class="aestrick">&#42;</span></label> <input type="text"
 							class="form-control number-OnlyTwoDecimal" id="contractAmount"
-							data-ng-required="workDataTender.workStatusId=='8'  &amp;&amp; workData.isTenders=='1'" data-ng-model="workDataTender.contractAmount"
-							data-ng-paste="paste($event)"
-							data-ng-keydown="removeTagOnBackspace($event)"
-							name="contractAmount" disabled="disabled" />
+							data-ng-required="workDataTender.workStatusId=='8'  &amp;&amp; workData.isTenders=='1'"
+							data-ng-model="workDataTender.contractAmount" data-ng-paste="paste($event)"
+							data-ng-keydown="removeTagOnBackspace($event)" name="contractAmount" disabled="disabled" />
 
 						<div data-ng-show="workTenderForm.$submitted">
 							<div data-ng-show="workDataTender.workStatusId=='8'">
@@ -929,47 +649,23 @@
 
 
 					</div>
-										
-					
-
-					<div class="form-group col-sm-4"
-						data-ng-if="workData.isTenders=='0' &amp;&amp; workData.isTender=='0'">
-						<label><span>Contract Amount (In Lacs )</span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label> <input type="text"
-							class="form-control number-OnlyTwoDecimal" id="contractAmount"
-							data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders=='0' " data-ng-model="workDataTender.contractAmount"
-							data-ng-paste="paste($event)"
-							data-ng-keydown="removeTagOnBackspace($event)"
-							name="contractAmount" />
-
-						<div data-ng-show="workTenderForm.$submitted">
-							<div data-ng-show="workData.isTenders == 1">
-								<p class="help-block" style="color: red;"
-									data-ng-show="workTenderForm.contractAmount.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span
-										th:text="#{contractAmt}">Technical Contract Amount (In
-										Rs.)</span>
-								</p>
-							</div>
-						</div>
 
 
 
-					</div>
 
 
 
-					<div class="form-group col-sm-4"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+
+					<div class="form-group col-sm-4">
 						<label><span>Contract Period (in months)</span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label> <input type="number"
+								class="aestrick">&#42;</span></label> <input type="number"
 							class="form-control number-OnlyTwoDecimal" id="tsTenure"
-							data-ng-required="workDataTender.workStatusId=='8' " min="1" max="999"
-							data-ng-paste="paste($event)"
+							data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
+							min="1" max="999" data-ng-paste="paste($event)"
 							data-ng-model="workDataTender.contractTenure" name="tsTenure"
 							data-ng-change="DateCaluculationByMonth(workDataTender.workOrderDate,workDataTender.contractTenure);"
 							data-ng-keydown="removeTagOnBackspace($event)"
-							data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null" />
+							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
 
 						<div data-ng-show="workTenderForm.$submitted">
 							<div data-ng-show="workDataTender.workStatusId=='8'">
@@ -986,47 +682,23 @@
 					</div>
 
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<label><span>Contract Period (in months)</span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label> <input type="number"
-							class="form-control number-OnlyTwoDecimal" id="tsTenure"
-							data-ng-required="workDataTender.workStatusId=='8'" min="1" max="999"
-							data-ng-paste="paste($event)"
-							data-ng-model="workDataTender.contractTenure" name="tsTenure"
-							data-ng-change="DateCaluculationByMonth(workDataTender.workOrderDate,workDataTender.contractTenure);"
-							data-ng-keydown="removeTagOnBackspace($event)" />
-
-						<div data-ng-show="workTenderForm.$submitted">
-							<div data-ng-show="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders == 1">
-								<p class="help-block" style="color: red;"
-									data-ng-show="workTenderForm.tsTenure.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span
-										th:text="#{contractTenureMonth}">Contract Tenure (in
-										months)</span>
-								</p>
-							</div>
-						</div>
-
-
-					</div>
 
 
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
+					<div class="form-group col-sm-4">
 						<label><span th:text="#{completionOrderDate}">Stipulated
-								Work Completion Date (as per agreement) </span><span class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker6"
-							data-target-input="nearest">
+								Work Completion Date (as per agreement) </span><span
+								class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker6" data-target-input="nearest">
 
-							<input type="text" class="form-control" id="tenderOpeningDate"
-								required="required" placeholder="DD-MM-YYYY"
+							<input type="text" class="form-control" id="tenderOpeningDate" placeholder="DD-MM-YYYY"
 								data-ng-model="workDataTender.workCompletionDate | date: 'dd/MM/yyyy'"
-								name="tenderOpeningDate" />
+								name="tenderOpeningDate" disabled="disabled"
+								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
+								  />
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker6" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker6"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -1036,11 +708,12 @@
 						</div>
 
 						<div data-ng-show="workTenderForm.$submitted">
-							<div >
+							<div>
 								<p class="help-block" style="color: red;"
 									data-ng-show="workTenderForm.tenderOpeningDate.$error.required">
 									<span th:text="#{pleaseEnter}">Please enter</span> <span
-										th:text="#{completionOrderDate}">Work Completion Date
+										th:text="#{completionOrderDate}">Work
+										Completion Date
 										(as per agreement) </span>
 								</p>
 							</div>
@@ -1049,49 +722,7 @@
 					</div>
 
 
-					<div class="form-group col-sm-4"
-						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
-						<label><span th:text="#{completionOrderDate}">Stipulated
-								Work Completion Date (as per agreement) </span><span class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker6"
-							data-target-input="nearest">
 
-
-
-
-
-							<input type="text" class="form-control" id="tenderOpeningDate"
-								data-ng-required="workDataTender.workStatusId=='8'"
-								data-ng-model="workDataTender.workCompletionDate | date: 'dd/MM/yyyy'"
-								name="tenderOpeningDate" disabled="disabled" />
-
-
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker6" data-toggle="datetimepicker">
-								<div class="input-group-text">
-									<i class="fa fa-calendar"></i>
-								</div>
-							</div>
-
-
-
-
-
-
-						</div>
-
-						<div data-ng-show="workTenderForm.$submitted">
-							<div data-ng-show="workDataTender.workStatusId=='8'">
-								<p class="help-block" style="color: red;"
-									data-ng-show="workTenderForm.tenderOpeningDate.$error.required">
-									<span th:text="#{pleaseEnter}">Please enter</span> <span
-										th:text="#{completionOrderDate}">Work Completion Date
-										(as per agreement) </span>
-								</p>
-							</div>
-						</div>
-
-					</div>
 
 
 
@@ -1148,41 +779,35 @@
 					</div> -->
 
 				</div>
-				<!--/.row-->
-
-				<!-- add 2 row by sumit  -->
 				<div class="row">
-                    <script >
-                    $('#datetimepicker16').datetimepicker({
-            			maxDate : moment(),
-            			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
-            			format : 'DD/MM/YYYY'
-            				
-            				  
-            		});
-                	$('#datetimepicker17').datetimepicker({
-            			maxDate : moment(),
-            			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
-            			format : 'DD/MM/YYYY'
-            				 
-            		});
-                    
-                    </script>
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='3'">
-						<label><span>Tender Called Date</span> <span
-							class="aestrick">&#42;</span> </label>
-						<div class="input-group date" id="datetimepicker16"
-							data-target-input="nearest">
-							<input type="text" class="form-control datetimepicker-input" data-ng-required="workDataTender.workStatusId=='3'"
-								data-target="#datetimepicker16" name="tenderCalledDate"
-								placeholder="DD/MM/YYYY"
+					<script>
+						$('#datetimepicker16').datetimepicker({
+							maxDate: moment(),
+							minDate: moment('01/01/1995', 'DD/MM/YYYY'),
+							format: 'DD/MM/YYYY'
+
+
+						});
+						$('#datetimepicker17').datetimepicker({
+							maxDate: moment(),
+							minDate: moment('01/01/1995', 'DD/MM/YYYY'),
+							format: 'DD/MM/YYYY'
+
+						});
+
+					</script>
+					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='3'">
+						<label><span>Tender Called Date</span> <span class="aestrick">&#42;</span> </label>
+						<div class="input-group date" id="datetimepicker16" data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input"
+								data-ng-required="workDataTender.workStatusId=='3'" data-target="#datetimepicker16"
+								name="tenderCalledDate" placeholder="DD/MM/YYYY"
 								data-ng-model="workDataTender.tenderCalledDate"
 								data-ng-disabled="workDataTender.tenderUpdated=='4' || workDataTender.tenderUpdated=='5' || workDataTender.tenderUpdated=='6' || workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8'"
 								id="tenderCalledDate" autocomplete="off" />
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker16" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker16"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -1199,26 +824,24 @@
 					</div>
 
 
-
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='3'">
-						<label><span>E-Tender No.</span></label> <input type="text" data-ng-required="workDataTender.workStatusId=='3'"
-							class="form-control" id="eTenderNo"
+					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='3'">
+						<label><span>E-Tender No.</span><span class="aestrick">&#42;</span></label> <input type="text"
+							data-ng-required="workDataTender.workStatusId=='3'" class="form-control" id="eTenderNo"
 							data-ng-disabled="workDataTender.tenderUpdated=='4' || workDataTender.tenderUpdated=='5' || workDataTender.tenderUpdated=='6' || workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8'"
-							data-ng-model="workDataTender.eTenderNo" name="eTenderNo"   ng-pattern="/^\d+$/"/>
+							data-ng-model="workDataTender.eTenderNo" name="eTenderNo" ng-pattern="/^\d+$/" />
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.eTenderNo.$error.required">
 								<span th:text="#{pleaseEnter}">Please enter</span> <span>E Tender
 									NO</span>
 							</p>
-						
+
 						</div>
-							<p class="help-block" style="color: red;"
-								data-ng-show="workTenderForm.eTenderNo.$error.pattern">
-								<span th:text="#{pleaseEnter}">Please enter</span> <span>Number only
-									</span>
-							</p>
+						<p class="help-block" style="color: red;"
+							data-ng-show="workTenderForm.eTenderNo.$error.pattern">
+							<span th:text="#{pleaseEnter}">Please enter</span> <span>Number only
+							</span>
+						</p>
 					</div>
 
 
@@ -1226,22 +849,19 @@
 
 
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='4'">
-						<label><span>Tender Received Date</span><span
-							class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker17"
-							data-target-input="nearest">
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker17" name="tenderReceivedDate"
-								placeholder="DD/MM/YYYY" data-ng-required="workDataTender.workStatusId=='4'"
+					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='4'">
+						<label><span>Tender Received Date</span><span class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker17" data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker17"
+								name="tenderReceivedDate" placeholder="DD/MM/YYYY"
+								data-ng-required="workDataTender.workStatusId=='4'"
 								data-ng-disabled="workDataTender.tenderUpdated=='5' || workDataTender.tenderUpdated=='6' || workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8' || workDataTender.tenderCalledDate==null"
-								data-ng-model="workDataTender.tenderReceivedDate"
-								id="tenderReceivedDate" autocomplete="off" />
+								data-ng-model="workDataTender.tenderReceivedDate" id="tenderReceivedDate"
+								autocomplete="off" />
 
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker17" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker17"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -1263,21 +883,17 @@
 
 
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='14'">
+					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='14'">
 						<label><span>Re-Tender Date</span></label>
-						<div class="input-group date" id="datetimepicker18"
-							data-target-input="nearest">
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker18" name="reTenderDate"
-								placeholder="DD/MM/YYYY"
+						<div class="input-group date" id="datetimepicker18" data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker18"
+								name="reTenderDate" placeholder="DD/MM/YYYY"
 								data-ng-disabled="workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8' || workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null"
-								data-ng-model="workDataTender.reTenderDate" id="reTenderDate"
-								autocomplete="off" />
+								data-ng-model="workDataTender.reTenderDate" id="reTenderDate" autocomplete="off" />
 
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker18" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker18"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -1293,31 +909,28 @@
 						</div>
 
 					</div>
-				    <script >
-					$('#datetimepicker21').datetimepicker({
-						maxDate : moment(),
-						minDate : moment('01/01/1995', 'DD/MM/YYYY'),
-						format : 'DD/MM/YYYY'
-							 
-					});
-				    </script>
+					<script>
+						$('#datetimepicker21').datetimepicker({
+							maxDate: moment(),
+							minDate: moment('01/01/1995', 'DD/MM/YYYY'),
+							format: 'DD/MM/YYYY'
+
+						});
+					</script>
 
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='7'">
+					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='7'">
 						<label><span>LoA Issued Date</span><span class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker21"
-							data-target-input="nearest">
-							<input type="text" class="form-control datepicker-input"
-								data-target="#datetimepicker21" name="loaIssuedDate"
-								placeholder="DD/MM/YYYY" data-ng-required="workDataTender.workStatusId=='7'"
+						<div class="input-group date" id="datetimepicker21" data-target-input="nearest">
+							<input type="text" class="form-control datepicker-input" data-target="#datetimepicker21"
+								name="loaIssuedDate" placeholder="DD/MM/YYYY"
+								data-ng-required="workDataTender.workStatusId=='7'"
 								data-ng-disabled="workDataTender.tenderUpdated=='8' || workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null "
-								data-ng-model="workDataTender.loaIssuedDate" id="loaIssuedDate"
-								autocomplete="off" />
+								data-ng-model="workDataTender.loaIssuedDate" id="loaIssuedDate" autocomplete="off" />
 
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker21" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker21"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -1334,22 +947,16 @@
 
 					</div>
 				</div>
-				<!-- end 5 row by Sumit -->
-
-
-
 				<div class="row"
 					data-ng-hide="workDataTender.workStatusId=='' ||workDataTender.workStatusId=='1' ||workDataTender.workStatusId=='7' || workDataTender.workStatusId=='14' || workDataTender.workStatusId=='4' || workDataTender.workStatusId=='3' || workDataTender.workStatusId==null">
 
 
 					<div class="form-group col-sm-4">
-						<label><span>Security Deposit</span></label> <br /> <label
-							class="radio-inline" style="padding-right: 5px;"> <input
-							type="radio" name="secureAmtStatus" checked="checked"
-							data-ng-model="workDataTender.secureAmtStatus" value="BG" /> <span>BG</span>
-						</label> <label class="radio-inline"> <input type="radio"
-							name="secureAmtStatus"
-							data-ng-model="workDataTender.secureAmtStatus" value="FDR" /> <span>FDR</span>
+						<label><span>Security Deposit</span></label> <br /> <label class="radio-inline"
+							style="padding-right: 5px;"> <input type="radio" name="secureAmtStatus" checked="checked"
+								data-ng-model="workDataTender.secureAmtStatus" value="BG" /> <span>BG</span>
+						</label> <label class="radio-inline"> <input type="radio" name="secureAmtStatus"
+								data-ng-model="workDataTender.secureAmtStatus" value="FDR" /> <span>FDR</span>
 						</label>
 
 						<!-- 	<div data-ng-show="workTenderForm.$submitted">
@@ -1366,18 +973,15 @@
 					<div class="form-group col-sm-4"
 						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
 						<label><span>BG/FDR Start Date</span></label>
-						<div class="input-group date" id="datetimepicker9"
-							data-target-input="nearest">
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker9" name="startDate"
-								placeholder="DD/MM/YYYY"
-								data-ng-model="workDataTender.startDate" id="startDate"
-								autocomplete="off"
+						<div class="input-group date" id="datetimepicker9" data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker9"
+								name="startDate" placeholder="DD/MM/YYYY" data-ng-model="workDataTender.startDate"
+								id="startDate" autocomplete="off"
 								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null || workDataTender.loaIssuedDate==null" />
 
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker9" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker9"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -1397,17 +1001,14 @@
 					<div class="form-group col-sm-4"
 						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
 						<label><span>BG/FDR Start Date</span></label>
-						<div class="input-group date" id="datetimepicker20"
-							data-target-input="nearest">
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker20" name="startDate"
-								placeholder="DD/MM/YYYY"
-								data-ng-model="workDataTender.startDate" id="startDate"
-								autocomplete="off" />
+						<div class="input-group date" id="datetimepicker20" data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker20"
+								name="startDate" placeholder="DD/MM/YYYY" data-ng-model="workDataTender.startDate"
+								id="startDate" autocomplete="off" />
 
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker20" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker20"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -1427,17 +1028,15 @@
 					<div class="form-group col-sm-4"
 						data-ng-hide="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
 						<label><span>BG/FDR End Date</span></label>
-						<div class="input-group date" id="datetimepicker10"
-							data-target-input="nearest">
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker10" name="endDate"
-								placeholder="DD/MM/YYYY" data-ng-model="workDataTender.endDate"
+						<div class="input-group date" id="datetimepicker10" data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker10"
+								name="endDate" placeholder="DD/MM/YYYY" data-ng-model="workDataTender.endDate"
 								id="endDate" autocomplete="off"
 								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null || workDataTender.loaIssuedDate==null" />
 
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker10" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker10"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -1456,16 +1055,14 @@
 					<div class="form-group col-sm-4"
 						data-ng-show="workData.isTenders=='0' &amp;&amp; workDataTender.workStatusId=='8'">
 						<label><span>BG/FDR End Date</span></label>
-						<div class="input-group date" id="datetimepicker22"
-							data-target-input="nearest">
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker22" name="endDate"
-								placeholder="DD/MM/YYYY" data-ng-model="workDataTender.endDate"
+						<div class="input-group date" id="datetimepicker22" data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker22"
+								name="endDate" placeholder="DD/MM/YYYY" data-ng-model="workDataTender.endDate"
 								id="endDate" autocomplete="off" />
 
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker22" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker22"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -1483,40 +1080,15 @@
 
 
 				</div>
-
-
-
-
-				<!-- 2nd Row start -->
-
 				<div class="row"
 					data-ng-hide="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'">
 
 
 
 				</div>
+			</div> 
 
-
-
-
-			</div>
-
-
-
-			<!-- 	<div class="tab-footer text-right" align="right"  data-ng-hide="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'">
-				<button type="submit" class="btn  btn-success  next-button"
-					id="draftD" disabled="disabled">
-					<i class="las la-file-alt"></i> Save As Draft
-				</button>
-				<button type="submit" class="btn btn-primary next-button nexxt"
-					id="finalD" disabled="disabled">
-					Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
-				</button>
-			</div>
- -->
-
-			<div class="tab-footer text-right"
-				data-ng-show="workDataProgress.workStatus=='notProgressIssued'"
+			<div class="tab-footer bg-light rounded text-right pr-2" data-ng-show="workDataProgress.workStatus=='notProgressIssued'"
 				th:if="${roleName=='ROLE_DISTRICT'|| roleName=='ROLE_DEPARTMENT'}">
 				<button type="submit" class="btn  btn-success  next-button"
 					data-ng-show="workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13' || workDataTender.workStatusId=='14' || workDataTender.workStatusId=='3' || workDataTender.workStatusId=='4' || workDataTender.workStatusId=='7' || workDataTender.workStatusId==null"
@@ -1527,149 +1099,147 @@
 				<button type="submit" class="btn btn-primary next-button nexxt"
 					data-ng-hide="workDataTender.workStatusId=='3' || workDataTender.workStatusId=='4' || workDataTender.workStatusId=='14'|| workDataTender.workStatusId=='7' ||workDataTender.workStatusId==null"
 					data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13' "
-					id="finalTtbtn"
-					data-ng-click="finalSubmit=false;saveTDraft=true;saveTNext=true;">
+					id="finalTtbtn" data-ng-click="finalSubmit=false;saveTDraft=true;saveTNext=true;">
 					Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
 				</button>
 			</div>
-
-
-
-
-			<div class="alert alert-success alert-dismissible" role="alert"
-				id="myAlert" data-ng-if="successResponseTender=='success'">
+			<div class="alert alert-success alert-dismissible" role="alert" id="myAlert"
+				data-ng-if="successResponseTender=='success'">
 				<!-- <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> -->
 				<strong>Success!</strong> Work Status is changed now.
 			</div>
-
-
 		</div>
 	</form>
+	</div>
 	<script type="text/javascript">
-	/*<![CDATA[*/
-	//Plug-in to fetch page data 
-	
-	var tstatus = null;
-	function fetchWorkTenderStatus(workID) {
+		/*<![CDATA[*/
+		//Plug-in to fetch page data 
 
-		tstatus = $("#dynamic-table-workstatus")
+		var tstatus = null;
+		function fetchWorkTenderStatus(workID) {
+
+			tstatus = $("#dynamic-table-workstatus")
 				.DataTable(
-						{
-							"processing" : true,
-							"serverSide" : true,
-							"sort" : "position",
-							//bStateSave variable you can use to save state on client cookies: set value "true" 
-							"bStateSave" : false,
-							//Default: Page display length
-							"iDisplayLength" :10,
-							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
-							"iDisplayStart" : 0,
-							"pagingType" : "full_numbers",
-							"aaSorting" : [],
-							/* "dom" : 'Blrtip', */
-							"dom" : "<'row'<'col-12 datatbl-top'lB>>"
-									+ "<'row'<'col-md-6'r><'col-md-6'>>"
-									+ "<'row'<'col-md-12't>><'row'<'col-md-6'i><'col-md-6'p>>",
-							"buttons" : [
-									
-									 ],
-							"lengthMenu" : [ [ 10, 25, 50, 100000 ],
-									[ 10, 25, 50, "All" ] ],
+					{
+						"processing": true,
+						"serverSide": true,
+						"sort": "position",
+						//bStateSave variable you can use to save state on client cookies: set value "true" 
+						"bStateSave": false,
+						//Default: Page display length
+						"iDisplayLength": 10,
+						//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+						"iDisplayStart": 0,
+						"pagingType": "full_numbers",
+						"aaSorting": [],
+						/* "dom" : 'Blrtip', */
+						"dom": "<'row'<'col-12 datatbl-top'lB>>"
+							+ "<'row'<'col-md-6'r><'col-md-6'>>"
+							+ "<'row'<'col-md-12't>><'row'<'col-md-6'i><'col-md-6'p>>",
+						"buttons": [
 
-							"fnDrawCallback" : function() {
+						],
+						"lengthMenu": [[10, 25, 50, 100000],
+						[10, 25, 50, "All"]],
+
+						"fnDrawCallback": function () {
 
 
-								//Get page numer on client. Please note: number start from 0 So
-								//for the first page you will see 0 second page 1 third page 2...
-								//Un-comment below alert to see page number
-								//alert("Current page number: "+this.fnPagingInfo().iPage);    
-							},
-							"fnServerParams" : function(aoData) {
-							
-                            
-							},
-							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
-						
-							},
-							"fnRowCallback" : function(nRow, aData,
-									iDisplayIndex, iDisplayIndexFull) {
-								/* $('td:eq(0)', nRow)
-										.html(
-												(this.fnPagingInfo().iPage
-								 * this.fnPagingInfo().iLength + (iDisplayIndex + 1))); */
-										
-							},
+							//Get page numer on client. Please note: number start from 0 So
+							//for the first page you will see 0 second page 1 third page 2...
+							//Un-comment below alert to see page number
+							//alert("Current page number: "+this.fnPagingInfo().iPage);    
+						},
+						"fnServerParams": function (aoData) {
 
-							"language" : {
-								searchPlaceholder : "Name",
-								info: "", // Removes the "Showing X to Y of Z entries" text
-							    infoFiltered: "", // Removes the "filtered from ..." part
-							    infoEmpty: ""
-							},
-							"sAjaxSource" : "fetchWorkStatusByWorkID/"+workID,
-								
-							"columns" : [ {
-								"data" : "index",
-								"bSortable" : false
-							},{
-								"mData" : "workStatusNameE",
-								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var workStatusNameE=row.workStatusNameE
-			  	            		if(null== workStatusNameE){
-			  	            			workStatusNameE="-";
-			  	            		}
-			  	            		return workStatusNameE; 
-			  	            	} 
-								
-							},
-							{
-								"mData" : "StatusDate",
-								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var StatusDate=row.StatusDate
-			  	            		if(null== StatusDate){
-			  	            			StatusDate="-";
-			  	            		}
-			  	            		return StatusDate; 
-			  	            	} 
-								
+
+						},
+						"fnCreatedRow": function (nRow, aData, iDataIndex) {
+
+						},
+						"fnRowCallback": function (nRow, aData,
+							iDisplayIndex, iDisplayIndexFull) {
+							/* $('td:eq(0)', nRow)
+									.html(
+											(this.fnPagingInfo().iPage
+							 * this.fnPagingInfo().iLength + (iDisplayIndex + 1))); */
+
+						},
+
+						"language": {
+							searchPlaceholder: "Name",
+							info: "", // Removes the "Showing X to Y of Z entries" text
+							infoFiltered: "", // Removes the "filtered from ..." part
+							infoEmpty: ""
+						},
+						"sAjaxSource": "fetchWorkStatusByWorkID/" + workID,
+
+						"columns": [{
+							"data": "index",
+							"bSortable": false
+						}, {
+							"mData": "workStatusNameE",
+							"bSortable": false,
+							mRender: function (mData, type, row) {
+								var workStatusNameE = row.workStatusNameE
+								if (null == workStatusNameE) {
+									workStatusNameE = "-";
+								}
+								return workStatusNameE;
 							}
-							
-							],
 
-						});
-	}
-	
-	
-	
-	function reDrawstatus() {
-	
-		tstatus.draw();
-	}
-	$('#filter-btn').click(function() {
-		$('#filters').fadeToggle(300);
-	});
-	$('.filter-close').click(function(e) {
-		e.preventDefault();
-		$(this).parent('#filters').fadeOut(300);
-	});
-	$('#applyFilters').click(function(e) {
-		//e.preventDefault();
-		$('#filters').fadeOut(300);
-		//$('#searchForm').submit();
-	});
-	var filter_box = $('#filters');
-	$(document).mouseup(function(e) {
-		if (!filter_box.is(e.target) && filter_box.has(e.target).length === 0) {
-			$('#filters:visible').fadeOut('300');
+						},
+						{
+							"mData": "StatusDate",
+							"bSortable": false,
+							mRender: function (mData, type, row) {
+								var StatusDate = row.StatusDate
+								if (null == StatusDate) {
+									StatusDate = "-";
+								}
+								return StatusDate;
+							}
+
+						}
+
+						],
+
+					});
 		}
-	});
-	/*]]>*/
-</script>
+
+
+
+		function reDrawstatus() {
+
+			tstatus.draw();
+		}
+		$('#filter-btn').click(function () {
+			$('#filters').fadeToggle(300);
+		});
+		$('.filter-close').click(function (e) {
+			e.preventDefault();
+			$(this).parent('#filters').fadeOut(300);
+		});
+		$('#applyFilters').click(function (e) {
+			//e.preventDefault();
+			$('#filters').fadeOut(300);
+			//$('#searchForm').submit();
+		});
+		var filter_box = $('#filters');
+		$(document).mouseup(function (e) {
+			if (!filter_box.is(e.target) && filter_box.has(e.target).length === 0) {
+				$('#filters:visible').fadeOut('300');
+			}
+		});
+		
+		
+		
+		/*]]>*/
+	</script>
+
 	<div class="container-fluid" data-ng-show="true">
 		<div class="animated fadeIn">
-			<div class="row"   >
+			<div class="row">
 				<div class="col-md-12" data-ng-init="loadWorkTenderStatus();">
 					<div class="card">
 						<div class="card-header">
@@ -1678,8 +1248,8 @@
 						</div>
 						<div class="card-body">
 							<div class="pr">
-								
-							
+
+
 							</div>
 							<!-- <div class="row">
 								<div class="col-md-12">
@@ -1696,10 +1266,10 @@
 									<thead class="thead-default">
 										<tr>
 											<th><span>S.No.</span></th>
-												<th><span>Work Status</span></th>
-												<th><span>Date</span></th>
-												
-											
+											<th><span>Work Status</span></th>
+											<th><span>Date</span></th>
+
+
 										</tr>
 									</thead>
 								</table>
@@ -1713,145 +1283,145 @@
 		</div>
 
 	</div>
-	<div class= "container" data-ng-init="loadUserList()">
+	<div class="container" data-ng-init="loadUserList()">
 
-		<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		  <div class="modal-dialog" role="document">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title" id="exampleModalLabel">Area Officers</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          <span aria-hidden="true">&times;</span>
-		        </button>
-		      </div>
-		      <div class="modal-body">
-		      <div class="row">
-										<div class="col-md-12">
-											<div data-ng-if="responseObject.successMessage != null"
-												class="text-success">
-												<strong>Success!</strong>
-												<p>{{responseObject.successMessage}}</p>
-											</div>
-										</div>
-									</div>
-		    
-		      <fieldset class="legend-border">
-												<legend class="legend-border">Filters</legend>
-					<div class="row">
-							<div class="form-group col-sm-4">
-							<div class="form-group">
-							<label><span>FirstName</span></label>
-							<input type="text" class="form-control" id="searchBox2" 
-														placeholder="Search by firstName" data-ng-change="reloadJqueryDatatable2();"
-														data-ng-model="searchBo2x" maxlength="100" />
-							
-							</div>
-							
-							</div>
-							<div class="form-group col-sm-4">
-									<div class="form-group">
-																<label><span>Email (User Id)</span></label> <input
-																	type="text" class="form-control" data-ng-model="emailId"  placeholder="Email ID"
-																	id="emailId"  data-ng-change="reloadJqueryDatatable2();"/>
-															</div>
-							
-							
-							</div>
-							<div class="form-group col-sm-4">
-							     <div class="form-group">
-																<label><span>Mobile No.</span></label> <input maxlength="10"
-																	type="text" class="form-control" data-ng-model="mobileNo" placeholder="Mobile No"
-																	id="mobileNo" data-ng-change="reloadJqueryDatatable2();" />
+		<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+			aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Area Officers</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-12">
+								<div data-ng-if="responseObject.successMessage != null" class="text-success">
+									<strong>Success!</strong>
+									<p>{{responseObject.successMessage}}</p>
 								</div>
-							
-							
-							
 							</div>
-					
-					</div>							
-												
-												
-			  	</fieldset>								
-		        
-		        <!--  add model list -->
-		        <div class="table-responsive responsive-md">
-										<table id="dynamic-table2"
-											class="table table-striped table-bordered table-hover table-outline">
-											<thead class="thead-default">
-												<tr>
-													<th class="text-center"><span>S.No.</span></th>
-													<th><span>First Name</span></th>
-													<th><span>Last Name</span></th>
-													<!-- <th><span>User Name</span></th> -->
-													<th><span>Mobile No.</span></th>
-													<th><span>Email (User Id)</span></th>
-													<!-- 
+						</div>
+
+						<fieldset class="legend-border">
+							<legend class="legend-border">Filters</legend>
+							<div class="row">
+								<div class="form-group col-sm-4">
+									<div class="form-group">
+										<label><span>FirstName</span></label>
+										<input type="text" class="form-control" id="searchBox2"
+											placeholder="Search by firstName" data-ng-change="reloadJqueryDatatable2();"
+											data-ng-model="searchBo2x" maxlength="100" />
+
+									</div>
+
+								</div>
+								<div class="form-group col-sm-4">
+									<div class="form-group">
+										<label><span>Email (User Id)</span></label> <input type="text"
+											class="form-control" data-ng-model="emailId" placeholder="Email ID"
+											id="emailId" data-ng-change="reloadJqueryDatatable2();" />
+									</div>
+
+
+								</div>
+								<div class="form-group col-sm-4">
+									<div class="form-group">
+										<label><span>Mobile No.</span></label> <input maxlength="10" type="text"
+											class="form-control" data-ng-model="mobileNo" placeholder="Mobile No"
+											id="mobileNo" data-ng-change="reloadJqueryDatatable2();" />
+									</div>
+
+
+
+								</div>
+
+							</div>
+
+
+						</fieldset>
+
+						<!--  add model list -->
+						<div class="table-responsive responsive-md">
+							<table id="dynamic-table2"
+								class="table table-striped table-bordered table-hover table-outline">
+								<thead class="thead-default">
+									<tr>
+										<th class="text-center"><span>S.No.</span></th>
+										<th><span>First Name</span></th>
+										<th><span>Last Name</span></th>
+										<!-- <th><span>User Name</span></th> -->
+										<th><span>Mobile No.</span></th>
+										<th><span>Email (User Id)</span></th>
+										<!-- 
 													 <th><span>Official Email Id</span></th>
 													<th><span>Official Phone</span></th> -->
-													<th><span>Division</span></th>
-													
-													<th><span>Role</span></th>
-													<!-- <th><span>Designation</span></th> -->
-													<th><span>District</span></th>
+										<th><span>Division</span></th>
+
+										<th><span>Role</span></th>
+										<!-- <th><span>Designation</span></th> -->
+										<th><span>District</span></th>
 
 
-													<!-- <th><span>Sub Engineer Name</span></th> -->
-													<th><span>Status</span></th>
-													<th><span>Action</span></th>
-												
-												</tr>
-											</thead>
-										</table>
-									</div>
-		        
-		         <!-- end model list -->
-		        
-		      </div>
-		      <div class="modal-footer">
-		        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+										<!-- <th><span>Sub Engineer Name</span></th> -->
+										<th><span>Status</span></th>
+										<th><span>Action</span></th>
+
+									</tr>
+								</thead>
+							</table>
+						</div>
+
+						<!-- end model list -->
+
+					</div>
+					<div class="modal-footer">
+						<!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 		        <button type="button" class="btn btn-primary">Save changes</button> -->
-		      </div>
-		    </div>
-		  </div>
+					</div>
+				</div>
+			</div>
 		</div>
- <script>
-	var t2= null;
+		<script>
+			var t2 = null;
 			function fetchUserList() {
-					
-					t2 = $("#dynamic-table2")
-					.DataTable(
-							{
-								"processing" : true,
-								"serverSide" : true,
-								"sort" : "position",
-								//bStateSave variable you can use to save state on client cookies: set value "true" 
-								"bStateSave" : false,
-								//Default: Page display length
-								"iDisplayLength" : 10,
-								//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
-								"iDisplayStart" : 0,
-								"pagingType" : "full_numbers",
-								"aaSorting" : [],
-							
-							
-								"buttons" : [
-										 ],
-								"lengthMenu" : [ [ 10, 25, 50, 100000 ],
-										[ 10, 25, 50, "All" ] ],
-			                    
-								"fnDrawCallback" : function() {
 
-									
-									//Get page numer on client. Please note: number start from 0 So
-									//for the first page you will see 0 second page 1 third page 2...
-									//Un-comment below alert to see page number
-									//alert("Current page number: "+this.fnPagingInfo().iPage);    
-								},
-								"fnServerParams" : function(aoData) {
-										aoData.push({
-										"name" : "searchBoxVal",
-										"value" : $('#searchBox2').val().trim()
-									});/*
+				t2 = $("#dynamic-table2")
+					.DataTable(
+						{
+							"processing": true,
+							"serverSide": true,
+							"sort": "position",
+							//bStateSave variable you can use to save state on client cookies: set value "true" 
+							"bStateSave": false,
+							//Default: Page display length
+							"iDisplayLength": 10,
+							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+							"iDisplayStart": 0,
+							"pagingType": "full_numbers",
+							"aaSorting": [],
+
+
+							"buttons": [
+							],
+							"lengthMenu": [[10, 25, 50, 100000],
+							[10, 25, 50, "All"]],
+
+							"fnDrawCallback": function () {
+
+
+								//Get page numer on client. Please note: number start from 0 So
+								//for the first page you will see 0 second page 1 third page 2...
+								//Un-comment below alert to see page number
+								//alert("Current page number: "+this.fnPagingInfo().iPage);    
+							},
+							"fnServerParams": function (aoData) {
+								aoData.push({
+									"name": "searchBoxVal",
+									"value": $('#searchBox2').val().trim()
+								});/*
 									 aoData.push({
 										"name" : "roleCode",
 										"value" : $('#roleCode').val()
@@ -1864,182 +1434,189 @@
 										"name" : "username",
 										"value" : $('#username').val().trim()
 									}); */
-									aoData.push({
-										"name" : "emailId",
-										"value" : $('#emailId').val().trim()
-									});
-									aoData.push({
-										"name" : "mobileNo",
-										"value" : $('#mobileNo').val().trim()
-									});
+								aoData.push({
+									"name": "emailId",
+									"value": $('#emailId').val().trim()
+								});
+								aoData.push({
+									"name": "mobileNo",
+									"value": $('#mobileNo').val().trim()
+								});
 
-								},
-								"fnCreatedRow" : function(nRow, aData, iDataIndex) {
-									/* if(aData.status != "Pending"){
+							},
+							"fnCreatedRow": function (nRow, aData, iDataIndex) {
+								/* if(aData.status != "Pending"){
+								$('td:eq(10)', nRow)
+										.html(
+												'<a class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="View/Edit" href="#editUserForm/'
+														+ encryptFunc(aData.id)
+														+ '"><i class="fa fa-pencil"></i></a>');
+								$('td:eq(10)', nRow)
+										.append(
+												'<a onclick="return deleteUser('
+														+ aData.id
+														+ ');" href="" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash-o"></i></a> ');}
+								else{
 									$('td:eq(10)', nRow)
-											.html(
-													'<a class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="View/Edit" href="#editUserForm/'
-															+ encryptFunc(aData.id)
-															+ '"><i class="fa fa-pencil"></i></a>');
-									$('td:eq(10)', nRow)
-											.append(
-													'<a onclick="return deleteUser('
-															+ aData.id
-															+ ');" href="" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash-o"></i></a> ');}
-									else{
-										$('td:eq(10)', nRow)
-										.html("");
-									}	 */
-									
-									$('td:eq(9)', nRow).html('')
-									if(parseInt(aData.id) != parseInt(window.currentUser)){
-									$('td:eq(9)', nRow).append('<button type="button" class="btn btn-xs btn-primary" onclick="assignUser('+aData.id+')">Assign User</button>');
-									}else {
-										$('td:eq(9)', nRow).append('Already Assign');
-									}
-									
-									
-									
-								},
-								
-								"fnRowCallback" : function(nRow, aData,
-										iDisplayIndex, iDisplayIndexFull) {
-									/* $('td:eq(0)', nRow)
-											.html(
-													(this.fnPagingInfo().iPage
-									 * this.fnPagingInfo().iLength + (iDisplayIndex + 1))); */
-									 
-									  if (aData.status == 'Pending') {
-							                $(nRow).remove();
-							            }
-									 
-									 
-								},
+									.html("");
+								}	 */
 
-								"language" : {
-									searchPlaceholder : "firstName",
-									 "infoFiltered": "",
-									 "infoEmpty": "" ,
-									 "info": "", 
-								},
-								"sAjaxSource" : "fetchUserList",
+								$('td:eq(9)', nRow).html('')
+								if (parseInt(aData.id) != parseInt(window.currentUser)) {
+									$('td:eq(9)', nRow).append('<button type="button" class="btn btn-xs btn-primary" onclick="assignUser(' + aData.id + ')">Assign User</button>');
+								} else {
+									$('td:eq(9)', nRow).append('Already Assign');
+								}
 
-								"columns" : [ {
-									"data" : "null",
-									"bSortable" : false,
-									"render": function (data, type, row, meta) {
-									           return meta.row + 1; // Start from 1
-									       }
-								}, {
-									"mData" : "firstName",
-									"bSortable" : false
-								}, {
-									"mData" : "lastName",
-									"bSortable" : false
-								}, {
-									"mData" : "mobileNo",
-									"bSortable" : false
-								}, {
-									"mData" : "emailId",
-									"bSortable" : false
-								}, {
-									"mData" : "divisionName",
-									"bSortable" : false
-								},
 
-								{
-									"mData" : "role.roleName"
-								}/* , {
+
+							},
+
+							"fnRowCallback": function (nRow, aData,
+								iDisplayIndex, iDisplayIndexFull) {
+								/* $('td:eq(0)', nRow)
+										.html(
+												(this.fnPagingInfo().iPage
+								 * this.fnPagingInfo().iLength + (iDisplayIndex + 1))); */
+
+								if (aData.status == 'Pending') {
+									$(nRow).remove();
+								}
+
+
+							},
+
+							"language": {
+								searchPlaceholder: "firstName",
+								"infoFiltered": "",
+								"infoEmpty": "",
+								"info": "",
+							},
+							"sAjaxSource": "fetchUserList",
+
+							"columns": [{
+								"data": "null",
+								"bSortable": false,
+								"render": function (data, type, row, meta) {
+									return meta.row + 1; // Start from 1
+								}
+							}, {
+								"mData": "firstName",
+								"bSortable": false
+							}, {
+								"mData": "lastName",
+								"bSortable": false
+							}, {
+								"mData": "mobileNo",
+								"bSortable": false
+							}, {
+								"mData": "emailId",
+								"bSortable": false
+							}, {
+								"mData": "divisionName",
+								"bSortable": false
+							},
+
+							{
+								"mData": "role.roleName"
+							}/* , {
 																"mData" : "designationName",
 																"bSortable" : false
 															} */, {
-									"mData" : "districtName",
-									"bSortable" : false
-								}/* , {
+								"mData": "districtName",
+								"bSortable": false
+							}/* , {
 																"mData" : "subEnggNameAndImplAgency",
 																"bSortable" : false
 															} */, {
-									"mData" : "status"
-								},
-								{
-									"mData": null
-									
-								}],
+								"mData": "status"
+							},
+							{
+								"mData": null
 
-							});
+							}],
+
+						});
+			}
+			function reDraw2() {
+					t2.draw();
 				}
-	
- </script>
-		</div>
+		</script>
+	</div>
 
 
-     <div class="card-header" >
-		 Assign Area Officer
-	 </div>
-<div class="card-body" >
-		  <div class="row" data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='13'">
+	<div class="card-header">
+		Assign Area Officer
+	</div>
+	<div class="card-body">
+		<div class="row"
+			data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='13'">
 			<div class="col-sm-2">
 				<button type="button" class="btn btn-success"
-				        ng-click="openModal(workData.workId,workData.userAssignee)">
-				    Assign Officer
+					ng-click="openModal(workData.workId,workData.userAssignee)">
+					Assign Officer
 				</button>
 
 			</div>
-			<div class="col-sm-4"> 
+			<div class="col-sm-4">
 				<label>Assign User</label>
 				<div data-ng-show="workData.userAssigneeName == null">No user Assign </div>
-				<input  data-n-if="workData.userAssigneeName !=null " disabled="disabled" value="{{workData.userAssigneeName}}"/>
+				<input data-n-if="workData.userAssigneeName !=null " disabled="disabled"
+					value="{{workData.userAssigneeName}}" />
 			</div>
-			
-			<br/>
-			<br/>
-			<br/>
-			<br/>
-			</div>
-			<div class="row"  data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12' || workDataTender.workStatusId=='13'">
-			<div  class="table-responsive responsive-md"  data-ng-init="loadareaUserList()">
-											<table id="dynamic-table25"
-												class="table table-striped table-bordered table-hover table-outline">
-												<thead class="thead-default">
-													<tr>
-														<th  class="text-center"><span>S.No.</span></th>
-														<th><span>First Name</span></th>
-														<th><span>Last Name</span></th>
-														<!-- <th><span>User Name</span></th> -->
 
-														<th><span>Designation/Role</span></th>
-														<th><span>Mobile No.</span></th>
-														<th><span>Email (User Id)</span></th>
-														<!-- 
+			<br />
+			<br />
+			<br />
+			<br />
+		</div>
+		<div class="row"
+			data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12' || workDataTender.workStatusId=='13'">
+			<div class="table-responsive responsive-md" data-ng-init="loadareaUserList()">
+				<table id="dynamic-table25" class="table table-striped table-bordered table-hover table-outline">
+					<thead class="thead-default">
+						<tr>
+							<th class="text-center"><span>S.No.</span></th>
+							<th><span>First Name</span></th>
+							<th><span>Last Name</span></th>
+							<!-- <th><span>User Name</span></th> -->
+
+							<th><span>Designation/Role</span></th>
+							<th><span>Mobile No.</span></th>
+							<th><span>Email (User Id)</span></th>
+							<!-- 
 														 <th><span>Official Email Id</span></th>
 														<th><span>Official Phone</span></th> -->
-														<th><span>Agency Department</span></th>
-														
-														<th><span>Assigned Date</span></th>
-														<th><span>Status</span></th>
-													
-													</tr>
-												</thead>
-												<tbody>
-												  <tr data-ng-repeat="user in useralist">
-													<td>{{ $index + 1 }}</td> 
-												    <td>{{ user.firstName }}</td>
-												    <td>{{ user.lastName }}</td>
-													<td>{{ user.role.roleName }}</td>
-													<td>{{ user.mobileNo }}</td>
-													<td>{{ user.emailId}}</td>
-													<td>{{ user.departmentName}}</td>
-													<td>{{ user.assignDate|date:'dd-MM-yyyy'}}</td>
-													
-														<td>
-														  {{ workData.userAssigneeName === user.firstName +' '+user.lastName ? 'Assigned' : 'Previously Assigned' }}
-														</td>
-													
-												    <!-- other columns -->
-												  </tr>
-												</tbody>
-											</table>
-										</div>
-		  </div>
-	 </div>
+							<th><span>Agency Department</span></th>
+
+							<th><span>Assigned Date</span></th>
+							<th><span>Status</span></th>
+
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="user in useralist">
+							<td>{{ $index + 1 }}</td>
+							<td>{{ user.firstName }}</td>
+							<td>{{ user.lastName }}</td>
+							<td>{{ user.role.roleName }}</td>
+							<td>{{ user.mobileNo }}</td>
+							<td>{{ user.emailId}}</td>
+							<td>{{ user.departmentName}}</td>
+							<td>{{ user.assignDate|date:'dd-MM-yyyy'}}</td>
+
+							<td>
+								{{ workData.userAssigneeName === user.firstName +' '+user.lastName ? 'Assigned' :
+								'Previously Assigned' }}
+							</td>
+
+							<!-- other columns -->
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			 
+		</div>
+		 
+	</div>
 </div>

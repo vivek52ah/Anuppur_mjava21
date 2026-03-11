@@ -12,7 +12,7 @@ public class DmRemarksBean {
 
 	private String remark;
 
-	private Integer workId;
+	private Long workId;
 
 	private MultipartFile dmattachment;
 
@@ -27,6 +27,10 @@ public class DmRemarksBean {
 	private String roleCode;
 	
 	 private String departmentRemarks;
+	 
+	 private Long depertmentMasterId;
+	 
+	 private String departmentName;
 
 	public Long getDocumentId() {
 		return documentId;
@@ -76,11 +80,11 @@ public class DmRemarksBean {
 		this.remark = remark;
 	}
 
-	public Integer getWorkId() {
+	public Long getWorkId() {
 		return workId;
 	}
 
-	public void setWorkId(Integer workId) {
+	public void setWorkId(Long workId) {
 		this.workId = workId;
 	}
 
@@ -122,6 +126,22 @@ public class DmRemarksBean {
 
 	public final void setDepartmentRemarks(String departmentRemarks) {
 		this.departmentRemarks = departmentRemarks;
+	}
+
+	public final Long getDepertmentMasterId() {
+		return depertmentMasterId;
+	}
+
+	public final void setDepertmentMasterId(Long depertmentMasterId) {
+		this.depertmentMasterId = depertmentMasterId;
+	}
+
+	public final String getDepartmentName() {
+		return departmentName;
+	}
+
+	public final void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
 	}
 
 	

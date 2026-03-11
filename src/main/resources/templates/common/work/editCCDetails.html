@@ -229,8 +229,8 @@
 
 					<div class="form-group col-sm-4"
 						data-ng-hide="workDataCC.responseCC == 'CCIssued'">
-						<label><span>Remarks</span><span class="aestrick">&#42;</span></label>
-						<textarea class="form-control" id="remarks" required="required"
+						<label><span>Remarks</span></label>
+						<textarea class="form-control" id="remarks" 
 							data-ng-model="workDataCC.remarks" name="remarks"></textarea>
 						<div data-ng-show="workFormCC.$submitted">
 							<p class="help-block" style="color: red;"
@@ -242,8 +242,8 @@
 
 					<div class="form-group col-sm-4"
 						data-ng-show="workDataCC.responseCC == 'CCIssued'">
-						<label><span>Remarks</span><span class="aestrick">&#42;</span></label>
-						<textarea class="form-control" id="remarks" required="required"
+						<label><span>Remarks</span></label>
+						<textarea class="form-control" id="remarks" 
 							disabled="disabled" data-ng-model="workDataCC.remarks"
 							name="remarks"></textarea>
 

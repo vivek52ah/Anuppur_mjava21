@@ -316,7 +316,7 @@
 		/* Scrollbar ke liye */
 		div.dataTables_wrapper {
 			width: 100%;
-			overflow-x: auto;
+			overflow-x: scroll;
 		}
 	</style>
 
@@ -433,6 +433,12 @@
 }
 
 		
+.dataTables_scrollBody{height: 360px;}
+
+.modal-dialog {
+    max-width: 85%!important;
+    width: auto;
+}
 	</style>
 	
 	<script>
@@ -480,11 +486,31 @@
 </script>
 
 
+<script>
+function toggleFullScreen() {
+    const img = document.getElementById("modalImage");
+
+    if (!document.fullscreenElement) {
+        if (img.requestFullscreen) {
+            img.requestFullscreen();
+        } else if (img.webkitRequestFullscreen) { // Safari
+            img.webkitRequestFullscreen();
+        } else if (img.msRequestFullscreen) { // IE
+            img.msRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+</script>
+
 <style>
 
 .dropdown-menu.show{width:100%!important}
 .dropdown-menu.show {
-    top: -35px !important;position:relative!important;
+    top: -35px !important;
 }
 #fyId {
     position: relative!important;
@@ -781,38 +807,38 @@ ul.dropdown-menu.inner.show li {
     
     
     
-    
-     <label><input type="checkbox" class="col-toggle" data-column="0" checked="checked" /> S.No.</label>
-   	 <label><input type="checkbox" class="col-toggle" data-column="1" checked="checked" /> Division</label>
-	 <label><input type="checkbox" class="col-toggle" data-column="2" checked="checked" /> District</label>
-	 <label><input type="checkbox" class="col-toggle" data-column="3" checked="checked" /> Work Unique ID</label>
-	 <label><input type="checkbox" class="col-toggle" data-column="4" checked="checked" /> Work Name</label>
-     <label><input type="checkbox" class="col-toggle" data-column="5" checked="checked" /> Work Type</label>
-	 <label><input type="checkbox" class="col-toggle" data-column="6" checked="checked" /> FY of Sanction</label>
-	 <label><input type="checkbox" class="col-toggle" data-column="7" checked="checked" /> Executive Agency</label>
-	 <label><input type="checkbox" class="col-toggle" data-column="8" checked="checked" /> Financing Agency</label>
+    <label><input type="checkbox" class="col-toggle" data-column="0" checked="checked" />Checkbox</label>
+     <label><input type="checkbox" class="col-toggle" data-column="1" checked="checked" /> S.No.</label>
+   	 <label><input type="checkbox" class="col-toggle" data-column="2" checked="checked" /> Division</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="3" checked="checked" /> District</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="4" checked="checked" /> Work Unique ID</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="5" checked="checked" /> Work Name</label>
+     <label><input type="checkbox" class="col-toggle" data-column="6" checked="checked" /> Work Type</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="7" checked="checked" /> FY of Sanction</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="8" checked="checked" /> Executive Agency</label>
+	 <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Financing Agency</label>
 	<!-- <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Year of Administrative Sanction</label>-->
-    <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> A.S. Date. </label>
-    <label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> Total A.S. Amount </label>
-    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> Agreement No </label>
-    <label><input type="checkbox" class="col-toggle" data-column="12" checked="checked" /> Agreement Date </label>
+    <label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> A.S. Date. </label>
+    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> Total A.S. Amount </label>
+    <label><input type="checkbox" class="col-toggle" data-column="12" checked="checked" /> Agreement No </label>
+    <label><input type="checkbox" class="col-toggle" data-column="13" checked="checked" /> Agreement Date </label>
    
    <!-- <label><input type="checkbox" class="col-toggle" data-column="14" checked="checked" /> Work Order</label>-->
 
-    <label><input type="checkbox" class="col-toggle" data-column="13" checked="checked" /> Completion Date as per Agreement</label>
-    <label><input type="checkbox" class="col-toggle" data-column="14" checked="checked" /> Total Expenditure (In Lakhs)</label>
-    <label><input type="checkbox" class="col-toggle" data-column="15" checked="checked" /> Physical Status</label>
-    <label><input type="checkbox" class="col-toggle" data-column="16" checked="checked" /> Level of Completion</label>
-    <label><input type="checkbox" class="col-toggle" data-column="17" checked="checked" /> Contractor Name</label>
-	<label><input type="checkbox" class="col-toggle" data-column="18" checked="checked" /> Department Remarks</label>
+    <label><input type="checkbox" class="col-toggle" data-column="14" checked="checked" /> Completion Date as per Agreement</label>
+    <label><input type="checkbox" class="col-toggle" data-column="15" checked="checked" /> Total Expenditure (In Lakhs)</label>
+    <label><input type="checkbox" class="col-toggle" data-column="16" checked="checked" /> Physical Status</label>
+    <label><input type="checkbox" class="col-toggle" data-column="17" checked="checked" /> Level of Completion</label>
+    <label><input type="checkbox" class="col-toggle" data-column="18" checked="checked" /> Contractor Name</label>
+	<label><input type="checkbox" class="col-toggle" data-column="19" checked="checked" /> Department Remarks</label>
    <!-- <label><input type="checkbox" class="col-toggle" data-column="21" checked="checked" /> SOR Year</label>-->
    <!-- <label><input type="checkbox" class="col-toggle" data-column="22" checked="checked" /> Tender %</label>-->
     
    <!-- <label><input type="checkbox" class="col-toggle" data-column="23" checked="checked" /> Work Priority</label>-->
 
     <!--<label><input type="checkbox" class="col-toggle" data-column="24" checked="checked" /> Vidhan Sabha</label>-->
-    <label><input type="checkbox" class="col-toggle" data-column="19" checked="checked" /> DM Remarks</label>
-    <label><input type="checkbox" class="col-toggle" data-column="20" checked="checked" /> Action</label>
+    <label><input type="checkbox" class="col-toggle" data-column="20" checked="checked" /> DM Remarks</label>
+    <label><input type="checkbox" class="col-toggle" data-column="21" checked="checked" /> Action</label>
 	
 </div>
 <div class="slide-dropdown-wrapper" style="position: relative; width: 260px; float:right;">
@@ -895,12 +921,20 @@ function openDmRemarkModal(workId, dmRemarkId) {
         }
 
         scope.loadDmRemarksForWorkId(workId);
+		scope.loadDepartmentRemarksForWorkId(workId);
     });
 
     $('#dmRemarkModal').modal('show');
 }
 
+$('#dmRemarkModal').on('hidden.bs.modal', function () {
 
+    // Agar DataTable hai
+    if ($.fn.DataTable.isDataTable('#dynamic-w-table')) {
+        $('#dynamic-w-table').DataTable().ajax.reload(null, false);
+    }
+
+});
 
 
 
@@ -1047,7 +1081,21 @@ function openDmRemarkModal(workId, dmRemarkId) {
 										lengthMenu: [[10, 25, 50, 100000], [10, 25, 50, "All"]],
 
 
+
+
 										columns: [
+										
+										{
+												data: null,
+												orderable: false,
+												 title: '<input type="checkbox" id="selectAll">',
+												searchable: false,
+												className: 'text-center',
+												render: function (data, type, row) {
+													return `<input type="checkbox" class="row-checkbox" value="${row.id}">`;
+												}
+											},
+
 											{
 												data: null,
 												title: "S.No.",
@@ -1091,64 +1139,75 @@ function openDmRemarkModal(workId, dmRemarkId) {
 											{data: "dateOfCompletion", title: "Completion Date as per Agreement", defaultContent: "-"},
 											//{data: "totalExpeditureTillDate", title: "Total Expenditure (In Lakhs)", defaultContent: "-"},
 											{
-											    data: null,
-											    title: "Total Expenditure (In Lakhs)",
-											    defaultContent: "-",
-											    render: function (data, type, row) {
+												data: "totalExpeditureTillDate",
+												title: "Total Expenditure (In Lakhs)",
+												defaultContent: "-",
+												render: function (data, type, row) {
 
-											        if (!data) return "-";
+													let amount = (data !== null && data !== undefined)
+														? `<span style="font-weight:600; margin-right:8px;">${data}</span>`
+														: `<span style="margin-right:8px;">-</span>`;
 
-											        return `
-											            <a href="javascript:void(0)"
-											               style="color:#0056b3; font-weight:600; text-decoration:underline;"
-											               onclick="openFinancingAgencyExpenditureModal(${row.id})">
-											               View
-											            </a>
-											        `;
-											    }
-											},
+													return `
+           
+            <a href="javascript:void(0)"
+               style="color:#0056b3; font-weight:600; text-decoration:underline;"
+               onclick="openFinancingAgencyExpenditureModal(${row.id})">
+               View
+            </a>
+             &nbsp;&nbsp;&nbsp;
+             ${amount}
+        `;
+												}
+											}
+,
 											{data: "workStatusName", title: "Physical Status", defaultContent: "-"},
 											{data: "levelOfCompletion", title: "Level of Completion", defaultContent: "-"},
 											{data: "contractorName", title: "Contractor Name", defaultContent: "-"},
-											{data: "DepartmentRemarks", title: "Department Remarks", defaultContent: "-"},
+											{data: "departmentRemarks", title: "Department Remarks", defaultContent: "-"},
 										//	{data: "sor", title: "SOR Year", defaultContent: "-"},
 										//	{data: "tenderParcentage", title: "Tender Percentage", defaultContent: "-"},
 										//	{data: "workPriority", title: "Work Priority", defaultContent: "-"},
 											
 										//	{data: "vidhanSabhaName", title: "Vidhan Sabha", defaultContent: "-"},
 											{
-												data: null,
+												data: "DmRemakrs",
 												title: 'DM Remarks',
 												className: 'text-center',
 												render: function (data, type, row) {
+													console.log("ROW =>", row);
+													let remark = (data)
+														? `<span style="font-weight:600; margin-right:8px;">${data}</span>`
+														: `<span style="margin-right:8px;">-</span>`;
 
-										//			const dmRemark = row.dmRemakrs || '-';
-										//			const dmDate = row.dmAproveRejectDate || '-';
-										//			const workId = row.workId;
+													//			const dmRemark = row.dmRemakrs || '-';
+													//			const dmDate = row.dmAproveRejectDate || '-';
+													//			const workId = row.workId;
 
 													return `
-            <div>
+													${remark}
+        
 
-                <br/>
+                <br/>   <br/>   <br/>
                 <a href="javascript:void(0)" class="btn btn-xs btn-warning"
              onclick="openDmRemarkModal(${row.workId} || ${row.dmRemarkId})"
              title="Add / View DM Remark">
              <i class="fa fa-user"></i>
           </a>
-            </div>
+           
         `;
 												}
 											}
 											,
 
-											{
-											    data: null,
-											    title: "Report",
-											    defaultContent: "",
-											    className: "report-col",
-											    orderable: false,
-											    searchable: false
-											},
+					//						{
+					//						    data: null,
+					//						    title: "Report",
+					//						    defaultContent: "",
+					//						    className: "report-col",
+					//						    orderable: false,
+					//						    searchable: false
+					//						},
 
 
 											{
@@ -1193,7 +1252,7 @@ function openDmRemarkModal(workId, dmRemarkId) {
 										                $actionCell.append(`
 										                    <a class="btn btn-xs btn-warning m-1"
 										                       title="View Images"
-										                       onclick="openProgressImages(${rowIdx}, '${data.workNo}', '${data.workSubTypeName}')">
+										                       onclick="openProgressImages(${rowIdx}, '${data.workNo}', '${data.levelOfCompletion}')">
 										                       <i class="fa fa-eye"></i>
 										                    </a>
 										                `);
@@ -1202,7 +1261,8 @@ function openDmRemarkModal(workId, dmRemarkId) {
 										                window.progressDocsStore[rowIdx] = {
 										                    docs: data.progressDocuments,
 										                    workNo: data.workNo,
-										                    workSubTypeName: data.workSubTypeName
+										                    levelOfCompletion: data.levelOfCompletion,
+										                    workName: data.workName
 										                };
 
 										            } else {
@@ -1263,14 +1323,48 @@ function openDmRemarkModal(workId, dmRemarkId) {
 												}
 											}, */
 
-											  {
-												  text: '<span class="fa fa-file-excel-o"></span> Export Full Excel',
-												  action: function (e, dt, node, config) {
-													  window.location.href = 'manageOngoingWorks/downloadAllWorksExcel';
-												  }
-											  }, 
+										//	  {
+										//		  text: '<span class="fa fa-file-excel-o"></span> Export Full Excel',
+										//		  action: function (e, dt, node, config) {
+										//			  window.location.href = 'manageOngoingWorks/downloadAllWorksExcel';
+										//		  }
+										//	  }, 
+
+											{
+												text: 'Export to Excel',
+												action: function () {
+
+													var selectedIds = getSelectedWorkIds();
+
+													if (selectedIds.length === 0) {
+														alert("Please select at least one record");
+														return;
+													}
+													selectedIds = selectedIds
+													            .filter(function (id) {
+													                return id && id !== 'undefined';
+													            })
+													            .map(function (id) {
+													                return Number(id);
+													            })
+													            .sort(function (a, b) {
+													                return b - a;
+													            });
+													// ✅ POST request for file download
+													var form = $('<form method="POST" action="manageOngoingWorks/downloadAllWorksExcel"></form>');
+
+													selectedIds.forEach(function (id) {
+														if (id && id !== 'undefined') {
+															form.append('<input type="hidden" name="workIds" value="' + id + '">');
+														}
+													});
 
 
+													$('body').append(form);
+													form.submit();
+													form.remove();
+												}
+											},
 
 
 											{
@@ -1432,6 +1526,31 @@ function openDmRemarkModal(workId, dmRemarkId) {
 								});
 
 
+		//Select checkBoax
+		function getSelectedWorkIds() {
+			var ids = [];
+			$('.row-checkbox:checked').each(function () {
+				var id = $(this).val();
+				if (id && id !== 'undefined') {
+					ids.push(id);
+				}
+			});
+			return ids;
+		}
+
+
+		// header checkbox click
+		$(document).on('change', '#selectAll', function () {
+    var isChecked = this.checked;
+
+    $('.row-checkbox').each(function () {
+        this.checked = isChecked;
+    });
+});
+
+
+//
+
 								/*]]>*/
 
 
@@ -1503,7 +1622,7 @@ function openDmRemarkModal(workId, dmRemarkId) {
 
 							$(document).ready(function () {
 
-							    const defaultSelect = [0, 3, 4, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20];
+							    const defaultSelect = [0, 1, 4, 5, 8, 9, 10, 13, 14, 15, 16, 17, 19, 20, 21];
 							    const $checkboxes = $(".col-toggle");
 							    const $dropdown = $("#add-column-list");
 							    const $toggleBtn = $("#toggleAllColumns");
@@ -1651,7 +1770,7 @@ function openDmRemarkModal(workId, dmRemarkId) {
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th style="width:10%">#</th>
+                            <th style="width:10%">S.No.</th>
                             <th>Financial Agency</th>
                             <th style="width:25%">Cost (₹)</th>
                         </tr>
@@ -1691,7 +1810,7 @@ function openDmRemarkModal(workId, dmRemarkId) {
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th style="width:10%">#</th>
+                            <th style="width:10%">S.No.</th>
                             <th>Financial Agency</th>
                             <th style="width:25%">Cost (₹)</th>
                             <th style="width:25%">Expenditure (₹)</th>
@@ -1716,6 +1835,34 @@ function openDmRemarkModal(workId, dmRemarkId) {
     </div>
 </div>
 	
+
+
+
+
+<style>
+	#modalImage:fullscreen {
+	    max-height: none !important;
+	    width: auto;
+	    height: 100vh;
+	}
+
+</style>
+
+<!--<div class="modal-header">
+    <h5 class="modal-title">
+        Work No:- {{workNo}} <br />
+        Progress Level:- {{workSubTypeName}} <br />
+        Work Name:- {{workName}}
+    </h5>
+
+    <h5>Date Time:- {{date}}</h5>
+
+    <button type="button"
+            class="btn btn-sm btn-dark"
+            onclick="toggleFullScreen()">
+        <i class="fa fa-expand"></i>
+    </button>
+</div>-->
 	
 	
 
@@ -1725,8 +1872,8 @@ function openDmRemarkModal(workId, dmRemarkId) {
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				<div class="modal-header">
 					<h5 class="modal-title" id="exampleModalLabel">
-						Work No. :- {{workNo}} <br /> Progress Level :-
-						{{workSubTypeName}}
+						Work No:- {{workNo}} <br /> Progress Level:-
+						{{levelOfCompletion}} <br /> Work Name:- {{workName}}
 
 					</h5>
 					<h5>Date Time:- {{date}}</h5>
@@ -1739,13 +1886,6 @@ function openDmRemarkModal(workId, dmRemarkId) {
 					<img id="modalImage" src="" class="img-fluid" style="max-height: 500px;" />
 				</div>
 
-
-
-
-
-
-
-				<!-- Counter Above Footer -->
 				<div style="text-align: center; padding: 10px; background: #f5f5f5;">
 					<p id="imageCounter" style="margin: 0; font-size: 14px; font-weight: 500; color: #333;">
 						1/10</p>
@@ -1762,7 +1902,11 @@ function openDmRemarkModal(workId, dmRemarkId) {
 				</div>
 
 
-
+				<button type="button" style="position: absolute;right: 15px;top: 20%;"
+								           class="btn btn-sm btn-dark"
+								           onclick="toggleFullScreen()">
+								       <i class="fa fa-expand"></i>
+								   </button>
 
 
 			</div>
@@ -1862,7 +2006,6 @@ function openDmRemarkModal(workId, dmRemarkId) {
 				        <tr>
 				          <th>S.No</th>
 				          <th>DM Remark</th>
-				          <th>Department Remark</th>
 				          <th>Remark Date</th>
 				        <!--  <th>Attachment</th>-->
 				          <th >Action</th>
@@ -1872,7 +2015,6 @@ function openDmRemarkModal(workId, dmRemarkId) {
 				        <tr data-ng-repeat="remark in dmremarkslist track by $index">
 				          <td>{{ $index + 1 }}</td>
 				          <td>{{ remark.remark || '-'}}</td>
-				          <td>{{ remark.departmentRemarks || '-'}}</td>
 				          <td>{{ remark.createdDate | date: 'dd-MM-yyyy hh:mm:ss a' }}</td>
 				        <!--  <td >
 							<a data-ng-if="remark.documentId!=null" class="btn btn-primary" ng-click="openAttachmentModal(remark.documentId)">
@@ -1883,10 +2025,10 @@ function openDmRemarkModal(workId, dmRemarkId) {
 				          </td>-->
 				          
 							<td>
-							  <button type="button" class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)" data-ng-disabled="roleName != 'ROLE_DM'">
+							  <button type="button" class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)" data-ng-disabled="roleName != 'ROLE_DM' ">
 							    Delete
 							  </button>
-							  <button  type="button" class="btn btn-danger btn-sm" data-ng-click="getRemarksDetails(remark.id)" data-ng-disabled="roleName != 'ROLE_DM'">
+							  <button  type="button" class="btn btn-danger btn-sm" data-ng-click="getRemarksDetails(remark.id)" data-ng-disabled="roleName != 'ROLE_DM' ">
 							  						    Edit
 							  						  </button>
 
@@ -1897,8 +2039,63 @@ function openDmRemarkModal(workId, dmRemarkId) {
 				  </div>
 				</div>
 
-
-
+				<div class="card-header" >
+								<span>Department Remarks History</span>
+							</div>
+				<div class="card-body">
+							  <div class="table-responsive-wrapper">
+							    <table class="table table-bordered table-striped">
+							      <thead>
+									<tr>
+										<th>S.No</th>
+										<!--  <th>User</th>
+																												  <th>Role</th>-->
+										<th>Depaerment Remark</th>
+										<th>Remark</th>
+										<th>Remark Date</th>
+										<th>Attachment</th>
+										<!--<th th:if="${( roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}">Action</th>-->
+									</tr>
+							      </thead>
+							      <tbody>
+									<tr data-ng-repeat="remark in departmentremarkslist track by $index">
+										<td>{{ $index + 1 }}</td>
+										<!--<td>{{ remark.createBy}}</td>
+																											  <td>{{ remark.role}}</td>-->
+										<td>{{ remark.departmentName || '-'}}</td>
+										<td>{{ remark.departmentRemarkName || '-'}}</td>
+										<td>{{ remark.createdDate | date: 'dd-MM-yyyy hh:mm:ss a' }}</td>
+										
+										<!--<td>{{remark.roleCode}}</td>-->
+									
+										<td>
+									
+											<a class="btn btn-primary" target="_blank" ng-click="openAttachmentModal(remark.documentId)"
+												ng-if="remark.documentId != null" 
+												>
+												View Attachment
+											</a>
+									
+									
+										</td>
+										<!--<td>
+									
+											<button type="button"
+												data-ng-disabled="roleName === 'ROLE_DEPARTMENT' &amp;&amp; remark.roleCode === 'ROLE_DM' "
+												class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)">
+												Delete
+											</button>
+											<button type="button" data-ng-disabled="roleName === 'ROLE_DEPARTMENT' &amp;&amp; remark.roleCode === 'ROLE_DM'"
+												class="btn btn-danger btn-sm" data-ng-click="getDepartmentRemarksDetails(remark.id)">
+												Edit
+											</button>
+									
+										</td>-->
+									</tr>
+							      </tbody>
+							    </table>
+							  </div>
+							</div>
                     
                 
 
@@ -1918,9 +2115,11 @@ function openDmRemarkModal(workId, dmRemarkId) {
 			$('#myModal').modal('show');
 		});
 
-		function openImageModal(imageUrl, workNo) {
+		function openImageModal(imageUrl, workNo, workName) {
 			document.getElementById('modalImage').src = imageUrl;
 			document.getElementById('workNoHeading').innerText = "Work No: " + workNo;
+			document.getElementById('workNameHeading').innerText =
+        "Work Name: " + workName;
 			$('#imageModal').modal('show');
 		}
 		
@@ -1950,9 +2149,7 @@ function openDmRemarkModal(workId, dmRemarkId) {
 		                        <tr>
 		                            <td>${index + 1}</td>
 		                            <td>${item.financialAgencyName}</td>
-		                            <td style="text-align:right;">
-		                                ₹ ${item.cost}
-		                            </td>
+		                            <td>₹ ${item.cost}</td>
 		                        </tr>
 		                    `;
 		                });
@@ -2061,38 +2258,44 @@ function openDmRemarkModal(workId, dmRemarkId) {
 		window.currentImageIndex = 0;
 		window.currentImageList = [];
 
-		window.openProgressImages = function (rowIndex) {
-			const data = window.progressDocsStore[rowIndex]; // <-- Yeh line important hai
+window.openProgressImages = function (rowIndex) {
+    const data = window.progressDocsStore[rowIndex];
 
-			if (!data || !data.docs) {
-				alert("No document data found.");
-				return;
-			}
+    if (!data || !data.docs) {
+        alert("No document data found.");
+        return;
+    }
 
-			window.currentImageList = data.docs.filter(doc => doc.workStatusId === 10);
-			window.currentImageIndex = 0;
+    // ✅ Filter + sort DESC by createdDate
+    window.currentImageList = data.docs
+        .filter(doc => doc.workStatusId === 10)
+        .sort(function (a, b) {
+            return new Date(b.createdDate) - new Date(a.createdDate); // DESC
+        });
 
-			// AngularJS scope update
-			const scope = angular.element(document.getElementById('imageModal')).scope();
-			scope.$apply(function () {
-				scope.workNo = data.workNo;
-				scope.workSubTypeName = data.workSubTypeName;
+    window.currentImageIndex = 0;
 
-				if (data && data.docs) {
-					angular.forEach(data.docs, function (doc, idx) {
-						scope.date = doc.createdDate; // agar createdDate hai
-					});
-				}
-			});
+    // AngularJS scope update
+    const scope = angular.element(document.getElementById('imageModal')).scope();
+    scope.$apply(function () {
+        scope.workNo = data.workNo;
+        scope.levelOfCompletion = data.levelOfCompletion;
+        scope.workName = data.workName;
 
-			if (window.currentImageList.length > 0) {
-				window.currentImageIndex = 0;
-				window.showImageAt(window.currentImageIndex);
-				$('#imageModal').modal('show');
-			} else {
-				alert("No image found.");
-			}
-		};
+        // latest date (since DESC, first element is latest)
+        if (window.currentImageList.length > 0) {
+            scope.date = window.currentImageList[0].createdDate;
+        }
+    });
+
+    if (window.currentImageList.length > 0) {
+        window.showImageAt(window.currentImageIndex);
+        $('#imageModal').modal('show');
+    } else {
+        alert("No image found.");
+    }
+};
+
 
 		window.showImageAt = function (index) {
 			if (index >= 0 && index < window.currentImageList.length) {

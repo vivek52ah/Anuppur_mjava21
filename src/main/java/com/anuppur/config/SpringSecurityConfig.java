@@ -137,6 +137,25 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().referrerPolicy(ReferrerPolicy.NO_REFERRER_WHEN_DOWNGRADE);
 
         // Content Security Policy (CSP)
+//        http.headers().contentSecurityPolicy(
+//        	    "default-src 'self'; " +
+//        	    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.canvasjs.com https://unpkg.com https://code.jquery.com https://cdnjs.cloudflare.com https://unpkg.com/leaflet@1.7.1/dist/leaflet.js; " +
+//        	    "style-src 'self' 'unsafe-inline' https://unpkg.com https://unpkg.com/leaflet@1.7.1/dist/leaflet.css; " +
+//        	    "style-src-elem 'self' 'unsafe-inline' https://unpkg.com https://unpkg.com/leaflet@1.7.1/dist/leaflet.css; " +
+//        	    "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.canvasjs.com https://unpkg.com https://code.jquery.com https://cdnjs.cloudflare.com https://unpkg.com/leaflet@1.7.1/dist/leaflet.js; " +
+//        	    "object-src 'none'; " +
+//        	    "form-action 'self'; " +
+//        	    "font-src 'self'; " +
+//        	    "media-src 'none'; " +
+//        	    "connect-src 'self' http://localhost:8060/jsonsigner/Sign; " +
+//        	    "img-src 'self' data: blob: https://*.google.com https://unpkg.com/leaflet@1.7.1/dist/images/ https://*.tile.openstreetmap.org; " + 
+//        	    "frame-src 'self'; " +
+//        	    "child-src 'self'; " +
+//        	    "report-uri /csp-violation-report-endpoint"
+//        	);
+
+        
+        
         http.headers().contentSecurityPolicy(
         	    "default-src 'self'; " +
         	    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.canvasjs.com https://unpkg.com https://code.jquery.com https://cdnjs.cloudflare.com https://unpkg.com/leaflet@1.7.1/dist/leaflet.js; " +
@@ -144,16 +163,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         	    "style-src-elem 'self' 'unsafe-inline' https://unpkg.com https://unpkg.com/leaflet@1.7.1/dist/leaflet.css; " +
         	    "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.canvasjs.com https://unpkg.com https://code.jquery.com https://cdnjs.cloudflare.com https://unpkg.com/leaflet@1.7.1/dist/leaflet.js; " +
         	    "object-src 'none'; " +
-        	    "form-action 'self'; " +
+        	    "form-action 'self' https://raman-coe.mp.gov.in; " +   // ✅ FIX HERE
         	    "font-src 'self'; " +
         	    "media-src 'none'; " +
         	    "connect-src 'self' http://localhost:8060/jsonsigner/Sign; " +
-        	    "img-src 'self' data: blob: https://*.google.com https://unpkg.com/leaflet@1.7.1/dist/images/ https://*.tile.openstreetmap.org; " + 
+        	    "img-src 'self' data: blob: https://*.google.com https://unpkg.com/leaflet@1.7.1/dist/images/ https://*.tile.openstreetmap.org; " +
         	    "frame-src 'self'; " +
         	    "child-src 'self'; " +
         	    "report-uri /csp-violation-report-endpoint"
         	);
 
+        
 //        http.headers()
 //        .contentSecurityPolicy("default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; form-action 'self'; object-src 'none'; connect-src 'self'; img-src 'self';");
 

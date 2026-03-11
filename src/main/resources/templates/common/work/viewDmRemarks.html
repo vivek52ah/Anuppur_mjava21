@@ -7,6 +7,7 @@
 		 window.roleName = [[${roleName}]];
 		  /*]]>*/
 		</script>
+		
 <style>
 	a.disabled {
 	  opacity: 0.5;
@@ -15,7 +16,7 @@
 
 </style>
 		<form
-			data-ng-submit="saveOrUpdateDmRemarks(workForm.$valid,dmattachment)"
+			data-ng-submit="saveOrUpdateDepartmentRemarks(workForm.$valid,dmattachment)"
 			name="workForm" id="workFormId" novalidate="novalidate"
 			enctype="multipart/form-data">
 
@@ -23,7 +24,7 @@
 				<div class="card-header" th:if="${( roleName == 'ROLE_DM' )}">
 					<span>DM Remarks</span>
 				</div>
-				<div class="card-body">
+				<div class="card-body" >
 
 
 					<div class="card-header"
@@ -33,26 +34,47 @@
 					<div class="card-body"
 						th:if="${(roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}"
 						>
+						
+						<input type="hidden" id="workId" data-ng-model="workData.workId" />
+						
                          <div class="row">
-						<div class="col-sm-9">
-							<label>Department Remark<span class="text-danger">*</span></label>
+							 
+							 	<div class="form-group col-sm-4"
+							data-ng-init="loadDepartmentMaster(); ">
+							<label><span>Department Remarks</span><span class="aestrick">&#42;</span></label>
+							<select class="form-control" id="depertmentMasterId"
+								required="required" data-ng-model="workDataR.depertmentMasterId"
+								name="depertmentMasterId">
+								<option value="" disabled="disabled">--Select--</option>
+								<option data-ng-repeat="dr in departmentMaster "
+									value="{{dr.id}}">{{dr.name}}</option>
+							</select>
+							<div data-ng-show="workForm.$submitted">
+								<p class="help-block" style="color: red;"
+									data-ng-show="workForm.depertmentMasterId.$error.required">
+									<span th:text="#{pleaseSelect}">Please select</span> <span>Department Remarks</span>
+								</p>
+							</div>
+						</div>
+							 
+							 
+						<div class="col-sm-4" data-ng-show="workDataR.depertmentMasterId == 5">
+							<label>Remarks<span class="text-danger"></span></label>
 							<!--<textarea class="form-control" maxlength="1000"
 							    required="required"
 							    data-ng-model="workDataR.remakr"
 							    placeholder="Remarks"
 							    data-ng-readonly="roleName !== workDataR.roleCode">
 							</textarea>-->
-							 <input type="hidden"
-                           id="workId"
-                           data-ng-model="workData.workId"/>
+							 
 							<textarea class="form-control" maxlength="1000"
-															required="required" id="departmentRemarks"
-															data-ng-model="workDataR.departmentRemarks" name="departmentRemarks" rows="7"
+															required="required" id="departmentRemarkName"
+															data-ng-model="workDataR.departmentRemarkName" name="departmentRemarkName" rows="7"
 															placeholder="Department Remarks" th:readonly="${roleName != 'ROLE_DEPARTMENT'}"></textarea>
      
 							
 						</div>
-						<div class="col-sm-3">
+						<div class="col-sm-4">
 							<label>Uplaod Attachment </label>
 							<input type='file' accept="image/*,.pdf" class="form-control"
 																						 required="required"
@@ -89,7 +111,7 @@
 				</div>
 
                 <div class="card-header" data-ng-if="workData.workId" data-ng-init="loadDmRemarksForWorkId(workData.workId)">
-					<span>DM Remarks History</span>
+					<span>DM Remarks History view</span>
 				</div>
 				<style>
 				  .table-responsive-wrapper {
@@ -103,7 +125,7 @@
 				  }
 				</style>
 
-				<div class="card-body">
+				<div class="card-body" >
 				  <div class="table-responsive-wrapper">
 				    <table class="table table-bordered table-striped">
 				      <thead>
@@ -112,10 +134,9 @@
 						<!--  <th>User</th>
 						  <th>Role</th>-->
 						  <th>DM Remark</th>
-				          <th>Depaerment Remark</th>
 				          <th>Remark Date</th>
 				          <!--<th>Attachment</th>-->
-				          <th th:if="${( roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}">Action</th>
+				          <!--<th th:if="${( roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}">Action</th>-->
 				        </tr>
 				      </thead>
 				      <tbody>
@@ -124,8 +145,11 @@
 						  <!--<td>{{ remark.createBy}}</td>
 						  <td>{{ remark.role}}</td>-->
 						  <td>{{ remark.remark || '-'}}</td>
-				          <td>{{ remark.departmentRemarks || '-'}}</td>
+				         
+				          
 				          <td>{{ remark.createdDate | date: 'dd-MM-yyyy hh:mm:ss a' }}</td>
+						  <!--<td>{{remark.roleCode}}</td>-->
+
 				          <!--<td >
 							
 							<a class="btn btn-primary" target="_blank"
@@ -138,22 +162,79 @@
 
 				           
 				          </td>-->
-				          <td >
+				         <!-- <td >
 							
-							  <button type="button" data-ng-disabled="roleName != 'ROLE_DEPARTMENT'" class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)" >
+							  <button type="button" data-ng-disabled="roleName === 'ROLE_DEPARTMENT' &amp;&amp; remark.roleCode === 'ROLE_DM' " class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)" >
 							    Delete
 							  </button>
-							  <button type="button" data-ng-disabled="roleName != 'ROLE_DEPARTMENT'" class="btn btn-danger btn-sm" data-ng-click="getRemarksDetails(remark.id)">
+							  <button type="button" data-ng-disabled="roleName === 'ROLE_DEPARTMENT' &amp;&amp; remark.roleCode === 'ROLE_DM'" class="btn btn-danger btn-sm" data-ng-click="getDepartmentRemarksDetails(remark.id)">
 							  						    Edit
 							  						  </button>
 
-				          </td>
+				          </td>-->
 				        </tr>
 				      </tbody>
 				    </table>
 				  </div>
 				</div>
 
+				
+				<div class="card-header" data-ng-if="workData.workId" data-ng-init="loadDepartmentRemarksForWorkId(workData.workId)">
+					<span>Department Remarks History view</span>
+				</div>
+				<div class="card-body" >
+								  <div class="table-responsive-wrapper">
+								    <table class="table table-bordered table-striped">
+								      <thead>
+								        <tr>
+								          <th>S.No</th>
+										<!--  <th>User</th>
+										  <th>Role</th>-->
+										  <th>Depaerment Remark</th>
+								          <th>Remark</th>
+								          <th>Remark Date</th>
+								          <th>Attachment</th>
+								          <th th:if="${( roleName == 'ROLE_DM' || roleName =='ROLE_DEPARTMENT')}">Action</th>
+								        </tr>
+								      </thead>
+								      <tbody>
+								        <tr data-ng-repeat="remark in departmentremarkslist track by $index">
+								          <td>{{ $index + 1 }}</td>
+										  <!--<td>{{ remark.createBy}}</td>
+										  <td>{{ remark.role}}</td>-->
+										  <td>{{ remark.departmentName || '-'}}</td>
+								          <td>{{ remark.departmentRemarkName || '-'}}</td>
+								         
+								          <td>{{ remark.createdDate | date: 'dd-MM-yyyy hh:mm:ss a' }}</td>
+										  <!--<td>{{remark.roleCode}}</td>-->
+
+								          <td >
+											
+											<a class="btn btn-primary" target="_blank"
+											   ng-click="openAttachmentModal(remark.documentId)"
+											   ng-if="remark.documentId != null"
+											   ng-class="{'disabled': roleName !== remark.roleCode}"
+											   ng-style="{'pointer-events': (roleName !== remark.roleCode ? 'none' : 'auto')}">
+											   View Attachment
+											</a>
+
+								           
+								          </td>
+								          <td >
+											
+											  <button type="button" data-ng-disabled="roleName === 'ROLE_DEPARTMENT' &amp;&amp; remark.roleCode === 'ROLE_DM' " class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)" >
+											    Delete
+											  </button>
+											  <button type="button" data-ng-disabled="roleName === 'ROLE_DEPARTMENT' &amp;&amp; remark.roleCode === 'ROLE_DM'" class="btn btn-danger btn-sm" data-ng-click="getDepartmentRemarksDetails(remark.id)">
+											  						    Edit
+											  						  </button>
+
+								          </td>
+								        </tr>
+								      </tbody>
+								    </table>
+								  </div>
+								</div>
 
 
 

@@ -410,6 +410,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 	$scope.reloadJqueryDatatable2 = function() {
 		$loading.start('sample-1');
 		reDraw2();
+		//window.reloadJqueryDatatable2();
 		$loading.finish('sample-1');
 
 	};
@@ -1727,8 +1728,8 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 	$scope.downloadDocumentIdWSPro = function(documentId, workSubStatusNameE) {
 		//console.log(" downloadDocument =" + documentId + "@@@@" + workSubStatus);
-		//$scope.loadWorkProgressDocumetnId(documentId);
-		//		$scope.workDataProgress.workSubStatusNameE = String(workSubStatusNameE);
+		// $scope.loadWorkProgressDocumetnId(documentId);
+		$scope.workDataProgress.workSubStatusNameE = String(workSubStatusNameE);
 		$scope.imageurl = 'downloadDocumentWSPro/' + documentId;
 		$('#exampleModal').modal('show');
 		//	$window.open('downloadDocumentWSPro/' + documentId, '_blank');
@@ -1904,8 +1905,8 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 		if ($scope.workData.isTenders == 1) {
-			if (isValid) {
-				
+			if (!isValid) {
+		alert("All fields are required.")
 				return false;
 			}
 		}
@@ -1913,9 +1914,45 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 		//	alert("call---")
 
 		if ($scope.workDataTender.workStatusId == '8') {
-
-if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 			
+			if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
+			//	alert($scope.workDataTender.eTenderNo+"<==$scope.workDataTender.eTenderNo------$scope.workDataTender.workStatusId"+$scope.workDataTender.workStatusId);
+				if ($scope.workDataTender.eTenderNo == undefined || $scope.workDataTender.eTenderNo =="undefined" || $scope.workDataTender.eTenderNo == "" || $scope.workDataTender.eTenderNo == null || $scope.workDataTender.eTenderNo == "null") {
+					//alert('Please select E-Tender No');
+					alert("All fields are required.")
+					return false;
+				}
+
+				if ($scope.workDataTender.tenderCalledDate == undefined || $scope.workDataTender.tenderCalledDate =="undefined" || $scope.workDataTender.tenderCalledDate == "" || $scope.workDataTender.tenderCalledDate == null || $scope.workDataTender.tenderCalledDate == "null") {
+					//	alert('Please select Tender Called Date');
+					alert("All fields are required.")
+					return false;
+				}
+			
+
+			
+				if ($scope.workDataTender.tenderReceivedDate == undefined || $scope.workDataTender.tenderReceivedDate =="undefined" || $scope.workDataTender.tenderReceivedDate == "" || $scope.workDataTender.tenderReceivedDate == null || $scope.workDataTender.tenderReceivedDate == "null") {
+					//	alert('Please select Tender Received Date');
+					alert("All fields are required.")
+					return false;
+				}
+			
+
+			/*if ($scope.workDataTender.workStatusId == '14') {
+				if ($scope.workDataTender.reTenderDate == undefined) {
+					alert('Please select Re-Tender Date');
+					return false;
+				}
+			}*/
+		
+				if ($scope.workDataTender.loaIssuedDate == undefined || $scope.workDataTender.loaIssuedDate =="undefined" || $scope.workDataTender.loaIssuedDate == "" || $scope.workDataTender.loaIssuedDate == null || $scope.workDataTender.loaIssuedDate == "null") {
+					//alert('Please select LoA Issued Date');
+					alert("All fields are required.")
+					return false;
+				}
+}
+
+			if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 				if (ldTdfFile) {
 					$scope.noFileError = (ldTdfFile) ? false : true;
 					var maxSizeUpload = 25000000;// in bytes (here 5 MB)
@@ -1937,8 +1974,6 @@ if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 					}
 				}
 			} 
-			
-	
 
 			if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 				if (dTTTFile) {
@@ -2218,10 +2253,10 @@ if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 
 			if ($scope.workDataTender.workStatusId == '3') {
 				//	alert($scope.workDataTender.eTenderNo+"<==$scope.workDataTender.eTenderNo------$scope.workDataTender.workStatusId"+$scope.workDataTender.workStatusId);
-				/*if ($scope.workDataTender.eTenderNo == undefined) {
+				if ($scope.workDataTender.eTenderNo == undefined) {
 					alert('Please select E-Tender No');
 					return false;
-				}*/
+				}
 
 				if ($scope.workDataTender.tenderCalledDate == undefined) {
 					alert('Please select Tender Called Date');
@@ -2450,17 +2485,17 @@ if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 
 		/*if (!isValid)
 				return false;*/
-		if ($scope.workData.isTenders == 1) {
-			if (!$scope.workDataContractor.name) {
-				alert("Please enter contractor name.");
-				return false;
-			}
-
-			if (!$scope.workDataContractor.firmNameAddress) {
-				alert("Please enter contractor firm address.");
-				return false;
-			}
-		}
+//		if ($scope.workData.isTenders == 1) {
+//			if (!$scope.workDataContractor.name) {
+//				alert("Please enter contractor name.");
+//				return false;
+//			}
+//
+//			if (!$scope.workDataContractor.firmNameAddress) {
+//				alert("Please enter contractor firm address.");
+//				return false;
+//			}
+//		}
 
 
 
@@ -2602,28 +2637,28 @@ if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 			}
 
 
-			if ($scope.workDataProgress.workSubStatusId != null) {
-				if (WProdfFile) {
-					$scope.noFileError = (WProdfFile) ? false : true;
-					var maxSizeUpload = 25000000;// in bytes (here 5 MB)
-					if (WProdfFile) {
-						$scope.fileSizeErrorLW = (WProdfFile.size > maxSizeUpload) ? true : false;
-					}
-					if ($scope.noFileError)
-						return false;
-					if ($scope.fileSizeErrorLW)
-						return false;
-
-				} else {
-
-					if ($scope.fileExtentionErrorLW)
-						return false;
-					if ($scope.responseImage != 'yes') {
-						alert("Please select Image File");
-						return false;
-					}
-				}
-			}
+//			if ($scope.workDataProgress.workSubStatusId != null) {
+//				if (WProdfFile) {
+//					$scope.noFileError = (WProdfFile) ? false : true;
+//					var maxSizeUpload = 25000000;// in bytes (here 5 MB)
+//					if (WProdfFile) {
+//						$scope.fileSizeErrorLW = (WProdfFile.size > maxSizeUpload) ? true : false;
+//					}
+//					if ($scope.noFileError)
+//						return false;
+//					if ($scope.fileSizeErrorLW)
+//						return false;
+//
+//				} else {
+//
+//					if ($scope.fileExtentionErrorLW)
+//						return false;
+//					if ($scope.responseImage != 'yes') {
+//						alert("Please select Image File");
+//						return false;
+//					}
+//				}
+//			}
 
 		}
 
@@ -2903,10 +2938,11 @@ if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 						$scope.loadWorkProgress();
 
 					} else {
+						
 						$scope.createWorkProSubStatusUploadingData(WProdfFile);
+}
 
-
-					}
+					
 				}
 				$loading.finish('sample-1');
 			});
@@ -2942,10 +2978,9 @@ if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 
 
 
-		/*if (WProdfFile) {
+	if(WProdfFile){
 			fd.append('file', WProdfFile);
-		}*/
-
+}
 		if ($scope.workDataProgress.workSubStatusId) {
 
 			fd.append('workSubStatusId', $scope.workDataProgress.workSubStatusId);
@@ -3297,14 +3332,14 @@ if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 			}
 		}
 
-		if ($scope.workDataCC.ccDate == null || $scope.workDataCC.remarks == null || $scope.workDataCC.workStatusId == null) {
+		if ($scope.workDataCC.ccDate == null || $scope.workDataCC.workStatusId == null) {
 			if (!isValid)
 				return false;
 
 		}
 
 		if ($scope.workDataCC.workStatusId == '12') {
-			if (!$scope.workDataCC.dateHandOver || !$scope.workDataCC.handoverRemarks || !$scope.workDataCC.paymentStatus) {
+			if (!$scope.workDataCC.dateHandOver  || !$scope.workDataCC.paymentStatus) {
 				if (!isValid)
 					return false;
 			}
@@ -3319,21 +3354,9 @@ if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 
 			$scope.workDataCC.workRequestStatusId = 2;
 		}
-
-		if (confirm("Are you sure you want to save the data?")) {
-
-			$loading.start('sample-1');
-
-			/*if($scope.saveAsDraft == true){
-				 
-				$scope.technicalSanctionStatusId = 2;
-			}
-			
-			if($scope.submit == true){
-				 
-				$scope.technicalSanctionStatusId =  3;
-			}*/
-			var fd = new FormData();
+		
+		
+					var fd = new FormData();
 
 			if ($scope.workDataCC.workId) {
 				fd.append('workId', $scope.workDataCC.workId);
@@ -3373,6 +3396,21 @@ if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
 			if ($scope.workDataCC.paymentStatus) {
 				fd.append('paymentStatus', $scope.workDataCC.paymentStatus);
 			}
+
+		if (confirm("Are you sure you want to save the data?")) {
+
+			$loading.start('sample-1');
+
+			/*if($scope.saveAsDraft == true){
+				 
+				$scope.technicalSanctionStatusId = 2;
+			}
+			
+			if($scope.submit == true){
+				 
+				$scope.technicalSanctionStatusId =  3;
+			}*/
+
 
 
 
@@ -5968,7 +6006,22 @@ $scope.loadWorkFinancialAgencyList = function(workId) {
 		}
 	};
 
+$scope.deleteDepartmentRemark = function(id) {
 
+		if (confirm("Are you sure to delete this entry?")) {
+			$loading.start('sample-1');
+
+			var responsePromise = $http.get('deleteDepartmentRemarks/' + id);
+			responsePromise.success(function(data, status, headers, config) {
+				$rootScope.responseObject = data;
+				 $window.location.reload();
+				$scope.loadDepartmentRemarksForWorkId();
+				$loading.finish('sample-1');
+			});
+		} else {
+			return false;
+		}
+	};
 
 
 	$scope.deleteScheme = function(workHeadId) {
@@ -8072,6 +8125,27 @@ $scope.loadWorkFinancialAgencyList = function(workId) {
 			$scope.workDataR.id = data.id;
 			$scope.workDataR.role = data.role;
 			$scope.workDataR.roleCode = data.roleCode;
+			$scope.workDataR.depertmentMasterId = data.depertmentMasterId + "";
+			$scope.workDataR.DepartmentName = data.DepartmentName + "";
+			//		$scope.workData.role = $scope.workD
+			console.log("EDIT DATA : ", data);
+console.log("EDIT ROLE : ", data.role);
+
+			$loading.finish('sample-1');
+		});
+	};
+	
+		$scope.getDepartmentRemarksDetails = function(id) {
+		$loading.start('sample-1');
+		var response = $http.get('getDepartmentRemarksDetailsById/' + id);
+		response.success(function(data, status, headers, config) {
+			$scope.workDataR = data;
+			$scope.workDataR.remakr = data.remark;
+			$scope.workDataR.id = data.id;
+			$scope.workDataR.role = data.role;
+			$scope.workDataR.roleCode = data.roleCode;
+			$scope.workDataR.depertmentMasterId = data.depertmentMasterId + "";
+			$scope.workDataR.DepartmentName = data.DepartmentName + "";
 			//		$scope.workData.role = $scope.workD
 			console.log("EDIT DATA : ", data);
 console.log("EDIT ROLE : ", data.role);
@@ -8138,7 +8212,7 @@ $scope.loadDmRemarksForWorkId = function(workId) {
 
    $scope.roleName = window.roleName;
     if (!workId) {
-        alert("WorkId missing in load");
+      
         return;
     }
 
@@ -8159,7 +8233,37 @@ $scope.loadDmRemarksForWorkId = function(workId) {
 
             remark.createdDateObj = new Date(remark.createdDate);
         }
+$scope.getRemarksDetails();
+        $loading.finish('sample-1');
+    });
+};
 
+$scope.loadDepartmentRemarksForWorkId = function(workId) {
+
+   $scope.roleName = window.roleName;
+    if (!workId) {
+      
+        return;
+    }
+
+    $loading.start('sample-1');
+
+    // ✅ USE workId ARGUMENT
+    var response = $http.get('getDepartmentRemarks/' + workId);
+
+    response.success(function(data) {
+
+        $scope.departmentremarkslist = data;
+
+        for (var i = 0; i < data.length; i++) {
+            var remark = data[i];
+
+         remark.dmRemarks = remark.dmRemarks || '';
+
+
+            remark.createdDateObj = new Date(remark.createdDate);
+        }
+$scope.getDepartmentRemarksDetails();
         $loading.finish('sample-1');
     });
 };
@@ -8167,7 +8271,7 @@ $scope.loadDmRemarksForWorkId = function(workId) {
 
 	
 	$scope.saveOrUpdateDmRemarks = function(isValid, dmattachment) {
-		//	alert("Call DM Login Remarks")
+		//	alert("Call DM Login Remarks" + $scope.workDataR.depertmentMasterId)
 		//$scope.workData.dmStatus =$scope.workData.dmStatus;
 
 
@@ -8214,6 +8318,7 @@ $scope.loadDmRemarksForWorkId = function(workId) {
 		formData.append("remark", $scope.workDataR.remakr || '');
 	//	alert("$scope.workDataR.departmentRemarks ========== " + $scope.workDataR.departmentRemarks)
 		formData.append("departmentRemarks", $scope.workDataR.departmentRemarks || '');
+		
 		var finalWorkId = null;
 
 		if ($scope.workId) {
@@ -8229,6 +8334,13 @@ $scope.loadDmRemarksForWorkId = function(workId) {
 
 		// ✅ सिर्फ एक ही बार append होगा
 		formData.append("workId", finalWorkId);
+		if ($scope.workDataR.depertmentMasterId !== null &&
+			$scope.workDataR.depertmentMasterId !== undefined &&
+			$scope.workDataR.depertmentMasterId !== '') {
+
+			formData.append("depertmentMasterId",
+				$scope.workDataR.depertmentMasterId);
+		}
 
 		formData.append("dmStatus", $scope.workDataR.dmStatus || '');
 		//alert(dmattachment)
@@ -8263,9 +8375,13 @@ $scope.loadDmRemarksForWorkId = function(workId) {
 					$timeout(function() {
 						$rootScope.responseObject.successMessage = null;
 					}, 5000);
-					$scope.loadDmRemarksForWorkId($scope.workId);
+					
+					$scope.workDataR = {};
+					$scope.loadDmRemarksForWorkId(finalWorkId);
+					
 
-					$scope.workDataR.remakr = "";
+					$scope.workDataR.departmentRemakrs = "";
+					$scope.workDataR.remakrs = "";
 					document.getElementById("dmremarksAttachment").value = null;
 
 					//$window.location.href = '#manageOngoingWorks';
@@ -8291,6 +8407,147 @@ $scope.loadDmRemarksForWorkId = function(workId) {
 
 
 	};
+	
+	
+	$scope.saveOrUpdateDepartmentRemarks = function(isValid, dmattachment) {
+		//	alert("Call DM Login Remarks" + $scope.workDataR.depertmentMasterId)
+		//$scope.workData.dmStatus =$scope.workData.dmStatus;
+
+
+		if (!isValid) {
+
+			//return false;
+		}
+
+
+
+
+		if (dmattachment) {
+			$scope.noFileError = (dmattachment) ? false : true;
+			var maxSizeUpload = 25000000;// in bytes (here 5 MB)
+			//var allowedExtensions = ['pdf', 'PDF'];
+			if (dmattachment) {
+				$scope.fileExtentionErrorDM = (dmattachment.size > maxSizeUpload) ? true : false;
+
+			}
+
+			if ($scope.noFileError)
+				return false;
+			if ($scope.fileExtentionErrorDM)
+				return false;
+
+		} else {
+			//$scope.noFileError = false;
+			//$scope.workData.dmStatus = null;
+			if ($scope.fileExtentionErrorDM)
+				return false;
+			if ($scope.workDataR.documentId) {
+				alert("Please select File");
+				return false;
+			}
+		}
+
+
+
+		var formData = new FormData();
+	//	alert("$scope.workDataR.id========== " + $scope.workDataR.id)
+		if ($scope.workDataR.id) {
+			formData.append("id", $scope.workDataR.id || '');
+		}
+		formData.append("remark", $scope.workDataR.remakr || '');
+	//	alert("$scope.workDataR.departmentRemarks ========== " + $scope.workDataR.departmentRemarks)
+		formData.append("departmentRemarkName", $scope.workDataR.departmentRemarkName || '');
+		
+		var finalWorkId = null;
+
+		if ($scope.workId) {
+			finalWorkId = $scope.workId;
+		} else if ($scope.workData && $scope.workData.workId) {
+			finalWorkId = $scope.workData.workId;
+		}
+
+		if (!finalWorkId) {
+			alert("WorkId missing!");
+			return;
+		}
+
+		// ✅ सिर्फ एक ही बार append होगा
+		formData.append("workId", finalWorkId);
+		if ($scope.workDataR.depertmentMasterId !== null &&
+			$scope.workDataR.depertmentMasterId !== undefined &&
+			$scope.workDataR.depertmentMasterId !== '') {
+
+			formData.append("depertmentMasterId",
+				$scope.workDataR.depertmentMasterId);
+		}
+
+		formData.append("dmStatus", $scope.workDataR.dmStatus || '');
+		//alert(dmattachment)
+		if (dmattachment) {
+			formData.append("dmattachment", dmattachment);
+		}
+		else {
+			//return;
+		}
+
+
+		if (confirm("Are you sure you want to save the data?")) {
+			$scope.workDataR.dmStatus = $scope.workDataR.dmStatus;
+			//document.getElementById("submit").disabled=true;
+
+			$loading.start('sample-1');
+
+
+
+			//var responsePromise = $http.post('saveOrUpdate', formData);
+			var responsePromise = $http.post('saveOrUpdateDepartment', formData, {
+				transformRequest: angular.identity,
+				headers: {
+					'Content-Type': undefined
+				}
+			});
+			responsePromise.success(function(data, status, headers, config) {
+
+				$loading.start('sample-1');
+				$rootScope.responseObject = data;
+				if ($rootScope.responseObject.successMessage != null) {
+					$timeout(function() {
+						$rootScope.responseObject.successMessage = null;
+					}, 5000);
+					
+					$scope.workDataR = {};
+					$scope.loadDepartmentRemarksForWorkId(finalWorkId);
+					
+
+					$scope.workDataR.departmentRemakrs = "";
+					$scope.workDataR.remakrs = "";
+					document.getElementById("dmremarksAttachment").value = null;
+
+					//$window.location.href = '#manageOngoingWorks';
+				}
+				if ($rootScope.responseObject.errorMessage != null) {
+					$timeout(function() {
+						$rootScope.responseObject.errorMessage = null;
+					}, 5000);
+				}
+				$loading.finish('sample-1');
+			});
+			responsePromise.error(function() {
+				$rootScope.responseObject = {};
+				$rootScope.responseObject.errorMessage = "Some error occured while saving the data";
+				$timeout(function() {
+					$rootScope.responseObject.errorMessage = null;
+				}, 5000);
+				$loading.finish('sample-1');
+			});
+		} else {
+			$scope.workDataR.dmStatus = null;
+		}
+
+
+	};
+
+
 
 	$scope.loadareaUserList = function() {
 
@@ -8711,12 +8968,19 @@ $scope.workDataRows = []; // Dynamic rows
 $scope.financialHeadsOriginal = []; // Original list
 
 // Load financial heads from API
-$scope.loadFinancialHeadforAddAS = function() {
+$scope.loadFinancialHeadforAddAS = function(isEdit) {
     $loading.start('sample-1');
     $http.get('fetchFinancialHead')
         .then(function(response) {
 
             $scope.financialHeadsOriginal = angular.copy(response.data);
+            
+            
+            if (isEdit && $scope.workDataRows.length > 0) {
+            angular.forEach($scope.workDataRows, function(row) {
+                row.availableFinancialHeads = angular.copy($scope.financialHeadsOriginal);
+            });
+        }
 
             // पहली row add करो
             $scope.workDataRows = [];
@@ -8818,12 +9082,12 @@ $scope.saveFinancialAgency = function () {
 
         console.log("ID:", id, "Cost:", cost, "Value:", value);
 
-        // FINAL VALIDATION
-        if (value > cost) {
-            alert("Expenditure cannot be greater than Cost.\nAllowed: " + cost + "\nEntered: " + value);
-            isValid = false;
-            return false;   // break loop
-        }
+//        // FINAL VALIDATION
+//        if (value > cost) {
+//            alert("Expenditure cannot be greater than Cost.\nAllowed: " + cost + "\nEntered: " + value);
+//            isValid = false;
+//            return false;   // break loop
+//        }
 
 
         dataList.push({
@@ -8834,16 +9098,29 @@ $scope.saveFinancialAgency = function () {
         });
 
     });
-
+    
+    
     $.ajax({
-        url: "saveFinancialAgencyEnteredCost",
-        method: "POST",
-        data: JSON.stringify(dataList),
-        contentType: "application/json",
-        success: function (res) {
-     //       alert("Data saved successfully!");
+    url: "saveFinancialAgencyEnteredCost",
+    method: "POST",
+    data: JSON.stringify(dataList),
+    contentType: "application/json",
+    success: function (res) {
+
+        // ❗ backend validation message
+        if (res !== 'SUCCESS') {
+            alert(res);   // 🔥 backend ka exact msg
+            return;
         }
-    });
+
+        // ✅ success case
+        $("#dynamic-fa-table .cost-input").val('');
+        alert("Data saved successfully!");
+    },
+    
+});
+
+
 
 }
 
@@ -8950,6 +9227,22 @@ $scope.checkCurrentPassword = function () {
         });
 };
 
+	$scope.loadDepartmentMaster = function() {
+
+		$loading.start('sample-1');
+
+		var response = $http.get('getDepartmentMaster');
+
+		response.success(function(data, status, headers, config) {
+			$scope.departmentMaster = data;
+			$loading.finish('sample-1');
+		});
+
+		response.error(function() {
+			$loading.finish('sample-1');
+			alert("Failed to load Department Master");
+		});
+	};
 
 
 });

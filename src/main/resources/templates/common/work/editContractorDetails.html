@@ -46,9 +46,8 @@
 
 					<div class="form-group col-sm-4"
 						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
-						<label><span th:text="#{contractorName}"></span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label> <input type="text"
-							class="form-control" id="name" required="required"
+						<label><span th:text="#{contractorName}"></span></label> <input type="text"
+							class="form-control" id="name" 
 							data-ng-model="workDataContractor.name" name="name"
 							data-ng-disabled="workData.role == 'ROLE_SAU' || workData.role =='ROLE_DISTRICT' " />
 						<input type="hidden" data-ng-model="workDataContractor.workId" />
@@ -66,9 +65,8 @@
 
 					<div class="form-group col-sm-4"
 						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
-						<label><span th:text="#{contractorName}"></span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label> <input type="text"
-							class="form-control" id="name" required="required"
+						<label><span th:text="#{contractorName}"></span></label> <input type="text"
+							class="form-control" id="name"
 							data-ng-model="workDataContractor.name" name="name"
 							data-ng-disabled="workData.role == 'ROLE_DEPARTMENT' || workData.role =='ROLE_DEPT_DISTRICT' || workData.role=='ROLE_SYSTEM_ADMIN' || workData.role=='ROLE_SU' || isDisabled " />
 						<input type="hidden" data-ng-model="workDataContractor.workId" />
@@ -177,8 +175,7 @@
 
 					<div class="form-group col-sm-4"
 						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==1">
-						<label><span>Contractor’s Firm Name and Address</span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label>
+						<label><span>Contractor’s Firm Name and Address</span></label>
 						<textarea class="form-control" id="firmNameAddress"
 							required="required"
 							data-ng-model="workDataContractor.firmNameAddress"
@@ -196,8 +193,7 @@
 
 					<div class="form-group col-sm-4"
 						data-ng-show="workData.isRecommendedAgency!=null &amp;&amp; workData.isRecommendedAgency==0">
-						<label><span>Contractor’s Firm Name and Address</span><span data-ng-show="workData.isTenders == 1"
-							class="aestrick">&#42;</span></label>
+						<label><span>Contractor’s Firm Name and Address</span></label>
 						<textarea class="form-control" id="firmNameAddress"
 							required="required"
 							data-ng-model="workDataContractor.firmNameAddress"

@@ -529,7 +529,7 @@ td {
 		});
 
 		$('#datetimepicker5').datetimepicker({
-			maxDate : moment(),
+			
 			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
 			format : 'DD/MM/YYYY'
 				,
@@ -1054,7 +1054,9 @@ td {
 							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
 								$('td:eq(7)', nRow)
 								.html('');
-								if(aData.moreImage == false){
+								console.log("aData.imagepath-------- " + aData.imagepath)
+					//			if(aData.moreImage == false){
+						       if (aData.imagepath && aData.imagepath !== "") {
 								if (aData.workStatusId == 10) {
 									$('td:eq(7)', nRow)
 											.html(
@@ -1067,14 +1069,14 @@ td {
 								$('td:eq(7)', nRow)
 								.append(
 										'<button class="btn btn-xs btn-warning" type="button"   title="Download File" onclick="return downloadFileWSDocumnt('+(aData.documentId)+',\'' + aData.workSubStatusNameE + '\' )"> <i class="fa fa-eye" ></i> </button>');
-						
-								}
-								else{
-									$('td:eq(7)', nRow)
-								    .append(
-								        '<button class="btn btn-xs btn-warning" type="button" title="Download File" onclick="return openDiv(' + aData.documentId + ', \'' + aData.createdDate + '\')"> <i class="fa fa-file-image-o"></i> </button>'
-								    );
-									}
+							}
+							//	}
+							//	else{
+							//		$('td:eq(7)', nRow)
+							//	    .append(
+							//	        '<button class="btn btn-xs btn-warning" type="button" title="Download File" onclick="return openDiv(' + aData.documentId + ', \'' + aData.createdDate + '\')"> <i class="fa fa-file-image-o"></i> </button>'
+							//	    );
+							//		}
 								
 								if(aData.workStatusId == 9) {
 									$('td:eq(7)', nRow).html('<span >-</span>');
@@ -1253,7 +1255,7 @@ td {
 	                "data": "id",
 	                "bSortable": false,
 	                "render": function(data, type, row) {
-	                    return `<input type="text" class="form-control cost-input" data-id="${data}" data-workid="${row.workId}" data-financialheadid="${row.financialHeadId}" data-cost="${row.cost}"  value="${row.expenditure ?? ''}" />`;
+	                    return `<input type="text" class="form-control cost-input" data-id="${data}" data-workid="${row.workId}" data-financialheadid="${row.financialHeadId}" data-cost="${row.cost}"  />`;
 	                }
 	            }
 	        ]

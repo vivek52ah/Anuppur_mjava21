@@ -218,27 +218,11 @@
 
 	<div class="row">
 
-					<div class="form-group col-sm-4" data-ng-init="loadFinancialHead();">
-						<label><span>Financing Agency</span><span class="aestrick">&#42;</span></label>
-						<select class="form-control"
-							data-ng-model="workData.financialHeadId" name="financialHeadId"
-							id="financialHeadId" required="required">
-							<option value="" disabled="disabled">--Select--</option>
-							<option
-								data-ng-repeat="financialHead in financialHeads"
-								value="{{financialHead.id}}">{{financialHead.financialHeadName}}</option>
-						</select>
-						<div data-ng-show="workForm.$submitted">
-							<p class="help-block" style="color: red;"
-								data-ng-show="workForm.financialHeadId.$error.required">
-								<span th:text="#{pleaseSelect}">Please select</span> <span>financial Head</span>
-							</p>
-						</div>
-					</div>
+				
 					
 						<div class="form-group col-sm-4" data-ng-init="loadVidhanSabha();">
 						<label><span>Vidhan Sabha</span><span class="aestrick">&#42;</span></label>
-						<select class="form-control"
+						<select class="form-control" disabled="disabled"
 							data-ng-model="workData.vidhanSabhaId" name="vidhanSabhaId"
 							id="vidhanSabhaId" required="required">
 							<option value="" disabled="disabled">--Select--</option>
@@ -619,6 +603,90 @@
 				</div>
 
 
+<div class="card-header">
+				<span>Fund Breakup of the Work</span>
+				</div>
+	<div class="card-body">
+			<div data-ng-init="loadFinancialHeadforAddAS();">
+
+    <div data-ng-repeat="row in workDataRows track by $index" class="row" style="margin-bottom:10px;">
+
+		<input type="hidden" data-ng-model="row.financialAgencyId"/>
+
+						<div class="form-group col-sm-4">
+							<label>Financing Agency <span class="aestrick">*</span></label> <select
+								class="form-control" data-ng-model="row.financialHeadId"
+								name="financialHeadId" id="financialHeadId" disabled="disabled"								data-ng-change="updateAllAvailableFinancialHeads()"
+								required="required">
+								<option value="" disabled="disabled">--Select--</option>
+								<option data-ng-repeat="head in row.availableFinancialHeads"
+									value="{{head.id}}">{{head.financialHeadName}}</option>
+							</select>
+
+							<!-- Validation Message (Same as Gram Panchayat) -->
+							<div data-ng-show="workForm.$submitted">
+								<p class="help-block" style="color: red;"
+									data-ng-show="workForm.financialHeadId.$error.required">
+									<span>Please select</span> <span>Financing Agency</span>
+								</p>
+							</div>
+
+						</div>
+
+						<div class="form-group col-sm-4">
+							<label>Cost (In Lacs) <span class="aestrick">*</span></label> <input
+								type="text" class="form-control number-OnlyTwoDecimal" id="cost"
+								name="cost" data-ng-model="row.cost" required="required" min="0"
+								data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01"
+								placeholder="Enter cost" disabled="disabled"/>
+
+							<!-- Validation Messages -->
+							<div data-ng-show="workForm.$submitted">
+
+								<!-- Required -->
+								<p class="help-block" style="color: red;"
+									data-ng-show="workForm.cost.$error.required">Please enter
+									Cost</p>
+
+								<!-- Decimal Validation -->
+								<div data-ng-show="row.cost != null">
+									<p class="help-block" style="color: red;"
+										data-ng-show="!workForm.cost.$valid">Add Max. Two Decimal!
+									</p>
+								</div>
+
+							</div>
+						</div>
+
+
+
+						
+
+
+						<div class="form-group col-sm-2" style="padding-top: 25px;">
+            <!-- Hide Remove button for first row -->
+          <!--  <button type="button" class="btn btn-danger" 
+                    data-ng-click="removeRow($index)" 
+                    data-ng-if="$index > 0">
+                Remove
+            </button>-->
+        </div>
+
+    </div>
+    
+    <div class="form-group col-sm-4">
+							<label>Total AS (In Lacs)</label> <input type="text" 
+								class="form-control" ng-value="getTotalCost()" readonly="readonly"/>
+						</div>
+
+    <!-- Single Add Row button -->
+    <!--<button type="button" class="btn btn-success" data-ng-click="addRow()">Add</button>
+-->
+</div>
+
+
+					</div>
+
 				<div class="card-header">
 					<span>Work Priority</span>
 				</div>
@@ -630,7 +698,7 @@
 						<label><span>Work Priority</span><span class="aestrick">&#42;</span></label>
 
 
-						<select class="form-control" id="workPriorityId" 
+						<select class="form-control" id="workPriorityId1" 
 							required="required" data-ng-model="workData.workPriorityId"
 							name="workPriorityId">
 							<option value="null" disabled="disabled">--Select--</option>

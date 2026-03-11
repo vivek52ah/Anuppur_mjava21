@@ -53,6 +53,9 @@ public class DmRemarks  extends Auditable{
     @Column(name = "department_remarks")
     private String departmentRemarks;
     
+    @Column(name = "department_master_id")
+    private Long depertmentMasterId;
+    
     
     public Short getEnabled() {
 		return enabled;
@@ -101,4 +104,14 @@ public class DmRemarks  extends Auditable{
 	public final void setDepartmentRemarks(String departmentRemarks) {
 		this.departmentRemarks = departmentRemarks;
 	}
+
+	public final Long getDepertmentMasterId() {
+		return depertmentMasterId;
+	}
+
+	public final void setDepertmentMasterId(Long depertmentMasterId) {
+		this.depertmentMasterId = depertmentMasterId;
+	}
+	
+	
 }

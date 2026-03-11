@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import com.anuppur.bean.BlockBean;
 import com.anuppur.bean.CCBean;
 import com.anuppur.bean.ContractorBean;
+import com.anuppur.bean.DepartmentMasterBean;
+import com.anuppur.bean.DepartmentRemarksBean;
 import com.anuppur.bean.DistrictBean;
 import com.anuppur.bean.DivisionBean;
 import com.anuppur.bean.DmRemarksBean;
@@ -429,7 +431,7 @@ public interface CommonService {
 
 	List<FinancialAgencyBean> fetchFinancialAgencyByWorkId(Long workId);
 
-	void updateFinancialAgencyCost(Long id, Double expenditure, Long workId);
+	String updateFinancialAgencyCost(Long id, Double expenditure, Long workId);
 
 	String deleteByFinancailAgencyId(Long id);
 
@@ -438,4 +440,14 @@ public interface CommonService {
 	List<FinancialAgencyBean> getFinancialAgenciesByWorkId(Long workId);
 
 	List<FinancialAgencyBean> getFinancialAgenciesExpenditureByWorkId(Long workId);
+
+	List<DepartmentMasterBean> fetchDepartmentMaster();
+
+	String addOrUpdateDepartmentRemark(DepartmentRemarksBean bean);
+
+	List<DepartmentRemarksBean> getAllDepartmentRemarksByWorkID(Long long1);
+
+	DepartmentRemarksBean getDepartmentRemarksDetailsById(Long long1);
+
+	Boolean deleteDepartmentRemarks(Long long1);
 }

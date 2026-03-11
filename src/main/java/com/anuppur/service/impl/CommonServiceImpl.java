@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -35,6 +36,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import javax.persistence.Entity;
 
 //import org.thymeleaf.util.StringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -70,6 +73,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.anuppur.bean.BlockBean;
 import com.anuppur.bean.CCBean;
 import com.anuppur.bean.ContractorBean;
+import com.anuppur.bean.DepartmentMasterBean;
+import com.anuppur.bean.DepartmentRemarksBean;
 import com.anuppur.bean.DistrictBean;
 import com.anuppur.bean.DivisionBean;
 import com.anuppur.bean.DmRemarksBean;
@@ -122,6 +127,8 @@ import com.anuppur.entity.AsGeneratedCount;
 import com.anuppur.entity.Block;
 import com.anuppur.entity.CC;
 import com.anuppur.entity.Contractor;
+import com.anuppur.entity.DepartmentMaster;
+import com.anuppur.entity.DepartmentRemarks;
 import com.anuppur.entity.District;
 import com.anuppur.entity.Division;
 import com.anuppur.entity.DmRemarks;
@@ -186,6 +193,8 @@ import com.anuppur.repository.BlockRepository;
 import com.anuppur.repository.CCRepository;
 import com.anuppur.repository.CategorySubTypeMappingRepository;
 import com.anuppur.repository.ContractorRepository;
+import com.anuppur.repository.DepartmentMasterRepository;
+import com.anuppur.repository.DepartmentRemarksRepository;
 import com.anuppur.repository.DistrictRepository;
 import com.anuppur.repository.DivisionRepository;
 import com.anuppur.repository.DmRemarksRepository;
@@ -462,6 +471,12 @@ public class CommonServiceImpl implements CommonService {
 	@Autowired
 	private FinancialAgencyRepository financialAgencyRepository;
 	
+	@Autowired
+	private DepartmentMasterRepository departmentMasterRepository;
+	
+	@Autowired
+	private DepartmentRemarksRepository departmentRemarksRepository;
+	
 	@Override
 	public WorkJson fetchWorksList(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
 			List<Long> fyList, List<Long> agencyList, String blockId, String workStatus, String districtId,
@@ -469,8 +484,6 @@ public class CommonServiceImpl implements CommonService {
 			List<Long> priorityList, List<Long> headList, List<Long> vsList) {
 
 		
-		System.err.println("workStatusId === " + statusList);
-		System.err.println("financialYears==== " + fyList);
 		
 		Integer workSubTypeIdInt = null;
 		if (workSubTypeId != null) {
@@ -630,20 +643,16 @@ public class CommonServiceImpl implements CommonService {
 							// logger.info(dmRemarks.getCreated_time()+"asdasdasdasdasdasdasds");
 						}
 						StringBuilder deptRemarks = new StringBuilder();
+						StringBuilder dmRemark = new StringBuilder();
+						StringBuilder dmRemarkMaster = new StringBuilder();
 						if (dmRemarks != null) {
 							String createdTimeStr = dmRemarks.getCreated_time();
 							if (dmRemarks.getRemark() != null && !dmRemarks.getRemark().isEmpty() ) {
-								bean.setDmRemakrs(dmRemarks.getRemark());
+								dmRemark.append(dmRemarks.getRemark());
 							} else {
 								bean.setDmRemakrs("-");
 							}
 							
-							
-							if (dmRemarks.getDepartmentRemarks() != null && !dmRemarks.getDepartmentRemarks().isEmpty() ) {
-								deptRemarks.append(dmRemarks.getDepartmentRemarks());
-							} else {
-								deptRemarks.append("-");
-							}
 							if (createdTimeStr != null && !createdTimeStr.trim().isEmpty()) {
 								try {
 									SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
@@ -662,7 +671,8 @@ public class CommonServiceImpl implements CommonService {
 							bean.setDmAproveRejectDate(null);
 							 deptRemarks.append("-");
 						}
-						bean.setDepartmentRemarks(deptRemarks.toString());
+						
+						bean.setDmRemakrs(dmRemark.toString());
 						beanList.add(bean);
 					}
 				}
@@ -1383,24 +1393,28 @@ public class CommonServiceImpl implements CommonService {
 						bean.setLattitude(documentUploadWorkProgress.getLattitude());
 						bean.setLongitude(documentUploadWorkProgress.getLongitude());
 						bean.setAddress(documentUploadWorkProgress.getAddress());
+						if(bean.getDocumentName() != null) {
 						bean.setImagepath(imageUrl.substring(0, 21) + "/anuppur/mobile/downloadDocumentWSPro/"
 								+ bean.getDocumentId());
-
-						List<DocumentUploadWorkProgress> byWorkIdAndCreatedDate = documentUploadWorkProgressRepository
-								.findByWorkIdAndCreatedDate(workId, documentUploadWorkProgress.getCreatedDate());
-
-						bean.setMoreImage(byWorkIdAndCreatedDate.size() > 1);
+						}
+						/*
+						 * List<DocumentUploadWorkProgress> byWorkIdAndCreatedDate =
+						 * documentUploadWorkProgressRepository .findByWorkIdAndCreatedDate(workId,
+						 * documentUploadWorkProgress.getCreatedDate());
+						 * 
+						 * bean.setMoreImage(byWorkIdAndCreatedDate.size() > 1);
+						 */
 						beanList.add(bean);
 					}
 
-					beanList = beanList.stream().filter(distinctByKey(DocumentUploadWorkProgressBean::getCreatedDate)) // Filter
+					//beanList = beanList.stream().filter(distinctByKey(DocumentUploadWorkProgressBean::getCreatedDate)) // Filter
 																														// distinct
 																														// by
 																														// createdDate
-							.collect(Collectors.toList());
-					AtomicInteger indexa = new AtomicInteger(1);
+					//		.collect(Collectors.toList());
+					//AtomicInteger indexa = new AtomicInteger(1);
 
-					beanList.forEach(bean -> bean.setIndexWS(indexa.getAndIncrement()));
+				//	beanList.forEach(bean -> bean.setIndexWS(indexa.getAndIncrement()));
 
 				}
 				json = new WorkProgressImagesJson();
@@ -1535,8 +1549,6 @@ public class CommonServiceImpl implements CommonService {
 			boolean isGeoTagged = false;
 
 			if (work != null && work.getId() != null) {
-				// System.err.println(work.getId() + "---"+
-				// geoLocationRepository.findByworkId(work.getId()).get(0).getId() );
 				isGeoTagged = geoLocationRepository.existsByWorkId(work.getId());
 			}
 
@@ -3039,22 +3051,32 @@ public class CommonServiceImpl implements CommonService {
 				responseObject = new ResponseObject();
 				Work work = workRepository.findOne(uplDocumentUploadWorkProgressBean.getWorkId());
 				String workNo = null;
-
+				DocumentUploadWorkProgress documentUpload = null;
 				if (uplDocumentUploadWorkProgressBean.getFile() != null) {
 					logger.info("WorkStatusnkdncknd.." + uplDocumentUploadWorkProgressBean.getWorkSubStatusId());
-					DocumentUploadWorkProgress documentUpload = DMSUtil.uploadWorkProgressDocument(
+					 documentUpload = DMSUtil.uploadWorkProgressDocument(
 							documentRootPath + workWorkProgressDocumentPath,
 							uplDocumentUploadWorkProgressBean.getWorkId(), uplDocumentUploadWorkProgressBean.getFile(),
 							null, "blank", uplDocumentUploadWorkProgressBean.getWorkSubStatusId(),
 							uplDocumentUploadWorkProgressBean.getWorkStatusId());
-
-					WorkStatus workStatusId2 = workStatusRepository
+					 WorkStatus workStatusId = workStatusRepository
+								.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId());
+					 	documentUpload.setWorkStatusId(workStatusId.getId());
+						documentUpload.setWorkStatusNameE(workStatusId.getWorkStatusNameE());
+						documentUpload.setPerc(uplDocumentUploadWorkProgressBean.getPerc());
+					 documentUploadWorkProgressRepository.save(documentUpload);
+				}else if (uplDocumentUploadWorkProgressBean.getFile() == null && uplDocumentUploadWorkProgressBean.getWorkStatusId() == 10){
+					documentUpload = new DocumentUploadWorkProgress();
+					WorkStatus workStatusId = workStatusRepository
 							.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId());
-					documentUpload.setWorkStatusId(workStatusId2.getId());
-					documentUpload.setWorkStatusNameE(workStatusId2.getWorkStatusNameE());
+					documentUpload.setWorkStatusId(workStatusId.getId());
+					documentUpload.setWorkStatusNameE(workStatusId.getWorkStatusNameE());
+					documentUpload.setWorkSubStatusId(uplDocumentUploadWorkProgressBean.getWorkSubStatusId());
 					documentUpload.setRemarks(uplDocumentUploadWorkProgressBean.getRemarks());
 					documentUpload.setPerc(uplDocumentUploadWorkProgressBean.getPerc());
-
+					documentUpload.setEnabled((short) 1);
+					documentUpload.setCreatedDate(new Date());
+					documentUpload.setWorkId(uplDocumentUploadWorkProgressBean.getWorkId());
 					documentUploadWorkProgressRepository.save(documentUpload);
 
 					/*
@@ -3398,46 +3420,7 @@ public class CommonServiceImpl implements CommonService {
 					workTender.setStatus(DMSConstants.STATUS_ACTIVE);
 				}
 				// Store document uploaded in the DB
-				System.err.println("workTenderBean.getWorkStatusId()" + workTenderBean.getWorkStatusId());
-				if (workTenderBean.getWorkStatusId() != '3' || workTenderBean.getWorkStatusId() != '4'
-						|| workTenderBean.getWorkStatusId() != '5' || workTenderBean.getWorkStatusId() != '6'
-						|| workTenderBean.getWorkStatusId() != '7') {
-					if (workTenderBean.getPac() != null) {
-						DocumentUpload documentUpload = DMSUtil.uploadTenderWorkDocument(
-								documentRootPath + workTenderSanctionDocumentPath, "blank", workTenderBean.getPac(),
-								null, "blank");
-						documentRepository.save(documentUpload);
-						workTender.setDocumentUpload(documentUpload);
 
-					}
-
-					if (workTenderBean.getLdtul() != null) {
-						DocumentUpload documentUploadLoi = DMSUtil.uploadTenderWorkDocumentUloi(
-								documentRootPath + workTenderSanctionDocumentPath, "blank", workTenderBean.getLdtul(),
-								null, "blank");
-						documentRepository.save(documentUploadLoi);
-						workTender.setDocumentUploadLoi(documentUploadLoi);
-					}
-					if (workTenderBean.getUploadAgreementforWork() != null) {
-						DocumentUpload documentUploadUa = DMSUtil.uploadTenderWorkDocumentUploadAgreement(
-								documentRootPath + workTenderSanctionDocumentPath, "blank",
-								workTenderBean.getUploadAgreementforWork(), null, "blank");
-						documentRepository.save(documentUploadUa);
-						workTender.setDocumentUploadUa(documentUploadUa);
-					}
-					if (workTenderBean.getRateStatus() != null) {
-						workTender.setRateStatus(workTenderBean.getRateStatus());
-						/*
-						 * if (workTenderBean.getRateStatus().equals("+")) {
-						 * workTender.setRateStatus("Plus"); } if
-						 * (workTenderBean.getRateStatus().equals("-")) {
-						 * workTender.setRateStatus("Minus"); } if
-						 * (workTenderBean.getRateStatus().equals("=")) {
-						 * workTender.setRateStatus("Equal"); }
-						 */
-					}
-
-				}
 				convertWorkTenderBeanToEntity(workTender, workTenderBean);
 				workTenderRepository.save(workTender);
 
@@ -3550,22 +3533,33 @@ public class CommonServiceImpl implements CommonService {
 			workTender.setLoaIssuedDate(workTenderBean.getLoaIssuedDate());
 		}
 
-		try {
-			if (workTenderBean.getWorkCompletionDate() != null) {
-				SimpleDateFormat inputFormat = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)");
-				Date inputDate = inputFormat.parse(workTenderBean.getWorkCompletionDate());
-				;
-				SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
-				String formattedDate = outputFormat.format(inputDate);
-				workTender.setWorkCompletionDate(formattedDate);
-			}
+		if (workTenderBean.getWorkCompletionDate() != null 
+		        && !workTenderBean.getWorkCompletionDate().trim().isEmpty()) {
+
+		    try {
+		        // Frontend date format
+		        SimpleDateFormat inputFormat =
+		                new SimpleDateFormat("E MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)", Locale.ENGLISH);
+
+		        Date inputDate = inputFormat.parse(workTenderBean.getWorkCompletionDate());
+
+		        // Required DB format
+		        SimpleDateFormat outputFormat =
+		                new SimpleDateFormat("dd/MM/yyyy");
+
+		        String formattedDate = outputFormat.format(inputDate);
+
+		        workTender.setWorkCompletionDate(formattedDate);
+
+		    
+
 
 		} catch (java.text.ParseException e) {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();
 			logger.error("Cannot parse bean to entity", e);
 		}
-
+		}
 		workTender.setRemarks(workTenderBean.getRemarks());
 		workTender.setWork(workRepository.findOne(workTenderBean.getWorkId()));
 		workTender.setWorkRequestStatusId(workTenderBean.getWorkRequestStatusId());
@@ -3795,13 +3789,24 @@ public class CommonServiceImpl implements CommonService {
 		if (entity.getWorkStatus() == 8 || entity.getWorkStatus() == 9 || entity.getWorkStatus() == 10
 				|| entity.getWorkStatus() == 11 || entity.getWorkStatus() == 12 || entity.getWorkStatus() == 13) {
 
-			workTenderBean.setTenderFileId(entity.getDocumentUpload().getDocumentId());
+			if (entity.getDocumentUpload() != null) {
+			    workTenderBean.setTenderFileId(
+			        entity.getDocumentUpload().getDocumentId()
+			    );
+			}
+
 			if (entity.getDocumentUploadLoi() != null) {
-				workTenderBean.setuLoiId(entity.getDocumentUploadLoi().getDocumentId());
+			    workTenderBean.setuLoiId(
+			        entity.getDocumentUploadLoi().getDocumentId()
+			    );
 			}
+
 			if (entity.getDocumentUploadUa() != null) {
-				workTenderBean.setuAId(entity.getDocumentUploadUa().getDocumentId());
+			    workTenderBean.setuAId(
+			        entity.getDocumentUploadUa().getDocumentId()
+			    );
 			}
+
 		}
 
 		workTenderBean.setWorkRequestStatusId(entity.getWorkRequestStatusId());
@@ -4353,12 +4358,10 @@ public class CommonServiceImpl implements CommonService {
 				tsasWorkBean.setFileName(tsasWork.getDocumentUploadTechnical().getDocumentName());
 			}
 			tsasWorkBean.setTsRemarks(tsasWork.getTsRemarks());
-			System.err.println("tsasWork.getTsRemarks() == " + tsasWork.getTsRemarks());
 			tsasWorkBean.setAsAmt(tsasWork.getAsAmt());
 			tsasWorkBean.setAsNo(tsasWork.getAsNo());
 			tsasWorkBean.setAsDate(tsasWork.getAsDate());
 			tsasWorkBean.setAsRemarks(tsasWork.getAsRemarks());
-			System.err.println("tsasWork.getAsRemarks() == " + tsasWork.getAsRemarks());
 
 		}
 		return tsasWorkBean;
@@ -5767,7 +5770,6 @@ public class CommonServiceImpl implements CommonService {
 		DocumentUploadWorkProgress document = documentUploadWorkProgressRepository.findOne(documentId);
 		String fileName = document.getDocumentName();
 
-//		System.err.println("fileName1>>"+fileName);
 		String compareString = fileName.split("_")[0];
 		String fileWithFullPath = null;
 		logger.info(" fileName= " + compareString);
@@ -7554,18 +7556,51 @@ public class CommonServiceImpl implements CommonService {
 			List<DmRemarks> dmRemarks = dmRemarksRepository.findByworkId(work.getId());
 			if (dmRemarks != null && !dmRemarks.isEmpty()) {
 
-			    StringBuilder deptRemarks = new StringBuilder();
+			    DmRemarks lastRemark = dmRemarks.get(dmRemarks.size() - 1);
 
-			    for (DmRemarks r : dmRemarks) {
-			        if (r.getDepartmentRemarks() != null && !r.getDepartmentRemarks().trim().isEmpty()) {
-			            deptRemarks.append(r.getDepartmentRemarks()).append("<br>");
-			        }
+			    if (lastRemark.getRemark() != null ) {
+			        workBean.setDmRemakrs(lastRemark.getRemark());
 			    }
-
-			    workBean.setDepartmentRemarks(deptRemarks.toString());
 			}
 
 		
+			List<DepartmentRemarks> departmentRemarks =
+			        departmentRemarksRepository.findByWorkId(work.getId());
+
+			if (departmentRemarks != null && !departmentRemarks.isEmpty()) {
+
+			    // ✅ LAST UPDATED RECORD
+			    DepartmentRemarks dr =
+			            departmentRemarks.get(departmentRemarks.size() - 1);
+
+			    DepartmentMaster departmentMaster = null;
+			    if (dr.getDepertmentMasterId() != null) {
+			        departmentMaster =
+			                departmentMasterRepository.findOne(dr.getDepertmentMasterId());
+			    }
+
+			    String results = "";
+
+			    // 🔴 masterId == 5 → name + remark
+			    if (dr.getDepertmentMasterId() != null && dr.getDepertmentMasterId() == 5L) {
+
+			        if (departmentMaster != null) {
+			        	results = departmentMaster.getName();
+			        }
+
+			        if (dr.getDepartmentRemarkName() != null) {
+			        	results = results + " : " + dr.getDepartmentRemarkName();
+			        }
+			    }
+			    // 🟢 masterId != 5 → only name
+			    else {
+			        if (departmentMaster != null) {
+			        	results = departmentMaster.getName();
+			        }
+			    }
+
+			    workBean.setDepartmentRemarks(results);
+			}
 
 		return workBean;
 
@@ -8137,7 +8172,6 @@ public class CommonServiceImpl implements CommonService {
 					}
 				}
 
-				System.err.println(beanList.size());
 
 				workJson = new WorkJson();
 				workJson.setiTotalDisplayRecords(works.getTotalElements());
@@ -9026,10 +9060,13 @@ public class CommonServiceImpl implements CommonService {
 				bean.setAddress(documentUploadWorkProgress.getAddress());
 				bean.setImagepath(imageUrl + "anuppur/mobile/downloadDocumentWSPro/" + bean.getDocumentId());
 
-				List<DocumentUploadWorkProgress> byWorkIdAndCreatedDate = documentUploadWorkProgressRepository
-						.findByWorkIdAndCreatedDate(workId, documentUploadWorkProgress.getCreatedDate());
-
-				bean.setMoreImage(byWorkIdAndCreatedDate.size() > 1);
+				/*
+				 * List<DocumentUploadWorkProgress> byWorkIdAndCreatedDate =
+				 * documentUploadWorkProgressRepository .findByWorkIdAndCreatedDate(workId,
+				 * documentUploadWorkProgress.getCreatedDate());
+				 * 
+				 * bean.setMoreImage(byWorkIdAndCreatedDate.size() > 1);
+				 */
 				beanlist.add(bean);
 			}
 
@@ -9215,6 +9252,12 @@ public class CommonServiceImpl implements CommonService {
 			if (bean.getWorkId() != null ) {
 			    entity.setWorkId(Long.valueOf(bean.getWorkId()));
 			}
+			
+			if (bean.getDepertmentMasterId() != null
+			        && bean.getDepertmentMasterId() == 0L) {
+				bean.setDepertmentMasterId(null);
+			}
+			entity.setDepertmentMasterId(bean.getDepertmentMasterId());
 			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss a");
 			entity.setCreated_time(sdf.format(new Date()));
 			entity.setEnabled((short) 1);
@@ -9228,6 +9271,65 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 	}
+	
+	@Override
+	public String addOrUpdateDepartmentRemark(DepartmentRemarksBean bean) {
+		try {
+	
+			
+			if (bean == null) {
+				return "error: Invalid input";
+			}
+			DepartmentRemarks entity;
+
+			if (bean.getId() != null) {
+				// 🔄 Update case
+				entity = departmentRemarksRepository.findOne(bean.getId());
+			} else {
+				// 🆕 New record
+				entity = new DepartmentRemarks();
+			}
+			if (bean.getDmattachment() != null) {
+				DocumentUpload documentUpload = DMSUtil.uploadDMAttachment(documentRootPath + dmAttachment, "blank",
+						bean.getDmattachment(), null, "blank");
+
+				// documentUpload.setDocumentUploadPath(documentRootPath+dmAttachment+"");
+				documentRepository.save(documentUpload);
+
+				entity.setDocumentUpload(documentUpload);
+
+			}
+			
+
+				entity.setDepartmentRemarkName(
+				    bean.getDepartmentRemarkName() != null && !bean.getDepartmentRemarkName().trim().isEmpty()
+				        ? bean.getDepartmentRemarkName()
+				        : null
+				);
+
+			if (bean.getWorkId() != null ) {
+			    entity.setWorkId(Long.valueOf(bean.getWorkId()));
+			}
+			
+			if (bean.getDepertmentMasterId() != null
+			        && bean.getDepertmentMasterId() == 0L) {
+				bean.setDepertmentMasterId(null);
+			}
+			entity.setDepertmentMasterId(bean.getDepertmentMasterId());
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss a");
+			entity.setCreated_time(sdf.format(new Date()));
+			entity.setEnabled((short) 1);
+			departmentRemarksRepository.save(entity);
+
+			return "success";
+
+		} catch (Exception e) {
+			logger.error("Error while saving DM Remark: {}", e.getMessage(), e);
+			return "error: " + e.getMessage();
+		}
+
+	}
+	
 
 	@Override
 	public List<DmRemarksBean> getAllRemarksByWorkID(Long long1) {
@@ -9243,6 +9345,13 @@ public class CommonServiceImpl implements CommonService {
 			index++;
 			bean.setRemark(s.getRemark() != null ? s.getRemark() : "-" );
 			bean.setDepartmentRemarks(s.getDepartmentRemarks() != null  ? s.getDepartmentRemarks() : "-");
+			if(s.getDepertmentMasterId() != null) {
+			DepartmentMaster departmentMaster =	departmentMasterRepository.findOne(s.getDepertmentMasterId());
+			if(departmentMaster != null) {
+			bean.setDepertmentMasterId(departmentMaster.getId());
+			bean.setDepartmentName(departmentMaster.getName() != null ? departmentMaster.getName() : "-");
+			}
+			}
 			bean.setId(s.getId());
 			bean.setCreatedDate(dmRemarksRepository.findCreatedDateByWorkId(Long.parseLong(s.getId() + "")));
 			if (s.getDocumentUpload() != null) {
@@ -9256,6 +9365,7 @@ public class CommonServiceImpl implements CommonService {
 			Set<Role> role = users.getRoles();
 			for (Role r : role) {
 				bean.setRole(r.getRoleName());
+				bean.setRoleCode(r.getRoleCode());
 			}
 			}
 			}
@@ -9263,6 +9373,84 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 		return beanlist;
+	}
+	
+	@Override
+	public List<DepartmentRemarksBean> getAllDepartmentRemarksByWorkID(Long long1) {
+
+		List<DepartmentRemarksBean> beanlist = new ArrayList<>();
+
+		List<DepartmentRemarks> remakrs = departmentRemarksRepository.findByworkIdAndEnabled(long1, (short) 1);
+		int index = 1;
+
+		for (DepartmentRemarks s : remakrs) {
+			DepartmentRemarksBean bean = new DepartmentRemarksBean();
+			bean.setIndex(index);
+			index++;
+//			if(bean.getWorkId() != null) {
+//			DmRemarks dmRemarks = dmRemarksRepository.findByWorkId(bean.getWorkId());
+//			if(dmRemarks != null) {
+//				bean.setRemark(dmRemarks.getRemark() != null ? dmRemarks.getRemark() : "-" );
+			bean.setWorkId(s.getWorkId());
+				
+				if (s.getWorkId() != null) {
+				    List<DmRemarks> dmRemarks =  dmRemarksRepository.findByWorkId(s.getWorkId());
+
+				    if (dmRemarks != null && !dmRemarks.isEmpty()) {
+
+				        StringBuilder remarkBuilder = new StringBuilder();
+
+				        for (DmRemarks dmRemarks2 : dmRemarks) {
+				            if (dmRemarks2.getRemark() != null) {
+				                remarkBuilder
+				                    .append(dmRemarks2.getRemark());
+				                 
+				            }
+				        }
+
+				        bean.setRemark(remarkBuilder.toString());
+				    }
+				}
+						
+			
+			
+		//	bean.setRemark(s.getRemark() != null ? s.getRemark() : "-" );
+		//	bean.setDepartmentRemarks(s.getDepartmentRemarks() != null  ? s.getDepartmentRemarks() : "-");
+			
+			bean.setDepartmentRemarkName(s.getDepartmentRemarkName());
+			
+			
+			if(s.getDepertmentMasterId() != null) {
+			DepartmentMaster departmentMaster =	departmentMasterRepository.findOne(s.getDepertmentMasterId());
+			if(departmentMaster != null) {
+			bean.setDepertmentMasterId(departmentMaster.getId());
+			bean.setDepartmentName(departmentMaster.getName() != null ? departmentMaster.getName() : "-");
+			}
+			}
+			bean.setId(s.getId());
+			bean.setCreatedDate(departmentRemarksRepository.findCreatedDateByWorkId(Long.parseLong(s.getId() + "")));
+			if (s.getDocumentUpload() != null) {
+				bean.setDocumentId(s.getDocumentUpload().getDocumentId());
+			}
+			bean.setDocumentPath(CCDocumentPath);
+			if(s.getCreatedBy() != null) {
+			Users users = userRepository.findByUsername(s.getCreatedBy());
+			if(users != null) {
+			bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
+			Set<Role> role = users.getRoles();
+			for (Role r : role) {
+				bean.setRole(r.getRoleName());
+				bean.setRoleCode(r.getRoleCode());
+			}
+			}
+			}
+		
+		beanlist.add(bean);
+		}
+	
+
+		return beanlist;
+	
 	}
 
 	@Override
@@ -9278,12 +9466,27 @@ public class CommonServiceImpl implements CommonService {
 		}
 		return false;
 	}
+	
+	@Override
+	public Boolean deleteDepartmentRemarks(Long long1) {
+		DepartmentRemarks one = departmentRemarksRepository.findOne(long1);
+
+		if (one != null) {
+			one.setEnabled((short) 0);
+			DepartmentRemarks save = departmentRemarksRepository.save(one);
+			if (save.getId() != null) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public DmRemarksBean getRemakrsDetails(Long long1) {
 		DmRemarksBean bean = new DmRemarksBean();
 		DmRemarks one = dmRemarksRepository.findOne(long1);
 		bean.setRemark(one.getRemark());
+		bean.setDepartmentRemarks(one.getDepartmentRemarks());
 		if (one.getDocumentUpload() != null) {
 			bean.setDocumentId(one.getDocumentUpload().getDocumentId());
 		}
@@ -9300,6 +9503,68 @@ public class CommonServiceImpl implements CommonService {
 			}
 			}
 			}
+		if(null != one.getDepertmentMasterId()) {
+		DepartmentMaster departmentMaster = departmentMasterRepository.findOne(one.getDepertmentMasterId());
+			if(null != departmentMaster) {
+				bean.setDepertmentMasterId(departmentMaster.getId());
+				bean.setDepartmentName(departmentMaster.getName());
+			}
+		
+		}
+		return bean;
+	}
+	
+	@Override
+	public DepartmentRemarksBean getDepartmentRemarksDetailsById(Long long1) {
+		DepartmentRemarksBean bean = new DepartmentRemarksBean();
+		DepartmentRemarks one = departmentRemarksRepository.findOne(long1);
+		System.err.println(one.getWorkId() + "<------------- work id null");
+		if (one.getWorkId() != null) {
+		    List<DmRemarks> dmRemarks =
+		            (List<DmRemarks>) dmRemarksRepository.findByWorkId(one.getWorkId());
+
+		    if (dmRemarks != null && !dmRemarks.isEmpty()) {
+
+		        StringBuilder remarkBuilder = new StringBuilder();
+
+		        for (DmRemarks dmRemarks2 : dmRemarks) {
+		            if (dmRemarks2.getRemark() != null) {
+		                remarkBuilder
+		                    .append(dmRemarks2.getRemark())
+		                    .append("");
+		            }
+		        }
+
+		        bean.setRemark(remarkBuilder.toString());
+		    }
+		}
+		
+		//bean.setRemark(one.getRemark());
+		bean.setDepartmentRemarkName(one.getDepartmentRemarkName());
+		if (one.getDocumentUpload() != null) {
+			bean.setDocumentId(one.getDocumentUpload().getDocumentId());
+		}
+		bean.setId(one.getId());
+		
+		if(one.getCreatedBy() != null) {
+			Users users = userRepository.findByUsername(one.getCreatedBy());
+			if(users != null) {
+			bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
+			Set<Role> role = users.getRoles();
+			for (Role r : role) {
+				bean.setRole(r.getRoleName());
+				bean.setRoleCode(r.getRoleCode());
+			}
+			}
+			}
+		if(null != one.getDepertmentMasterId()) {
+		DepartmentMaster departmentMaster = departmentMasterRepository.findOne(one.getDepertmentMasterId());
+			if(null != departmentMaster) {
+				bean.setDepertmentMasterId(departmentMaster.getId());
+				bean.setDepartmentName(departmentMaster.getName());
+			}
+		
+		}
 		return bean;
 	}
 
@@ -9721,28 +9986,35 @@ public class CommonServiceImpl implements CommonService {
 	}
 	
 	@Override
-	public void updateFinancialAgencyCost(Long id, Double expenditure, Long workId) {
-		
-		if (expenditure == null) {
-	        return;
-	    }
-		
-		
-	    // Try to fetch existing entity by ID
-	    WorkFinancialAgency entity = financialAgencyRepository.findOne(id); // or findById(id).orElse(null);
+	public String updateFinancialAgencyCost(Long id, Double expenditure, Long workId) {
 
-	    if(entity != null) {
-	        // Record exists → add to existing expenditure
-	        Double currentExpenditure = entity.getExpenditure() != null ? entity.getExpenditure() : 0.0;
-	        entity.setExpenditure(currentExpenditure + expenditure);
-	    } else {
-	        // Record does not exist → create new
-	        entity = new WorkFinancialAgency();
-	        entity.setWorkId(workId);
-	        entity.setExpenditure(expenditure);
+	    if (expenditure == null || expenditure <= 0) {
+	        return "Invalid expenditure amount.";
 	    }
 
+	    WorkFinancialAgency entity = financialAgencyRepository.findOne(id);
+
+	    if (entity == null) {
+	        return "Financial Agency record not found.";
+	    }
+
+	    Double dbCost = entity.getCost();
+	    Double currentExpenditure = entity.getExpenditure() != null
+	            ? entity.getExpenditure()
+	            : 0.0;
+
+	    Double finalExpenditure = currentExpenditure + expenditure;
+
+	    // ✅ SOFT VALIDATION (NO ERROR)
+	    if (finalExpenditure > dbCost) {
+	        return "Expenditure cannot be greater than the cost. Remaining allowable amount is "
+	                + (dbCost - currentExpenditure) + ".";
+	    }
+
+	    entity.setExpenditure(finalExpenditure);
 	    financialAgencyRepository.save(entity);
+
+	    return "SUCCESS";
 	}
 
 	@Override
@@ -9810,6 +10082,20 @@ public class CommonServiceImpl implements CommonService {
 		return beans;
 	}
 
-
+	@Override
+	public List<DepartmentMasterBean> fetchDepartmentMaster() {
+		List<DepartmentMaster> departmentMastersList = departmentMasterRepository.findAll();
+		List<DepartmentMasterBean> departmentMasterBeans = new ArrayList<DepartmentMasterBean>();
+		
+		for (DepartmentMaster departmentMasters : departmentMastersList) {
+			DepartmentMasterBean bean =new DepartmentMasterBean();
+			bean.setId(departmentMasters.getId());
+			bean.setName(departmentMasters.getName());
+			bean.setEnabled(departmentMasters.getEnabled());	
+			departmentMasterBeans.add(bean);
+			}
+	//	System.err.println("Service------- " + departmentMasterBeans.size());
+		return departmentMasterBeans;
+	}
 
 }

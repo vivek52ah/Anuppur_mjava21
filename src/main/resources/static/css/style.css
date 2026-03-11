@@ -6965,7 +6965,9 @@ base-chart.chart {
 
 .app-header .navbar-nav .dropdown-menu-right {
   right: 0;
-  left: auto; }
+  left: auto; 
+  }
+  
 
 .app-header .navbar-nav .dropdown-menu-left {
   right: auto;

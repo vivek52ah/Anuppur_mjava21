@@ -1,5 +1,6 @@
 package com.anuppur.controller;
 
+import java.beans.PropertyEditorSupport;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +49,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +60,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.util.StringUtils;
 
@@ -64,6 +68,8 @@ import com.anuppur.bean.BlockBean;
 import com.anuppur.bean.CCBean;
 import com.anuppur.bean.ChangePasswordBean;
 import com.anuppur.bean.ContractorBean;
+import com.anuppur.bean.DepartmentMasterBean;
+import com.anuppur.bean.DepartmentRemarksBean;
 import com.anuppur.bean.DistrictBean;
 import com.anuppur.bean.DivisionBean;
 import com.anuppur.bean.DmRemarksBean;
@@ -107,6 +113,7 @@ import com.anuppur.bean.WorkTypeBean;
 import com.anuppur.bean.YearStatusBean;
 import com.anuppur.bean.departmentbean;
 import com.anuppur.constants.DMSConstants;
+import com.anuppur.entity.DepartmentMaster;
 import com.anuppur.entity.Users;
 import com.anuppur.entity.Work;
 import com.anuppur.json.BlockJson;
@@ -669,19 +676,14 @@ public class CommonController extends BaseController {
 
 		String scheme = request.getParameter("scheme");
 		String workType = request.getParameter("workType1");
-		System.err.println("workType "  + workType);
 	//	financialYear1
 		String financialYear = request.getParameter("financialYear1");
-		System.err.println("financialYear "  + financialYear);
 		String implementationAgency = request.getParameter("implementationAgency");
-		System.err.println("implementationAgency "  + implementationAgency);
 		String blockId = request.getParameter("blockId");
 		String divisionId = request.getParameter("divisionId");
 		String districtId = request.getParameter("districtId");
 		String workStatus = request.getParameter("workStatus");
-		System.err.println("workStatus "  + workStatus);
 		String workStatusId = request.getParameter("workStatusId");
-		System.err.println("workStatusId "  + workStatusId);
 		String workSubTypeId = request.getParameter("workSubTypeId");
 		String workPriorityId = request.getParameter("workPriorityId");
 		String financialHeadId = request.getParameter("financialHeadId1");
@@ -1343,6 +1345,8 @@ public class CommonController extends BaseController {
 	@ResponseBody
 	public ResponseObject addWorkProSubStatusUploading(DocumentUploadWorkProgressBean uploadWorkProgressBean,
 			HttpServletRequest request) throws Exception {
+		
+		
 
 		user = DMSUtil.getUserDetail();
 		logger.info("User - {}, Role - {} - Adding Work data", user.getUsername(), user.getAuthorities());
@@ -1350,6 +1354,12 @@ public class CommonController extends BaseController {
 
 		try {
 
+			   MultipartFile file = uploadWorkProgressBean.getFile();
+
+		        if (file == null || file.isEmpty()) {
+		            logger.info("No file uploaded");
+		        }
+			
 			String remoteIpAddr = request.getHeader("X-Forwarded-For");
 
 			logger.info("Header...." + remoteIpAddr);
@@ -2750,9 +2760,13 @@ public class CommonController extends BaseController {
 				
 				String contentType = request.getServletContext().getMimeType(file.getName());
 				if (contentType == null) {
-				    contentType = "image/jpeg"; // default
+				  //  contentType = "image/jpeg"; // default
+					contentType = "application/octet-stream"; 
 				}
 				response.setContentType(contentType);
+			    response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+			    response.setContentLengthLong(file.length());
+
 
 				// Read from the file and write into the response
 				byte[] buffer = new byte[1024];
@@ -4645,44 +4659,54 @@ public class CommonController extends BaseController {
 
 	
 	
-	@RequestMapping(value = "manageOngoingWorks/downloadAllWorksExcel", method = RequestMethod.GET)
-	public void exportWorkExcel(@RequestParam("workId") Long workId, HttpServletResponse response) {
-		
-		
-		// 🔥 Excel download controller ke start me
-		 response.setContentType(
-			        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-			    );
-			    response.setHeader(
-			        "Content-Disposition",
-			        "attachment; filename=work_report.xlsx"
-			    );
+	@RequestMapping(
+	        value = "manageOngoingWorks/downloadAllWorksExcel",
+	        method = RequestMethod.POST
+	)
+	public void exportWorkExcel(
+	        @RequestParam("workIds") List<Long> workIds,
+	        HttpServletResponse response) {
 
+		if (workIds == null || workIds.isEmpty()) {
+		    throw new RuntimeException("No valid work IDs received");
+		}
+		for (Long long1 : workIds) {
+		}
 
 		
-			    Workbook workbook = new XSSFWorkbook();
-		
-	    try  {
-	     //   response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-	     //   response.setHeader("Content-Disposition", "attachment; filename=work_Data.xlsx");
+	    response.setContentType(
+	        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	    );
+	    response.setHeader(
+	        "Content-Disposition",
+	        "attachment; filename=work_report.xlsx"
+	    );
 
-	        List<Work> works = workRepository.findById(workId);
+	    Workbook workbook = new XSSFWorkbook();
 
+	    try {
+
+	    	 List<Work> works = (List<Work>) workRepository.findAll(workIds);
+
+	    	 works.sort((a, b) -> b.getId().compareTo(a.getId()));
 	        Sheet sheet = workbook.createSheet("Works");
-	        String[] headers = { "S.No.", "Work Unique Id", "Work Name", "FY of Sanction", "Executive Agency",
-	                "AS Date", "Total AS Amount (In Lakhs)", "Fund 1 Cost (Lakh)", "Fund 2 Cost (Lakh)", "Fund 3 Cost (Lakh)", "Agreement Date", "Completion Date as par Agreement",
-	                "Fund 1 Exp (Lakh)",  "Fund 2 Exp (Lakh)",
-	                 "Fund 3 Exp (Lakh)", "Total Expenditure Till Date", "Physical Status", 
-	                 "Level Of Completion", "Departmental Remarks", "DM Remarks",
-	                  "Last Photo", "Second Last Photo"};
+
+	        String[] headers = {
+	            "S.No.", "Work Unique Id", "Work Name", "FY of Sanction",
+	            "Executive Agency", "AS Date", "Total AS Amount (In Lakhs)",
+	            "Fund 1 Cost (Lakh)", "Fund 2 Cost (Lakh)", "Fund 3 Cost (Lakh)",
+	            "Agreement Date", "Completion Date as per Agreement",
+	            "Fund 1 Exp (Lakh)", "Fund 2 Exp (Lakh)", "Fund 3 Exp (Lakh)",
+	            "Total Expenditure Till Date", "Physical Status",
+	            "Level Of Completion", "Departmental Remarks", "DM Remarks",
+	            "Last Photo", "Second Last Photo"
+	        };
 
 	        Row headerRow = sheet.createRow(0);
 	        for (int i = 0; i < headers.length; i++) {
 	            headerRow.createCell(i).setCellValue(headers[i]);
 	        }
-	        
-	        
-	        
+
 	        CreationHelper helper = workbook.getCreationHelper();
 	        Drawing<?> drawing = sheet.createDrawingPatriarch();
 
@@ -4691,19 +4715,26 @@ public class CommonController extends BaseController {
 
 	        int rowNum = 1;
 	        int index = 1;
-	        for (Work work : works) {
-	        	
 
-	        	
-	            WorkBean bean = commonServiceImpl.convertWorkEntityToBeans1(work, null);
+	        for (Work work : works) {
+
+	            WorkBean bean =
+	                commonServiceImpl.convertWorkEntityToBeans1(work, null);
+
 	            Row row = sheet.createRow(rowNum++);
+
 	            row.createCell(0).setCellValue(index++);
 	            row.createCell(1).setCellValue(nullToDash(bean.getWorkNo()));
 	            row.createCell(2).setCellValue(nullToDash(bean.getWorkName()));
 	            row.createCell(3).setCellValue(nullToDash(bean.getFinancialYearName()));
 	            row.createCell(4).setCellValue(nullToDash(bean.getImplementationAgencyName()));
 	            row.createCell(5).setCellValue(nullToDash(bean.getDateOfAdministrativeApproval()));
-	            row.createCell(6).setCellValue(bean.getAmountOfAdministrativeApproval() != null ? bean.getAmountOfAdministrativeApproval().toString() : "-");
+	            row.createCell(6).setCellValue(
+	                bean.getAmountOfAdministrativeApproval() != null
+	                    ? bean.getAmountOfAdministrativeApproval().toString()
+	                    : "-"
+	            );
+
 	            row.createCell(7).setCellValue(bean.getFund1());
 	            row.createCell(8).setCellValue(bean.getFund2());
 	            row.createCell(9).setCellValue(bean.getFund3());
@@ -4717,68 +4748,50 @@ public class CommonController extends BaseController {
 	            row.createCell(17).setCellValue(nullToDash(bean.getLevelOfCompletion()));
 	            row.createCell(18).setCellValue(nullToDash(bean.getDepartmentRemarks()));
 	            row.createCell(19).setCellValue(nullToDash(bean.getDmRemakrs()));
-	            
-	           
-	           
-	          
-	            
+
 	            // ===== LAST PHOTO =====
 	            if (bean.getLastPhotoDocumentId() != null) {
+	                byte[] imageBytes =
+	                    downloadImageByDocumentId(bean.getLastPhotoDocumentId());
 
-	            	byte[] imageBytes =
-	            		    downloadImageByDocumentId(bean.getLastPhotoDocumentId());
-
-	            		if (imageBytes != null && imageBytes.length > 0) {
-	            		    addImageToCell(
-	            		        workbook,
-	            		        sheet,
-	            		        drawing,
-	            		        helper,
-	            		        imageBytes,
-	            		        row.getRowNum(),
-	            		        20
-	            		    );
-	            		}
+	                if (imageBytes != null && imageBytes.length > 0) {
+	                    addImageToCell(
+	                        workbook, sheet, drawing, helper,
+	                        imageBytes, row.getRowNum(), 20
+	                    );
+	                }
 	            }
 
-
+	            // ===== SECOND LAST PHOTO =====
 	            if (bean.getSecondLastPhotoDocumentId() != null) {
+	                byte[] imageBytes =
+	                    downloadImageByDocumentId(bean.getSecondLastPhotoDocumentId());
 
-	            	byte[] imageBytes =
-	            		    downloadImageByDocumentId(bean.getSecondLastPhotoDocumentId());
-
-	            		if (imageBytes != null && imageBytes.length > 0) {
-	            		    addImageToCell(
-	            		        workbook,
-	            		        sheet,
-	            		        drawing,
-	            		        helper,
-	            		        imageBytes,
-	            		        row.getRowNum(),
-	            		        21
-	            		    );
-	            		}
-	              
+	                if (imageBytes != null && imageBytes.length > 0) {
+	                    addImageToCell(
+	                        workbook, sheet, drawing, helper,
+	                        imageBytes, row.getRowNum(), 21
+	                    );
+	                }
 	            }
 	        }
-	      //  workbook.write(response.getOutputStream());
+
 	        ServletOutputStream out = response.getOutputStream();
 	        workbook.write(out);
 	        out.flush();
-	        
 
-	    } catch (IOException e) {
-	    	logger.error("Error occurred while processing request" + e.getMessage());
+	    } catch (Exception e) {
+	        logger.error("Excel generation error", e);
 	        throw new RuntimeException("Failed to generate Excel file", e);
-	    }finally {
+	    } finally {
 	        try {
 	            workbook.close();
 	        } catch (Exception e) {
 	            // ignore
 	        }
 	    }
-
 	}
+
 
 	
 	
@@ -4940,7 +4953,22 @@ public class CommonController extends BaseController {
 		return value == null ? "-" : value;
 	}
 
-	
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+	    binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
+	        @Override
+	        public void setAsText(String text) {
+	            if (text == null || text.trim().isEmpty()
+	                    || "null".equalsIgnoreCase(text)
+	                    || "undefined".equalsIgnoreCase(text)) {
+	                setValue(null);
+	            } else {
+	                setValue(Long.parseLong(text));
+	            }
+	        }
+	    });
+	}
+
 	
 	@PostMapping( value="saveOrUpdate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	//@ResponseBody
@@ -4962,6 +4990,25 @@ public class CommonController extends BaseController {
 	}
 	
 	
+	@PostMapping( value="saveOrUpdateDepartment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	//@ResponseBody
+	public ResponseObject saveOrUpdateDepartmentRemarks( DepartmentRemarksBean bean) {
+	    ResponseObject response = new ResponseObject();
+
+	    
+	    String result = commonService.addOrUpdateDepartmentRemark(bean);
+
+	    if ("success".equals(result)) {
+	        response.setSuccessMessage("DM Remark saved successfully!");
+	    } else if (result.startsWith("error:")) {
+	        response.setErrorMessage(result.substring(6).trim()); // remove "error:" part
+	    } else {
+	        response.setErrorMessage("Unexpected response: " + result);
+	    }
+
+	    return response;
+	}
+	
 	
 	
 	@GetMapping(value="getDMRemarks/{workid}")
@@ -4970,16 +5017,41 @@ public class CommonController extends BaseController {
 		return commonService.getAllRemarksByWorkID(Long.parseLong(workid));
 	}
 
-	@GetMapping(value = "deleteRemarks/{id}")
-	public Boolean deleteRemarks(@PathVariable("id") String id,HttpServletRequest request) {
-		return commonService.deleteRemarks(Long.parseLong(id));
-
+	@GetMapping(value="getDepartmentRemarks/{workid}")
+	public List<DepartmentRemarksBean> getAllDepartmentRemarks(@PathVariable("workid") String workid,HttpServletRequest request ){
+		
+		return commonService.getAllDepartmentRemarksByWorkID(Long.parseLong(workid));
 	}
 	
 	
+	@GetMapping(value = "deleteRemarks/{id}")
+	public Boolean deleteRemarks(@PathVariable("id") String id,HttpServletRequest request) {
+		return commonService.deleteRemarks(Long.parseLong(id));
+	}
+	
+	@GetMapping(value = "deleteDepartmentRemarks/{id}")
+	public Boolean deleteDepartmentRemarks(@PathVariable("id") String id,HttpServletRequest request) {
+		return commonService.deleteDepartmentRemarks(Long.parseLong(id));
+	}
+	
 	@GetMapping(value="getRemarksDetailsById/{id}")
 	public DmRemarksBean  getRemakrsDetails(@PathVariable("id")String id , HttpServletRequest request) {
+		 // ✅ SAFETY CHECK (NO LOGIC CHANGE)
+	    if (id == null || id.equalsIgnoreCase("undefined") || id.equalsIgnoreCase("null")) {
+	        return null; // or new DepartmentRemarksBean();
+	    }
 		return commonService.getRemakrsDetails(Long.parseLong(id));
+
+	}
+	
+	@GetMapping(value="getDepartmentRemarksDetailsById/{id}")
+	public DepartmentRemarksBean  getDepartmentRemarksDetailsById(@PathVariable("id") String id , HttpServletRequest request) {
+		 // ✅ SAFETY CHECK (NO LOGIC CHANGE)
+	    if (id == null || id.equalsIgnoreCase("undefined") || id.equalsIgnoreCase("null")) {
+	        return null; // or new DepartmentRemarksBean();
+	    }
+		Long londId = Long.parseLong(id);
+		return commonService.getDepartmentRemarksDetailsById(londId);
 
 	}
 	
@@ -5056,7 +5128,6 @@ public class CommonController extends BaseController {
 	        @RequestParam(required = false) String searchBoxVal) {
 
 		
-		System.err.println("userId " + userId);
 	    // ✅ Pagination parameters from DataTable
 	    int start = Integer.parseInt(request.getParameter("start"));   // offset
 	    int length = Integer.parseInt(request.getParameter("length")); // page size
@@ -5110,7 +5181,6 @@ public class CommonController extends BaseController {
 	          @PathVariable Long workId,
 	          HttpServletRequest request) {
 
-	      System.err.println("work id " + workId);
 
 	      int start = Integer.parseInt(request.getParameter("start"));  
 	      int length = Integer.parseInt(request.getParameter("length")); 
@@ -5145,12 +5215,22 @@ public class CommonController extends BaseController {
 	          @RequestBody List<FinancialAgencyBean> list) {
 
 	      for (FinancialAgencyBean bean : list) {
-	    	  
-	          commonService.updateFinancialAgencyCost(bean.getId(), bean.getExpenditure(), bean.getWorkId());
+
+	          String result = commonService.updateFinancialAgencyCost(
+	                  bean.getId(),
+	                  bean.getExpenditure(),
+	                  bean.getWorkId()
+	          );
+
+	          // ❗ Agar koi validation message aaya
+	          if (!"SUCCESS".equalsIgnoreCase(result)) {
+	              return ResponseEntity.ok(result);   // 👈 frontend ko message
+	          }
 	      }
 
-	      return ResponseEntity.ok("success");
+	      return ResponseEntity.ok("SUCCESS");
 	  }
+
 
 	  
 	  @PostMapping("/deleteFinancialAgencyRow")
@@ -5265,4 +5345,11 @@ public class CommonController extends BaseController {
 			}
 			
 			// aman end code
+			
+			
+			@GetMapping(value = "getDepartmentMaster")
+			public List<DepartmentMasterBean> fetchDepartmentMasters() {
+				return commonService.fetchDepartmentMaster();
+				
+			}
 }
