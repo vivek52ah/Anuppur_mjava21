@@ -93,6 +93,11 @@ public class EmailServiceImpl {
 	public void sendEmailmessage(final EmailBean email) throws DMSBusinessException {
 
 		try {
+			// Check if email configuration is available
+			if (host == null || port == null || userName == null || password == null) {
+				throw new DMSBusinessException("Email configuration is not properly configured. Please configure mail.smtp.host, mail.smtp.port, mail.username, and mail.password in application properties.");
+			}
+			
 			// Get the session object
 			
 			

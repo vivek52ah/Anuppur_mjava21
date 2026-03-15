@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -56,6 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -481,7 +483,7 @@ public class CommonServiceImpl implements CommonService {
 	public WorkJson fetchWorksList(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
 			List<Long> fyList, List<Long> agencyList, String blockId, String workStatus, String districtId,
 			String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList,
-			List<Long> priorityList, List<Long> headList, List<Long> vsList) {
+			List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark) {
 
 		
 		
@@ -498,6 +500,16 @@ public class CommonServiceImpl implements CommonService {
 		User user = DMSUtil.getUserDetail();
 
 		Users userEntity = userRepository.findByUsernameAndStatus(user.getUsername(), DMSConstants.STATUS_ACTIVE);
+		
+		// Handle null userEntity
+		if (userEntity == null) {
+			logger.warn("User entity not found for username: {}", user.getUsername());
+			workJson = new WorkJson();
+			workJson.setAaData(new ArrayList<>());
+			workJson.setiTotalRecords(0L);
+			workJson.setiTotalDisplayRecords(0L);
+			return workJson;
+		}
 
 		Collection<GrantedAuthority> role = user.getAuthorities();
 		Long divisionCode = null;
@@ -508,7 +520,11 @@ public class CommonServiceImpl implements CommonService {
 		// logger.info("ROLEEEE....." + r);
 		if (r.contains("ROLE_DEPARTMENT")) {
 			Division division = userEntity.getDivision();
-			divisionCode = 3L;
+			if (division != null) {
+				divisionCode = division.getDivisionId();
+			} else {
+				divisionCode = 3L;
+			}
 			implAgency = userEntity.getImplementationAgency();
 		} else {
 			divisionCode = null;
@@ -517,7 +533,11 @@ public class CommonServiceImpl implements CommonService {
 
 		if (r.contains("ROLE_DISTRICT") || r.contains("ROLE_DEPT_DISTRICT")) {
 			District district = userEntity.getDistrict();
-			districtCode = district.getDistrictCode();
+			if (district != null) {
+				districtCode = district.getDistrictCode();
+			} else {
+				districtCode = "";
+			}
 			// logger.info("districtCodeif....." + districtCode);
 			implAgency = userEntity.getImplementationAgency();
 		} else {
@@ -537,9 +557,17 @@ public class CommonServiceImpl implements CommonService {
 
 			List<String> schemes = new ArrayList<String>();
 
-			String blockName = null;
-			if (blockId != null) {
-				blockName = blockRepository.findOne(Long.valueOf(blockId)).getBlockName();
+			// Convert blockId comma-separated string to List<Long>
+			List<Long> blockIdList = new ArrayList<>();
+			if (blockId != null && !blockId.isEmpty()) {
+				String[] blockIds = blockId.split(",");
+				for (String id : blockIds) {
+					try {
+						blockIdList.add(Long.valueOf(id.trim()));
+					} catch (NumberFormatException e) {
+						// Skip invalid IDs
+					}
+				}
 			}
 
 			Long divisionIds = null;
@@ -565,6 +593,7 @@ public class CommonServiceImpl implements CommonService {
 			priorityList = (priorityList == null || priorityList.isEmpty()) ? null : priorityList;
 			headList     = (headList == null || headList.isEmpty()) ? null : headList;
 			vsList       = (vsList == null || vsList.isEmpty()) ? null : vsList;
+			blockIdList  = (blockIdList == null || blockIdList.isEmpty()) ? null : blockIdList;
 
 			
 			
@@ -573,15 +602,18 @@ public class CommonServiceImpl implements CommonService {
 				 * works = workRepository.fetchAllWorksByDivision(pageable, workName,
 				 * workTypeId, financialYear, districtIds, workStatusId, agency);
 				 */
+				// For ROLE_DEPARTMENT, pass divisionCode to filter works by division
+				// Parameter order: pageable, workNo, workTypeList, fyList, districtIds, statusList, agencyList, username, priorityList, headList, vsList, divisionId, departmentRemark, blockIdList, workNameFilter
 				works = workRepositoryCustomImpl.fetchAllWorksByDivision(pageable, workNo, workTypeList, fyList,
-						districtIds, statusList, agencyList, userEntity.getUsername(), priorityList, headList,
-						vsList);
+						districtIds, statusList, agencyList, null, priorityList, headList,
+						vsList, divisionCode, departmentRemark, blockIdList, workNameFilter);
 
 			}
 
 			else if (r.contains("ROLE_DISTRICT")) {
+				// Parameter order: pageable, workNo, workTypeList, fyList, districtCode, agencyList, divisionIds, districtIds, workSubTypeIdInt, statusList, priorityList, headList, vsList, departmentRemark, blockIdList, workNameFilter
 				works = workRepositoryCustomImpl.fetchAllWorksByDistrict(pageable, workNo, workTypeList, fyList,
-						districtCode, agencyList, divisionIds, districtIds, workSubTypeIdInt, statusList, priorityList, headList, vsList);
+						districtCode, agencyList, divisionIds, districtIds, workSubTypeIdInt, statusList, priorityList, headList, vsList, departmentRemark, blockIdList, workNameFilter);
 			}
 
 //			else if (r.contains("ROLE_SAU")) {
@@ -600,12 +632,14 @@ public class CommonServiceImpl implements CommonService {
 				// works = workRepository.fetchAllWorksByAgency(pageable, workName, workType,
 				// financialYear, agency, divisionName, districtName, workSubTypeIdInt,
 				// workStatusName);
+				// Parameter order: pageable, workNo, workTypeId, financialYear, districtId, workStatusId, agency, workPriority, financialHead, vidhanSabha, workNameFilter, blockId, departmentRemark
 				works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
-						divisionIds, statusList, agencyList, priorityList, headList, headList);
+						null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark);
 				
 			} else {
+				// Parameter order: pageable, workNo, workTypeId, financialYear, districtId, workStatusId, agency, workPriority, financialHead, vidhanSabha, workNameFilter, blockId, departmentRemark
 				works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
-						districtIds, statusList, agencyList, priorityList, headList, vsList);
+						null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark);
 			}
 
 			// added by sumit
@@ -618,6 +652,7 @@ public class CommonServiceImpl implements CommonService {
 
 					int index = pageable.getPageNumber() * pageable.getPageSize();
 					for (Work work : entityList) {
+						
 						// WorkBean bean = convertWorkEntityToBean(work, "All");
 						WorkBean bean = convertWorkEntityToBeans1(work, "All");
 						if (work.getUserAssignee() != null) {
@@ -1478,14 +1513,14 @@ public class CommonServiceImpl implements CommonService {
 							da.setYear(expensesData.getYear());
 
 							bean.setTotalExpensess(bean.getExpensessUptoMarch()
-									.add(expensesDataRepository.findByWorkId(workTypeId).get(0).getTotalExpensess()));
+									.subtract(expensesDataRepository.findByWorkId(workTypeId).get(0).getTotalExpensess()));
 
 							// bean.setTotalExpensess(bean.getExpensessCurrentFy().add(totalprev));//.add(expensesDataRepository.findByWorkId(workTypeId).get(0).getExpensessCurrentFy()));
 							totalprev = bean.getTotalExpensess();
 
 						} else {
 							bean.setTotalExpensess(
-									expensesData.getTotalExpensess().add(expensesData.getExpensessCurrentFy()));
+									expensesData.getTotalExpensess().subtract(expensesData.getExpensessCurrentFy()));
 							totalprev = expensesData.getTotalExpensess();
 						}
 
@@ -1815,6 +1850,15 @@ public class CommonServiceImpl implements CommonService {
 				bean.setFinancialHeadId(entity.getFinancialHeadId());
 				bean.setCost(entity.getCost());
 				bean.setTotalCost(entity.getTotalCost());
+				
+				// Fetch and set the financial head name
+				if (entity.getFinancialHeadId() != null) {
+					FinancialHead financialHead = financialHeadRepository.findOne(entity.getFinancialHeadId());
+					if (financialHead != null) {
+						bean.setFinancialAgencyName(financialHead.getFinancialHeadName());
+					}
+				}
+				
 				beanList.add(bean);
 			}
 			workBean.setFinancialHeads(beanList);
@@ -7602,6 +7646,30 @@ public class CommonServiceImpl implements CommonService {
 			    workBean.setDepartmentRemarks(results);
 			}
 
+			// Set Financial Heads
+			List<WorkFinancialAgency> workFinancialAgency = financialAgencyRepository.findByWorkId(work.getId());
+			if(workFinancialAgency != null && !workFinancialAgency.isEmpty()) {
+				List<FinancialAgencyBean> beanList = new ArrayList<FinancialAgencyBean>();
+				for (WorkFinancialAgency entity : workFinancialAgency) {
+					FinancialAgencyBean bean = new FinancialAgencyBean();
+					bean.setId(entity.getId());
+					bean.setFinancialHeadId(entity.getFinancialHeadId());
+					bean.setCost(entity.getCost());
+					bean.setTotalCost(entity.getTotalCost());
+					
+					// Fetch and set the financial head name
+					if (entity.getFinancialHeadId() != null) {
+						FinancialHead financialHead = financialHeadRepository.findOne(entity.getFinancialHeadId());
+						if (financialHead != null) {
+							bean.setFinancialAgencyName(financialHead.getFinancialHeadName());
+						}
+					}
+					
+					beanList.add(bean);
+				}
+				workBean.setFinancialHeads(beanList);
+			}
+
 		return workBean;
 
 	}
@@ -7940,7 +8008,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public WorkJson fetchWorkForReport(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
 			List<Long> fyList, String Department, List<Long> agencyList, String blockId, String workStatus,
-			String districtName, String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList) {
+			String districtName, String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark) {
 		
 		
 		Integer workSubTypeIdInt = null;
@@ -7980,6 +8048,19 @@ public class CommonServiceImpl implements CommonService {
 //			divisionName = divisionRepository.findOne(Long.valueOf(divisionId)).getDivisionName();
 		}
 
+		// Convert blockIdFilter comma-separated string to List<Long>
+		List<Long> blockIdList = new ArrayList<>();
+		if (blockId != null && !blockId.isEmpty()) {
+			String[] blockIds = blockId.split(",");
+			for (String id : blockIds) {
+				try {
+					blockIdList.add(Long.valueOf(id.trim()));
+				} catch (NumberFormatException e) {
+					// Skip invalid IDs
+				}
+			}
+		}
+
 		// Sumit
 		workTypeList = (workTypeList == null || workTypeList.isEmpty()) ? null : workTypeList;
 		fyList       = (fyList == null || fyList.isEmpty()) ? null : fyList;
@@ -7988,6 +8069,7 @@ public class CommonServiceImpl implements CommonService {
 		priorityList = (priorityList == null || priorityList.isEmpty()) ? null : priorityList;
 		headList     = (headList == null || headList.isEmpty()) ? null : headList;
 		vsList       = (vsList == null || vsList.isEmpty()) ? null : vsList;
+		blockIdList  = (blockIdList == null || blockIdList.isEmpty()) ? null : blockIdList;
 
 		try {
 			Page<Work> works = null;
@@ -8053,7 +8135,7 @@ public class CommonServiceImpl implements CommonService {
 //			else {
 
 			works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workName, workTypeList, fyList,
-					districtIds, statusList, agencyList, priorityList, headList, vsList);
+					districtIds, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark);
 
 //			}
 
@@ -9725,6 +9807,35 @@ public class CommonServiceImpl implements CommonService {
 			return null;
 		}
 	}
+
+	@Override
+	public List<DmRemarksBean> fetchDmRemarksList() {
+		try {
+			List<DmRemarks> list = dmRemarksRepository.findByEnabled((short) 1);
+			
+			List<DmRemarksBean> beanList = new ArrayList<>();
+			Set<String> uniqueRemarks = new LinkedHashSet<>();
+			
+			for (DmRemarks dmRemark : list) {
+				if (dmRemark.getDepartmentRemarks() != null && !dmRemark.getDepartmentRemarks().isEmpty()) {
+					uniqueRemarks.add(dmRemark.getDepartmentRemarks());
+				}
+			}
+			
+			int id = 1;
+			for (String remark : uniqueRemarks) {
+				DmRemarksBean bean = new DmRemarksBean();
+				bean.setId((long) id);
+				bean.setDepartmentRemarks(remark);
+				beanList.add(bean);
+				id++;
+			}
+			return beanList;
+		} catch (Exception e) {
+			logger.error("An exception occurred while fetching DM remarks.", e);
+			return new ArrayList<>();
+		}
+	}
 	
 	
 	
@@ -10096,6 +10207,67 @@ public class CommonServiceImpl implements CommonService {
 			}
 	//	System.err.println("Service------- " + departmentMasterBeans.size());
 		return departmentMasterBeans;
+	}
+
+	@Override
+	public List<DepartmentRemarksBean> fetchDepartmentRemarksList() {
+		List<DepartmentRemarks> departmentRemarksList = departmentRemarksRepository.findAll();
+		List<DepartmentRemarksBean> departmentRemarksBeans = new ArrayList<DepartmentRemarksBean>();
+		
+		for (DepartmentRemarks remark : departmentRemarksList) {
+			DepartmentRemarksBean bean = new DepartmentRemarksBean();
+			bean.setId(remark.getId());
+			bean.setDepartmentRemarkName(remark.getDepartmentRemarkName());
+			bean.setDepertmentMasterId(remark.getDepertmentMasterId());
+			bean.setWorkId(remark.getWorkId());
+			bean.setEnabled(remark.getEnabled());
+			departmentRemarksBeans.add(bean);
+		}
+		return departmentRemarksBeans;
+	}
+
+	@Override
+	public List<String> getWorkNameSuggestions(String keyword) {
+		try {
+			if (keyword == null || keyword.trim().isEmpty()) {
+				return new ArrayList<>();
+			}
+			Pageable pageable = new PageRequest(0, 100);
+			Page<Work> works = workRepository.findByWorkNameContainingIgnoreCase(pageable, keyword);
+			return works.getContent().stream()
+					.map(Work::getWorkName)
+					.distinct()
+					.collect(Collectors.toList());
+		} catch (Exception e) {
+			logger.error("Error fetching work name suggestions", e);
+			return new ArrayList<>();
+		}
+	}
+
+	@Override
+	public List<BlockBean> getBlocksByDistrict(Long districtId) {
+		try {
+			if (districtId == null) {
+				return new ArrayList<>();
+			}
+			District district = districtRepository.findOne(districtId);
+			if (district == null) {
+				return new ArrayList<>();
+			}
+			List<Block> blocks = blockRepository.findByDistrictAndEnabledOrderByBlockName(district, (short) 1);
+			List<BlockBean> blockBeans = new ArrayList<>();
+			for (Block block : blocks) {
+				BlockBean bean = new BlockBean();
+				bean.setBlockId(block.getBlockId());
+				bean.setBlockName(block.getBlockName());
+				bean.setBlockCode(block.getBlockCode());
+				blockBeans.add(bean);
+			}
+			return blockBeans;
+		} catch (Exception e) {
+			logger.error("Error fetching blocks by district", e);
+			return new ArrayList<>();
+		}
 	}
 
 }

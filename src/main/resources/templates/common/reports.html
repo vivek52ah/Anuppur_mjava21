@@ -441,9 +441,9 @@ table.dataTable {
 		actionsBox : true,
 		noneSelectedText: '--Select Executive Agency--'
 	});
-	$('#workPriorityId').selectpicker({
+	$('#departmentRemark').selectpicker({
 		actionsBox : true,
-		noneSelectedText: '--Select Work Priority--'
+		noneSelectedText: '--Select Department Remarks--'
 	});
 	$('#financialHeadId1').selectpicker({
 		actionsBox : true,
@@ -453,6 +453,11 @@ table.dataTable {
 		actionsBox : true,
 		noneSelectedText: '--Select Vidhan Sabha--'
 	});
+	$('#blockId').selectpicker({
+		actionsBox : true,
+		liveSearch: true,
+		noneSelectedText: '--Select Block--'
+	});
 	
 	
 </script>
@@ -461,7 +466,7 @@ table.dataTable {
 
 .dropdown-menu.show{width:100%!important}
 .dropdown-menu.show {
-    top: -35px !important;position:relative!important;
+    top: -35px !important;
 }
 #fyId {
     position: relative!important;
@@ -563,7 +568,7 @@ ul.dropdown-menu.inner.show li {
 
 	<div class="container-fluid">
 		<div class="animated fadeIn">
-			<div class="row" data-ng-init="loadWorkForReport();">
+			<div class="row">
 				<div class="col-md-12">
 					<div class="card">
 						<div class="card-header">
@@ -586,9 +591,9 @@ ul.dropdown-menu.inner.show li {
 												<input type="text" class="form-control" placeholder="--Work Unique ID--" id="searchBoxVal" name="searchBoxVal" ng-model="workNo"
 													ng-change="loadWorkNoSuggestions(workNo)" />
 											
-												<ul class="list-group" ng-show="suggestedWorkNames.length > 0">
-													<li class="list-group-item" ng-repeat="name in suggestedWorkNames" ng-click="selectWorkName(name)">
-														{{name}}
+												<ul class="list-group" ng-show="suggestedWorkNos.length > 0">
+													<li class="list-group-item" ng-repeat="no in suggestedWorkNos" ng-click="selectWorkNo(no)">
+														{{no}}
 													</li>
 												</ul>
 											</div>
@@ -621,7 +626,7 @@ ul.dropdown-menu.inner.show li {
 													data-ng-init="loadDivisionsWork();" name="divisionId" disabled="disabled">
 													<option value="" disabled="disabled">--Select
 														Division--</option>
-													<option value="3">Rewa</option>
+													<option value="3">Shahdol</option>
 												</select>
 											</div>
 							
@@ -682,15 +687,15 @@ ul.dropdown-menu.inner.show li {
 											</div>
 							
 							
-											<div id="wpId" class="form-group col-sm-4" data-ng-init="loadWorkPriority(); ">
+											<div id="drId" class="form-group col-sm-4" data-ng-init="loadDepartmentMasters(); ">
 												
-												<select multiple="multiple" class="form-control" id="workPriorityId" data-ng-model="workData.workPriorityId"
-													name="workPriorityId" data-live-search="true">
-													<option value="" disabled="disabled">--Select Work Priority--
+												<select multiple="multiple" class="form-control" id="departmentRemark" data-ng-model="workData.departmentRemark"
+													name="departmentRemark" data-live-search="true">
+													<option value="" disabled="disabled">--Select DM Remarks--
 													</option>
-													<option data-ng-repeat="priority in priorityies | filter:priorityText" value="{{priority.id}}"
-													data-ng-class="{'selected-option': isSelected(priority.id)}">
-														{{priority.workPriorityName}}</option>
+													<option data-ng-repeat="dept in departmentMasters | filter:departmentText" value="{{dept.id}}"
+													data-ng-class="{'selected-option': isSelected(dept.id)}">
+														{{dept.name}}</option>
 												</select>
 											</div>
 							
@@ -719,6 +724,33 @@ ul.dropdown-menu.inner.show li {
 												</select>
 											</div>
 							
+										<!-- Work Name Filter -->
+										<div class="form-group col-sm-4" style="position: relative;">
+											<input type="text" class="form-control"
+												placeholder="--Search Work Name--" id="workNameFilter"
+												name="workNameFilter" ng-model="workNameSearch"
+												data-ng-change="loadWorkNameSuggestions(workNameSearch)" />
+
+											<ul class="list-group" ng-show="suggestedWorkNames.length > 0"
+												style="position: absolute; z-index: 1000; width: 100%; max-height: 200px; overflow-y: auto;">
+												<li class="list-group-item"
+													ng-repeat="name in suggestedWorkNames"
+													ng-click="selectWorkName(name)">{{name}}</li>
+											</ul>
+										</div>
+
+										<!-- Block Filter -->
+										<div id="blId" class="form-group col-sm-4" data-ng-init="loadBlocksByDistrict();">
+											<select multiple="multiple" class="form-control selectpicker" id="blockId" data-ng-model="workData.blockId"
+											name="blockId" data-live-search="true">
+											<option value="" disabled="disabled">--Select Block--</option>
+											<option data-ng-repeat="block in blocks | orderBy : 'blockName'"
+												value="{{block.blockId}}"
+												data-ng-class="{'selected-option': isSelected(block.blockId)}">
+												{{block.blockName}}</option>
+										</select>
+										</div>
+										
 										</div>
 									</fieldset>
 								</form>
@@ -753,9 +785,9 @@ ul.dropdown-menu.inner.show li {
 	 <label><input type="checkbox" class="col-toggle" data-column="6" checked="checked" /> FY of Sanction</label>
 	 <label><input type="checkbox" class="col-toggle" data-column="7" checked="checked" /> Executive Agency</label>
 	 <label><input type="checkbox" class="col-toggle" data-column="8" checked="checked" /> Financing Agency</label>
-	 <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Year of Administrative Sanction</label>
-    <label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> A.S. Date. </label>
-    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> Total A.S. Amount </label>
+	 <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Total A.S. Amount </label>
+	 <label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> Year of Administrative Sanction</label>
+    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> A.S. Date. </label>
     <label><input type="checkbox" class="col-toggle" data-column="12" checked="checked" /> Agreement Date </label>
      <label><input type="checkbox" class="col-toggle" data-column="13" checked="checked" /> Agreement No </label>
     <label><input type="checkbox" class="col-toggle" data-column="14" checked="checked" /> Work Order</label>
@@ -863,6 +895,8 @@ ul.dropdown-menu.inner.show li {
                 	
                 	d.searchBoxVal = $('#searchBoxVal').val().trim();
 
+                	d.workNameFilter = $('#workNameFilter').val().trim();
+                	d.blockId = getMultiSelectValue('#blockId').join(",");
                 	d.workType1 = getMultiSelectValue('#workType1').join(",");
                 	d.financialYear1 = getMultiSelectValue('#financialYear1').join(",");
                 	d.divisionId = getMultiSelectValue('#divisionId').join(",");
@@ -871,7 +905,7 @@ ul.dropdown-menu.inner.show li {
                 	d.workSubTypeId = getMultiSelectValue('#workSubTypeId').join(",");
                 	d.department = getMultiSelectValue('#department').join(",");
                 	d.implementationAgency = getMultiSelectValue('#implementationAgency').join(",");
-                	d.workPriorityId = getMultiSelectValue('#workPriorityId').join(",");
+                	d.departmentRemark = getMultiSelectValue('#departmentRemark').join(",");
                 	d.financialHeadId1 = getMultiSelectValue('#financialHeadId1').join(",");
                 	d.vidhanSabhaId1 = getMultiSelectValue('#vidhanSabhaId1').join(",");
 
@@ -886,7 +920,7 @@ ul.dropdown-menu.inner.show li {
                 	        department: d.department,
                 	        workStatusId: d.workStatusId,
                 	        implementationAgency: d.implementationAgency,
-                	        workPriorityId: d.workPriorityId,
+                	        departmentRemark: d.departmentRemark,
                 	        financialHeadId1: d.financialHeadId1,
                 	        vidhanSabhaId1: d.vidhanSabhaId1
                 	    });
@@ -931,9 +965,9 @@ ul.dropdown-menu.inner.show li {
 				
 				{data: "implementationAgencyName", title: "Executive Agency", defaultContent: "-"},
 				{data: "financialHeadName", title: "Financing Agency", defaultContent: "-"},
+				{data: "amountOfAdministrativeApproval", title: "Total A.S. Amount ", defaultContent: "-"},
 				{data: "yearOfAdministrativeApproval", title: "Year of Administrative Sanction", defaultContent: "-"},
 				{data: "dateOfAdministrativeApproval", title: "A.S. Date", defaultContent: "-"},
-				{data: "amountOfAdministrativeApproval", title: "Total A.S. Amount ", defaultContent: "-"},
 				{data: "agreementDate", title: "Agreement Date", defaultContent: "-"},
 				{data: "agreementNo", title: "Agreement No", defaultContent: "-"},
 				{data: "workOrderDate", title: "Work Order", defaultContent: "-"},
@@ -1124,6 +1158,26 @@ ul.dropdown-menu.inner.show li {
     
     window.reloadJqueryDatatables = function () {
     	
+    	// Save current filter values to localStorage
+    	const scope = angular.element(document.getElementById('searchForm')).scope();
+    	if (scope) {
+    		const filters = {
+    			searchBoxVal: $('#searchBoxVal').val() || '',
+    			workNameFilter: $('#workNameFilter').val() || '',
+    			blockId: $('#blockId').val() || [],
+    			financialYear1: scope.workData.financialYear1 || [],
+    			workType1: scope.workData.workType1 || [],
+    			workStatusId: scope.workData.workStatusId || [],
+    			workSubTypeId: scope.workData.workSubTypeId || [],
+    			implementationAgency: scope.workData.implementationAgency || [],
+    			departmentRemark: scope.workData.departmentRemark || [],
+    			financialHeadId1: scope.workData.financialHeadId1 || [],
+    			vidhanSabhaId1: scope.workData.vidhanSabhaId1 || '',
+    			department: scope.workData.department || []
+    		};
+    		localStorage.setItem('work_filters', JSON.stringify(filters));
+    	}
+    	
     //	alert("call")
         if (table) {
             setTimeout(function () {
@@ -1180,15 +1234,18 @@ ul.dropdown-menu.inner.show li {
 
 							        // Reset MODEL values
 							        scope.searchBoxVal = "";
+							        scope.workNameSearch = "";
 							        scope.workData.financialYear1 = [];
 							        scope.workData.workType1 = [];
 							        scope.workData.workStatusId = [];
 							        scope.workData.workSubTypeId = [];
 							        scope.workData.department = [];
 							        scope.workData.implementationAgency = [];
-							        scope.workData.workPriorityId = "";
+							        scope.workData.departmentRemark = [];
 							        scope.workData.financialHeadId1 = [];
 							        scope.workData.vidhanSabhaId1 = "";
+							        scope.workData.blockId = [];
+							        scope.suggestedWorkNames = [];
 
 							        // ❌ Do NOT reset division/district
 							        // scope.workData.divisionId = scope.workData.divisionId;
@@ -1197,6 +1254,7 @@ ul.dropdown-menu.inner.show li {
 
 							    // Reset DOM inputs
 							    $('#searchBoxVal').val("");
+							    $('#workNameFilter').val("");
 
 							    $('#financialYear1').val([]).trigger('change');
 							    $('#workType1').val([]).trigger('change');
@@ -1205,9 +1263,16 @@ ul.dropdown-menu.inner.show li {
 							    $('#financialHeadId1').val([]).trigger('change');
 							    $('#department').val([]).trigger('change');
 							    $('#implementationAgency').val([]).trigger('change');
+							    $('#blockId').val([]).trigger('change');
 
-							    $('#workPriorityId').val("").trigger('change');
+							    $('#departmentRemark').val([]).trigger('change');
 							    $('#vidhanSabhaId1').val("").trigger('change');
+
+							    // Reset selectpicker for blockId
+							    if ($('#blockId').data('selectpicker')) {
+							        $('#blockId').selectpicker('deselectAll');
+							        $('#blockId').selectpicker('refresh');
+							    }
 
 							    // ❌ Do NOT reset division/district DOM also
 							    // $('#divisionId').val(scope.workData.divisionId);
@@ -1252,7 +1317,7 @@ $('.col-toggle').on('change', function () {
 
 $(document).ready(function () {
 
-	const defaultSelect = [0, 3, 4, 7, 10, 11, 12, 14, 16, 17, 18, 24];
+	const defaultSelect = [0, 3, 4, 7, 9, 10, 11, 12, 14, 16, 17, 18, 24];
     const $checkboxes = $(".col-toggle");
     const $dropdown = $("#add-column-list");
     const $toggleBtn = $("#toggleAllColumns");

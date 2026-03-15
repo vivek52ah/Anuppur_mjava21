@@ -23,7 +23,7 @@ public interface DmRemarksRepository extends JpaRepository<DmRemarks, Long>{
 
 	List<DmRemarks> findByWorkId(Long valueOf);
 
-	
+	List<DmRemarks> findByEnabled(Short enabled);
 
 	
 }

@@ -463,9 +463,9 @@
 		actionsBox : true,
 		noneSelectedText: '--Select Executive Agency--'
 	});
-	$('#workPriorityId').selectpicker({
+	$('#departmentRemark').selectpicker({
 		actionsBox : true,
-		noneSelectedText: '--Select Work Priority--'
+		noneSelectedText: '--Select Department Remarks--'
 	});
 	$('#financialHeadId1').selectpicker({
 		actionsBox : true,
@@ -474,6 +474,11 @@
 	$('#vidhanSabhaId1').selectpicker({
 		actionsBox : true,
 		noneSelectedText: '--Select Vidhan Sabha--'
+	});
+	$('#blockId').selectpicker({
+		actionsBox : true,
+		liveSearch: true,
+		noneSelectedText: '--Select Block--'
 	});
 	
 	
@@ -675,7 +680,7 @@ ul.dropdown-menu.inner.show li {
 													data-ng-init="loadDivisionsWork();" name="divisionId" disabled="disabled">
 													<option value="" disabled="disabled">--Select
 														Division--</option>
-													<option value="3">Rewa</option>
+													<option value="3">Shahdol</option>
 												</select>
 											</div>
 							
@@ -736,17 +741,16 @@ ul.dropdown-menu.inner.show li {
 											</div>
 							
 							
-											<div id="wpId" class="form-group col-sm-4" data-ng-init="loadWorkPriority(); ">
-												
-												<select multiple="multiple" class="form-control" id="workPriorityId" data-ng-model="workData.workPriorityId"
-													name="workPriorityId" data-live-search="true">
-													<option value="" disabled="disabled">--Select Work Priority--
-													</option>
-													<option data-ng-repeat="priority in priorityies | filter:priorityText" value="{{priority.id}}"
-													data-ng-class="{'selected-option': isSelected(priority.id)}">
-														{{priority.workPriorityName}}</option>
-												</select>
-											</div>
+										<div id="drId" class="form-group col-sm-4" data-ng-init="loadDepartmentMasters(); ">
+											
+											<select multiple="multiple" class="form-control" id="departmentRemark" data-ng-model="workData.departmentRemark"
+												name="departmentRemark" data-live-search="true">
+												<option value="" disabled="disabled">--Select DM Remarks--
+												</option>
+												<option data-ng-repeat="dept in departmentMasters | filter:departmentText" value="{{dept.id}}"
+													data-ng-class="{'selected-option': isSelected(dept.id)}">{{dept.name}}</option>
+											</select>
+										</div>
 							
 							
 											<div id="fyhId" class="form-group col-sm-4" data-ng-init="loadFinancialHead();">
@@ -773,6 +777,33 @@ ul.dropdown-menu.inner.show li {
 												</select>
 											</div>
 							
+										<!-- Work Name Filter -->
+										<div class="form-group col-sm-4" style="position: relative;">
+											<input type="text" class="form-control"
+												placeholder="--Search Work Name--" id="workNameFilter"
+												name="workNameFilter" ng-model="workNameSearch"
+												data-ng-change="loadWorkNameSuggestions(workNameSearch)" />
+
+											<ul class="list-group" ng-show="suggestedWorkNames.length > 0"
+												style="position: absolute; z-index: 1000; width: 100%; max-height: 200px; overflow-y: auto;">
+												<li class="list-group-item"
+													ng-repeat="name in suggestedWorkNames"
+													ng-click="selectWorkName(name)">{{name}}</li>
+											</ul>
+										</div>
+
+										<!-- Block Filter -->
+										<div id="blId" class="form-group col-sm-4" data-ng-init="loadBlocksByDistrict();">
+											<select multiple="multiple" class="form-control selectpicker" id="blockId" data-ng-model="workData.blockId"
+											name="blockId" data-live-search="true">
+											<option value="" disabled="disabled">--Select Block--</option>
+											<option data-ng-repeat="block in blocks | orderBy : 'blockName'"
+												value="{{block.blockId}}"
+												data-ng-class="{'selected-option': isSelected(block.blockId)}">
+												{{block.blockName}}</option>
+										</select>
+										</div>
+										
 										</div>
 									</fieldset>
 								</form>
@@ -818,8 +849,9 @@ ul.dropdown-menu.inner.show li {
 	 <label><input type="checkbox" class="col-toggle" data-column="8" checked="checked" /> Executive Agency</label>
 	 <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Financing Agency</label>
 	<!-- <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Year of Administrative Sanction</label>-->
-    <label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> A.S. Date. </label>
-    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> Total A.S. Amount </label>
+	<label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> Total A.S. Amount </label>
+    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> A.S. Date. </label>
+    
     <label><input type="checkbox" class="col-toggle" data-column="12" checked="checked" /> Agreement No </label>
     <label><input type="checkbox" class="col-toggle" data-column="13" checked="checked" /> Agreement Date </label>
    
@@ -958,6 +990,8 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 
 									const FILTER_KEYS = [
 										'searchBoxVal',
+										'workNameFilter',
+										'blockId',
 										'financialYear1',
 										'department',
 										'workType1',
@@ -1016,45 +1050,39 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 											type: 'GET',
 											data: function (d) {
 
+												function getMultiSelectValue(id) {
+													let v = $(id).val();
+													if (!v) return [];        // null → empty array
+													if (Array.isArray(v)) return v;   // already array
+													return [v];               // string → convert to array
+												}
 
-
-												const f = JSON.parse(localStorage.getItem('work_filters') || '{}');
-												d.searchBoxVal = f.searchBoxVal || '';
-												d.financialYear1 = (f.financialYear1 || []).join(",");
-										        d.department = (f.department || []).join(",");
-										        d.workType1 = (f.workType1 || []).join(",");
-										        d.workStatusId = (f.workStatusId || []).join(",");
-										        d.implementationAgency = (f.implementationAgency || []).join(",");
-										        d.workPriorityId = (f.workPriorityId || []).join(",");
-										        d.financialHeadId1 = (f.financialHeadId1 || []).join(",");
-										        d.vidhanSabhaId1 = (f.vidhanSabhaId1 || []).join(",");
-												
-												
-												
-												/* d.financialYear = f.financialYear || '';
-												d.department = f.department || '';
-												d.workType = f.workType || '';
-												d.workStatusId = f.workStatusId || '';
-												d.implementationAgency = f.implementationAgency || '';
-												d.workPriorityId = f.workPriorityId || '';
-												d.financialHeadId = f.financialHeadId || '';
-												d.vidhanSabhaId = f.vidhanSabhaId || ''; */
-
-
+												d.searchBoxVal = $('#searchBoxVal').val().trim();
+												d.workNameFilter = $('#workNameFilter').val().trim();
+												d.blockId = getMultiSelectValue('#blockId').join(",");
+												d.financialYear1 = getMultiSelectValue('#financialYear1').join(",");
+										        d.department = getMultiSelectValue('#department').join(",");
+										        d.workType1 = getMultiSelectValue('#workType1').join(",");
+										        d.workStatusId = getMultiSelectValue('#workStatusId').join(",");
+										        d.implementationAgency = getMultiSelectValue('#implementationAgency').join(",");
+										        d.departmentRemark = getMultiSelectValue('#departmentRemark').join(",");
+										        d.financialHeadId1 = getMultiSelectValue('#financialHeadId1').join(",");
+										        d.vidhanSabhaId1 = getMultiSelectValue('#vidhanSabhaId1').join(",");
 
 												console.log("Sending filters to backend: ", {
 													searchBoxVal: d.searchBoxVal,
+													workNameFilter: d.workNameFilter,
+													blockId: d.blockId,
 													financialYear1: d.financialYear1,
 													department: d.department,
 													workType1: d.workType1,
 													workStatusId: d.workStatusId,
 													implementationAgency: d.implementationAgency,
-													workPriorityId: d.workPriorityId,
+													departmentRemark: d.departmentRemark,
 													financialHeadId1: d.financialHeadId1,
 													vidhanSabhaId1: d.vidhanSabhaId1
 													
 												});
-
 
 												d.iDisplayLength = d.length; // ✅ Already sent by DataTables
 												d.iDisplayStart = d.start;   // ✅ Already sent
@@ -1118,8 +1146,14 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 											    defaultContent: "-",
 											    render: function (data, type, row) {
 
-											        if (!data) return "-";
+											        if (!row.financialHeads || row.financialHeads.length === 0) return "-";
 
+											        // If only 1 financing agency, show the name directly
+											        if (row.financialHeads.length === 1) {
+											            return row.financialHeads[0].financialAgencyName || "-";
+											        }
+
+											        // If multiple financing agencies, show View link
 											        return `
 											            <a href="javascript:void(0)"
 											               style="color:#0056b3; font-weight:600; text-decoration:underline;"
@@ -1131,8 +1165,8 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 											},
 
 										//	{data: "yearOfAdministrativeApproval", title: "Year of Administrative Sanction", defaultContent: "-"},
-											{data: "dateOfAdministrativeApproval", title: "A.S. Date", defaultContent: "-"},
 											{data: "amountOfAdministrativeApproval", title: "Total A.S. Amount ", defaultContent: "-"},
+											{data: "dateOfAdministrativeApproval", title: "A.S. Date", defaultContent: "-"},
 											{data: "agreementNo", title: "Agreement No", defaultContent: "-"},
 											{data: "agreementDate", title: "Agreement Date", defaultContent: "-"},
 										//	{data: "workOrderDate", title: "Work Order", defaultContent: "-"},
@@ -1566,6 +1600,7 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 
 							    // Clear normal inputs
 							    $('#searchBoxVal').val('');
+							    $('#workNameFilter').val('');
 
 							    // MULTI SELECTS – CLEAR PROPERLY
 							    $('#financialYear1').val([]).trigger('change');
@@ -1573,9 +1608,10 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 							    $('#workStatusId').val([]).trigger('change');
 							    $('#implementationAgency').val([]).trigger('change');
 							    $('#financialHeadId1').val([]).trigger('change');
+							    $('#blockId').val([]).trigger('change');
 
 							    // SINGLE SELECTS
-							    $('#workPriorityId').val([]).trigger('change');
+							    $('#departmentRemark').val([]).trigger('change');
 							    $('#vidhanSabhaId1').val([]).trigger('change');
 							   // $('#vidhanSabhaId').val('');
 
@@ -1585,12 +1621,19 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 							        $('.multiselect').multiselect('updateButtonText');
 							    }
 
+							    // Reset selectpicker for blockId
+							    if ($('#blockId').data('selectpicker')) {
+							        $('#blockId').selectpicker('deselectAll');
+							        $('#blockId').selectpicker('refresh');
+							    }
+
 							    // Reset AngularJS model
 							    const scope = angular.element($('#searchForm')).scope();
 							    if (scope) {
 							        scope.$applyAsync(function () {
 
 							            scope.workName = '';
+							            scope.workNameSearch = '';
 
 							            // MULTI-SELECT MODELS MUST BE ARRAY
 							            scope.workData.financialYear1 = [];
@@ -1598,8 +1641,10 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 							            scope.workData.workStatusId = [];
 							            scope.workData.implementationAgency = [];
 							            scope.workData.financialHeadId1 = [];
-							            scope.workData.workPriorityId = [];
-							            	scope.workData.vidhanSabhaId1 = [];
+							            scope.workData.departmentRemark = [];
+							            scope.workData.vidhanSabhaId1 = [];
+							            scope.workData.blockId = [];
+							            scope.suggestedWorkNames = [];
 
 							            // SINGLE-SELECT MODELS
 							          //  scope.workData.workPriorityId = '';
@@ -1622,7 +1667,7 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 
 							$(document).ready(function () {
 
-							    const defaultSelect = [0, 1, 4, 5, 8, 9, 10, 13, 14, 15, 16, 17, 19, 20, 21];
+							    const defaultSelect = [0, 1, 4, 5, 8, 9, 10, 11, 13, 14, 15, 16, 17, 19, 20, 21];
 							    const $checkboxes = $(".col-toggle");
 							    const $dropdown = $("#add-column-list");
 							    const $toggleBtn = $("#toggleAllColumns");

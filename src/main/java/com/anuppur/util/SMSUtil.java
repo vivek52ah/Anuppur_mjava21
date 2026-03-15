@@ -111,6 +111,13 @@ public class SMSUtil {
 		String smsServiceType = "unicodemsg";
 		String templateId = (smsBean.getTemplateId() != null && smsBean.getTemplateId().equals("")) ? smsBean.getTemplateId()
 				: "1004187509346541932";
+		
+		// Check if SMS configuration is available
+		if (userName == null || password == null || senderId == null || url == null) {
+			logger.error("SMS configuration is not properly configured. Please configure sms.userName, sms.password, sms.senderId, and sms.url in application properties.");
+			return "SMS configuration not available";
+		}
+		
 		try {
 			logger.info("Sending SMS....");
 			queryString.append("username=" + URLEncoder.encode(userName, "UTF-8") + "&");
@@ -191,6 +198,12 @@ public class SMSUtil {
 		long starttime = System.currentTimeMillis();
 		long endtime = 0;
 		double timetaken =0.0;
+		
+		// Check if SMS configuration is available
+		if (userNameCdac == null || passwordCdac == null || senderIdCdac == null || urlCdac == null || secureKeyCdac == null) {
+			logger.error("SMS configuration is not properly configured. Please configure cdac.sms.userName, cdac.sms.password, cdac.sms.senderId, cdac.sms.url, and cdac.sms.secureKey in application properties.");
+			return "SMS configuration not available";
+		}
 		
 		String message=  smsBean.getSmsText();
 	       String finalmessage = "";

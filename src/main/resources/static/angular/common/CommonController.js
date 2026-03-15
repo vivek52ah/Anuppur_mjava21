@@ -1950,6 +1950,11 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 					alert("All fields are required.")
 					return false;
 				}
+
+				if ($scope.workDataTender.pacAmount == undefined || $scope.workDataTender.pacAmount =="undefined" || $scope.workDataTender.pacAmount == "" || $scope.workDataTender.pacAmount == null || $scope.workDataTender.pacAmount == "null") {
+					alert("Please enter PAC Amount")
+					return false;
+				}
 }
 
 			if ($scope.workData.isTenders == 1 || $scope.workData.isTenders == true) {
@@ -2104,11 +2109,11 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 					fd.append('contractAmount', $scope.workDataTender.contractAmount);
 				}
 
-				if ($scope.workDataTender.pacAmount && $scope.workData.isTenders == 1) {
-					//fd.append('pacAmount', $scope.workDataTender.pacAmount); (Math.round($scope.workDataTender.pacAmount * 100) / 100).toFixed(2)
-					fd.append('pacAmount', $scope.workDataTender.pacAmount);
+				var pacAmountValue = $scope.workDataTender.pacAmount;
+				if (pacAmountValue && pacAmountValue !== 'undefined' && pacAmountValue !== undefined && pacAmountValue !== '' && !isNaN(pacAmountValue)) {
+					fd.append('pacAmount', pacAmountValue);
 				} else {
-					fd.append('pacAmount', $scope.workDataTender.pacAmount);
+					fd.append('pacAmount', '0');
 				}
 
 
@@ -2213,10 +2218,21 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 						}
 
 
+						// Auto-move to next visible tab - skip hidden tabs
 						var $active = $('.wizard .nav-tabs .nav-item .active');
 						var $activeli = $active.parent("li");
-						$($activeli).next().find('a[data-toggle="tab"]').removeClass("disabled");
-						$($activeli).next().find('a[data-toggle="tab"]').click();
+						var $nextLi = $($activeli).next();
+						
+						// Keep looking for next visible tab
+						while ($nextLi.length > 0) {
+							var $nextTab = $nextLi.find('a[data-toggle="tab"]');
+							if ($nextTab.length > 0 && $nextTab.is(':visible') && !$nextTab.parent().is(':hidden')) {
+								$nextTab.removeClass("disabled");
+								$nextTab.tab('show');
+								break;
+							}
+							$nextLi = $nextLi.next();
+						}
 
 						$scope.loadContractorDetails();
 						$scope.loadTSASDetails();
@@ -2589,10 +2605,21 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 					}, 5000);
 					$scope.workDataProgress.workId = $rootScope.responseObject.id;
 
+					// Auto-move to next visible tab - skip hidden tabs
 					var $active = $('.wizard .nav-tabs .nav-item .active');
 					var $activeli = $active.parent("li");
-					$($activeli).next().find('a[data-toggle="tab"]').removeClass("disabled");
-					$($activeli).next().find('a[data-toggle="tab"]').click();
+					var $nextLi = $($activeli).next();
+					
+					// Keep looking for next visible tab
+					while ($nextLi.length > 0) {
+						var $nextTab = $nextLi.find('a[data-toggle="tab"]');
+						if ($nextTab.length > 0 && $nextTab.is(':visible') && !$nextTab.parent().is(':hidden')) {
+							$nextTab.removeClass("disabled");
+							$nextTab.tab('show');
+							break;
+						}
+						$nextLi = $nextLi.next();
+					}
 
 					$scope.loadWorkProgress();
 					$scope.loadTenderDetails();
@@ -2926,9 +2953,23 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 					if ($scope.workDataProgress.workSubStatusId == "null" || $scope.workDataProgress.workSubStatusId == null || $scope.workDataProgress.workSubStatusId == undefined || $scope.workDataProgress.workSubStatusId == "" || $scope.workDataProgress.workSubStatusId == 0) {
 
-
-
 						$scope.workDataCC.workId = $rootScope.responseObject.id;
+
+						// Auto-move to next visible tab - skip hidden tabs
+						var $active = $('.wizard .nav-tabs .nav-item .active');
+						var $activeli = $active.parent("li");
+						var $nextLi = $($activeli).next();
+						
+						// Keep looking for next visible tab
+						while ($nextLi.length > 0) {
+							var $nextTab = $nextLi.find('a[data-toggle="tab"]');
+							if ($nextTab.length > 0 && $nextTab.is(':visible') && !$nextTab.parent().is(':hidden')) {
+								$nextTab.removeClass("disabled");
+								$nextTab.tab('show');
+								break;
+							}
+							$nextLi = $nextLi.next();
+						}
 
 						$scope.loadCCDetails();
 						$scope.loadContractorDetails();
@@ -3260,10 +3301,15 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 					$rootScope.responseObject.successMessage = null;
 				}, 5000);
 				if ($scope.workDataProgress.workStatusId == '11') {
+					// Auto-move to next visible tab
 					var $active = $('.wizard .nav-tabs .nav-item .active');
 					var $activeli = $active.parent("li");
-					$($activeli).next().find('a[data-toggle="tab"]').removeClass("disabled");
-					$($activeli).next().find('a[data-toggle="tab"]').click();
+					var $nextTab = $($activeli).next().find('a[data-toggle="tab"]');
+					
+					if ($nextTab.length > 0 && $nextTab.is(':visible')) {
+						$nextTab.removeClass("disabled");
+						$nextTab.tab('show');
+					}
 				} else {
 					$scope.successResponseProgress = 'success';
 				}
@@ -3905,6 +3951,20 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 				$scope.workDataProgress = data;
+				
+				// Populate Total Expenditure till date with Total AS value from Fund Breakup
+				if ($scope.workDataRows && $scope.workDataRows.length > 0) {
+					let totalAS = 0;
+					angular.forEach($scope.workDataRows, function(row) {
+						if (row.cost && !isNaN(row.cost)) {
+							totalAS += parseFloat(row.cost);
+						}
+					});
+					if (totalAS > 0) {
+						$scope.workDataProgress.totalExpensess = parseFloat(totalAS.toFixed(2));
+					}
+				}
+				
 				$scope.loadWorkSubStatusByWorkStatus($scope.workData.workSubTypeId, $scope.workDataProgress.workStatusId);
 				//alert("callworkProgressCount=============" + $scope.workDataProgress.workProgressCount)
 				//alert("$scope.workDataProgress.workStatusId===@@@@@@@@" + $scope.workDataProgress.workStatusId)
@@ -5256,15 +5316,39 @@ $scope.loadWorkFinancialAgencyList = function(workId) {
 
 
 
-	$scope.loadBlocksByDistrict = function(districtName) {
-
+	// Load blocks by districtId (for reports and manage works pages)
+	$scope.loadBlocksByDistrict = function() {
+		// Hardcoded to load Anuppur blocks - using districtCode "461"
+		var districtCode = "461";
+		
 		$loading.start('sample-1');
-		var response = $http.get('fetchBlocksByDistrictName/' + districtName);
-		response.success(function(data, status, headers, config) {
-			$scope.blocks = data;
-			$loading.finish('sample-1');
-		});
+		$http.get(getBaseUrl() + "/systemAdmin/fetchBlocksByDistrict/" + districtCode)
+			.then(function(response) {
+				$scope.blocks = response.data;
+				console.log("Blocks loaded:", $scope.blocks);
+				
+				var y = $('#blId');
+				y.addClass('btn-selected');
+				
+				// Refresh selectpicker after data loads
+				setTimeout(function() {
+					$('#blockId').selectpicker('refresh');
+					$loading.finish('sample-1');
+				}, 1000);
+			})
+			.catch(function(error) {
+				console.error("Block API Error:", error);
+				$scope.blocks = [];
+				$loading.finish('sample-1');
+			});
 	};
+
+	// Watch for district change and reload blocks
+	$scope.$watch('workData.districtId', function(newVal, oldVal) {
+		if (newVal && newVal !== oldVal) {
+			$scope.loadBlocksByDistrict();
+		}
+	});
 
 	$scope.loadGramPanchayatByBlockId = function(blockId) {
 		if (blockId && blockId != null && blockId != 'null') {
@@ -8589,6 +8673,28 @@ $scope.getDepartmentRemarksDetails();
 			});
 	};
 
+	$scope.loadDepartmentMasters = function() {
+		$loading.start('sample-1');
+		$http.get('getDepartmentMaster')
+			.then(function(response) {
+				$scope.departmentMasters = response.data;
+				
+				var y = $('#drId');
+				y.addClass('btn-selected');
+
+				setTimeout(function() {
+					$('#departmentRemark').selectpicker('refresh');
+				}, 1000);
+				
+				$loading.finish('sample-1');
+			})
+			.catch(function(error) {
+				console.error("Error fetching department masters:", error);
+				$scope.departmentMasters = [];
+				$loading.finish('sample-1');
+			});
+	};
+
 
 
 
@@ -8928,6 +9034,8 @@ $scope.getDepartmentRemarksDetails();
 
 
 	$scope.suggestedWorkNos = [];
+	$scope.blocks = [];
+	$scope.suggestedWorkNames = [];
 
 	$scope.loadWorkNoSuggestions = function(keyword) {
 
@@ -8949,6 +9057,40 @@ $scope.getDepartmentRemarksDetails();
 		$scope.suggestedWorkNos = []; // hide dropdown
 		window.reloadJqueryDatatables(); // refresh table
 	};
+	
+	// Work Name Suggestions
+	$scope.suggestedWorkNames = [];
+
+	$scope.loadWorkNameSuggestions = function(keyword) {
+
+		if (!keyword || keyword.length < 2) {
+			$scope.suggestedWorkNames = [];
+			return;
+		}
+
+		$http.get(getBaseUrl() + "/systemAdmin/suggestWorkNames?keyword=" + keyword)
+			.then(function(response) {
+				$scope.suggestedWorkNames = response.data;
+			}, function(err) {
+				console.error("Work Name Suggestion API Error:", err);
+			});
+	};
+
+	$scope.selectWorkName = function(name) {
+		$scope.workNameSearch = name;
+		$scope.suggestedWorkNames = []; // hide dropdown
+		window.reloadJqueryDatatables(); // refresh table
+	};
+	
+	document.addEventListener("click", function(event) {
+    var isClickInside = event.target.closest("#workNameFilter");   // input id
+    var isList = event.target.closest(".suggestion-list-box");   // UL class
+    
+    if (!isClickInside && !isList) {
+        $scope.suggestedWorkNames = [];
+        $scope.$apply();   // update HTML
+    }
+});
 	
 	document.addEventListener("click", function(event) {
     var isClickInside = event.target.closest("#searchBoxVal");   // input id
@@ -9067,6 +9209,7 @@ $scope.updateAllAvailableFinancialHeads = function () {
 $scope.saveFinancialAgency = function () {
 //alert("Call---")
     let dataList = [];
+    let totalExpenditure = 0;
 
     $("#dynamic-fa-table .cost-input").each(function () {
 
@@ -9089,6 +9232,8 @@ $scope.saveFinancialAgency = function () {
 //            return false;   // break loop
 //        }
 
+        // Calculate total expenditure
+        totalExpenditure += value;
 
         dataList.push({
             id: id,
@@ -9099,6 +9244,8 @@ $scope.saveFinancialAgency = function () {
 
     });
     
+    // Populate expensessCurrentFy with total expenditure
+    $scope.workDataProgress.expensessCurrentFy = parseFloat(totalExpenditure.toFixed(2));
     
     $.ajax({
     url: "saveFinancialAgencyEnteredCost",

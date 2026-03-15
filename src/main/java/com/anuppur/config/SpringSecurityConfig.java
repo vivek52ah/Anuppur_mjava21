@@ -163,14 +163,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         	    "style-src-elem 'self' 'unsafe-inline' https://unpkg.com https://unpkg.com/leaflet@1.7.1/dist/leaflet.css; " +
         	    "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.canvasjs.com https://unpkg.com https://code.jquery.com https://cdnjs.cloudflare.com https://unpkg.com/leaflet@1.7.1/dist/leaflet.js; " +
         	    "object-src 'none'; " +
-        	    "form-action 'self' https://raman-coe.mp.gov.in; " +   // ✅ FIX HERE
+        	    "form-action 'self' https://raman-coe.mp.gov.in; " +
         	    "font-src 'self'; " +
         	    "media-src 'none'; " +
-        	    "connect-src 'self' http://localhost:8060/jsonsigner/Sign; " +
+        	    "connect-src 'self' http://localhost:8060/jsonsigner/Sign http://localhost:8085; " +
         	    "img-src 'self' data: blob: https://*.google.com https://unpkg.com/leaflet@1.7.1/dist/images/ https://*.tile.openstreetmap.org; " +
         	    "frame-src 'self'; " +
-        	    "child-src 'self'; " +
-        	    "report-uri /csp-violation-report-endpoint"
+        	    "child-src 'self'"
         	);
 
         

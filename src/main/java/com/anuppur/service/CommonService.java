@@ -277,7 +277,7 @@ public interface CommonService {
 
 	WorkJson fetchWorksList(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
 			List<Long> fyList, List<Long> agencyList, String blockId, String workStatus, String districtName,
-			String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList);
+			String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark);
 
 	WorkJson fetchHandoverWorksList(Pageable pageable, String workNo, String workName, String scheme, String workType,
 			String financialYear, String implementationAgency, String blockId, String workStatus, String divisionId,
@@ -297,6 +297,10 @@ public interface CommonService {
 	String fetchDownloadFileNameRevised(Long documentId);
 
 	String fetchDownloadDocumentWSPro(Long documentId);
+
+	List<String> getWorkNameSuggestions(String keyword);
+
+	List<BlockBean> getBlocksByDistrict(Long districtId);
 
 	WorkProgressImagesJson fetchProgressImagesList(Pageable pageable, Object workStatusName, Object workSubStatusName,
 			Object actionTakenDelay, Object reasonDelay, Object createdDate, Object subDelayReason, Object documentId,
@@ -378,7 +382,7 @@ public interface CommonService {
 
 	WorkJson fetchWorkForReport(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
 			List<Long> fyList, String Department, List<Long> agencyList, String blockId, String workStatus,
-			String districtName, String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList);
+			String districtName, String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark);
 
 	List<departmentbean> fetchAllDepartment();
 
@@ -418,6 +422,8 @@ public interface CommonService {
 
 	List<VidhanSabhaBean> fetchVidhanSabha();
 
+	List<DmRemarksBean> fetchDmRemarksList();
+
 	List<WorkBean> getFilteredWorkProgress(String workStatusStr, String userIdStr, String agencyIdStr, String workSubStatusStr, String searchBoxVal);
 
 	List<WorkBean> getFilteredWorkWithLatestExpenses(String workStatusStr, String userIdStr, String agencyIdStr,
@@ -446,6 +452,8 @@ public interface CommonService {
 	String addOrUpdateDepartmentRemark(DepartmentRemarksBean bean);
 
 	List<DepartmentRemarksBean> getAllDepartmentRemarksByWorkID(Long long1);
+
+	List<DepartmentRemarksBean> fetchDepartmentRemarksList();
 
 	DepartmentRemarksBean getDepartmentRemarksDetailsById(Long long1);
 

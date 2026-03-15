@@ -688,6 +688,12 @@ public class CommonController extends BaseController {
 		String workPriorityId = request.getParameter("workPriorityId");
 		String financialHeadId = request.getParameter("financialHeadId1");
 		String vidhanSabhaId = request.getParameter("vidhanSabhaId1");
+		String workNameFilter = request.getParameter("workNameFilter");
+		// Also check for DataTables global search parameter (keyword)
+		if ((workNameFilter == null || workNameFilter.isEmpty()) && request.getParameter("keyword") != null) {
+			workNameFilter = request.getParameter("keyword");
+		}
+		String departmentRemark = request.getParameter("departmentRemark");
 		String sSortCol = request.getParameter("iSortCol_0");
 		String sSortDir = request.getParameter("sSortDir_0");
 		String sColName = request.getParameter("mDataProp_" + sSortCol);
@@ -739,21 +745,25 @@ public class CommonController extends BaseController {
 
 		WorkJson workJson = commonService.fetchWorksList(pageable,
 				!StringUtils.isEmpty(searchParameterWorkNo) ? searchParameterWorkNo : null,
-				!StringUtils.isEmpty(searchParameterWorkNo) ? searchParameterWorkNo : null,
-				!StringUtils.isEmpty(scheme) ? scheme : null, workTypeList,
-						fyList,
-						agencyList,
-				!StringUtils.isEmpty(blockId) ? blockId : null, !StringUtils.isEmpty(workStatus) ? workStatus : null,
+				null,  // workName parameter (not used, use workNameFilter instead)
+				!StringUtils.isEmpty(scheme) ? scheme : null, 
+				workTypeList,
+				fyList,
+				agencyList,
+				!StringUtils.isEmpty(blockId) ? blockId : null, 
+				!StringUtils.isEmpty(workStatus) ? workStatus : null,
 				!StringUtils.isEmpty(districtId) ? districtId : null,
 				!StringUtils.isEmpty(divisionId) ? divisionId : null,
 				!StringUtils.isEmpty(searchByDivision) ? searchByDivision : null,
 				!StringUtils.isEmpty(workSubTypeId) ? workSubTypeId : null,
-						statusList,
-						priorityList,
-						headList,
-						vsList
-								
+				statusList,
+				priorityList,
+				headList,
+				vsList,
+				!StringUtils.isEmpty(workNameFilter) ? workNameFilter : null,
+				!StringUtils.isEmpty(departmentRemark) ? departmentRemark : null
 				);
+
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(workJson);
@@ -4229,6 +4239,12 @@ public class CommonController extends BaseController {
 		String workPriorityId = request.getParameter("workPriorityId");
 		String financialHeadId = request.getParameter("financialHeadId1");
 		String vidhanSabhaId = request.getParameter("vidhanSabhaId1");
+		String workNameFilter = request.getParameter("workNameFilter");
+		// Also check for DataTables global search parameter (keyword)
+		if ((workNameFilter == null || workNameFilter.isEmpty()) && request.getParameter("keyword") != null) {
+			workNameFilter = request.getParameter("keyword");
+		}
+		String departmentRemark = request.getParameter("departmentRemark");
 		String sSortCol = request.getParameter("iSortCol_0");
 		String sSortDir = request.getParameter("sSortDir_0");
 		String sColName = request.getParameter("mDataProp_" + sSortCol);
@@ -4287,7 +4303,9 @@ public class CommonController extends BaseController {
 						statusList,
 						priorityList,
 						headList,
-						vsList);
+						vsList,
+						!StringUtils.isEmpty(workNameFilter) ? workNameFilter : null,
+						!StringUtils.isEmpty(departmentRemark) ? departmentRemark : null);
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(workJson);
@@ -5079,6 +5097,11 @@ public class CommonController extends BaseController {
 		return commonService.fetchVidhanSabha();
 	}
 	
+	@RequestMapping(value = "fetchDmRemarksList", method = RequestMethod.GET)
+	public List<DmRemarksBean> fetchDmRemarksList(HttpServletRequest request) {
+		return commonService.fetchDmRemarksList();
+	}
+	
 	 
 	@RequestMapping(value = "/fetchInspectionReport", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody 
@@ -5173,6 +5196,13 @@ public class CommonController extends BaseController {
 	        List<String> names = commonService.getWorkNoSuggestions(keyword);
 	        return ResponseEntity.ok(names);
 	    }
+
+	  @GetMapping("/suggestWorkNames")
+	    public ResponseEntity<List<String>> suggestWorkNamesByKeyword(@RequestParam String keyword) {
+	        List<String> names = commonService.getWorkNameSuggestions(keyword);
+	        return ResponseEntity.ok(names);
+	    }
+
 	  
 	  
 	  
@@ -5352,4 +5382,10 @@ public class CommonController extends BaseController {
 				return commonService.fetchDepartmentMaster();
 				
 			}
+
+			@GetMapping(value = "fetchDepartmentRemarksList")
+			public List<DepartmentRemarksBean> fetchDepartmentRemarksList() {
+				return commonService.fetchDepartmentRemarksList();
+			}
 }
+
