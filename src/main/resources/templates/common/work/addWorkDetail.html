@@ -258,7 +258,7 @@
 
 
 					<div class="form-group col-sm-4">
-						<label><span th:text="#{tsOrderNo}">TS Order No. </span><span
+						<label><span >Technical Sanction Order No. </span><span
 							class="aestrick">&#42;</span></label> <input type="text"
 							class="form-control" id="tsNo" required="required"
 							data-ng-model="workData.tsNo" name="tsNo" /> <input
@@ -284,7 +284,7 @@
 					</script>
 
 					<div class="form-group col-sm-4">
-						<label><span th:text="#{tsOrderDate}">TS Order Date
+						<label><span>Technical Sanction Order Date
 						</span><span class="aestrick">&#42;</span></label>
 						<div class="input-group date" id="datetimepicker3"
 							data-target-input="nearest">
@@ -313,7 +313,7 @@
 					</div>
 
 					<div class="form-group col-sm-4">
-						<label><span th:text="#{tsAmount}">TS Amount (In
+						<label><span >Technical Sanction Amount (In
 								Lacs )</span><span class="aestrick">&#42;</span></label> <input type="text"
 							class="form-control number-OnlyTwoDecimal" id="tsAmt"
 							data-ng-model="workData.tsAmt" name="tsAmt" min="0"
@@ -345,7 +345,7 @@
 
 					<div class="form-group col-sm-4">
 						<div class="form-group">
-							<label> <span th:text="#{uploadTechnicalSanctionFile}">Upload
+							<label> <span >Upload
 									Technical Sanction File</span><span class="aestrick">&#42;</span>
 							</label> <input type='file' accept=".pdf" class="form-control"
 								data-ng-disabled="workData.tsFileId!=null" required="required"
@@ -387,7 +387,7 @@
 							</div>
 							<p class="help-block" style="color: red;"
 								data-ng-show="ldPdfFile == null &amp;&amp; workForm.$submitted">
-								Please upload TS file</p>
+								Please upload Technical Sanction file</p>
 
 							<div
 								data-ng-show="workForm.$submitted &amp;&amp; workData.tsFileId == null">
@@ -442,7 +442,7 @@
 				<div class="row">
 
 					<div class="form-group col-sm-4">
-						<label><span th:text="#{asOrderNo}"></span><span
+						<label><span >Administrative Sanction Order No.</span><span
 							class="aestrick">&#42;</span></label> <input type="text"
 							class="form-control" id="asNo" required="required"
 							data-ng-model="workData.asNo" name="asNo" />
@@ -466,7 +466,7 @@
 						});
 					</script>
 					<div class="form-group col-sm-4" data-ng-init="">
-						<label><span th:text="#{asOrderDate}">AA Order Date
+						<label><span >AA Order Date
 						</span><span class="aestrick">&#42;</span></label>
 						<div class="input-group date" id="datetimepicker4"
 							data-target-input="nearest">
@@ -496,7 +496,7 @@
 
 
 					<div class="form-group col-sm-4">
-						<label><span th:text="#{asAmount}">AA Amount (In
+						<label><span >AA Amount (In
 								Lacs )</span> <span class="aestrick">&#42;</span></label> <input type="text"
 							class="form-control number-OnlyTwoDecimal" id="asAmt"
 							data-ng-model="workData.asAmt" name="asAmt" required="required"
@@ -528,8 +528,8 @@
 
 					<div class="form-group col-sm-4">
 						<div class="form-group">
-							<label> <span th:text="#{uploadASSanctionFile}">Upload
-									Administrative Approval File</span> <span class="aestrick">&#42;</span>
+							<label> <span >Upload
+									Administrative Sanction File</span> <span class="aestrick">&#42;</span>
 							</label> <input type='file' accept=".pdf" required="required"
 								data-ng-disabled="workData.asFileId!=null" class="form-control"
 								data-ng-required="workData.asFileId == null"
@@ -551,7 +551,7 @@
 							</p>
 							<p
 								data-ng-show="workData.asFileId==null &amp;&amp; workForm.$submitted  &amp;&amp;  workForm.AsPdfFile.$error.required "
-								style="color: red;">Please Upload AS File</p>
+								style="color: red;">Please Upload Administrative Sanction File</p>
 							<p class="help-block" style="color: red;"
 								data-ng-show="fileSizeErrorAd &amp;&amp; workForm.$submitted">
 								<span>Uploaded file size does not supported</span>
@@ -687,7 +687,7 @@
     </div>
     
     <div class="form-group col-sm-4">
-							<label>Total AS (In Lacs)</label> <input type="text" 
+							<label>Total Administrative Sanction (In Lacs)</label> <input type="text" 
 								class="form-control" ng-value="getTotalCost()" readonly="readonly"/>
 						</div>
 

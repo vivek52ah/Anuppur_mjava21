@@ -65,6 +65,9 @@ import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.util.StringUtils;
 
 import com.anuppur.bean.BlockBean;
+import com.anuppur.bean.DepartmentWiseReportRowBean;
+import com.anuppur.bean.DmRemarkWiseReportRowBean;
+import com.anuppur.bean.PhotoUpdateReportRowBean;
 import com.anuppur.bean.CCBean;
 import com.anuppur.bean.ChangePasswordBean;
 import com.anuppur.bean.ContractorBean;
@@ -469,7 +472,11 @@ public class CommonController extends BaseController {
 	}
 
 	@RequestMapping(value = "/manageOngoingWorks", method = RequestMethod.GET)
-	public ModelAndView manageOngoingWorks(HttpServletRequest request) {
+	public ModelAndView manageOngoingWorks(HttpServletRequest request,
+			@RequestParam(required = false) String departmentId,
+			@RequestParam(required = false) String financialYearId,
+			@RequestParam(required = false) String workStatus,
+			@RequestParam(required = false) String departmentRemark) {
 
 		user = DMSUtil.getUserDetail();
 
@@ -484,6 +491,31 @@ public class CommonController extends BaseController {
 		logger.info(userBean.getLoggedInUserRole() + "role");
 		modelAndView.addObject("roleName", userBean.getLoggedInUserRole());
 		modelAndView.addObject("division", userBean.getDivisionId());
+		modelAndView.addObject("departmentId", departmentId);
+		modelAndView.addObject("financialYearId", financialYearId);
+		modelAndView.addObject("workStatus", workStatus);
+		modelAndView.addObject("departmentRemark", departmentRemark);
+		// Store URL params in session for use by fetchWorksList
+		if (workStatus != null && !workStatus.isEmpty()) {
+			request.getSession().setAttribute("urlWorkStatus", workStatus);
+		} else {
+			request.getSession().removeAttribute("urlWorkStatus");
+		}
+		if (departmentId != null && !departmentId.isEmpty()) {
+			request.getSession().setAttribute("urlDepartmentId", departmentId);
+		} else {
+			request.getSession().removeAttribute("urlDepartmentId");
+		}
+		if (financialYearId != null && !financialYearId.isEmpty()) {
+			request.getSession().setAttribute("urlFinancialYearId", financialYearId);
+		} else {
+			request.getSession().removeAttribute("urlFinancialYearId");
+		}
+		if (departmentRemark != null && !departmentRemark.isEmpty()) {
+			request.getSession().setAttribute("urlDepartmentRemark", departmentRemark);
+		} else {
+			request.getSession().removeAttribute("urlDepartmentRemark");
+		}
 		return modelAndView;
 	}
 
@@ -532,14 +564,14 @@ public class CommonController extends BaseController {
 		return new ModelAndView("common/yearWiseReport");
 	}
 
-	@RequestMapping(value = "/reports", method = RequestMethod.GET)
-	public ModelAndView reportsView(HttpServletRequest request) {
-		user = DMSUtil.getUserDetail();
-		logger.info("User - {}, Role - {} - Displaying Manage WorkCategory page", user.getUsername(),
-				user.getAuthorities());
-
-		return new ModelAndView("common/reports");
-	}
+//	@RequestMapping(value = "/reports", method = RequestMethod.GET)
+//	public ModelAndView reportsView(HttpServletRequest request) {
+//		user = DMSUtil.getUserDetail();
+//		logger.info("User - {}, Role - {} - Displaying Manage WorkCategory page", user.getUsername(),
+//				user.getAuthorities());
+//
+//		return new ModelAndView("common/reports");
+//	}
 	
 	
 	@RequestMapping(value = "/inspectionReport", method = RequestMethod.GET)
@@ -623,6 +655,109 @@ public class CommonController extends BaseController {
 		return new ModelAndView("common/generatePptReports");
 	}
 
+	@RequestMapping(value = "/departmentWiseWorksReport", method = RequestMethod.GET)
+	public ModelAndView departmentWiseWorksReportView(HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		logger.info("User - {}, Role - {} - Displaying Department Wise Works Report page", user.getUsername(),
+				user.getAuthorities());
+		return new ModelAndView("common/departmentWiseWorksReport");
+	}
+
+	@RequestMapping(value = "/reports", method = RequestMethod.GET)
+	public ModelAndView reportsView(HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		UserBean userBean = fetchLoggedInUserDetails(request);
+		ModelAndView mav = new ModelAndView("common/reports");
+		mav.addObject("roleName", userBean.getLoggedInUserRole());
+		return mav;
+	}
+
+	@RequestMapping(value = "/fetchDepartmentWiseReport", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public ResponseEntity<?> fetchDepartmentWiseReport(
+			@RequestParam(required = false) String agencyIds,
+			@RequestParam(required = false) String financialYearIds,
+			HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		logger.info("User - {}, Role - {} - Fetching Department Wise Report", user.getUsername(),
+				user.getAuthorities());
+		try {
+			List<Long> agencyIdList = convertToList(agencyIds);
+			List<Long> fyIdList = convertToList(financialYearIds);
+			List<DepartmentWiseReportRowBean> result = commonService.getDepartmentWiseReport(agencyIdList, fyIdList);
+			return ResponseEntity.ok(result);
+		} catch (NumberFormatException e) {
+			logger.error("Invalid filter parameter: {}", e.getMessage());
+			return ResponseEntity.badRequest().body("{\"errorMessage\": \"Invalid filter parameter: " + e.getMessage() + "\"}");
+		} catch (Exception e) {
+			logger.error("Error fetching department wise report: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("{\"errorMessage\": \"" + e.getMessage() + "\"}");
+		}
+	}
+
+	@RequestMapping(value = "/photoUpdateReport", method = RequestMethod.GET)
+	public ModelAndView photoUpdateReportView(HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		logger.info("User - {}, Role - {} - Displaying Photo Update Report page", user.getUsername(),
+				user.getAuthorities());
+		return new ModelAndView("common/photoUpdateReport");
+	}
+
+	@RequestMapping(value = "/fetchPhotoUpdateReport", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public ResponseEntity<?> fetchPhotoUpdateReport(
+			@RequestParam(required = false) String departmentIds,
+			HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		logger.info("User - {}, Role - {} - Fetching Photo Update Report", user.getUsername(),
+				user.getAuthorities());
+		try {
+			List<Long> deptIdList = convertToList(departmentIds);
+			List<PhotoUpdateReportRowBean> result = commonService.getPhotoUpdateReport(deptIdList);
+			return ResponseEntity.ok(result);
+		} catch (NumberFormatException e) {
+			logger.error("Invalid filter parameter: {}", e.getMessage());
+			return ResponseEntity.badRequest().body("{\"errorMessage\": \"Invalid filter parameter: " + e.getMessage() + "\"}");
+		} catch (Exception e) {
+			logger.error("Error fetching photo update report: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("{\"errorMessage\": \"" + e.getMessage() + "\"}");
+		}
+	}
+
+	@RequestMapping(value = "/dmRemarkWiseReport", method = RequestMethod.GET)
+	public ModelAndView dmRemarkWiseReportView(HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		logger.info("User - {}, Role - {} - Displaying DM Remark Wise Report page", user.getUsername(),
+				user.getAuthorities());
+		return new ModelAndView("common/dmRemarkWiseReport");
+	}
+
+	@RequestMapping(value = "/fetchDmRemarkWiseReport", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public ResponseEntity<?> fetchDmRemarkWiseReport(
+			@RequestParam(required = false) String deptMasterIds,
+			@RequestParam(required = false) String implAgencyIds,
+			HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		logger.info("User - {}, Role - {} - Fetching DM Remark Wise Report", user.getUsername(),
+				user.getAuthorities());
+		try {
+			List<Long> deptMasterIdList = convertToList(deptMasterIds);
+			List<Long> implAgencyIdList = convertToList(implAgencyIds);
+			List<DmRemarkWiseReportRowBean> result = commonService.getDmRemarkWiseReport(deptMasterIdList, implAgencyIdList);
+			return ResponseEntity.ok(result);
+		} catch (NumberFormatException e) {
+			logger.error("Invalid filter parameter: {}", e.getMessage());
+			return ResponseEntity.badRequest().body("{\"errorMessage\": \"Invalid filter parameter: " + e.getMessage() + "\"}");
+		} catch (Exception e) {
+			logger.error("Error fetching DM remark wise report: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("{\"errorMessage\": \"" + e.getMessage() + "\"}");
+		}
+	}
+
 	// Method to handle uploading of work progress inspection images.
 	@RequestMapping(value = "/uploadWorkProgressImages", method = RequestMethod.POST, consumes = {
 			"multipart/form-data" })
@@ -694,6 +829,26 @@ public class CommonController extends BaseController {
 			workNameFilter = request.getParameter("keyword");
 		}
 		String departmentRemark = request.getParameter("departmentRemark");
+		String department = request.getParameter("department");
+		// Use session-stored URL params (set by manageOngoingWorks when navigating from dept-wise report)
+		// Session takes priority over localStorage-restored workStatusId on every call
+		Object sessionWorkStatus = request.getSession().getAttribute("urlWorkStatus");
+		if (sessionWorkStatus != null) {
+			workStatus = sessionWorkStatus.toString();
+			workStatusId = null;
+		}
+		// Also: if workStatus string param is directly passed (from DataTables data function), it takes priority
+		if (workStatus != null && !workStatus.isEmpty()) {
+			workStatusId = null; // clear localStorage-restored IDs
+		}
+		Object sessionDeptId = request.getSession().getAttribute("urlDepartmentId");
+		if (sessionDeptId != null && (department == null || department.isEmpty())) {
+			department = sessionDeptId.toString();
+		}
+		Object sessionFyId = request.getSession().getAttribute("urlFinancialYearId");
+		if (sessionFyId != null && (financialYear == null || financialYear.isEmpty())) {
+			financialYear = sessionFyId.toString();
+		}
 		String sSortCol = request.getParameter("iSortCol_0");
 		String sSortDir = request.getParameter("sSortDir_0");
 		String sColName = request.getParameter("mDataProp_" + sSortCol);
@@ -707,6 +862,7 @@ public class CommonController extends BaseController {
 		List<Long> priorityList = convertToList(workPriorityId);
 		List<Long> headList = convertToList(financialHeadId);
 		List<Long> vsList = convertToList(vidhanSabhaId);
+		List<Long> departmentList = convertToList(department);
 	//	List<Integer> districtList = convertToList(districtId);
 	//	List<Integer> divisionList = convertToList(divisionId);
 	//	List<Integer> workSubTypeList = convertToList(workSubTypeId);
@@ -761,7 +917,8 @@ public class CommonController extends BaseController {
 				headList,
 				vsList,
 				!StringUtils.isEmpty(workNameFilter) ? workNameFilter : null,
-				!StringUtils.isEmpty(departmentRemark) ? departmentRemark : null
+				!StringUtils.isEmpty(departmentRemark) ? departmentRemark : null,
+				(departmentList != null && !departmentList.isEmpty()) ? departmentList : null
 				);
 
 

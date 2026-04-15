@@ -77,6 +77,9 @@ import com.anuppur.bean.CCBean;
 import com.anuppur.bean.ContractorBean;
 import com.anuppur.bean.DepartmentMasterBean;
 import com.anuppur.bean.DepartmentRemarksBean;
+import com.anuppur.bean.DepartmentWiseReportRowBean;
+import com.anuppur.bean.DmRemarkWiseReportRowBean;
+import com.anuppur.bean.PhotoUpdateReportRowBean;
 import com.anuppur.bean.DistrictBean;
 import com.anuppur.bean.DivisionBean;
 import com.anuppur.bean.DmRemarksBean;
@@ -479,11 +482,14 @@ public class CommonServiceImpl implements CommonService {
 	@Autowired
 	private DepartmentRemarksRepository departmentRemarksRepository;
 	
+	@Autowired
+	private CommonService commonService;
+	
 	@Override
 	public WorkJson fetchWorksList(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
 			List<Long> fyList, List<Long> agencyList, String blockId, String workStatus, String districtId,
 			String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList,
-			List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark) {
+			List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark, List<Long> departmentList) {
 
 		
 		
@@ -594,20 +600,37 @@ public class CommonServiceImpl implements CommonService {
 			headList     = (headList == null || headList.isEmpty()) ? null : headList;
 			vsList       = (vsList == null || vsList.isEmpty()) ? null : vsList;
 			blockIdList  = (blockIdList == null || blockIdList.isEmpty()) ? null : blockIdList;
+			
+			// Convert workStatus string (COMPLETED/ONGOING/NOT_STARTED) to statusList if not already set
+			if (statusList == null && workStatus != null && !workStatus.isEmpty()) {
+				Long flag = null;
+				if ("COMPLETED".equalsIgnoreCase(workStatus)) flag = 5L; // workStatusId=11
+				else if ("ONGOING".equalsIgnoreCase(workStatus)) flag = 5L; // workStatusId=10
+				else if ("NOT_STARTED".equalsIgnoreCase(workStatus)) flag = 5L; // workStatusId=9
+				// Since all three share flag=5, use direct IDs instead
+				statusList = new ArrayList<>();
+				if ("COMPLETED".equalsIgnoreCase(workStatus)) statusList.add(11L);
+				else if ("ONGOING".equalsIgnoreCase(workStatus)) statusList.add(10L);
+				else if ("NOT_STARTED".equalsIgnoreCase(workStatus)) statusList.add(9L);
+				if (statusList.isEmpty()) statusList = null;
+			}
 
 			
 			
 			if (r.contains("ROLE_DEPARTMENT")) {
-				/*
-				 * works = workRepository.fetchAllWorksByDivision(pageable, workName,
-				 * workTypeId, financialYear, districtIds, workStatusId, agency);
-				 */
-				// For ROLE_DEPARTMENT, pass divisionCode to filter works by division
-				// Parameter order: pageable, workNo, workTypeList, fyList, districtIds, statusList, agencyList, username, priorityList, headList, vsList, divisionId, departmentRemark, blockIdList, workNameFilter
-				works = workRepositoryCustomImpl.fetchAllWorksByDivision(pageable, workNo, workTypeList, fyList,
-						districtIds, statusList, agencyList, null, priorityList, headList,
-						vsList, divisionCode, departmentRemark, blockIdList, workNameFilter);
-
+				if (departmentList != null && !departmentList.isEmpty()) {
+					// When department filter is explicitly set, use generic query with dept filter
+					works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
+							null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark, departmentList);
+				} else if (agencyList != null && !agencyList.isEmpty()) {
+					// When agency filter is explicitly set (e.g. from dept-wise report), skip division filter
+					works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
+							null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark, null);
+				} else {
+					works = workRepositoryCustomImpl.fetchAllWorksByDivision(pageable, workNo, workTypeList, fyList,
+							districtIds, statusList, agencyList, null, priorityList, headList,
+							vsList, divisionCode, departmentRemark, blockIdList, workNameFilter);
+				}
 			}
 
 			else if (r.contains("ROLE_DISTRICT")) {
@@ -634,12 +657,12 @@ public class CommonServiceImpl implements CommonService {
 				// workStatusName);
 				// Parameter order: pageable, workNo, workTypeId, financialYear, districtId, workStatusId, agency, workPriority, financialHead, vidhanSabha, workNameFilter, blockId, departmentRemark
 				works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
-						null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark);
+						null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark, departmentList);
 				
 			} else {
 				// Parameter order: pageable, workNo, workTypeId, financialYear, districtId, workStatusId, agency, workPriority, financialHead, vidhanSabha, workNameFilter, blockId, departmentRemark
 				works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
-						null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark);
+						null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark, departmentList);
 			}
 
 			// added by sumit
@@ -1513,14 +1536,14 @@ public class CommonServiceImpl implements CommonService {
 							da.setYear(expensesData.getYear());
 
 							bean.setTotalExpensess(bean.getExpensessUptoMarch()
-									.subtract(expensesDataRepository.findByWorkId(workTypeId).get(0).getTotalExpensess()));
+									.add(expensesDataRepository.findByWorkId(workTypeId).get(0).getTotalExpensess()));
 
 							// bean.setTotalExpensess(bean.getExpensessCurrentFy().add(totalprev));//.add(expensesDataRepository.findByWorkId(workTypeId).get(0).getExpensessCurrentFy()));
 							totalprev = bean.getTotalExpensess();
 
 						} else {
 							bean.setTotalExpensess(
-									expensesData.getTotalExpensess().subtract(expensesData.getExpensessCurrentFy()));
+									expensesData.getTotalExpensess().add(expensesData.getExpensessCurrentFy()));
 							totalprev = expensesData.getTotalExpensess();
 						}
 
@@ -1993,11 +2016,14 @@ public class CommonServiceImpl implements CommonService {
 			bean.setCreatedBy(entity.getCreatedBy());
 			bean.setCreatedDate(entity.getCreatedDate());
 			bean.setEnabled(entity.getEnabled());
-			ImplementationAgencyType implementationAgencyType = implAgencyTypeRepository
-					.findOne(entity.getImplAgencyType());
-			bean.setImplAgencyType(
-					implementationAgencyType != null ? implementationAgencyType.getImplAgencyType() : "-");
-
+			if (entity.getImplAgencyType() != null) {
+				ImplementationAgencyType implementationAgencyType = implAgencyTypeRepository
+						.findOne(entity.getImplAgencyType());
+				bean.setImplAgencyType(
+						implementationAgencyType != null ? implementationAgencyType.getImplAgencyType() : "-");
+			} else {
+				bean.setImplAgencyType("-");
+			}
 			bean.setImplAgencyTypeId(entity.getImplAgencyType());
 		}
 		return bean;
@@ -2662,6 +2688,7 @@ public class CommonServiceImpl implements CommonService {
 					}
 					if (division.getDivisionId() != null) {
 						entity.setDivisionCode(division.getDivisionId());
+						entity.setDivisionId(division.getDivisionId());
 					}
 				}
 				if (bean.getDmRemakrs() != null && entity != null) {
@@ -3463,8 +3490,35 @@ public class CommonServiceImpl implements CommonService {
 				} else {
 					workTender.setStatus(DMSConstants.STATUS_ACTIVE);
 				}
-				// Store document uploaded in the DB
 
+				// Save Work Order file (pac)
+				if (workTenderBean.getPac() != null && !workTenderBean.getPac().isEmpty()) {
+					DocumentUpload docWorkOrder = DMSUtil.uploadTenderWorkDocument(
+							documentRootPath + workTenderSanctionDocumentPath, "blank",
+							workTenderBean.getPac(), null, "Tender");
+					documentRepository.save(docWorkOrder);
+					workTender.setDocumentUpload(docWorkOrder);
+				}
+
+				// Save LOA file (ldtul)
+				if (workTenderBean.getLdtul() != null && !workTenderBean.getLdtul().isEmpty()) {
+					DocumentUpload docLoi = DMSUtil.uploadTenderWorkDocumentUloi(
+							documentRootPath + workTenderSanctionDocumentPath, "blank",
+							workTenderBean.getLdtul(), null, "Tender");
+					documentRepository.save(docLoi);
+					workTender.setDocumentUploadLoi(docLoi);
+				}
+
+				// Save Agreement file (uploadAgreementforWork)
+				if (workTenderBean.getUploadAgreementforWork() != null && !workTenderBean.getUploadAgreementforWork().isEmpty()) {
+					DocumentUpload docAgreement = DMSUtil.uploadTenderWorkDocumentUploadAgreement(
+							documentRootPath + workTenderSanctionDocumentPath, "blank",
+							workTenderBean.getUploadAgreementforWork(), null, "Tender");
+					documentRepository.save(docAgreement);
+					workTender.setDocumentUploadUa(docAgreement);
+				}
+
+				// Store document uploaded in the DB
 				convertWorkTenderBeanToEntity(workTender, workTenderBean);
 				workTenderRepository.save(workTender);
 
@@ -3830,10 +3884,7 @@ public class CommonServiceImpl implements CommonService {
 			 */
 		}
 
-		if (entity.getWorkStatus() == 8 || entity.getWorkStatus() == 9 || entity.getWorkStatus() == 10
-				|| entity.getWorkStatus() == 11 || entity.getWorkStatus() == 12 || entity.getWorkStatus() == 13) {
-
-			if (entity.getDocumentUpload() != null) {
+		if (entity.getDocumentUpload() != null) {
 			    workTenderBean.setTenderFileId(
 			        entity.getDocumentUpload().getDocumentId()
 			    );
@@ -3850,8 +3901,6 @@ public class CommonServiceImpl implements CommonService {
 			        entity.getDocumentUploadUa().getDocumentId()
 			    );
 			}
-
-		}
 
 		workTenderBean.setWorkRequestStatusId(entity.getWorkRequestStatusId());
 		// DocumentUpload
@@ -3912,7 +3961,8 @@ public class CommonServiceImpl implements CommonService {
 		bean.setWorkSubStatusNameE(entity.getWorkSubStatusNameE());
 		bean.setWorkSubStatusNameH(bean.getWorkSubStatusNameH());
 		bean.setEnabled(entity.getEnabled());
-		// bean.setWorkStatus(entity.getWorkStatus());
+		bean.setWorkStatusId(entity.getWorkStatusId());
+		System.err.println("bean.setWorkStatusId" + bean.getWorkStatusId());
 		return bean;
 	}
 
@@ -7613,9 +7663,8 @@ public class CommonServiceImpl implements CommonService {
 
 			if (departmentRemarks != null && !departmentRemarks.isEmpty()) {
 
-			    // ✅ LAST UPDATED RECORD
-			    DepartmentRemarks dr =
-			            departmentRemarks.get(departmentRemarks.size() - 1);
+			    // Use LAST record — shows most recent department remark
+			    DepartmentRemarks dr = departmentRemarks.get(departmentRemarks.size() - 1);
 
 			    DepartmentMaster departmentMaster = null;
 			    if (dr.getDepertmentMasterId() != null) {
@@ -7669,7 +7718,13 @@ public class CommonServiceImpl implements CommonService {
 				}
 				workBean.setFinancialHeads(beanList);
 			}
-
+			
+			if(work.getId() != null) {
+			List<GeoTaggingBean> geoTaggingList = commonService.getGeoTaggingForWorkList(work.getId());
+			if(geoTaggingList != null) {
+			workBean.setGeoTaggingBeans(geoTaggingList);
+			}
+			}
 		return workBean;
 
 	}
@@ -8412,7 +8467,7 @@ public class CommonServiceImpl implements CommonService {
 		// workBean.setWorkType(work.getWorkType() != null ? work.getWorkType(): "-");
 		// WorkType workType =
 		// workTypeRepository.findByWorkTypeNameE(work.getWorkType());
-		WorkType workType = workTypeRepository.findOne(work.getWorkType());
+		WorkType workType = work.getWorkType() != null ? workTypeRepository.findOne(work.getWorkType()) : null;
 		if (null != workType) {
 			workBean.setWorkType(workType.getWorkTypeNameE() != null ? workType.getWorkTypeNameE() : "NA");
 			workBean.setWorkTypeId(workType.getWorkTypeId());
@@ -10099,7 +10154,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public String updateFinancialAgencyCost(Long id, Double expenditure, Long workId) {
 
-	    if (expenditure == null || expenditure <= 0) {
+	    if (expenditure == null) {
 	        return "Invalid expenditure amount.";
 	    }
 
@@ -10268,6 +10323,164 @@ public class CommonServiceImpl implements CommonService {
 			logger.error("Error fetching blocks by district", e);
 			return new ArrayList<>();
 		}
+	}
+	
+	@Override
+	public List<GeoTaggingBean> getGeoTaggingForWorkList(Long workId) {
+
+	    List<GeoTaggingBean> beanList = new ArrayList<>();
+
+	    try {
+	        List<WorkGeoLocation> geoList = geoLocationRepository.findByworkId(workId);
+	        List<LocationPoints> lp = pointsrepo.findAllByworkID(workId);
+
+	        if (geoList != null && !geoList.isEmpty()) {
+
+	            for (WorkGeoLocation geo : geoList) {
+
+	                GeoTaggingBean bean = new GeoTaggingBean();
+
+	                bean.setAddress(geo.getAddress());
+	                bean.setAtProjectionLocation(geo.getAtProjectionLocation());
+	                bean.setCurrentLocation(geo.getCurrentPoint());
+	                bean.setWorkId(geo.getWorkId());
+
+	                // Points mapping
+	                if (lp != null && !lp.isEmpty()) {
+	                    List<GTPoint> points2 = new ArrayList<>();
+
+	                    for (LocationPoints points : lp) {
+	                        GTPoint bean2 = new GTPoint();
+	                        bean2.setLattitude(points.getLattitude());
+	                        bean2.setLongitude(points.getLongitude());
+	                        points2.add(bean2);
+	                    }
+
+	                    bean.setPoints(points2);
+	                }
+
+	                beanList.add(bean);
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        logger.error("error getting Data", e);
+	    }
+
+	    return beanList;
+	}
+
+	@Override
+	public List<WorkBean> getWorkDetailsWithGeo() {
+		List<Work> workList = workRepository.findByStatus(DMSConstants.STATUS_ACTIVE);
+		List<WorkBean> beanList = new ArrayList<WorkBean>();
+		for (Work entity : workList) {
+			beanList.add(convertWorkEntityToBeans1(entity, CCDocumentPath));
+		}
+		return beanList;
+	}
+
+	@Override
+	public List<DepartmentWiseReportRowBean> getDepartmentWiseReport(List<Long> agencyIds, List<Long> financialYearIds) {
+		List<DepartmentWiseReportRowBean> result = new ArrayList<>();
+		try {
+			List<Object[]> rows;
+			boolean hasAgencyFilter = agencyIds != null && !agencyIds.isEmpty();
+			boolean hasFyFilter = financialYearIds != null && !financialYearIds.isEmpty();
+
+			if (hasAgencyFilter && hasFyFilter) {
+				rows = departmentRemarksRepository.fetchDepartmentWiseReportByDeptAndFy(agencyIds, financialYearIds);
+			} else if (hasFyFilter) {
+				rows = departmentRemarksRepository.fetchDepartmentWiseReportByFy(financialYearIds);
+			} else if (hasAgencyFilter) {
+				rows = departmentRemarksRepository.fetchDepartmentWiseReportByDept(agencyIds);
+			} else {
+				rows = departmentRemarksRepository.fetchDepartmentWiseReportAll();
+			}
+
+			if (rows != null) {
+				for (Object[] row : rows) {
+					DepartmentWiseReportRowBean bean = new DepartmentWiseReportRowBean();
+					bean.setImplementationAgencyId(row[0] != null ? ((Number) row[0]).longValue() : null);
+					bean.setImplementationAgencyName(row[1] != null ? row[1].toString() : null);
+					bean.setFinancialYearId(row[2] != null ? ((Number) row[2]).longValue() : null);
+					bean.setFinancialYearName(row[3] != null ? row[3].toString() : null);
+					bean.setTotalWorks(row[4] != null ? ((Number) row[4]).longValue() : 0L);
+					bean.setCompletedWorks(row[5] != null ? ((Number) row[5]).longValue() : 0L);
+					bean.setOngoingWorks(row[6] != null ? ((Number) row[6]).longValue() : 0L);
+					bean.setNotStartedWorks(row[7] != null ? ((Number) row[7]).longValue() : 0L);
+					result.add(bean);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Error fetching department-wise report", e);
+			throw new RuntimeException("Error fetching department-wise report", e);
+		}
+		return result;
+	}
+
+	@Override
+	public List<PhotoUpdateReportRowBean> getPhotoUpdateReport(List<Long> departmentIds) {
+		List<PhotoUpdateReportRowBean> result = new ArrayList<>();
+		try {
+			List<Object[]> rows;
+			if (departmentIds == null || departmentIds.isEmpty()) {
+				rows = documentUploadWorkProgressRepository.fetchPhotoUpdateReportAll();
+			} else {
+				rows = documentUploadWorkProgressRepository.fetchPhotoUpdateReportByDept(departmentIds);
+			}
+			if (rows != null) {
+				for (Object[] row : rows) {
+					PhotoUpdateReportRowBean bean = new PhotoUpdateReportRowBean();
+					bean.setDepartmentId(row[0] != null ? ((Number) row[0]).longValue() : null);
+					bean.setDepartmentName(row[1] != null ? row[1].toString() : null);
+					bean.setWorkName(row[2] != null ? row[2].toString() : null);
+					bean.setTotalWorks(row[3] != null ? ((Number) row[3]).longValue() : 0L);
+					bean.setAreaOfficerName(row[4] != null ? row[4].toString() : null);
+					bean.setDays(row[5] != null ? ((Number) row[5]).intValue() : 0);
+					result.add(bean);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Error fetching photo update report", e);
+			throw new RuntimeException("Error fetching photo update report", e);
+		}
+		return result;
+	}
+
+	@Override
+	public List<DmRemarkWiseReportRowBean> getDmRemarkWiseReport(List<Long> deptMasterIds, List<Long> implAgencyIds) {
+		List<DmRemarkWiseReportRowBean> result = new ArrayList<>();
+		try {
+			List<Object[]> rows;
+			boolean hasDeptFilter = deptMasterIds != null && !deptMasterIds.isEmpty();
+			boolean hasAgencyFilter = implAgencyIds != null && !implAgencyIds.isEmpty();
+
+			if (hasDeptFilter && hasAgencyFilter) {
+				rows = departmentRemarksRepository.fetchDmRemarkWiseReportByDeptAndAgency(deptMasterIds, implAgencyIds);
+			} else if (hasDeptFilter) {
+				rows = departmentRemarksRepository.fetchDmRemarkWiseReportByDept(deptMasterIds);
+			} else if (hasAgencyFilter) {
+				rows = departmentRemarksRepository.fetchDmRemarkWiseReportByAgency(implAgencyIds);
+			} else {
+				rows = departmentRemarksRepository.fetchDmRemarkWiseReportAll();
+			}
+
+			if (rows != null) {
+				for (Object[] row : rows) {
+					DmRemarkWiseReportRowBean bean = new DmRemarkWiseReportRowBean();
+					bean.setDepartmentMasterId(row[0] != null ? ((Number) row[0]).longValue() : null);
+					bean.setIssueType(row[1] != null ? row[1].toString() : null);
+					bean.setDepartmentNames(row[2] != null ? row[2].toString() : null);
+					bean.setTotalWorks(row[3] != null ? ((Number) row[3]).longValue() : 0L);
+					result.add(bean);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Error fetching DM remark-wise report", e);
+			throw new RuntimeException("Error fetching DM remark-wise report", e);
+		}
+		return result;
 	}
 
 }

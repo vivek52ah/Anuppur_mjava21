@@ -601,14 +601,14 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 						$rootScope.responseObject.successMessage = null;
 					}, 5000);
 
+					var newWorkId = data.id;
 					if (tsDocument || asDocument || workOrderDocument || estDocument || ccDocument || mlaDocument) {
-						$scope.uploadWorkDocument(data.id, tsDocument, asDocument, estDocument, ccDocument, workOrderDocument, mlaDocument, null, null, null, null, null, null, null, null, null, 'manageOngoingWorks');
+						$scope.uploadWorkDocument(newWorkId, tsDocument, asDocument, estDocument, ccDocument, workOrderDocument, mlaDocument, null, null, null, null, null, null, null, null, null, 'editWork/' + newWorkId);
 					}
 					if (fileArr.length > 0) {
-						$scope.uploadOtherDoc(data.id, fileArr, 'manageOngoingWorks');
-
+						$scope.uploadOtherDoc(newWorkId, fileArr, 'editWork/' + newWorkId);
 					} else {
-						$window.location.href = '#manageOngoingWorks';
+						$window.location.href = '#editWork/' + newWorkId;
 					}
 				}
 				if ($rootScope.responseObject.errorMessage != null) {
@@ -1221,7 +1221,7 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 				$scope.successRespondeTS = 'success';
 				if (mode == 'Add') {
 
-					$window.location.href = '#manageOngoingWorks';
+					$window.location.href = '#editWork/' + $rootScope.responseObject.id;
 				} if (mode == 'Edit') {
 					/*var $active = $('.wizard .nav-tabs .nav-item .active');
 					var $activeli = $active.parent("li");
@@ -3951,19 +3951,6 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
 
 
 				$scope.workDataProgress = data;
-				
-				// Populate Total Expenditure till date with Total AS value from Fund Breakup
-				if ($scope.workDataRows && $scope.workDataRows.length > 0) {
-					let totalAS = 0;
-					angular.forEach($scope.workDataRows, function(row) {
-						if (row.cost && !isNaN(row.cost)) {
-							totalAS += parseFloat(row.cost);
-						}
-					});
-					if (totalAS > 0) {
-						$scope.workDataProgress.totalExpensess = parseFloat(totalAS.toFixed(2));
-					}
-				}
 				
 				$scope.loadWorkSubStatusByWorkStatus($scope.workData.workSubTypeId, $scope.workDataProgress.workStatusId);
 				//alert("callworkProgressCount=============" + $scope.workDataProgress.workProgressCount)
@@ -8048,7 +8035,11 @@ $scope.deleteDepartmentRemark = function(id) {
 	};
 
 	$scope.loadWorkForReport = function() {
-
+		// Read departmentRemark from AngularJS route params if available
+		if ($routeParams.departmentRemark && !window.urlDepartmentRemark) {
+			window.urlDepartmentRemark = $routeParams.departmentRemark;
+			localStorage.removeItem('work_filters');
+		}
 		fetchWorkForReport();
 	};
 
@@ -8067,6 +8058,14 @@ $scope.deleteDepartmentRemark = function(id) {
 		var response = $http.get('fetchAllDepartment');
 		response.success(function(data, status, headers, config) {
 			$scope.department = data;
+
+			var y = $('#deptId');
+			if (y.length) y.addClass('btn-selected');
+
+			setTimeout(function() {
+				$('#department').selectpicker('refresh');
+			}, 1000);
+
 			$loading.finish('sample-1');
 		});
 	};
@@ -9391,5 +9390,175 @@ $scope.checkCurrentPassword = function () {
 		});
 	};
 
+	// ---- Department-wise Works Report ----
 
-});
+	$scope.deptWiseReportRows = [];
+	$scope.deptWiseFilterData = { departmentIds: [], financialYearIds: [] };
+	$scope.deptWiseStatusMap = {}; // flag number → comma-separated workStatusIds
+
+	$scope.loadDeptWiseDepartmentOptions = function() {
+		$http.get('fetchConstructionAgencys').then(function(response) {
+			$scope.deptWiseDepartmentOptions = response.data;
+			$timeout(function() {
+				$('#deptWiseDeptFilter').selectpicker('refresh');
+			}, 500);
+		});
+	};
+
+	$scope.loadDeptWiseFyOptions = function() {
+		// Load workStatus map first, then FY options
+		$http.get('getWorkStatus').then(function(res) {
+			var data = res.data;
+			if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) {} }
+			if (Array.isArray(data)) {
+				var map = {};
+				data.forEach(function(s) {
+					var f = String(s.flag);
+					if (!map[f]) map[f] = [];
+					map[f].push(s.workStatusId);
+				});
+				// Store as comma-separated strings
+				$scope.deptWiseStatusMap['1'] = (map['1'] || []).join(',');
+				$scope.deptWiseStatusMap['2'] = (map['2'] || []).join(',');
+				$scope.deptWiseStatusMap['3'] = (map['3'] || []).join(',');
+			}
+		});
+		$http.get('fetchFinancialYear').then(function(response) {
+			$scope.deptWiseFyOptions = response.data;
+			$timeout(function() {
+				$('#deptWiseFyFilter').selectpicker('refresh');
+				$scope.fetchDeptWiseReport();
+			}, 300);
+		});
+	};
+
+	$scope.fetchDeptWiseReport = function() {
+		var params = {};
+		var agencyIds = $('#deptWiseDeptFilter').val();
+		if (agencyIds && agencyIds.length > 0 && !(agencyIds.length === 1 && agencyIds[0] === '')) {
+			params.agencyIds = agencyIds.join(',');
+		}
+		var fyIds = $('#deptWiseFyFilter').val();
+		if (fyIds && fyIds.length > 0 && !(fyIds.length === 1 && fyIds[0] === '')) {
+			params.financialYearIds = fyIds.join(',');
+		}
+		$http.get('fetchDepartmentWiseReport', { params: params }).then(function(res) {
+			$scope.deptWiseReportRows = res.data;
+		}, function(err) {
+			console.error('Error fetching department wise report:', err);
+			$scope.deptWiseReportRows = [];
+		});
+	};
+
+	$scope.resetDeptWiseFilters = function() {
+		$('#deptWiseDeptFilter').selectpicker('val', []);
+		$('#deptWiseFyFilter').selectpicker('val', []);
+		$scope.fetchDeptWiseReport();
+	};
+
+	$scope.getDeptWiseDetailUrl = function(row, workStatus) {
+		var base = '#/manageOngoingWorks';
+		var params = '?implementationAgency=' + row.implementationAgencyId + '&financialYearId=' + row.financialYearId;
+		if (workStatus) {
+			// Direct workStatusId mapping based on actual DB values
+			var statusIdMap = { 'COMPLETED': '11', 'ONGOING': '10', 'NOT_STARTED': '9' };
+			var sid = statusIdMap[workStatus];
+			if (sid) params += '&workStatusId=' + sid;
+		}
+		return base + params;
+	};
+
+	// ---- Photo Update Report ----
+
+	$scope.photoUpdateReportRows = [];
+
+	$scope.loadPhotoUpdateDeptOptions = function() {
+		$http.get('fetchImplAgency').then(function(response) {
+			$scope.photoUpdateDeptOptions = response.data;
+			$timeout(function() {
+				$('#photoUpdateDeptFilter').selectpicker('refresh');
+				$scope.fetchPhotoUpdateReportData();
+			}, 300);
+		});
+	};
+
+	$scope.fetchPhotoUpdateReportData = function() {
+		var params = {};
+		var deptIds = $('#photoUpdateDeptFilter').val();
+		if (deptIds && deptIds.length > 0 && !(deptIds.length === 1 && deptIds[0] === '')) {
+			params.departmentIds = deptIds.join(',');
+		}
+		$http.get('fetchPhotoUpdateReport', { params: params }).then(function(res) {
+			$scope.photoUpdateReportRows = res.data;
+		}, function(err) {
+			console.error('Error fetching photo update report:', err);
+			$scope.photoUpdateReportRows = [];
+		});
+	};
+
+	$scope.resetPhotoUpdateFilters = function() {
+		$('#photoUpdateDeptFilter').selectpicker('val', []);
+		$scope.fetchPhotoUpdateReportData();
+	};
+
+	$scope.getPhotoUpdateDetailUrl = function(row) {
+		return '#/manageOngoingWorks?implementationAgency=' + row.departmentId;
+	};
+
+	// ---- DM Remark-wise Report ----
+
+	$scope.dmRemarkWiseReportRows = [];
+
+	$scope.loadIssueTypeOptions = function() {
+		$http.get('getDepartmentMaster').then(function(response) {
+			$scope.issueTypeOptions = response.data;
+			$timeout(function() {
+				$('#issueTypeFilter').selectpicker('refresh');
+			}, 300);
+		}, function(err) {
+			console.error('Error loading issue type options:', err);
+		});
+	};
+
+	$scope.loadDeptNameOptions = function() {
+		$http.get('fetchImplAgency').then(function(response) {
+			$scope.deptNameOptions = response.data;
+			$timeout(function() {
+				$('#deptNameFilter').selectpicker('refresh');
+			}, 300);
+		}, function(err) {
+			console.error('Error loading department name options:', err);
+		});
+	};
+
+	$scope.fetchDmRemarkWiseReportData = function() {
+		var params = {};
+		var deptMasterIds = $('#issueTypeFilter').val();
+		if (deptMasterIds && deptMasterIds.length > 0 && !(deptMasterIds.length === 1 && deptMasterIds[0] === '')) {
+			params.deptMasterIds = deptMasterIds.join(',');
+		}
+		var implAgencyIds = $('#deptNameFilter').val();
+		if (implAgencyIds && implAgencyIds.length > 0 && !(implAgencyIds.length === 1 && implAgencyIds[0] === '')) {
+			params.implAgencyIds = implAgencyIds.join(',');
+		}
+		$http.get('fetchDmRemarkWiseReport', { params: params }).then(function(res) {
+			$scope.dmRemarkWiseReportRows = res.data;
+		}, function(err) {
+			console.error('Error fetching DM remark wise report:', err);
+			$scope.dmRemarkWiseReportRows = [];
+		});
+	};
+
+	$scope.resetDmRemarkFilters = function() {
+		$('#issueTypeFilter').selectpicker('val', []);
+		$('#deptNameFilter').selectpicker('val', []);
+		$scope.fetchDmRemarkWiseReportData();
+	};
+
+	$scope.getDmRemarkDetailUrl = function(row) {
+		return '#/manageOngoingWorks?departmentRemark=' + row.departmentMasterId;
+	};
+
+	$scope.goToDmRemarkDetail = function(row) {
+		window.location.href = '#/manageOngoingWorks?departmentRemark=' + row.departmentMasterId;
+	};});

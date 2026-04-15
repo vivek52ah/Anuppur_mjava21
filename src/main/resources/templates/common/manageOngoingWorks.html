@@ -463,9 +463,14 @@
 		actionsBox : true,
 		noneSelectedText: '--Select Executive Agency--'
 	});
+	$('#department').selectpicker({
+		actionsBox : true,
+		liveSearch: true,
+		noneSelectedText: '--Select Department--'
+	});
 	$('#departmentRemark').selectpicker({
 		actionsBox : true,
-		noneSelectedText: '--Select Department Remarks--'
+		noneSelectedText: '--Search by Issue Type--'
 	});
 	$('#financialHeadId1').selectpicker({
 		actionsBox : true,
@@ -487,28 +492,85 @@
 <script th:inline="javascript">
   /*<![CDATA[*/
   window.roleName = [[${roleName}]];
+  window.urlDepartmentId   = [[${departmentId}]]   || null;
+  window.urlFinancialYearId = [[${financialYearId}]] || null;
+  window.urlWorkStatus     = [[${workStatus}]]     || null;
+  window.urlDepartmentRemark = [[${departmentRemark}]] || null;
+
+  // Also parse from hash fragment for AngularJS hash-based navigation
+  // e.g. #manageOngoingWorks?departmentId=X&financialYearId=Y&workStatus=Z
+  (function() {
+    var hash = window.location.hash || '';
+    var qIdx = hash.indexOf('?');
+    if (qIdx !== -1) {
+      var hashParams = new URLSearchParams(hash.substring(qIdx + 1));
+      if (!window.urlDepartmentId && hashParams.get('departmentId'))
+        window.urlDepartmentId = hashParams.get('departmentId');
+      if (!window.urlFinancialYearId && hashParams.get('financialYearId'))
+        window.urlFinancialYearId = hashParams.get('financialYearId');
+      if (!window.urlWorkStatus && hashParams.get('workStatus'))
+        window.urlWorkStatus = hashParams.get('workStatus');
+      if (hashParams.get('implementationAgency'))
+        window.urlImplementationAgency = hashParams.get('implementationAgency');
+      if (hashParams.get('departmentRemark'))
+        window.urlDepartmentRemark = hashParams.get('departmentRemark');
+      // Support direct workStatusId IDs from dept-wise report links
+      if (hashParams.get('workStatusId')) {
+        window.urlWorkStatusIds = hashParams.get('workStatusId');
+      } else if (hashParams.get('departmentId') || hashParams.get('financialYearId') || hashParams.get('implementationAgency')) {
+        // Navigating from dept-wise report without workStatus filter — clear any stored IDs
+        window.urlWorkStatusIds = '';
+        // Also clear localStorage workStatusId to prevent stale filter
+        try {
+          var wf = JSON.parse(localStorage.getItem('work_filters') || '{}');
+          wf.workStatusId = '';
+          localStorage.setItem('work_filters', JSON.stringify(wf));
+        } catch(e) {}
+      }
+    }
+  })();
   /*]]>*/
 </script>
 
 
 <script>
-function toggleFullScreen() {
-    const img = document.getElementById("modalImage");
-
-    if (!document.fullscreenElement) {
-        if (img.requestFullscreen) {
-            img.requestFullscreen();
-        } else if (img.webkitRequestFullscreen) { // Safari
-            img.webkitRequestFullscreen();
-        } else if (img.msRequestFullscreen) { // IE
-            img.msRequestFullscreen();
-        }
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
+/*<![CDATA[*/
+function openZoomOverlay() {
+    var src = document.getElementById('modalImage').src;
+    document.getElementById('zoomImage').src = src;
+    var total = window.currentImageList ? window.currentImageList.length : 1;
+    var idx = window.currentImageIndex !== undefined ? window.currentImageIndex : 0;
+    document.getElementById('zoomCounter').innerText = (idx + 1) + ' / ' + total;
+    var overlay = document.getElementById('zoomOverlay');
+    overlay.style.display = 'flex';
+}
+function closeZoomOverlay() {
+    document.getElementById('zoomOverlay').style.display = 'none';
+}
+function zoomNext() {
+    if (window.currentImageList && window.currentImageIndex < window.currentImageList.length - 1) {
+        window.currentImageIndex++;
+        window.showImageAt(window.currentImageIndex);
+        document.getElementById('zoomImage').src = document.getElementById('modalImage').src;
+        document.getElementById('zoomCounter').innerText = (window.currentImageIndex + 1) + ' / ' + window.currentImageList.length;
     }
 }
+function zoomPrev() {
+    if (window.currentImageList && window.currentImageIndex > 0) {
+        window.currentImageIndex--;
+        window.showImageAt(window.currentImageIndex);
+        document.getElementById('zoomImage').src = document.getElementById('modalImage').src;
+        document.getElementById('zoomCounter').innerText = (window.currentImageIndex + 1) + ' / ' + window.currentImageList.length;
+    }
+}
+document.addEventListener('keydown', function(e) {
+    var overlay = document.getElementById('zoomOverlay');
+    if (!overlay || overlay.style.display === 'none') return;
+    if (e.key === 'ArrowRight') zoomNext();
+    else if (e.key === 'ArrowLeft') zoomPrev();
+    else if (e.key === 'Escape') closeZoomOverlay();
+});
+/*]]>*/
 </script>
 
 <style>
@@ -667,8 +729,18 @@ ul.dropdown-menu.inner.show li {
 											</div>
 							
 											<!-- Department -->
-							
-							
+										<div id="deptId" class="form-group col-sm-4" data-ng-init="loadDepartments();">
+											<select multiple="multiple" class="form-control" id="department"
+												data-ng-model="workData.department"
+												name="department" data-live-search="true">
+												<option value="" disabled="disabled">--Select Department--</option>
+												<option data-ng-repeat="dept in department"
+													value="{{dept.id}}"
+													data-ng-class="{'selected-option': isSelected(dept.id)}">
+													{{dept.depName}}</option>
+											</select>
+										</div>
+
 											<!--  	<option
 																					data-ng-repeat="divisionName in divisions | orderBy : 'divisionName'"
 																					value="{{divisionName.divisionId}}">{{divisionName.divisionName}}</option> -->
@@ -849,8 +921,8 @@ ul.dropdown-menu.inner.show li {
 	 <label><input type="checkbox" class="col-toggle" data-column="8" checked="checked" /> Executive Agency</label>
 	 <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Financing Agency</label>
 	<!-- <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Year of Administrative Sanction</label>-->
-	<label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> Total A.S. Amount </label>
-    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> A.S. Date. </label>
+	<label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> Total Administrative Sanction Amount </label>
+    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> Administrative Sanction Date. </label>
     
     <label><input type="checkbox" class="col-toggle" data-column="12" checked="checked" /> Agreement No </label>
     <label><input type="checkbox" class="col-toggle" data-column="13" checked="checked" /> Agreement Date </label>
@@ -987,6 +1059,10 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 
 								$(document).ready(function () {
 
+									// Clear saved filters when navigating from dept-wise report
+									if (window.urlWorkStatusIds || window.urlDepartmentId || window.urlFinancialYearId || window.urlImplementationAgency || window.urlDepartmentRemark) {
+										localStorage.removeItem('work_filters');
+									}
 
 									const FILTER_KEYS = [
 										'searchBoxVal',
@@ -999,7 +1075,8 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 										'implementationAgency',
 										'workPriorityId',
 										'financialHeadId1',
-										'vidhanSabhaId1'
+										'vidhanSabhaId1',
+										'departmentRemark'
 									];
 
 									// 🟢 Restore saved filters
@@ -1060,12 +1137,20 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 												d.searchBoxVal = $('#searchBoxVal').val().trim();
 												d.workNameFilter = $('#workNameFilter').val().trim();
 												d.blockId = getMultiSelectValue('#blockId').join(",");
-												d.financialYear1 = getMultiSelectValue('#financialYear1').join(",");
-										        d.department = getMultiSelectValue('#department').join(",");
+
+												// If navigating from dept-wise report, use URL params directly
+												if (window.urlImplementationAgency) {
+													d.implementationAgency = window.urlImplementationAgency;
+													d.financialYear1 = window.urlFinancialYearId || getMultiSelectValue('#financialYear1').join(",");
+												} else {
+													d.financialYear1 = getMultiSelectValue('#financialYear1').join(",") || (window.urlFinancialYearId || '');
+													d.implementationAgency = getMultiSelectValue('#implementationAgency').join(",");
+												}
+
+										        d.department = getMultiSelectValue('#department').join(",") || (window.urlDepartmentId || '');
 										        d.workType1 = getMultiSelectValue('#workType1').join(",");
-										        d.workStatusId = getMultiSelectValue('#workStatusId').join(",");
-										        d.implementationAgency = getMultiSelectValue('#implementationAgency').join(",");
-										        d.departmentRemark = getMultiSelectValue('#departmentRemark').join(",");
+										        d.workStatusId = getMultiSelectValue('#workStatusId').join(",") || (window.urlWorkStatusIds || '');
+										        d.departmentRemark = getMultiSelectValue('#departmentRemark').join(",") || (window.urlDepartmentRemark || '');
 										        d.financialHeadId1 = getMultiSelectValue('#financialHeadId1').join(",");
 										        d.vidhanSabhaId1 = getMultiSelectValue('#vidhanSabhaId1').join(",");
 
@@ -1165,8 +1250,8 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 											},
 
 										//	{data: "yearOfAdministrativeApproval", title: "Year of Administrative Sanction", defaultContent: "-"},
-											{data: "amountOfAdministrativeApproval", title: "Total A.S. Amount ", defaultContent: "-"},
-											{data: "dateOfAdministrativeApproval", title: "A.S. Date", defaultContent: "-"},
+											{data: "amountOfAdministrativeApproval", title: "Total Administrative Sanction Amount ", defaultContent: "-"},
+											{data: "dateOfAdministrativeApproval", title: "Administrative Sanction Date", defaultContent: "-"},
 											{data: "agreementNo", title: "Agreement No", defaultContent: "-"},
 											{data: "agreementDate", title: "Agreement Date", defaultContent: "-"},
 										//	{data: "workOrderDate", title: "Work Order", defaultContent: "-"},
@@ -1609,6 +1694,7 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 							    $('#implementationAgency').val([]).trigger('change');
 							    $('#financialHeadId1').val([]).trigger('change');
 							    $('#blockId').val([]).trigger('change');
+							    $('#department').val([]).trigger('change');
 
 							    // SINGLE SELECTS
 							    $('#departmentRemark').val([]).trigger('change');
@@ -1949,7 +2035,7 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 
 				<button type="button" style="position: absolute;right: 15px;top: 20%;"
 								           class="btn btn-sm btn-dark"
-								           onclick="toggleFullScreen()">
+								           onclick="openZoomOverlay()">
 								       <i class="fa fa-expand"></i>
 								   </button>
 
@@ -1957,6 +2043,15 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 			</div>
 		</div>
 	</div>
+
+<!-- Zoom Overlay with Prev/Next -->
+<div id="zoomOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:99999;align-items:center;justify-content:center;">
+    <button onclick="closeZoomOverlay()" style="position:absolute;top:15px;right:20px;background:none;border:none;color:#fff;font-size:32px;cursor:pointer;">&times;</button>
+    <button onclick="zoomPrev()" style="position:absolute;left:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:40px;padding:10px 18px;border-radius:50%;cursor:pointer;">&#8249;</button>
+    <img id="zoomImage" src="" style="max-width:90%;max-height:90vh;border-radius:6px;box-shadow:0 0 30px rgba(0,0,0,0.5);" />
+    <button onclick="zoomNext()" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:40px;padding:10px 18px;border-radius:50%;cursor:pointer;">&#8250;</button>
+    <div style="position:absolute;bottom:20px;color:#fff;font-size:14px;" id="zoomCounter"></div>
+</div>
 
 
 
@@ -2403,6 +2498,119 @@ window.openProgressImages = function (rowIndex) {
 
 		/*]]>*/
 	</script>
+
+<!-- URL param pre-population for department-wise report drill-down -->
+<script>
+/*<![CDATA[*/
+(function () {
+    // Map workStatus string to flag value
+    var STATUS_FLAG_MAP = { 'COMPLETED': 1, 'ONGOING': 2, 'NOT_STARTED': 3 };
+
+    var urlDeptId   = window.urlDepartmentId   || null;
+    var urlFyId     = window.urlFinancialYearId || null;
+    var urlWStatus  = window.urlWorkStatus      || null;
+
+    if (!urlDeptId && !urlFyId && !urlWStatus) return; // nothing to do
+
+    // Resolve workStatus string → workStatusIds by polling getWorkStatus endpoint
+    function resolveWorkStatusIds(statusStr, callback) {
+        if (!statusStr) { callback(null); return; }
+        var targetFlag = STATUS_FLAG_MAP[statusStr.toUpperCase()];
+        if (!targetFlag) { callback(null); return; }
+
+        $.get(getBaseUrl() + '/systemAdmin/getWorkStatus', function (data) {
+            var ids = [];
+            if (Array.isArray(data)) {
+                data.forEach(function (s) {
+                    if (s.flag == targetFlag) ids.push(String(s.workStatusId));
+                });
+            } else {
+                try {
+                    var parsed = typeof data === 'string' ? JSON.parse(data) : data;
+                    if (Array.isArray(parsed)) {
+                        parsed.forEach(function (s) {
+                            if (s.flag == targetFlag) ids.push(String(s.workStatusId));
+                        });
+                    }
+                } catch (e) {}
+            }
+            window.urlWorkStatusIds = ids.join(',');
+            callback(ids);
+        }).fail(function () { callback(null); });
+    }
+
+    // Pre-select a multi-select (selectpicker) with given IDs, polling until options are rendered
+    function preSelectMulti(selectId, ids, onDone) {
+        if (!ids || ids.length === 0) { if (onDone) onDone(); return; }
+        var strIds = ids.map(String);
+        var attempt = 0;
+        var interval = setInterval(function () {
+            attempt++;
+            var $sel = $(selectId);
+            var opts = $sel.find('option').not('[value=""]');
+            if (opts.length > 0) {
+                clearInterval(interval);
+                $sel.val(strIds);
+                if ($sel.data('selectpicker')) {
+                    $sel.selectpicker('val', strIds);
+                    $sel.selectpicker('refresh');
+                } else {
+                    $sel.trigger('change');
+                }
+                if (onDone) onDone();
+            }
+            if (attempt > 40) { clearInterval(interval); if (onDone) onDone(); } // give up after ~4s
+        }, 100);
+    }
+
+    var pendingCount = 0;
+    function onPrePopDone() {
+        pendingCount--;
+        if (pendingCount <= 0) {
+            // All pre-populations done — trigger initial data fetch
+            setTimeout(function () {
+                if (typeof window.reloadJqueryDatatables === 'function') {
+                    window.reloadJqueryDatatables();
+                }
+            }, 200);
+        }
+    }
+
+    // Pre-select department
+    if (urlDeptId) {
+        pendingCount++;
+        preSelectMulti('#department', [urlDeptId], onPrePopDone);
+    }
+
+    // Pre-select financial year
+    if (urlFyId) {
+        pendingCount++;
+        preSelectMulti('#financialYear1', [urlFyId], onPrePopDone);
+    }
+
+    // Pre-select work status (after resolving IDs from flag)
+    if (urlWStatus) {
+        pendingCount++;
+        resolveWorkStatusIds(urlWStatus, function (ids) {
+            if (ids && ids.length > 0) {
+                preSelectMulti('#workStatusId', ids, onPrePopDone);
+            } else {
+                onPrePopDone();
+            }
+        });
+    }
+
+    // If nothing to wait for, still trigger reload
+    if (pendingCount === 0 && (urlDeptId || urlFyId || urlWStatus)) {
+        setTimeout(function () {
+            if (typeof window.reloadJqueryDatatables === 'function') {
+                window.reloadJqueryDatatables();
+            }
+        }, 1500);
+    }
+})();
+/*]]>*/
+</script>
 
 </body>
 

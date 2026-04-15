@@ -443,7 +443,7 @@ table.dataTable {
 	});
 	$('#departmentRemark').selectpicker({
 		actionsBox : true,
-		noneSelectedText: '--Select Department Remarks--'
+		noneSelectedText: '--Search by Issue Type--'
 	});
 	$('#financialHeadId1').selectpicker({
 		actionsBox : true,
@@ -785,9 +785,9 @@ ul.dropdown-menu.inner.show li {
 	 <label><input type="checkbox" class="col-toggle" data-column="6" checked="checked" /> FY of Sanction</label>
 	 <label><input type="checkbox" class="col-toggle" data-column="7" checked="checked" /> Executive Agency</label>
 	 <label><input type="checkbox" class="col-toggle" data-column="8" checked="checked" /> Financing Agency</label>
-	 <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Total A.S. Amount </label>
+	 <label><input type="checkbox" class="col-toggle" data-column="9" checked="checked" /> Total Administrative Sanction Amount </label>
 	 <label><input type="checkbox" class="col-toggle" data-column="10" checked="checked" /> Year of Administrative Sanction</label>
-    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> A.S. Date. </label>
+    <label><input type="checkbox" class="col-toggle" data-column="11" checked="checked" /> Administrative Sanction Date. </label>
     <label><input type="checkbox" class="col-toggle" data-column="12" checked="checked" /> Agreement Date </label>
      <label><input type="checkbox" class="col-toggle" data-column="13" checked="checked" /> Agreement No </label>
     <label><input type="checkbox" class="col-toggle" data-column="14" checked="checked" /> Work Order</label>
@@ -965,9 +965,9 @@ ul.dropdown-menu.inner.show li {
 				
 				{data: "implementationAgencyName", title: "Executive Agency", defaultContent: "-"},
 				{data: "financialHeadName", title: "Financing Agency", defaultContent: "-"},
-				{data: "amountOfAdministrativeApproval", title: "Total A.S. Amount ", defaultContent: "-"},
+				{data: "amountOfAdministrativeApproval", title: "Total Administrative Sanction Amount ", defaultContent: "-"},
 				{data: "yearOfAdministrativeApproval", title: "Year of Administrative Sanction", defaultContent: "-"},
-				{data: "dateOfAdministrativeApproval", title: "A.S. Date", defaultContent: "-"},
+				{data: "dateOfAdministrativeApproval", title: "Administrative Sanction Date", defaultContent: "-"},
 				{data: "agreementDate", title: "Agreement Date", defaultContent: "-"},
 				{data: "agreementNo", title: "Agreement No", defaultContent: "-"},
 				{data: "workOrderDate", title: "Work Order", defaultContent: "-"},
@@ -1467,6 +1467,11 @@ $(document).ready(function () {
 						style="max-height: 500px;" />
 				</div>
 
+				<button type="button" style="position: absolute;right: 15px;top: 20%;"
+				    class="btn btn-sm btn-dark" onclick="openZoomOverlay()">
+				    <i class="fa fa-expand"></i>
+				</button>
+
 
 
 
@@ -1586,6 +1591,54 @@ window.showPrevImage = function () {
     }
 };
     /*]]>*/
+</script>
+
+<!-- Zoom Overlay with Prev/Next -->
+<div id="zoomOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:99999;align-items:center;justify-content:center;">
+    <button onclick="closeZoomOverlay()" style="position:absolute;top:15px;right:20px;background:none;border:none;color:#fff;font-size:32px;cursor:pointer;">&times;</button>
+    <button onclick="zoomPrev()" style="position:absolute;left:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:40px;padding:10px 18px;border-radius:50%;cursor:pointer;">&#8249;</button>
+    <img id="zoomImage" src="" style="max-width:90%;max-height:90vh;border-radius:6px;box-shadow:0 0 30px rgba(0,0,0,0.5);" />
+    <button onclick="zoomNext()" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:40px;padding:10px 18px;border-radius:50%;cursor:pointer;">&#8250;</button>
+    <div style="position:absolute;bottom:20px;color:#fff;font-size:14px;" id="zoomCounter"></div>
+</div>
+
+<script>
+/*<![CDATA[*/
+function openZoomOverlay() {
+    var src = document.getElementById('modalImage').src;
+    document.getElementById('zoomImage').src = src;
+    var total = window.currentImageList ? window.currentImageList.length : 1;
+    var idx = window.currentImageIndex !== undefined ? window.currentImageIndex : 0;
+    document.getElementById('zoomCounter').innerText = (idx + 1) + ' / ' + total;
+    document.getElementById('zoomOverlay').style.display = 'flex';
+}
+function closeZoomOverlay() {
+    document.getElementById('zoomOverlay').style.display = 'none';
+}
+function zoomNext() {
+    if (window.currentImageList && window.currentImageIndex < window.currentImageList.length - 1) {
+        window.currentImageIndex++;
+        window.showImageAt(window.currentImageIndex);
+        document.getElementById('zoomImage').src = document.getElementById('modalImage').src;
+        document.getElementById('zoomCounter').innerText = (window.currentImageIndex + 1) + ' / ' + window.currentImageList.length;
+    }
+}
+function zoomPrev() {
+    if (window.currentImageList && window.currentImageIndex > 0) {
+        window.currentImageIndex--;
+        window.showImageAt(window.currentImageIndex);
+        document.getElementById('zoomImage').src = document.getElementById('modalImage').src;
+        document.getElementById('zoomCounter').innerText = (window.currentImageIndex + 1) + ' / ' + window.currentImageList.length;
+    }
+}
+document.addEventListener('keydown', function(e) {
+    var overlay = document.getElementById('zoomOverlay');
+    if (!overlay || overlay.style.display === 'none') return;
+    if (e.key === 'ArrowRight') zoomNext();
+    else if (e.key === 'ArrowLeft') zoomPrev();
+    else if (e.key === 'Escape') closeZoomOverlay();
+});
+/*]]>*/
 </script>
 
 </body>

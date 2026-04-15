@@ -38,6 +38,30 @@ dms
 				templateUrl: 'manageOngoingWorks',
 				controller : 'CommonController'
 			})
+			.when('/departmentWiseWorksReport',{
+				templateUrl: 'departmentWiseWorksReport',
+				controller : 'CommonController'
+			})
+			.when('/photoUpdateReport',{
+				templateUrl: 'photoUpdateReport',
+				controller : 'CommonController'
+			})
+			.when('/dmRemarkWiseReport',{
+				templateUrl: 'dmRemarkWiseReport',
+				controller : 'CommonController'
+			})
+			.when('/reports', {
+				templateUrl: 'reports',
+				controller : 'CommonController'
+			})
+			.when('/inspectionReport', {
+				templateUrl: 'inspectionReport',
+				controller : 'CommonController'
+			})
+			.when('/workExpenditureReport', {
+				templateUrl: 'workExpenditureReport',
+				controller : 'CommonController'
+			})
 			.when('/viewCompletedWork',{
 				templateUrl: 'viewCompletedWork',
 				controller : 'CommonController'

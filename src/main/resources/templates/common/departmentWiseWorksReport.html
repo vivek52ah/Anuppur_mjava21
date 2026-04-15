@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css"/>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+<script th:src="@{/js/bootstrap-select.min.js}"></script>
+<script th:src="@{/js/bootstrap-select.js}"></script>
+
+<script>
+$(document).ready(function() {
+	$('#deptWiseDeptFilter').selectpicker({
+		actionsBox: true,
+		liveSearch: true,
+		noneSelectedText: '--Select Department--'
+	});
+	$('#deptWiseFyFilter').selectpicker({
+		actionsBox: true,
+		liveSearch: true,
+		noneSelectedText: '--Select Financial Year--'
+	});
+});
+</script>
+
+<style>
+thead th { color: #076659; background-color: #D0EAEB; }
+.table th, .table td { text-align: center; vertical-align: middle; }
+.card { margin-bottom: 1.5rem; box-shadow: 0 0 7px rgb(0 0 0 / 70%); border-radius: 7px; }
+select#deptWiseDeptFilter + button, select#deptWiseFyFilter + button { background: #fff; border: 1px solid #ccc; }
+.dropdown-menu.show { width: 100% !important; }
+a.count-link { font-weight: bold; }
+</style>
+</head>
+
+<div id="page-div">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a><span th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item active"><span>Department-wise Works Report</span></li>
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group">
+				<a class="btn" data-ng-click="doTheBack()"><i class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<i class="fa fa-bar-chart"></i>
+							<span> Department-wise Works Report </span>
+						</div>
+						<div class="card-body" data-ng-init="loadDeptWiseDepartmentOptions(); loadDeptWiseFyOptions();">
+
+							<!-- Filters -->
+							<div class="pr">
+								<form name="deptWiseReportForm" novalidate="novalidate">
+									<fieldset class="legend-border">
+										<legend class="legend-border">Filters</legend>
+										<div class="row">
+
+											<!-- Department Filter -->
+											<div class="form-group col-sm-6">
+												<select multiple="multiple" class="form-control selectpicker"
+													id="deptWiseDeptFilter"
+													name="deptWiseDeptFilter"
+													data-live-search="true"
+													data-actions-box="true"
+													title="--Select Department--">
+													<option data-ng-repeat="dept in deptWiseDepartmentOptions"
+														value="{{dept.implementationAgencyId}}">{{dept.implementationAgencyNameE}}</option>
+												</select>
+											</div>
+
+											<!-- Financial Year Filter -->
+											<div class="form-group col-sm-6">
+												<select multiple="multiple" class="form-control selectpicker"
+													id="deptWiseFyFilter"
+													name="deptWiseFyFilter"
+													data-live-search="true"
+													data-actions-box="true"
+													title="--Select Financial Year--">
+													<option data-ng-repeat="fy in deptWiseFyOptions"
+														value="{{fy.financialYearId}}">{{fy.financialYearName}}</option>
+												</select>
+											</div>
+
+										</div>
+									</fieldset>
+								</form>
+							</div>
+
+							<!-- Action Buttons -->
+							<div class="form-group col-sm-12 text-right mt-2">
+								<button type="button" class="btn btn-primary"
+									data-ng-click="fetchDeptWiseReport();">Search</button>
+								<button type="button" class="btn btn-secondary"
+									data-ng-click="resetDeptWiseFilters();">Reset</button>
+							</div>
+
+							<!-- Summary Table -->
+							<div class="table-responsive">
+								<table class="table table-bordered table-striped" style="width:100%">
+									<thead>
+										<tr>
+											<th>S.No</th>
+											<th>Department Name</th>
+											<th>Financial Year</th>
+											<th>Total Works</th>
+											<th>Completed Work</th>
+											<th>Ongoing Work</th>
+											<th>Not Started Work</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr data-ng-if="!deptWiseReportRows || deptWiseReportRows.length === 0">
+											<td colspan="7">No data available</td>
+										</tr>
+										<tr data-ng-repeat="row in deptWiseReportRows track by $index">
+											<td>{{$index + 1}}</td>
+											<td>{{row.implementationAgencyName || '-'}}</td>
+											<td>{{row.financialYearName}}</td>
+											<td><a class="count-link" data-ng-href="{{getDeptWiseDetailUrl(row, '')}}">{{row.totalWorks}}</a></td>
+											<td><a class="count-link" data-ng-href="{{getDeptWiseDetailUrl(row, 'COMPLETED')}}">{{row.completedWorks}}</a></td>
+											<td><a class="count-link" data-ng-href="{{getDeptWiseDetailUrl(row, 'ONGOING')}}">{{row.ongoingWorks}}</a></td>
+											<td><a class="count-link" data-ng-href="{{getDeptWiseDetailUrl(row, 'NOT_STARTED')}}">{{row.notStartedWorks}}</a></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</html>

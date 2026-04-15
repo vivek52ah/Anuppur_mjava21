@@ -46,7 +46,7 @@
 		<li class="breadcrumb-menu d-md-down-none">
 			<div class="btn-group" role="group" aria-label="Button group">
 				<a class="btn" href="#" data-ng-click="doTheBack()"><i
-					class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+					class="icon-arrow-left-circle"></i> &nbsp;<span >Back</span></a>
 			</div>
 		</li>
 	</ol>
@@ -75,7 +75,7 @@
 								</div>
 								<div class="row">
 								<div class="form-group col-sm-4" >
-										<label><span th:text="#{Designation}">Designation</span><span class="aestrick">&#42;</span></label>
+										<label><span >Designation</span><span class="aestrick">&#42;</span></label>
 										<select name="userType" class="form-control"
 											data-ng-init="loadDesignation()"
 											data-ng-model="userData.designationId" data-ng-disabled="userData.id != null"
@@ -492,11 +492,11 @@
 							</div>
 							<div class="card-footer text-right" data-ng-hide ="userData.id != null"> 
 								<button type="submit" class="btn btn-sm btn-primary" id="submit" >
-									<span th:text="#{submit}">Submit</span>
+									<span >Submit</span>
 								</button></div>
 								<div data-ng-hide="userData.id == null" class="card-footer text-right">
 								<button type="button" class="btn btn-sm btn-primary"  data-ng-click="editUser(userForm.$valid)"  id="submit2">
-									<span th:text="#{submit}">Submit</span>
+									<span >Submit</span>
 								</button>
 								<!-- <button type="reset" class="btn btn-sm btn-danger">Reset</button> -->
 							</div>

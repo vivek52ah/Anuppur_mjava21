@@ -9,6 +9,9 @@ import com.anuppur.bean.BlockBean;
 import com.anuppur.bean.CCBean;
 import com.anuppur.bean.ContractorBean;
 import com.anuppur.bean.DepartmentMasterBean;
+import com.anuppur.bean.DepartmentWiseReportRowBean;
+import com.anuppur.bean.DmRemarkWiseReportRowBean;
+import com.anuppur.bean.PhotoUpdateReportRowBean;
 import com.anuppur.bean.DepartmentRemarksBean;
 import com.anuppur.bean.DistrictBean;
 import com.anuppur.bean.DivisionBean;
@@ -277,7 +280,7 @@ public interface CommonService {
 
 	WorkJson fetchWorksList(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
 			List<Long> fyList, List<Long> agencyList, String blockId, String workStatus, String districtName,
-			String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark);
+			String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark, List<Long> departmentList);
 
 	WorkJson fetchHandoverWorksList(Pageable pageable, String workNo, String workName, String scheme, String workType,
 			String financialYear, String implementationAgency, String blockId, String workStatus, String divisionId,
@@ -458,4 +461,14 @@ public interface CommonService {
 	DepartmentRemarksBean getDepartmentRemarksDetailsById(Long long1);
 
 	Boolean deleteDepartmentRemarks(Long long1);
+
+	List<GeoTaggingBean> getGeoTaggingForWorkList(Long workId);
+
+	List<WorkBean> getWorkDetailsWithGeo();
+
+	List<DepartmentWiseReportRowBean> getDepartmentWiseReport(List<Long> agencyIds, List<Long> financialYearIds);
+
+	List<PhotoUpdateReportRowBean> getPhotoUpdateReport(List<Long> departmentIds);
+
+	List<DmRemarkWiseReportRowBean> getDmRemarkWiseReport(List<Long> deptMasterIds, List<Long> implAgencyIds);
 }

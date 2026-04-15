@@ -268,7 +268,7 @@
 
 
 							<div class="form-group col-sm-4">
-								<label><span th:text="#{tsOrderNo}">TS Order No.
+								<label><span >Technical Sanction Order No.
 								</span><span class="aestrick">&#42;</span></label> <input type="text"
 									data-ng-disabled="workData.isDisabledDep == false"
 									class="form-control" id="tsNo" required="required"
@@ -285,7 +285,7 @@
 							</div>
 
 							<div class="form-group col-sm-4">
-								<label><span th:text="#{tsOrderDate}">TS Order
+								<label><span >Technical Sanction Order
 										Date </span><span class="aestrick">&#42;</span></label>
 								<div class="input-group date" id="datetimepicker3"
 									data-target-input="nearest">
@@ -316,7 +316,7 @@
 							</div>
 
 							<div class="form-group col-sm-4">
-								<label><span th:text="#{tsAmount}">TS Amount (In
+								<label><span >Technical Sanction Amount (In
 										Lacs )</span><span class="aestrick">&#42;</span></label> <input type="text"
 									data-ng-disabled="workData.isDisabledDep == false"
 									class="form-control number-OnlyTwoDecimal" id="tsAmt"
@@ -350,7 +350,7 @@
 
 							<div class="form-group col-sm-4">
 								<div class="form-group">
-									<label> <span th:text="#{uploadTechnicalSanctionFile}">Upload
+									<label> <span >Upload
 											Technical Sanction File</span><span class="aestrick">&#42;</span>
 									</label> <input type='file' accept=".pdf" class="form-control"
 										data-ng-disabled="workData.tsFileId!=null" required="required"
@@ -432,16 +432,16 @@
 
 
 
-
+					
 
 					<div class="card-header">
-						<span>Administrative Approval Details</span>
+						<span>Administrative Sanction Details</span>
 					</div>
 					<div class="card-body">
 						<div class="row">
 
 							<div class="form-group col-sm-4">
-								<label><span th:text="#{asOrderNo}"></span><span
+								<label><span >Administrative Sanction Order No.</span><span
 									class="aestrick">&#42;</span></label> <input type="text"
 									class="form-control" id="asNo" required="required"
 									data-ng-disabled="workData.isDisabledDep == false"
@@ -457,7 +457,7 @@
 							</div>
 
 							<div class="form-group col-sm-4">
-								<label><span th:text="#{asOrderDate}">AA Order
+								<label><span >Administrative Sanction Order
 										Date </span><span class="aestrick">&#42;</span></label>
 								<div class="input-group date" id="datetimepicker4"
 									data-target-input="nearest">
@@ -488,7 +488,7 @@
 
 
 							<div class="form-group col-sm-4">
-								<label><span th:text="#{asAmount}">AA Amount (In
+								<label><span >Administrative Sanction Amount (In
 										Lacs )</span> <span class="aestrick">&#42;</span></label> <input type="text"
 									class="form-control number-OnlyTwoDecimal" id="asAmt"
 									data-ng-model="workData.asAmt" name="asAmt" required="required"
@@ -521,8 +521,8 @@
 
 							<div class="form-group col-sm-4">
 								<div class="form-group">
-									<label> <span th:text="#{uploadASSanctionFile}">Upload
-											Administrative Approval File</span> <span class="aestrick">&#42;</span>
+									<label> <span >Upload
+											Administrative Sanction File</span> <span class="aestrick">&#42;</span>
 									</label> <input type='file' accept=".pdf"
 										data-ng-disabled="workData.asFileId!=null"
 										class="form-control" data-file-model="AdPdfFile"
@@ -704,7 +704,7 @@
     </div>
     
     <div class="form-group col-sm-4">
-							<label>Total AS (In Lacs)</label> <input type="text" 
+							<label>Total Administrative Sanction (In Lacs)</label> <input type="text" 
 								class="form-control" ng-value="getTotalCost()" readonly="readonly"/>
 						</div>
 

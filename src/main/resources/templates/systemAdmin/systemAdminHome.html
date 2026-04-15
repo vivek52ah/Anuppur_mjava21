@@ -163,23 +163,14 @@
 									href="#manageGrampanchayat"><i
 										class="icon-arrow-right-circle"></i><span>Gram
 											Panchayat</span></a></li>
-								<!--
-								<li class="nav-item "><a class="nav-link"
-									href="#manageHead"><i class="icon-arrow-right-circle"></i><span>Segment
-											Master</span></a></li>
-
-							 	<li class="nav-item "><a class="nav-link"
-									href="#manageScheme"><i class="icon-arrow-right-circle"></i><span>Scheme
-											Master</span></a></li>
-
-								<li class="nav-item "><a class="nav-link" href="#manageSor"><i
-										class="icon-arrow-right-circle"></i><span>SOR Master</span></a></li>
-
-								<li class="nav-item "><a class="nav-link" href="#manageSdr"><i
-										class="icon-arrow-right-circle"></i><span>Delay Reason
-											Master</span></a></li>
- -->
 							</ul></li>
+
+						<li class="nav-item navigation" th:if="${roleName=='ROLE_SYSTEM_ADMIN'}">
+							<a class="nav-link" th:href="@{/systemAdmin/bulkWork/uploadPage}">
+								<i class="fa fa-file-excel-o" aria-hidden="true"></i>
+								<span>Bulk Work Upload</span>
+							</a>
+						</li>
 
 						<li id="a2" class="nav-item nav-dropdown nav-dropdownnew2"
 							th:if="${roleName=='ROLE_DM' || roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DEPARTMENT'}"><a
@@ -226,6 +217,21 @@
 									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName=='ROLE_DEPARTMENT'} "><a
 									class="nav-link" href="#workExpenditureReport"><i
 										class="icon-arrow-right-circle"></i><span>Work Expenditure Report</span></a></li>
+
+									<li class="nav-item"
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName=='ROLE_DEPARTMENT'} "><a
+									class="nav-link" href="#departmentWiseWorksReport"><i
+										class="icon-arrow-right-circle"></i><span>Department Wise Works Report</span></a></li>
+
+									<li class="nav-item"
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName=='ROLE_DEPARTMENT'}"><a
+									class="nav-link" href="#photoUpdateReport"><i
+										class="icon-arrow-right-circle"></i><span>Photo Update Report</span></a></li>
+
+									<li class="nav-item"
+									th:if="${roleName=='ROLE_SYSTEM_ADMIN' || roleName=='ROLE_DM' || roleName=='ROLE_DEPARTMENT'}"><a
+									class="nav-link" href="#dmRemarkWiseReport"><i
+										class="icon-arrow-right-circle"></i><span>DM Remark Wise Report</span></a></li>
 
 								<!-- <li class="nav-item"
 									th:if="${roleName=='' } "><a

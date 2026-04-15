@@ -1397,19 +1397,19 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 								
 								//Expenditure Report Query
 								@Query(value = "SELECT w.work_no, w.work_name, w.implementation_agency, w.user_id, wt.pac, wp.total_expensess, " +
-								        "MAX(ec.expensess_upto_march) AS total_expensess_upto_march, w.work_status, ec.created_date " +
-								        "FROM dhs_anuppur.t_work w " +
-								        "LEFT JOIN dhs_anuppur.t_work_progress wp ON w.id = wp.work_id " +
-								        "LEFT JOIN dhs_anuppur.t_work_tender wt ON w.id = wt.work_id " +
-								        "LEFT JOIN dhs_anuppur.expenses_cost ec ON w.id = ec.work_id " +
-								        "WHERE (ec.year, ec.month) = (SELECT ec.year, ec.month FROM expenses_cost  ORDER BY ec.year DESC, ec.month DESC LIMIT 1) " +
+								        "MAX(ec.expensess_upto_march) AS total_expensess_upto_march, w.work_status, MAX(ec.created_date) AS created_date " +
+								        "FROM t_work w " +
+								        "LEFT JOIN t_work_progress wp ON w.id = wp.work_id " +
+								        "LEFT JOIN t_work_tender wt ON w.id = wt.work_id " +
+								        "LEFT JOIN expenses_cost ec ON w.id = ec.work_id " +
+								        "WHERE w.status = 'Active' " +
 								        "AND (:workStatus IS NULL OR w.work_status = :workStatus) " +
 								        "AND (:userId IS NULL OR w.user_id = :userId) " +
 								        "AND (:agencyId IS NULL OR w.implementation_agency = :agencyId) " +
 								        "AND (:workName IS NULL OR LOWER(w.work_name) LIKE LOWER(CONCAT('%', :workName, '%'))) " +
 								        "GROUP BY w.work_no, w.work_name, w.implementation_agency, w.user_id, wt.pac, wp.total_expensess, w.work_status " +
-								        "ORDER BY w.id desc",
-								       nativeQuery = true)
+								        "ORDER BY MAX(w.id) desc",
+								        nativeQuery = true)
 								List<Object[]> fetchWorkWithLatestExpensesFilters(
 								        @Param("workStatus") Long workStatus,
 								        @Param("userId") Long userId,
@@ -1475,6 +1475,8 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 
 
 								List<Work> findById(Long workId);
+
+								List<Work> findByStatus(String statusActive);
 
 								
 

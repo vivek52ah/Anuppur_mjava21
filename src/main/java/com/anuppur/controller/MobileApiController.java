@@ -578,4 +578,21 @@ public class MobileApiController extends BaseController {
 		}
 
 	}
+	
+	
+	
+	@RequestMapping(value = "fetchWorkStatus", method = RequestMethod.GET)
+	public List<WorkStatusBean> fetchWorkStatus(HttpServletRequest request) {
+		
+	return	commonService.fetchWorkStatus();
+		
+	}
+	
+	@RequestMapping(value = "fetchWorkSubStatus", method = RequestMethod.GET)
+	public List<WorkSubStatusBean> fetchWorkSubStatus(HttpServletRequest request) {
+		
+	return	commonService.getWorkSubStatus();
+		
+	}
+	
 }

@@ -604,7 +604,7 @@
 							name="totalExpensess" data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/"
 							step="0.01" disabled="disabled" />
 
-						<div data-ng-show="workFormProgress.$submitted">
+						<!-- <div data-ng-show="workFormProgress.$submitted">
 							<div>
 								<p class="help-block" style="color: red;">
 									<span class="help-block"
@@ -612,7 +612,7 @@
 										Add Max. Two Decimal! </span>
 								</p>
 							</div>
-						</div>
+						</div> -->
 						<!--  <div data-ng-show="workFormProgress.$submitted">
 						<div data-ng-show="workDataProgress.workStatusId=='10' ||workDataProgress.workStatusId=='11'  ">
 							<p class="help-block" style="color: red;"
@@ -670,11 +670,11 @@
 				
 
 
-				<div class="row" data-ng-show="workDataProgress.workStatusId=='9' "
-					data-ng-hide="workDataProgress.workStatusId=='11' || workDataProgress.workStatusId=='10' || workDataProgress.workStatus=='notProgressIssued'">
+			<!-- 	<div class="row" data-ng-show="workDataProgress.workStatusId=='9' "
+					data-ng-hide="workDataProgress.workStatusId=='11' || workDataProgress.workStatusId=='10' || workDataProgress.workStatus=='notProgressIssued'"> -->
 
 
-					<div class="form-group col-sm-4">
+					<!-- <div class="form-group col-sm-4">
 
 						<label><span>Expenditure till 31 March (A) (In Lacs
 								)</span></label> <input type="number" min="0" class="form-control"
@@ -682,11 +682,11 @@
 							name="expensessUptoMarch" disabled="disabled" />
 
 
-					</div>
+					</div> -->
 
 
 
-					<div class="form-group col-sm-4">
+					<!-- <div class="form-group col-sm-4">
 
 
 						<label><span>Expenditure in current financial year
@@ -696,11 +696,11 @@
 
 
 					</div>
+ -->
 
 
 
-
-					<div class="form-group col-sm-4">
+					<!-- <div class="form-group col-sm-4">
 
 
 						<label><span>Total Updated Expenditure (A+B) (In
@@ -709,7 +709,7 @@
 							disabled="disabled" />
 
 
-					</div>
+					</div> -->
 
 
 
@@ -730,8 +730,8 @@
 					</div> -->
 
 
-				</div>
-				
+				<!-- </div>
+ -->				
 				
 				
 				
@@ -858,12 +858,12 @@
 
 								<div class="pr">
 									<form name="searchForm" novalidate="novalidate" id="searchForm">
-										<fieldset class="legend-border">
+										<!-- <fieldset class="legend-border">
 											<legend class="legend-border">Filters</legend>
 
 											<div class="row">
 
-							<!--					<div class="form-group col-sm-4">
+												<div class="form-group col-sm-4">
 													<select class="form-control" id="year"
 														data-ng-model="workData.year" data-ng-init="loadYears();"
 														data-ng-change="reloadedJqueryDatatableex();" name="year">
@@ -873,7 +873,7 @@
 															value="{{year.year}}">{{year.year}}</option>
 													</select>
 												</div>
--->
+
 											</div>
 
 
@@ -881,7 +881,7 @@
 
 
 
-										</fieldset>
+										</fieldset> -->
 									</form>
 								</div>
 

@@ -128,6 +128,17 @@ public class WorkRepositoryCustomImpl {
                 Long districtId, List<Long> workStatusId, List<Long> agency,
                 List<Long> workPriority, List<Long> financialHead, List<Long> vidhanSabha,
                 String workNameFilter, List<Long> blockId, String departmentRemark) {
+        return findAllByStatusNotDeleted(pageable, workNo, workTypeId, financialYear, districtId,
+                workStatusId, agency, workPriority, financialHead, vidhanSabha,
+                workNameFilter, blockId, departmentRemark, null);
+    }
+
+    public Page<Work> findAllByStatusNotDeleted(Pageable pageable,
+                String workNo, List<Long> workTypeId, List<Long> financialYear,
+                Long districtId, List<Long> workStatusId, List<Long> agency,
+                List<Long> workPriority, List<Long> financialHead, List<Long> vidhanSabha,
+                String workNameFilter, List<Long> blockId, String departmentRemark,
+                List<Long> departmentList) {
 
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
@@ -156,6 +167,12 @@ public class WorkRepositoryCustomImpl {
             Predicate dmRemarksPredicate = addDepartmentRemarksFilter(cb, query, work, departmentRemark);
             if (dmRemarksPredicate != null) {
                 predicates.add(dmRemarksPredicate);
+            }
+
+            // Filter: Department (by department master ID via DepartmentRemarks)
+            Predicate deptPredicate = addDepartmentFilter(cb, query, work, departmentList);
+            if (deptPredicate != null) {
+                predicates.add(deptPredicate);
             }
 
             // Multiple values filters (List)
@@ -216,6 +233,12 @@ public class WorkRepositoryCustomImpl {
             Predicate dmRemarksCountPredicate = addDepartmentRemarksFilter(cb, countQuery, countRoot, departmentRemark);
             if (dmRemarksCountPredicate != null) {
                 countPredicates.add(dmRemarksCountPredicate);
+            }
+
+            // Filter: Department for count
+            Predicate deptCountPredicate = addDepartmentFilter(cb, countQuery, countRoot, departmentList);
+            if (deptCountPredicate != null) {
+                countPredicates.add(deptCountPredicate);
             }
 
             if (workTypeId != null && !workTypeId.isEmpty()) {
@@ -689,6 +712,23 @@ public class WorkRepositoryCustomImpl {
 
 	
 	
+
+	// Helper method to add department filter (by department master ID via DepartmentRemarks)
+	private Predicate addDepartmentFilter(CriteriaBuilder cb, CriteriaQuery<?> query, Root<Work> work, List<Long> departmentList) {
+		if (departmentList != null && !departmentList.isEmpty()) {
+			Subquery<Long> deptSubquery = query.subquery(Long.class);
+			Root<DepartmentRemarks> deptRoot = deptSubquery.from(DepartmentRemarks.class);
+			deptSubquery.select(deptRoot.get("workId"))
+				.where(
+					cb.and(
+						deptRoot.get("depertmentMasterId").in(departmentList),
+						cb.equal(deptRoot.get("enabled"), (short) 1)
+					)
+				);
+			return work.get("id").in(deptSubquery);
+		}
+		return null;
+	}
 
 	// Helper method to add department remarks filter
 	private Predicate addDepartmentRemarksFilter(CriteriaBuilder cb, CriteriaQuery<?> query, Root<Work> work, String departmentRemark) {

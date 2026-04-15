@@ -36,6 +36,8 @@ public class WorkBean {
     
 	private String agreementDate;
 	
+	private List<GeoTaggingBean> geoTaggingBeans;
+	
 	private String agreementNo;
        
 	public Boolean getIsGeoTagged() {
@@ -1406,6 +1408,14 @@ public class WorkBean {
 
 	public final void setDateOfCompletion(String dateOfCompletion) {
 		this.dateOfCompletion = dateOfCompletion;
+	}
+
+	public final List<GeoTaggingBean> getGeoTaggingBeans() {
+		return geoTaggingBeans;
+	}
+
+	public final void setGeoTaggingBeans(List<GeoTaggingBean> geoTaggingBeans) {
+		this.geoTaggingBeans = geoTaggingBeans;
 	}
 
 	

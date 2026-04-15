@@ -1256,7 +1256,22 @@ td {
 	                    return `<input type="text" class="form-control cost-input" data-id="${data}" data-workid="${row.workId}" data-financialheadid="${row.financialHeadId}" data-cost="${row.cost}"  />`;
 	                }
 	            }
-	        ]
+	        ],
+	        "initComplete": function(settings, json) {
+	            if (json && json.data) {
+	                var total = 0;
+	                json.data.forEach(function(row) {
+	                    var val = parseFloat(row.expenditure);
+	                    if (!isNaN(val)) total += val;
+	                });
+	                var scope = angular.element("#page-fa-div").scope();
+	                if (scope) {
+	                    scope.$apply(function() {
+	                        scope.workDataProgress.totalExpensess = parseFloat(total.toFixed(2));
+	                    });
+	                }
+	            }
+	        }
 	    });
 	}
 

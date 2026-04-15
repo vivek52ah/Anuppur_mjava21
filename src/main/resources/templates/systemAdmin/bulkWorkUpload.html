@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bulk Work Upload</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}" type="image/x-icon" />
+    <div th:replace="fragments/header :: header-css" />
+    <style>
+        .upload-section { margin-bottom: 24px; }
+        .result-box { margin-top: 20px; }
+        .error-table { font-size: 13px; }
+        .mandatory-note { color: #c0392b; font-size: 12px; }
+        .file-hint { color: #888; font-size: 12px; }
+        .doc-filename { font-family: monospace; background: #f4f4f4; padding: 4px 8px; border-radius: 3px; }
+    </style>
+</head>
+<body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+<div class="controller">
+    <div th:replace="fragments/header :: header_after_login" />
+    <div class="app-body">
+        <main class="main" style="padding: 20px;">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/systemAdmin/home}">Home</a></li>
+                <li class="breadcrumb-item active">Bulk Work Upload</li>
+            </ol>
+
+            <div class="container-fluid">
+                <div class="animated fadeIn">
+
+                    <!-- Pre-upload Document Section -->
+                    <div class="row upload-section">
+                        <div class="col-md-10">
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fa fa-file-pdf-o"></i> Step 1: Pre-upload TS &amp; AS Documents
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted" style="font-size:13px;">
+                                        Upload TS and AS documents separately before filling the Excel template.
+                                        Copy the returned filename into the corresponding column in the Excel file.
+                                    </p>
+
+                                    <div class="row">
+                                        <!-- TS Upload -->
+                                        <div class="col-md-5">
+                                            <div class="card" style="border:1px solid #d4e6f1;">
+                                                <div class="card-header" style="background:#d4e6f1;font-weight:bold;">
+                                                    <i class="fa fa-file-text-o"></i> Technical Sanction (TS) Document
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <label>Select TS Document (PDF)</label>
+                                                        <input type="file" id="tsDocFile" class="form-control-file"
+                                                               accept=".pdf,.jpg,.jpeg,.png" />
+                                                        <small class="file-hint">Accepted: PDF, JPG, PNG</small>
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-info"
+                                                            onclick="uploadTsDocument()">
+                                                        <i class="fa fa-upload"></i> Upload TS Document
+                                                    </button>
+                                                    <div id="tsUploadResult" style="display:none;" class="mt-2">
+                                                        <span class="text-success"><i class="fa fa-check-circle"></i> Uploaded:</span>
+                                                        <span id="tsFileName" class="doc-filename"></span>
+                                                        <button type="button" class="btn btn-xs btn-default ml-1"
+                                                                onclick="copyText('tsFileName')" title="Copy">
+                                                            <i class="fa fa-copy"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div id="tsUploadError" class="text-danger mt-2" style="display:none;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- AS Upload -->
+                                        <div class="col-md-5 ml-md-3">
+                                            <div class="card" style="border:1px solid #d5f5e3;">
+                                                <div class="card-header" style="background:#d5f5e3;font-weight:bold;">
+                                                    <i class="fa fa-file-text-o"></i> Administrative Sanction (AS) Document
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <label>Select AS Document (PDF)</label>
+                                                        <input type="file" id="asDocFile" class="form-control-file"
+                                                               accept=".pdf,.jpg,.jpeg,.png" />
+                                                        <small class="file-hint">Accepted: PDF, JPG, PNG</small>
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-success"
+                                                            onclick="uploadAsDocument()">
+                                                        <i class="fa fa-upload"></i> Upload AS Document
+                                                    </button>
+                                                    <div id="asUploadResult" style="display:none;" class="mt-2">
+                                                        <span class="text-success"><i class="fa fa-check-circle"></i> Uploaded:</span>
+                                                        <span id="asFileName" class="doc-filename"></span>
+                                                        <button type="button" class="btn btn-xs btn-default ml-1"
+                                                                onclick="copyText('asFileName')" title="Copy">
+                                                            <i class="fa fa-copy"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div id="asUploadError" class="text-danger mt-2" style="display:none;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Template Download + Upload Section -->
+                    <div class="row upload-section">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fa fa-upload"></i> Bulk Work Creation
+                                </div>
+                                <div class="card-body">
+
+                                    <!-- Step 1: Download Template -->
+                                    <div class="mb-3">
+                                        <strong>Step 2:</strong> Download the Excel template, fill in work details,
+                                        then upload the completed file below.
+                                        <br/>
+                                        <a th:href="@{/systemAdmin/bulkWork/downloadTemplate}"
+                                           class="btn btn-sm btn-success mt-2">
+                                            <i class="fa fa-download"></i> Download Template
+                                        </a>
+                                    </div>
+
+                                    <hr/>
+
+                                    <!-- Step 2: Upload -->
+                                    <div>
+                                        <strong>Step 3:</strong> Select the completed Excel file and upload.
+                                        <span class="mandatory-note">* Only .xlsx files are accepted</span>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="form-group col-sm-6">
+                                            <label>Select Excel File (.xlsx)</label>
+                                            <input type="file" id="bulkFile" class="form-control-file"
+                                                   accept=".xlsx" onchange="validateFileType(this)" />
+                                            <small id="fileTypeError" class="text-danger" style="display:none;">
+                                                Only .xlsx files are accepted
+                                            </small>
+                                        </div>
+                                        <div class="form-group col-sm-3" style="padding-top:28px;">
+                                            <button type="button" id="uploadBtn" class="btn btn-sm btn-primary"
+                                                    onclick="submitUpload()">
+                                                <i class="fa fa-upload"></i> Upload and Create Works
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Spinner -->
+                                    <div id="uploadSpinner" style="display:none;" class="mt-2">
+                                        <i class="fa fa-spinner fa-spin"></i> Processing, please wait...
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Result Section -->
+                    <div id="resultSection" class="row result-box" style="display:none;">
+                        <div class="col-md-10">
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fa fa-info-circle"></i> Upload Result
+                                </div>
+                                <div class="card-body">
+                                    <div id="resultMessage" class="mb-3"></div>
+
+                                    <div id="resultStats" class="mb-3" style="display:none;">
+                                        <table class="table table-sm table-bordered" style="width:auto;">
+                                            <tr>
+                                                <th>Total Rows</th>
+                                                <td id="statTotal"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Successfully Created</th>
+                                                <td id="statSuccess" class="text-success"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Failed Rows</th>
+                                                <td id="statFailed" class="text-danger"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+
+                                    <div id="validationReportDiv" style="display:none;" class="mb-3">
+                                        <a id="validationReportLink" href="#" class="btn btn-sm btn-warning"
+                                           onclick="downloadValidationReport(); return false;">
+                                            <i class="fa fa-file-excel-o"></i> Download Validation Report
+                                        </a>
+                                    </div>
+
+                                    <div id="errorTableDiv" style="display:none;">
+                                        <h6>Row-Level Errors:</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-striped table-bordered error-table">
+                                                <thead class="thead-default">
+                                                    <tr>
+                                                        <th>Row #</th>
+                                                        <th>Column</th>
+                                                        <th>Error</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="errorTableBody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="app-footer">
+        <span>ANUPPUR - Monitoring System &copy; 2024. All rights reserved.</span>
+    </footer>
+
+    <div th:replace="fragments/footer :: footer" />
+</div>
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script>
+/*<![CDATA[*/
+    var validationReportBase64 = null;
+
+    function validateFileType(input) {
+        var errorEl = document.getElementById('fileTypeError');
+        if (input.files.length > 0) {
+            var name = input.files[0].name;
+            if (!name.toLowerCase().endsWith('.xlsx')) {
+                errorEl.style.display = 'block';
+                input.value = '';
+            } else {
+                errorEl.style.display = 'none';
+            }
+        }
+    }
+
+    function submitUpload() {
+        var fileInput = document.getElementById('bulkFile');
+        var errorEl = document.getElementById('fileTypeError');
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please select an Excel (.xlsx) file to upload.');
+            return;
+        }
+        var fileName = fileInput.files[0].name;
+        if (!fileName.toLowerCase().endsWith('.xlsx')) {
+            errorEl.style.display = 'block';
+            return;
+        }
+        errorEl.style.display = 'none';
+
+        var formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        document.getElementById('uploadBtn').disabled = true;
+        document.getElementById('uploadSpinner').style.display = 'block';
+        document.getElementById('resultSection').style.display = 'none';
+
+        $.ajax({
+            url: '/anuppur/systemAdmin/bulkWork/upload',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                showResult(response);
+            },
+            error: function(xhr) {
+                var msg = 'Upload failed. Please try again.';
+                try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
+                showErrorMessage(msg);
+            },
+            complete: function() {
+                document.getElementById('uploadBtn').disabled = false;
+                document.getElementById('uploadSpinner').style.display = 'none';
+            }
+        });
+    }
+
+    function showResult(data) {
+        validationReportBase64 = data.validationReportBase64 || null;
+
+        var msgEl = document.getElementById('resultMessage');
+        if (data.failureCount === 0 && data.successCount > 0) {
+            msgEl.innerHTML = '<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + escHtml(data.message) + '</div>';
+        } else if (data.successCount === 0) {
+            msgEl.innerHTML = '<div class="alert alert-danger"><i class="fa fa-times-circle"></i> ' + escHtml(data.message) + '</div>';
+        } else {
+            msgEl.innerHTML = '<div class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> ' + escHtml(data.message) + '</div>';
+        }
+
+        if (data.totalRows > 0) {
+            document.getElementById('statTotal').textContent = data.totalRows;
+            document.getElementById('statSuccess').textContent = data.successCount;
+            document.getElementById('statFailed').textContent = data.failureCount;
+            document.getElementById('resultStats').style.display = 'block';
+        }
+
+        if (validationReportBase64) {
+            document.getElementById('validationReportDiv').style.display = 'block';
+        }
+
+        if (data.errors && data.errors.length > 0) {
+            var tbody = document.getElementById('errorTableBody');
+            tbody.innerHTML = '';
+            data.errors.forEach(function(err) {
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td>' + err.rowNumber + '</td><td>' + escHtml(err.columnName) + '</td><td>' + escHtml(err.errorMessage) + '</td>';
+                tbody.appendChild(tr);
+            });
+            document.getElementById('errorTableDiv').style.display = 'block';
+        }
+
+        document.getElementById('resultSection').style.display = 'block';
+    }
+
+    function showErrorMessage(msg) {
+        document.getElementById('resultMessage').innerHTML =
+            '<div class="alert alert-danger"><i class="fa fa-times-circle"></i> ' + escHtml(msg) + '</div>';
+        document.getElementById('resultSection').style.display = 'block';
+    }
+
+    function downloadValidationReport() {
+        if (!validationReportBase64) return;
+        var byteChars = atob(validationReportBase64);
+        var byteNums = new Array(byteChars.length);
+        for (var i = 0; i < byteChars.length; i++) {
+            byteNums[i] = byteChars.charCodeAt(i);
+        }
+        var blob = new Blob([new Uint8Array(byteNums)],
+            {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'ValidationReport.xlsx';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function uploadTsDocument() {
+        uploadDocFile('tsDocFile', 'tsUploadResult', 'tsFileName', 'tsUploadError',
+                      '/anuppur/systemAdmin/bulkWork/uploadTsDocument');
+    }
+
+    function uploadAsDocument() {
+        uploadDocFile('asDocFile', 'asUploadResult', 'asFileName', 'asUploadError',
+                      '/anuppur/systemAdmin/bulkWork/uploadAsDocument');
+    }
+
+    function uploadDocFile(inputId, resultDivId, fileNameSpanId, errorDivId, url) {
+        var fileInput = document.getElementById(inputId);
+        var resultDiv = document.getElementById(resultDivId);
+        var errorDiv  = document.getElementById(errorDivId);
+        resultDiv.style.display = 'none';
+        errorDiv.style.display  = 'none';
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+            errorDiv.textContent = 'Please select a document file.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                document.getElementById(fileNameSpanId).textContent = response.fileName;
+                resultDiv.style.display = 'block';
+            },
+            error: function(xhr) {
+                errorDiv.textContent = 'Document upload failed. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        });
+    }
+
+    function copyText(spanId) {
+        var text = document.getElementById(spanId).textContent;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text);
+        } else {
+            var el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        }
+        alert('Copied: ' + text);
+    }
+
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+    
+    /*]]>*/
+</script>
+</body>
+</html>

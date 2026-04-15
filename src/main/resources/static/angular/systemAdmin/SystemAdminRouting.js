@@ -81,6 +81,18 @@ dms
 				templateUrl: 'manageOngoingWorks',
 				controller : 'CommonController'
 			})
+			.when('/departmentWiseWorksReport',{
+				templateUrl: 'departmentWiseWorksReport',
+				controller : 'CommonController'
+			})
+			.when('/photoUpdateReport',{
+				templateUrl: 'photoUpdateReport',
+				controller : 'CommonController'
+			})
+			.when('/dmRemarkWiseReport',{
+				templateUrl: 'dmRemarkWiseReport',
+				controller : 'CommonController'
+			})
 			.when('/editUserForm/:id', {
 				templateUrl: function(params){ return 'editUserForm/' + params.id; }, 
 				controller : 'SystemAdminController'
