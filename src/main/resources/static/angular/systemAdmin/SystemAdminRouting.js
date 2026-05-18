@@ -1,13 +1,7 @@
-var dms = angular.module('dms', ['ngRoute','darthwade.dwLoading','ngIdle','ui.bootstrap']);
-dms.config(['KeepaliveProvider', 'IdleProvider', function(KeepaliveProvider, IdleProvider) {
-	  IdleProvider.idle(1800);
-	  IdleProvider.timeout(2);
-	  KeepaliveProvider.interval(2);
-	}]);
+// Get the existing dms module (don't recreate it)
+var dms = angular.module('dms');
 
-dms.run(['Idle', function(Idle) {
-Idle.watch();
-}]);
+// Add routes to the existing module
 dms
 	.config( ['$routeProvider', function($routeProvider) {
 		$routeProvider

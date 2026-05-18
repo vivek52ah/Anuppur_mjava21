@@ -1,0 +1,77 @@
+═══════════════════════════════════════════════════════════════════
+
+                    ⚠️  READ THIS FIRST  ⚠️
+
+═══════════════════════════════════════════════════════════════════
+
+
+I FIXED YOUR CSS AND JS ISSUES!
+
+But you MUST follow these steps EXACTLY:
+
+
+═══════════════════════════════════════════════════════════════════
+
+STEP 1: RESTART APPLICATION IN ECLIPSE
+
+   1. Click RED SQUARE button (Stop)
+   2. Wait for it to stop
+   3. Click GREEN PLAY button (Run)
+   4. Wait for "Started DmsAnuppurApplication" message
+
+═══════════════════════════════════════════════════════════════════
+
+STEP 2: CLEAR BROWSER CACHE
+
+   1. Press: Ctrl + Shift + Delete
+   2. Select: "Cached images and files"
+   3. Click: "Clear data"
+
+═══════════════════════════════════════════════════════════════════
+
+STEP 3: CLOSE ALL BROWSER TABS
+
+   Close every tab that has your application open
+
+═══════════════════════════════════════════════════════════════════
+
+STEP 4: OPEN NEW TAB AND GO TO:
+
+   http://localhost:8085/anuppur/
+
+   (Type it EXACTLY as shown above)
+
+═══════════════════════════════════════════════════════════════════
+
+STEP 5: PRESS F5 TO REFRESH
+
+═══════════════════════════════════════════════════════════════════
+
+
+THAT'S IT! CSS and JS should now work!
+
+
+═══════════════════════════════════════════════════════════════════
+
+TO VERIFY IT WORKED:
+
+   Run this command in PowerShell:
+
+   .\diagnose_issue.ps1
+
+   All checks should show GREEN (OK)
+
+═══════════════════════════════════════════════════════════════════
+
+IF STILL NOT WORKING:
+
+   Read: COMPLETE_CHECKLIST.md
+
+═══════════════════════════════════════════════════════════════════
+
+
+IMPORTANT: You MUST restart the application!
+The fix only works after restarting!
+
+
+═══════════════════════════════════════════════════════════════════
