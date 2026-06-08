@@ -66,9 +66,32 @@ dms.run(['Idle', function(Idle) {
 Idle.watch();
 }]);
 
+window.__dmsStableJQuery = window.__dmsStableJQuery || window.jQuery;
+window.restoreDmsJQuery = function() {
+	var stableJQuery = window.__dmsStableJQuery;
+	if (!stableJQuery || !stableJQuery.fn) {
+		return window.jQuery;
+	}
+	var currentJQuery = window.jQuery;
+	var currentMissingPlugins = !currentJQuery || !currentJQuery.fn
+		|| (stableJQuery.fn.selectpicker && !currentJQuery.fn.selectpicker)
+		|| (stableJQuery.fn.DataTable && !currentJQuery.fn.DataTable);
+
+	// Some ng-view fragments include their own jQuery. When that executes it
+	// replaces $.fn and disconnects Bootstrap Select/DataTables from the app.
+	if (currentMissingPlugins) {
+		window.jQuery = stableJQuery;
+		window.$ = stableJQuery;
+	}
+	return window.jQuery || stableJQuery;
+};
+
 window.initManageOngoingWorksSelectpickers = function() {
-	var $ = window.jQuery;
+	var $ = typeof window.restoreDmsJQuery === 'function' ? window.restoreDmsJQuery() : window.jQuery;
 	if (!$ || typeof $.fn.selectpicker !== 'function') {
+		return false;
+	}
+	if (!$('#manageOngoingWorksRoot').length) {
 		return false;
 	}
 	var configs = {
@@ -93,6 +116,7 @@ window.initManageOngoingWorksSelectpickers = function() {
 		'#vidhanSabhaId1': 'vidhanSabhaId',
 		'#blockId': 'blockId'
 	};
+	window.manageOngoingWorksSelectpickerConfigs = configs;
 	function updateSelectpickerCaption($el, config) {
 		var selectedText = $el.find('option:selected').filter(function() {
 			return $(this).val() !== '';
@@ -151,6 +175,10 @@ window.initManageOngoingWorksSelectpickers = function() {
 		var $el = $(sel);
 		if (!$el.length) return;
 		try {
+			$el.addClass('selectpicker');
+			if ($el.data('selectpicker') && !$el.closest('.bootstrap-select').length) {
+				$el.removeData('selectpicker');
+			}
 			if ($el.data('selectpicker')) {
 				$el.selectpicker('refresh');
 			} else {
@@ -202,26 +230,31 @@ window.initManageOngoingWorksSelectpickers = function() {
 };
 
 window.refreshSelectpickerAfterLoad = function(selector) {
-	var $ = window.jQuery;
+	var $ = typeof window.restoreDmsJQuery === 'function' ? window.restoreDmsJQuery() : window.jQuery;
 	if (!$ || typeof $.fn.selectpicker !== 'function') return;
-	// Small delay so Angular finishes rendering ng-repeat options
-	setTimeout(function() {
+	var attempts = 0;
+	function refreshWhenReady() {
+		attempts++;
 		var $el = $(selector);
 		if (!$el.length) return;
 		try {
+			$el.addClass('selectpicker');
+			if ($el.data('selectpicker') && !$el.closest('.bootstrap-select').length) {
+				$el.removeData('selectpicker');
+			}
 			if ($el.data('selectpicker')) {
 				$el.selectpicker('refresh');
 			} else {
-				$el.selectpicker();
+				var configs = window.manageOngoingWorksSelectpickerConfigs || {};
+				$el.selectpicker(configs[selector] || {});
 			}
 		} catch(e) {}
-	}, 50);
-};
-
-window.safeSelectpickerRefresh = function(selector) {
-	if (typeof window.refreshSelectpickerAfterLoad === 'function') {
-		window.refreshSelectpickerAfterLoad(selector);
+		if ($el.find('option').not('[value=""]').length === 0 && attempts < 20) {
+			setTimeout(refreshWhenReady, 100);
+		}
 	}
+	// Small delay so Angular finishes rendering ng-repeat options
+	setTimeout(refreshWhenReady, 50);
 };
 
 window.safeSelectpickerRefresh = function(selector) {
@@ -235,6 +268,9 @@ window.safeSelectpickerRefresh = function(selector) {
 dms.run(['$rootScope', '$timeout', function($rootScope, $timeout) {
 	$rootScope.$on('$viewContentLoaded', function() {
 		$timeout(function() {
+			if (typeof window.restoreDmsJQuery === 'function') {
+				window.restoreDmsJQuery();
+			}
 			var view = document.querySelector('[ng-view]');
 			if (!view) {
 				return;
@@ -295,13 +331,16 @@ dms.run(['$rootScope', '$timeout', function($rootScope, $timeout) {
 
 	// Cleanup all DataTables when leaving any route to prevent CSS/JS conflicts
 	$rootScope.$on('$routeChangeStart', function(event, next, current) {
-		if ($.fn && $.fn.DataTable) {
+		var $ = typeof window.restoreDmsJQuery === 'function' ? window.restoreDmsJQuery() : window.jQuery;
+		if ($ && $.fn && $.fn.DataTable) {
 			$.fn.DataTable.tables({ visible: false, api: true }).destroy();
 		}
 		// Remove any lingering modal backdrops
-		$('.modal-backdrop').remove();
-		$('body').removeClass('modal-open');
-		$('body').css('padding-right', '');
+		if ($) {
+			$('.modal-backdrop').remove();
+			$('body').removeClass('modal-open');
+			$('body').css('padding-right', '');
+		}
 	});
 
 	$rootScope.$on('$routeChangeSuccess', function(event, current) {
