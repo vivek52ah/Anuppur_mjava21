@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.anuppur.entity.Schemes;
 import com.anuppur.entity.WorkHead;
@@ -14,7 +16,8 @@ public interface SchemeRepository extends JpaRepository<Schemes, Long> {
 	List<Schemes> findByEnabled(Short isEnabled);
 	
 	
-	Schemes findBySchemeName(Long schemeName);
+	@Query(value = "SELECT * FROM mst_schemes WHERE scheme_name = :schemeName LIMIT 1", nativeQuery = true)
+	Schemes findBySchemeName(@Param("schemeName") Long schemeName);
 
 	Schemes findBySchemeNameAndEnabled(String schemeName, Short isEnabled);
 

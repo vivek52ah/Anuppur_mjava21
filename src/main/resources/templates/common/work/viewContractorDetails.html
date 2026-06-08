@@ -3,7 +3,7 @@
 		novalidate="novalidate">
 
 		<div class="card"
-			data-ng-hide="workDataTender.workStatus=='notTenderIssued'">
+			data-ng-show="workDataTender.tenderUpdated=='8' || workDataTender.tenderUpdated=='9' || workDataTender.tenderUpdated=='10' || workDataTender.tenderUpdated=='11' || workDataTender.tenderUpdated=='12' || workDataTender.tenderUpdated=='13'">
 			<div class="card-header">
 				<span>Contractor’s Details</span>
 			</div>
@@ -178,7 +178,7 @@
 
 		</div>
 		<div class="tab-footer text-right" hidden="hidden"
-			data-ng-hide="workDataTender.workStatus=='notTenderIssued'"
+			data-ng-show="workDataTender.tenderUpdated=='8' || workDataTender.tenderUpdated=='9' || workDataTender.tenderUpdated=='10' || workDataTender.tenderUpdated=='11' || workDataTender.tenderUpdated=='12' || workDataTender.tenderUpdated=='13'"
 			th:if="${roleName=='ROLE_SAU' ||roleName=='ROLE_DEPARTMENT'}">
 			<button type="submit" class="btn  btn-success  next-button"
 				id="draftCobtn"

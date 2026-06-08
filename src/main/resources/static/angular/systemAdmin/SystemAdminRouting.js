@@ -1,7 +1,47 @@
-// Get the existing dms module (don't recreate it)
 var dms = angular.module('dms');
+dms.config(['KeepaliveProvider', 'IdleProvider', function(KeepaliveProvider, IdleProvider) {
+	  IdleProvider.idle(1800);
+	  IdleProvider.timeout(2);
+	  KeepaliveProvider.interval(2);
+	}]);
 
-// Add routes to the existing module
+dms.run(['Idle', function(Idle) {
+Idle.watch();
+}]);
+
+function getAppContextPath() {
+	var path = window.location.pathname || '';
+	var segments = path.split('/');
+	return segments.length > 1 && segments[1] ? '/' + segments[1] : '';
+}
+
+function rootTemplateUrl(url) {
+	var path = window.location.pathname || '';
+	var segments = path.split('/');
+	
+	// Get context path (e.g., 'anuppur')
+	var contextPath = '';
+	if (segments.length > 1 && segments[1]) {
+		contextPath = '/' + segments[1];
+	}
+	
+	// Get controller base path (e.g., 'systemAdmin', 'admin', etc.)
+	var controllerBase = '';
+	if (segments.length > 2 && segments[2]) {
+		// Check if it's a known controller path
+		var knownControllers = ['systemAdmin', 'admin', 'superAdmin', 'dpo', 'district', 'hq', 'division', 'agencyAdmin', 'ceo'];
+		if (knownControllers.indexOf(segments[2]) !== -1) {
+			controllerBase = '/' + segments[2];
+		}
+	}
+	
+	if (url && url.charAt(0) === '/') {
+		url = url.substring(1);
+	}
+	
+	return contextPath + controllerBase + '/' + url;
+}
+
 dms
 	.config( ['$routeProvider', function($routeProvider) {
 		$routeProvider
@@ -71,21 +111,21 @@ dms
 				templateUrl:  'manageusers',
 				controller : 'SystemAdminController'
 			})
-			.when('/manageOngoingWorks',{
-				templateUrl: 'manageOngoingWorks',
-				controller : 'CommonController'
+			.when('/manageOngoingWorks', {
+				templateUrl: rootTemplateUrl('manageOngoingWorks'),
+				controller: 'CommonController'
 			})
-			.when('/departmentWiseWorksReport',{
-				templateUrl: 'departmentWiseWorksReport',
-				controller : 'CommonController'
+			.when('/departmentWiseWorksReport', {
+				templateUrl: rootTemplateUrl('departmentWiseWorksReport'),
+				controller: 'CommonController'
 			})
-			.when('/photoUpdateReport',{
-				templateUrl: 'photoUpdateReport',
-				controller : 'CommonController'
+			.when('/photoUpdateReport', {
+				templateUrl: rootTemplateUrl('photoUpdateReport'),
+				controller: 'CommonController'
 			})
-			.when('/dmRemarkWiseReport',{
-				templateUrl: 'dmRemarkWiseReport',
-				controller : 'CommonController'
+			.when('/dmRemarkWiseReport', {
+				templateUrl: rootTemplateUrl('dmRemarkWiseReport'),
+				controller: 'CommonController'
 			})
 			.when('/editUserForm/:id', {
 				templateUrl: function(params){ return 'editUserForm/' + params.id; }, 
@@ -107,62 +147,60 @@ dms
 
 			.when('/addUserAgencyFrom', {
 				templateUrl: 'addUserAgencyFrom',
-				controller: 'SystemAdminController'
+				controller : 'SystemAdminController'
 			})
 			
 			.when('/agencyWiseReport', {
-				templateUrl: 'agencyWiseReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('agencyWiseReport'),
+				controller: 'CommonController'
 			})
-			
 			.when('/schemeWiseReport', {
-				templateUrl: 'schemeWiseReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('schemeWiseReport'),
+				controller: 'CommonController'
 			})
-			
 			.when('/yearWiseReport', {
-				templateUrl: 'yearWiseReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('yearWiseReport'),
+				controller: 'CommonController'
 			})
 			.when('/reports', {
-				templateUrl: 'reports',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('reports'),
+				controller: 'CommonController'
 			})
 			.when('/inspectionReport', {
-				templateUrl: 'inspectionReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('inspectionReport'),
+				controller: 'CommonController'
 			})
 			.when('/workExpenditureReport', {
-				templateUrl: 'workExpenditureReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('workExpenditureReport'),
+				controller: 'CommonController'
 			})
 			.when('/segmentWiseRport', {
-				templateUrl: 'segmentWiseRport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('segmentWiseRport'),
+				controller: 'CommonController'
 			})
 			.when('/schemeYearWiseReport', {
-				templateUrl: 'schemeYearWiseReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('schemeYearWiseReport'),
+				controller: 'CommonController'
 			})
 			.when('/divisionReport', {
-				templateUrl: 'divisionReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('divisionReport'),
+				controller: 'CommonController'
 			})
 			.when('/drawingStatusReport', {
-				templateUrl: 'drawingStatusReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('drawingStatusReport'),
+				controller: 'CommonController'
 			})
 			.when('/asIssuedReport', {
-				templateUrl: 'asIssuedReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('asIssuedReport'),
+				controller: 'CommonController'
 			})
 			.when('/physicalPercentageWiseReport', {
-				templateUrl: 'physicalPercentageWiseReport',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('physicalPercentageWiseReport'),
+				controller: 'CommonController'
 			})
 			.when('/generatePptReports', {
-				templateUrl: 'generatePptReports',
-				controller : 'CommonController'
+				templateUrl: rootTemplateUrl('generatePptReports'),
+				controller: 'CommonController'
 			})
 			
 			.when('/addWorkFacility',{
@@ -188,9 +226,20 @@ dms
 			.when('/manageWorkType',{
 				templateUrl:'manageWorkSubtype',
 				controller:'SystemAdminController'
-				
 			})
-			
+			.when('/manageWorkSubtype',{
+				templateUrl:'manageWorkSubtype',
+				controller:'SystemAdminController'
+			})
+
+			.when('/editWork/:id', {
+				templateUrl: function(params){ return rootTemplateUrl('editWork/' + params.id); },
+				controller: 'CommonController'
+			})
+			.when('/viewWork/:id', {
+				templateUrl: function(params){ return rootTemplateUrl('viewWork/' + params.id); },
+				controller: 'CommonController'
+			})
 			.when('/editWorkType/:id', {
 				templateUrl: function(params){ return 'editWorkSubType/' + params.id; }, 
 				controller : 'SystemAdminController'

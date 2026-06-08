@@ -1,6 +1,5 @@
 package com.anuppur.repository;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -8,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.anuppur.entity.District;
 import com.anuppur.entity.Users;
@@ -120,7 +118,7 @@ public interface UserRepository  extends JpaRepository<Users, Long> {
 
 	List<Users> findByImplementationAgency(Users userId);
 	@Query("from Users u where (u.status = COALESCE(:status,u.status) "
-			+ "and (u.username = COALESCE(:username,u.username)) and (u.emailId= COALESCE( :emailId, u.emailId))) and(u.designationID = COALESCE(:designationId,u.designationID)) ) ")
+			+ "and (u.username = COALESCE(:username,u.username)) and (u.emailId= COALESCE( :emailId, u.emailId)) and (u.designationID = COALESCE(:designationId,u.designationID))) ")
 	Page<Users> findByUsernameContainingAndStatusAndUsernameAndEmailIdAndDesignationIDIn(Pageable pageable, 
 			 @Param("status")String status, 
 			@Param("username")String username, @Param("emailId")String emailId,@Param("designationId") List<Long> designationIds);
@@ -177,44 +175,48 @@ public interface UserRepository  extends JpaRepository<Users, Long> {
 		    @Param("searchParameter") String searchParameter,
 		    @Param("createdBy") String createdBy);
 
-	Users findByUsernameAndStatusNotIn(String emailId, String statusDeleted);
+	@Query("from Users u where u.username = :username and u.status != :status")
+	Users findByUsernameAndStatusNotIn(@Param("username") String username, @Param("status") String status);
 
-	Users findByMobileNoAndStatusNotIn(String mobileNo, String statusDeleted);
+	@Query("from Users u where u.mobileNo = :mobileNo and u.status != :status")
+	Users findByMobileNoAndStatusNotIn(@Param("mobileNo") String mobileNo, @Param("status") String status);
 
 	
-	Page<Users> findByStatusNotInAndUsernameAndEmailIdAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
+	Page<Users> findByStatusNotAndUsernameAndEmailIdAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
 			String statusDeleted, String searchParameter, String emailId, String mobileNo, Long l, String username);
 
-	Page<Users> findByStatusNotInAndEmailIdAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
+	Page<Users> findByStatusNotAndEmailIdAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
 			String statusDeleted, String emailId, String mobileNo, Long l, String username);
 
-	Page<Users> findByStatusNotInAndUsernameAndEmailIdAndDesignationIDAndCreatedBy(Pageable pageable,
+	Page<Users> findByStatusNotAndUsernameAndEmailIdAndDesignationIDAndCreatedBy(Pageable pageable,
 			String statusDeleted, String searchParameter, String emailId, Long l, String username);
 
-	Page<Users> findByStatusNotInAndUsernameAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
+	Page<Users> findByStatusNotAndUsernameAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
 			String statusDeleted, String searchParameter, String mobileNo, Long l, String username);
 
-	Page<Users> findByStatusNotInAndFirstnameAndEmailIdAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
+	Page<Users> findByStatusNotAndFirstnameAndEmailIdAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
 			String statusDeleted, String searchParameter, String emailId, String mobileNo, Long l, String username);
 
-	Page<Users> findByStatusNotInAndFirstnameAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
+	Page<Users> findByStatusNotAndFirstnameAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable,
 			String statusDeleted, String searchParameter, String mobileNo, Long l, String username);
 
-	Page<Users> findByStatusNotInAndFirstnameAndEmailIdAndDesignationIDAndCreatedBy(Pageable pageable,
+	Page<Users> findByStatusNotAndFirstnameAndEmailIdAndDesignationIDAndCreatedBy(Pageable pageable,
 			String statusDeleted, String searchParameter, String emailId, Long l, String username);
 
-	Page<Users> findByStatusNotInAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable, String statusDeleted,
+	Page<Users> findByStatusNotAndMobileNoAndDesignationIDAndCreatedBy(Pageable pageable, String statusDeleted,
 			String mobileNo, Long l, String username);
 
-	List<Users> findByDesignationIDAndStatusNotIn(Long l, String string);
+	List<Users> findByDesignationIDAndStatusNot(Long l, String string);
 
 	@Query(value = "SELECT created_by FROM dhs_anuppur.users where id=:userAssignee",nativeQuery = true)
 	String findByUserAssinee(@Param("userAssignee")Long  userAssignee);
 
 	
 	// create by 
+	@Query("from Users u where (u.status = COALESCE(:status,u.status) "
+			+ "and (u.username = COALESCE(:username,u.username)) and (u.emailId= COALESCE( :emailId, u.emailId)) and (u.designationID = COALESCE(:designationId,u.designationID))) ")
 	Page<Users> findByUsernameContainingAndStatusAndUsernameAndEmailIdAndDesignationID(Pageable pageable, String status,
-			String username, String emailId, long l);
+			String username, String emailId, long designationId);
 
 	Page<Users> findByStatusAndUsernameAndEmailIdAndDesignationID(Pageable pageable, String status, String username,
 			String emailId, long l);

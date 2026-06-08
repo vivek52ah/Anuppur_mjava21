@@ -1,53 +1,36 @@
 package com.anuppur.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+// ✅ CHANGED: javax.persistence.* → jakarta.persistence.*
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
+// ✅ ADDED: Lombok annotations to replace manual getters/setters (optional but recommended)
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "area_officer_record")
 public class AreaOfficerRecord extends Auditable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-	
-	
-	
-	
-	@Column(name = "userid")
-	private Long userid;
-	
-	@Column(name = "workid")
-	private Long workId;
+    @Id
+    // ✅ CHANGED: GenerationType.AUTO → GenerationType.IDENTITY
+    // In Hibernate 6 (Spring Boot 3), AUTO uses a sequence table by default
+    // which can cause issues with MySQL. IDENTITY uses AUTO_INCREMENT instead.
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(name = "userid")
+    private Long userid;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Column(name = "workid")
+    private Long workId;
 
-	public Long getUserid() {
-		return userid;
-	}
-
-	public void setUserid(Long userid) {
-		this.userid = userid;
-	}
-
-	public Long getWorkid() {
-		return workId;
-	}
-
-	public void setWorkid(Long workid) {
-		this.workId = workid;
-	}
-	
-	
-	
 }

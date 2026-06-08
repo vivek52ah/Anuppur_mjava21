@@ -403,6 +403,10 @@
 	var tstatuscc = null;
 	function fetchWorkTenderStatuscc(workID) {
 
+		if ($.fn.DataTable.isDataTable('#dynamic-table-workstatuscc')) {
+			$('#dynamic-table-workstatuscc').DataTable().destroy();
+		}
+
 		tstatuscc = $("#dynamic-table-workstatuscc")
 				.DataTable(
 						{

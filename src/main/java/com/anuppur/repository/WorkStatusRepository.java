@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.anuppur.entity.Schemes;
-import com.anuppur.entity.WorkHead;
 import com.anuppur.entity.WorkStatus;
 import com.anuppur.entity.WorkType;
 
@@ -32,7 +31,4 @@ public interface WorkStatusRepository  extends JpaRepository<WorkStatus, Long> {
 	WorkStatus findByWorkStatusNameEAndSchemes(String workStatus, Schemes findBySchemeNameAndEnabled);
 	
 	WorkStatus findByWorkStatusNameE(String statusName);
-
-	WorkStatus findById(Long workStatusId);
-     
 }

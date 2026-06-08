@@ -1,31 +1,4 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-	<meta charset="UTF-8" />
-
-
-	<title>Dynamic Exportable Table</title>
-
-	<!-- DataTables CSS -->
-	<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
-	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css" />
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"/>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css"/>
-	
-
-	<!-- jQuery & DataTables JS -->
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-	<script src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
-	<script src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-	<script th:src="@{/js/bootstrap-select.min.js}"></script>
-	<script th:src="@{/js/bootstrap-select.js}"></script>
-	
-
+<!-- Fragment for ng-view: do not load jQuery/Bootstrap/CDN here (uses layout from home page) -->
 	<style>
 		.checkbox-container {
 			margin-bottom: 10px;
@@ -441,7 +414,7 @@
 }
 	</style>
 	
-	<script>
+	<!-- <script>
 	
 	setTimeout(function() {
 		$('#accountHeadId1').selectpicker();
@@ -487,6 +460,119 @@
 	});
 	
 	
+</script> -->
+
+<script>
+(function() {
+    var manageWorkSelectPlaceholders = {
+        financialYear1: '--Select FY of Sanction--',
+        workType1: '--Select Work Type--',
+        workStatusId: '--Select Work Status--',
+        implementationAgency: '--Select Executive Agency--',
+        department: '--Select Department--',
+        departmentRemark: '--Search by Issue Type--',
+        financialHeadId1: '--Select Financing Agency--',
+        vidhanSabhaId1: '--Select Vidhan Sabha--',
+        blockId: '--Select Block--'
+    };
+
+    window.forceManageWorkSelectCaption = function(selectOrId) {
+        if (!window.jQuery) return;
+        var $select = typeof selectOrId === 'string' ? jQuery(selectOrId) : jQuery(selectOrId);
+        if (!$select.length) return;
+        var id = $select.attr('id');
+        var selectedText = $select.find('option:selected').filter(function() {
+            return jQuery(this).val() !== '';
+        }).map(function() {
+            return jQuery.trim(jQuery(this).text());
+        }).get();
+        if (!selectedText.length) {
+            selectedText = $select.closest('.bootstrap-select').find('.dropdown-menu li.selected:not(.disabled) .text').map(function() {
+                return jQuery.trim(jQuery(this).text());
+            }).get();
+        }
+        var caption = selectedText.length ? selectedText.join(', ') : (manageWorkSelectPlaceholders[id] || '');
+        var $button = $select.closest('.bootstrap-select').find('> .dropdown-toggle');
+        var $inner = $button.find('.filter-option-inner-inner');
+        if ($inner.length) {
+            $inner.text(caption);
+        } else {
+            $button.find('.filter-option').text(caption);
+        }
+        $button.attr('title', caption).toggleClass('bs-placeholder', selectedText.length === 0);
+    };
+
+    window.forceAllManageWorkSelectCaptions = function() {
+        Object.keys(manageWorkSelectPlaceholders).forEach(function(id) {
+            window.forceManageWorkSelectCaption('#' + id);
+        });
+    };
+
+    function startManageWorkCaptionWatcher() {
+        if (window.manageWorkCaptionWatcher) {
+            clearInterval(window.manageWorkCaptionWatcher);
+        }
+        window.manageWorkCaptionWatcher = setInterval(function() {
+            if ((window.location.hash || '').indexOf('manageOngoingWorks') === -1) {
+                clearInterval(window.manageWorkCaptionWatcher);
+                window.manageWorkCaptionWatcher = null;
+                return;
+            }
+            window.forceAllManageWorkSelectCaptions();
+        }, 300);
+    }
+
+    function scheduleSelectpickerInit() {
+        setTimeout(function() {
+            if (window.initManageOngoingWorksSelectpickers) {
+                window.initManageOngoingWorksSelectpickers();
+            }
+            window.forceAllManageWorkSelectCaptions();
+            startManageWorkCaptionWatcher();
+        }, 800);
+    }
+    if (window.jQuery) {
+        jQuery(function() {
+            scheduleSelectpickerInit();
+            jQuery(document)
+                .off('click.manageWorkTemplateCaption change.manageWorkTemplateCaption', '.bootstrap-select .dropdown-menu li a, #financialYear1, #workType1, #workStatusId, #implementationAgency, #department, #departmentRemark, #financialHeadId1, #vidhanSabhaId1, #blockId')
+                .on('click.manageWorkTemplateCaption change.manageWorkTemplateCaption', '.bootstrap-select .dropdown-menu li a, #financialYear1, #workType1, #workStatusId, #implementationAgency, #department, #departmentRemark, #financialHeadId1, #vidhanSabhaId1, #blockId', function() {
+                    var $select = jQuery(this).is('select') ? jQuery(this) : jQuery(this).closest('.bootstrap-select').find('select');
+                    [0, 80, 250, 600].forEach(function(delay) {
+                        setTimeout(function() {
+                            window.forceManageWorkSelectCaption($select);
+                        }, delay);
+                    });
+                });
+            document.removeEventListener('click', window.manageWorkNativeCaptionClick || function() {}, true);
+            window.manageWorkNativeCaptionClick = function(event) {
+                var link = event.target && event.target.closest ? event.target.closest('.bootstrap-select .dropdown-menu li a') : null;
+                if (!link) return;
+                var picker = link.closest('.bootstrap-select');
+                if (!picker) return;
+                var select = picker.querySelector('select');
+                if (!select) return;
+                var clickedTextNode = link.querySelector('.text');
+                var clickedText = clickedTextNode ? clickedTextNode.textContent.trim() : link.textContent.trim();
+                var button = picker.querySelector(':scope > .dropdown-toggle');
+                if (button && clickedText) {
+                    var inner = button.querySelector('.filter-option-inner-inner') || button.querySelector('.filter-option');
+                    if (inner) inner.textContent = clickedText;
+                    button.setAttribute('title', clickedText);
+                    button.classList.remove('bs-placeholder');
+                }
+                [0, 80, 250, 600].forEach(function(delay) {
+                    setTimeout(function() {
+                        window.forceManageWorkSelectCaption(select);
+                    }, delay);
+                });
+            };
+            document.addEventListener('click', window.manageWorkNativeCaptionClick, true);
+        });
+    } else {
+        scheduleSelectpickerInit();
+    }
+})();
 </script>
 
 <script th:inline="javascript">
@@ -533,7 +619,7 @@
 </script>
 
 
-<script>
+<script th:inline="none">
 /*<![CDATA[*/
 function openZoomOverlay() {
     var src = document.getElementById('modalImage').src;
@@ -577,7 +663,7 @@ document.addEventListener('keydown', function(e) {
 
 .dropdown-menu.show{width:100%!important}
 .dropdown-menu.show {
-    top: -35px !important;
+    top: 100% !important;
 }
 #fyId {
     position: relative!important;
@@ -666,21 +752,37 @@ select#vidhanSabhaId1 + button {
 
 
 ul.dropdown-menu.inner.show {
-    max-width: 200px!important;overflow:hidden!important
+    max-width: 300px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
 }
 ul.dropdown-menu.inner.show li {
-    width: 276px !important;overflow:hidden!important
+    width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.bootstrap-select > .dropdown-toggle,
+.bootstrap-select > .dropdown-toggle:hover,
+.bootstrap-select > .dropdown-toggle:focus {
+    background-color: #fff !important;
+    color: #1a2942 !important;
+    border: 1px solid #ccc !important;
+}
+
+.bootstrap-select .dropdown-toggle .filter-option,
+.bootstrap-select .dropdown-toggle .filter-option-inner-inner {
+    color: #1a2942 !important;
+    text-align: left !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>
 
-
-</head>
-
-<body>
-
 	<div class="container-fluid">
 		<div class="animated fadeIn">
-			<div class="row" data-ng-init="loadWorkForReport();">
+			<div class="row" id="manageOngoingWorksRoot">
 				<div class="col-md-12">
 					<div class="card">
 						<div class="card-header">
@@ -702,7 +804,7 @@ ul.dropdown-menu.inner.show li {
 											<div class="form-group col-sm-4" style="position: relative;">
 												<input type="text" class="form-control"
 													placeholder="--Work Unique Id--" id="searchBoxVal"
-													name="searchBoxVal" ng-model="workNo"
+													name="searchBoxVal" ng-model="workNo" autocomplete="off"
 													data-ng-change="loadWorkNoSuggestions(workNo)" />
 
 												<ul class="list-group" ng-show="suggestedWorkNos.length > 0"
@@ -713,14 +815,29 @@ ul.dropdown-menu.inner.show li {
 												</ul>
 											</div>
 
+											<!-- Work Name Filter -->
+										<div class="form-group col-sm-4" style="position: relative;">
+											<input type="text" class="form-control"
+												placeholder="--Search Work Name--" id="workNameFilter"
+												name="workNameFilter" ng-model="workNameSearch"
+												data-ng-change="loadWorkNameSuggestions(workNameSearch)" />
+
+											<ul class="list-group" ng-show="suggestedWorkNames.length > 0"
+												style="position: absolute; z-index: 1000; width: 100%; max-height: 200px; overflow-y: auto;">
+												<li class="list-group-item"
+													ng-repeat="name in suggestedWorkNames"
+													ng-click="selectWorkName(name)">{{name}}</li>
+											</ul>
+										</div>
 
 											<!-- Financial Year -->
 										<div id="fyId" class="form-group col-sm-4" data-ng-init="loadFinancialYears();">
 												
 												<select multiple="multiple" class="form-control " id="financialYear1" data-ng-model="workData.financialYear"
-													 name="financialYear" data-live-search="true">
-													<option value="" disabled="disabled">--Select
-														Financial Year--</option>
+													 name="financialYear" data-live-search="true" aria-placeholder="select
+														Financial Year">
+													<!-- <option value="" disabled="disabled">--Select
+														Financial Year--</option> -->
 													<option data-ng-repeat="financialYearName in financialYears "
 														value="{{financialYearName.financialYearId}}"
 														data-ng-class="{'selected-option': isSelected(financialYearName.financialYearId)}">
@@ -732,8 +849,8 @@ ul.dropdown-menu.inner.show li {
 										<div id="deptId" class="form-group col-sm-4" data-ng-init="loadDepartments();">
 											<select multiple="multiple" class="form-control" id="department"
 												data-ng-model="workData.department"
-												name="department" data-live-search="true">
-												<option value="" disabled="disabled">--Select Department--</option>
+												name="department" data-live-search="true" aria-placeholder="Select Department">
+												<!-- <option value="" disabled="disabled">--Select Department--</option> -->
 												<option data-ng-repeat="dept in department"
 													value="{{dept.id}}"
 													data-ng-class="{'selected-option': isSelected(dept.id)}">
@@ -775,9 +892,10 @@ ul.dropdown-menu.inner.show li {
 											<div id="wtId" class="form-group col-sm-4">
 												
 												<select multiple="multiple" class="form-control" id="workType1" data-ng-model="workData.workType"
-													data-ng-init="loadWorkTypes();" data-ng-change="" name="workType" data-live-search="true">
-													<option value="" disabled="disabled">--Select Work
-														Type--</option>
+													data-ng-init="loadWorkTypes();" data-ng-change="" name="workType" data-live-search="true" aria-placeholder="Select Work
+														Type">
+													<!-- <option value="" disabled="disabled">--Select Work
+														Type--</option> -->
 													<option data-ng-repeat="workType in workTypes | filter:workType"
 														value="{{workType.workTypeId}}" data-ng-class="{'selected-option': isSelected(workType.workTypeId)}">{{workType.workTypeNameE}}
 													</option>
@@ -790,9 +908,9 @@ ul.dropdown-menu.inner.show li {
 											<div id="wsId" class="form-group col-sm-4">
 												
 												<select multiple="multiple" class="form-control" id="workStatusId" data-ng-model="workData.workStatusId"
-													data-ng-init="loadWorkStatus1();" name="workStatusId" data-live-search="true">
-													<option value="" disabled="disabled">--Select Work
-														Status--</option>
+													data-ng-init="loadWorkStatus1();" name="workStatusId" data-live-search="true" aria-placeholder="Select Work Status">
+													<!-- <option value="" disabled="disabled">--Select Work
+														Status--</option> -->
 													<option data-ng-repeat="worksStatusName in worksStatus | filter:worksStatu"
 														value="{{worksStatusName.workStatusId}}"  data-ng-class="{'selected-option': isSelected(worksStatusName.workStatusId)}">
 														{{worksStatusName.workStatusNameE}}</option>
@@ -803,9 +921,10 @@ ul.dropdown-menu.inner.show li {
 											<div id="iaId" class="form-group col-sm-4" data-ng-init="loadAgencies()">
 												
 												<select multiple="multiple" class="form-control" data-ng-model="workData.implementationAgency"
-													name="implementationAgency" id="implementationAgency" data-live-search="true">
-													<option value="" disabled="disabled">--Select
-														Agency--</option>
+													name="implementationAgency" id="implementationAgency" data-live-search="true" aria-placeholder="Select
+														Agency">
+													<!-- <option value="" disabled="disabled">--Select
+														Agency--</option> -->
 													<option data-ng-repeat="agency in agencies | filter:implAgency"
 														value="{{agency.implementationAgencyId}}" data-ng-class="{'selected-option': isSelected(agency.implementationAgencyId)}">
 														{{agency.implementationAgencyNameE}}</option>
@@ -816,9 +935,9 @@ ul.dropdown-menu.inner.show li {
 										<div id="drId" class="form-group col-sm-4" data-ng-init="loadDepartmentMasters(); ">
 											
 											<select multiple="multiple" class="form-control" id="departmentRemark" data-ng-model="workData.departmentRemark"
-												name="departmentRemark" data-live-search="true">
-												<option value="" disabled="disabled">--Select DM Remarks--
-												</option>
+												name="departmentRemark" data-live-search="true" aria-placeholder="Select DM Remarks">
+												<!-- <option value="" disabled="disabled">--Select DM Remarks--
+												</option> -->
 												<option data-ng-repeat="dept in departmentMasters | filter:departmentText" value="{{dept.id}}"
 													data-ng-class="{'selected-option': isSelected(dept.id)}">{{dept.name}}</option>
 											</select>
@@ -828,9 +947,9 @@ ul.dropdown-menu.inner.show li {
 											<div id="fyhId" class="form-group col-sm-4" data-ng-init="loadFinancialHead();">
 												
 												<select  multiple="multiple" class="form-control" data-ng-model="workData.financialHeadId" name="financialHeadId"
-													id="financialHeadId1" required="required" data-live-search="true">
-													<option value="" disabled="disabled">--Select Financial Head--
-													</option>
+													id="financialHeadId1" required="required" data-live-search="true" aria-placeholder="Select Financial Head">
+													<!-- <option value="" disabled="disabled">--Select Financial Head--
+													</option> -->
 													<option data-ng-repeat="financialHead in financialHeads | filter:financialHeadText"
 														value="{{financialHead.id}}" data-ng-class="{'selected-option': isSelected(financialHead.id)}">{{financialHead.financialHeadName}}
 													</option>
@@ -841,8 +960,8 @@ ul.dropdown-menu.inner.show li {
 											<div id="vsId" class="form-group col-sm-4" data-ng-init="loadVidhanSabha();">
 												
 												<select multiple="multiple" class="form-control" data-ng-model="workData.vidhanSabhaId" name="vidhanSabhaId"
-													id="vidhanSabhaId1" required="required" data-live-search="true">
-													<option value="" disabled="disabled">--Select Vidhan Sabha--</option>
+													id="vidhanSabhaId1" required="required" data-live-search="true" aria-placeholder="Select Vidhan Sabha">
+													<!-- <option value="" disabled="disabled">--Select Vidhan Sabha--</option> -->
 													<option data-ng-repeat="vidhanSabha in vidhanSabhas | filter:vidhanSabhaText"
 														value="{{vidhanSabha.id}}" data-ng-class="{'selected-option': isSelected(vidhanSabha.id)}">{{vidhanSabha.vidhanSabhaName}}
 													</option>
@@ -850,7 +969,7 @@ ul.dropdown-menu.inner.show li {
 											</div>
 							
 										<!-- Work Name Filter -->
-										<div class="form-group col-sm-4" style="position: relative;">
+										<!-- <div class="form-group col-sm-4" style="position: relative;">
 											<input type="text" class="form-control"
 												placeholder="--Search Work Name--" id="workNameFilter"
 												name="workNameFilter" ng-model="workNameSearch"
@@ -862,13 +981,13 @@ ul.dropdown-menu.inner.show li {
 													ng-repeat="name in suggestedWorkNames"
 													ng-click="selectWorkName(name)">{{name}}</li>
 											</ul>
-										</div>
+										</div> -->
 
 										<!-- Block Filter -->
 										<div id="blId" class="form-group col-sm-4" data-ng-init="loadBlocksByDistrict();">
 											<select multiple="multiple" class="form-control selectpicker" id="blockId" data-ng-model="workData.blockId"
-											name="blockId" data-live-search="true">
-											<option value="" disabled="disabled">--Select Block--</option>
+											name="blockId" data-live-search="true" aria-placeholder="Select Block">
+											<!-- <option value="" disabled="disabled">--Select Block--</option> -->
 											<option data-ng-repeat="block in blocks | orderBy : 'blockName'"
 												value="{{block.blockId}}"
 												data-ng-class="{'selected-option': isSelected(block.blockId)}">
@@ -1031,9 +1150,12 @@ function openDmRemarkModal(workId, dmRemarkId) {
     $('#dmRemarkModal').modal('show');
 }
 
-$('#dmRemarkModal').on('hidden.bs.modal', function () {
+$('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 
-    // Agar DataTable hai
+    // Only handle if dmRemarkModal itself closed (not a child modal)
+    if (e.target.id !== 'dmRemarkModal') return;
+
+    // Agar DataTable hai - reload without resetting searchBoxVal
     if ($.fn.DataTable.isDataTable('#dynamic-w-table')) {
         $('#dynamic-w-table').DataTable().ajax.reload(null, false);
     }
@@ -1057,7 +1179,12 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 
 								var table;
 
-								$(document).ready(function () {
+								window.initManageOngoingWorks = function initManageOngoingWorks() {
+									// Destroy existing DataTable if present to avoid re-init issues
+									if ($.fn.DataTable && $.fn.DataTable.isDataTable('#dynamic-w-table')) {
+										$('#dynamic-w-table').DataTable().destroy();
+										table = null;
+									}
 
 									// Clear saved filters when navigating from dept-wise report
 									if (window.urlWorkStatusIds || window.urlDepartmentId || window.urlFinancialYearId || window.urlImplementationAgency || window.urlDepartmentRemark) {
@@ -1079,33 +1206,52 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 										'departmentRemark'
 									];
 
-									// 🟢 Restore saved filters
-									const savedFilters = JSON.parse(localStorage.getItem('work_filters') || '{}');
+									// 🟢 Restore saved filters ONLY when coming back from editWork
+									function asArrayValue(value) {
+										if (!value) return [];
+										return Array.isArray(value) ? value : [value];
+									}
+
+									const shouldRestoreFilters = window._restoreWorkFilters;
+									const savedFilters = shouldRestoreFilters
+										? JSON.parse(localStorage.getItem('work_filters') || '{}')
+										: {};
+									window._restoreWorkFilters = false; // reset flag
 
 									// 1. Populate HTML inputs
-									FILTER_KEYS.forEach(key => {
-										$('#' + key).val(savedFilters[key] || '');
-									});
-
-									// 2. Apply to Angular scope
-									const scope = angular.element($('#searchForm')).scope();
-									if (scope) {
-										scope.$applyAsync(() => {
-											scope.workName = savedFilters.searchBoxVal || '';
-											scope.workData.financialYear1 = savedFilters.financialYear1 || '';
-											scope.workData.department = savedFilters.department || '';
-											scope.workData.workType1 = savedFilters.workType1 || '';
-											scope.workData.workStatusId = savedFilters.workStatusId || '';
-											scope.workData.implementationAgency = savedFilters.implementationAgency || '';
-											scope.workData.workPriorityId = savedFilters.workPriorityId || '';
-											scope.workData.financialHeadId1 = savedFilters.financialHeadId1 || '';
-											scope.workData.vidhanSabhaId1 = savedFilters.vidhanSabhaId1 || '';
+									if (shouldRestoreFilters) {
+										FILTER_KEYS.forEach(key => {
+											$('#' + key).val(savedFilters[key] || '');
 										});
 									}
 
-									// 3. Save filters on any change
-									FILTER_KEYS.forEach(key => {
-										$('#' + key).on('change input', function () {
+									// 2. Apply to Angular scope
+									const scope = angular.element($('#searchForm')).scope();
+									if (scope && shouldRestoreFilters) {
+										scope.$applyAsync(() => {
+											scope.workData = scope.workData || {};
+											scope.workNo = savedFilters.searchBoxVal || '';
+											scope.workNameSearch = savedFilters.workNameFilter || '';
+											scope.workData.financialYear = asArrayValue(savedFilters.financialYear1);
+											scope.workData.department = asArrayValue(savedFilters.department);
+											scope.workData.workType = asArrayValue(savedFilters.workType1);
+											scope.workData.workStatusId = asArrayValue(savedFilters.workStatusId);
+											scope.workData.implementationAgency = asArrayValue(savedFilters.implementationAgency);
+											scope.workData.financialHeadId = asArrayValue(savedFilters.financialHeadId1);
+											scope.workData.vidhanSabhaId = asArrayValue(savedFilters.vidhanSabhaId1);
+											scope.workData.blockId = asArrayValue(savedFilters.blockId);
+											scope.workData.departmentRemark = asArrayValue(savedFilters.departmentRemark);
+										});
+										setTimeout(function() {
+											if (window.initManageOngoingWorksSelectpickers) {
+												window.initManageOngoingWorksSelectpickers();
+											}
+										}, 100);
+									}
+
+									// 3. Save filters on any change — use .off() first to prevent stacking
+								FILTER_KEYS.forEach(key => {
+										$('#' + key).off('change input').on('change input', function () {
 											const filterData = {};
 											FILTER_KEYS.forEach(k => {
 												filterData[k] = $('#' + k).val() || '';
@@ -1116,6 +1262,10 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 
 
 
+
+									if ($.fn.DataTable && $.fn.DataTable.isDataTable('#dynamic-w-table')) {
+										$('#dynamic-w-table').DataTable().destroy();
+									}
 
 									table = $('#dynamic-w-table').DataTable({
 
@@ -1191,7 +1341,7 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 										iDisplayStart: 0,
 										aaSorting: [],
 
-										lengthMenu: [[10, 25, 50, 100000], [10, 25, 50, "All"]],
+										lengthMenu: [ [10, 25, 50, 100000], [10, 25, 50, "All"] ],
 
 
 
@@ -1263,20 +1413,11 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 												defaultContent: "-",
 												render: function (data, type, row) {
 
-													let amount = (data !== null && data !== undefined)
-														? `<span style="font-weight:600; margin-right:8px;">${data}</span>`
-														: `<span style="margin-right:8px;">-</span>`;
+													let displayVal = (data !== null && data !== undefined && data !== '') ? data : '0';
 
-													return `
-           
-            <a href="javascript:void(0)"
-               style="color:#0056b3; font-weight:600; text-decoration:underline;"
-               onclick="openFinancingAgencyExpenditureModal(${row.id})">
-               View
-            </a>
-             &nbsp;&nbsp;&nbsp;
-             ${amount}
-        `;
+													return `<a href="javascript:void(0)"
+													       style="font-weight:600; color:#333; text-decoration:underline; cursor:pointer;"
+													       onclick="openFinancingAgencyExpenditureModal(${row.id})">${displayVal}</a>`;
 												}
 											}
 ,
@@ -1371,7 +1512,7 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 										                $actionCell.append(`
 										                    <a class="btn btn-xs btn-warning m-1"
 										                       title="View Images"
-										                       onclick="openProgressImages(${rowIdx}, '${data.workNo}', '${data.levelOfCompletion}')">
+										                       onclick="openProgressImages(${rowIdx})">
 										                       <i class="fa fa-eye"></i>
 										                    </a>
 										                `);
@@ -1400,16 +1541,26 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 										            }
 
 										            // Edit button
-										            if (data.role === 'ROLE_DEPARTMENT') {
-										                $actionCell.append(`
-										                    <a class="btn btn-xs btn-primary m-1"
-										                       title="Edit"
-										                       href="#editWork/${data.id}">
-										                       <i class="fa fa-pencil"></i>
-										                    </a>
-										                `);
-										            }
+										            // if (data.role === 'ROLE_DEPARTMENT') {
+										            //     $actionCell.append(`
+										            //         <a class="btn btn-xs btn-primary m-1"
+										            //            title="Edit"
+										            //           href="#/editWork/{{data.id}}">
+										            //            <i class="fa fa-pencil"></i>
+										            //         </a>
+										            //     `);
+										            // }
 
+													if (data.role === 'ROLE_DEPARTMENT') {
+    $actionCell.append(`
+        <a class="btn btn-xs btn-primary m-1"
+           title="Edit"
+           href="#/editWork/${data.id}">
+           <i class="fa fa-pencil"></i>
+        </a>
+    `);
+}
+													
 										            // Delete button
 										            if (data.role === 'ROLE_SYSTEM_ADMIN') {
 										                $actionCell.append(`
@@ -1558,6 +1709,11 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 									//             var column = table.column($(this).data('column'));
 									//             column.visible($(this).is(':checked'));
 									//         });
+								} // end initManageOngoingWorks
+
+								// Run on first page load
+								$(document).ready(function () {
+									initManageOngoingWorks();
 								});
 
 
@@ -1574,8 +1730,8 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 
 
 								function downloadFileWSDocumnt(documentId, workSubStatusNameE) {
-									// Build the image URL
-									let url = getBaseUrl() + '/downloadDocumentWSPro/' + documentId;
+									// Build the image URL - relative to current page context
+									let url = 'downloadDocumentWSPro/' + documentId;
 
 									// Set the image URL in the modal
 									document.querySelector('#exampleModal img').src = url;
@@ -1627,21 +1783,27 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 								}
 
 								//filter stores
-								// 🟩 On Edit Button Click – Save current filters to localStorage
-								$(document).on('click', '.btn-edit', function () {
+								// 🟩 On Edit Button Click – Save current filters and set restore flag
+								$(document).off('click', '.btn-edit').on('click', '.btn-edit', function () {
+									// Set flag so manageOngoingWorks restores filters when user comes back
+									window._restoreWorkFilters = true;
 									const scope = angular.element($('#searchForm')).scope();
 									const filters = {
-										searchBoxVal: $('#searchBoxVal').val() || scope.workName || '',
-										financialYear1: $('#financialYear').val() || scope.workData.financialYear1 || '',
+										searchBoxVal: $('#searchBoxVal').val() || scope.workNo || '',
+										workNameFilter: $('#workNameFilter').val() || scope.workNameSearch || '',
+										blockId: $('#blockId').val() || scope.workData.blockId || '',
+										financialYear1: $('#financialYear1').val() || scope.workData.financialYear || '',
 										department: $('#department').val() || scope.workData.department || '',
-										workSubTypeId: $('#workType1').val() || scope.workData.workType1 || '',
+										workType1: $('#workType1').val() || scope.workData.workType || '',
 										workStatusId: $('#workStatusId').val() || scope.workData.workStatusId || '',
-										implementationAgency: $('#implementationAgency').val() || scope.workData.implementationAgency || ''
+										implementationAgency: $('#implementationAgency').val() || scope.workData.implementationAgency || '',
+										financialHeadId1: $('#financialHeadId1').val() || scope.workData.financialHeadId || '',
+										vidhanSabhaId1: $('#vidhanSabhaId1').val() || scope.workData.vidhanSabhaId || '',
+										departmentRemark: $('#departmentRemark').val() || scope.workData.departmentRemark || ''
 									};
 									localStorage.setItem('work_filters', JSON.stringify(filters));
 
 									const id = $(this).data('id');
-									//   window.location.href = '/anuppur/work/edit/' + id;
 								});
 
 
@@ -1658,10 +1820,9 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 		}
 
 
-		// header checkbox click
-		$(document).on('change', '#selectAll', function () {
+		// header checkbox click — use .off() to prevent stacking
+		$(document).off('change', '#selectAll').on('change', '#selectAll', function () {
     var isChecked = this.checked;
-
     $('.row-checkbox').each(function () {
         this.checked = isChecked;
     });
@@ -1707,35 +1868,48 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 							        $('.multiselect').multiselect('updateButtonText');
 							    }
 
-							    // Reset selectpicker for blockId
-							    if ($('#blockId').data('selectpicker')) {
-							        $('#blockId').selectpicker('deselectAll');
-							        $('#blockId').selectpicker('refresh');
-							    }
+							    // Reset selectpicker captions
+							    [
+							        '#financialYear1',
+							        '#workType1',
+							        '#workStatusId',
+							        '#implementationAgency',
+							        '#financialHeadId1',
+							        '#blockId',
+							        '#department',
+							        '#departmentRemark',
+							        '#vidhanSabhaId1'
+							    ].forEach(function(selector) {
+							        var $select = $(selector);
+							        if ($select.data('selectpicker')) {
+							            $select.selectpicker('val', []);
+							            $select.selectpicker('render');
+							        }
+							    });
 
 							    // Reset AngularJS model
 							    const scope = angular.element($('#searchForm')).scope();
 							    if (scope) {
 							        scope.$applyAsync(function () {
 
-							            scope.workName = '';
+							            scope.workNo = '';
 							            scope.workNameSearch = '';
 
 							            // MULTI-SELECT MODELS MUST BE ARRAY
-							            scope.workData.financialYear1 = [];
-							            scope.workData.workType1 = [];
+							            scope.workData.financialYear = [];
+							            scope.workData.workType = [];
 							            scope.workData.workStatusId = [];
 							            scope.workData.implementationAgency = [];
-							            scope.workData.financialHeadId1 = [];
+							            scope.workData.financialHeadId = [];
 							            scope.workData.departmentRemark = [];
-							            scope.workData.vidhanSabhaId1 = [];
+							            scope.workData.vidhanSabhaId = [];
 							            scope.workData.blockId = [];
+							            scope.workData.department = [];
 							            scope.suggestedWorkNames = [];
 
 							            // SINGLE-SELECT MODELS
 							          //  scope.workData.workPriorityId = '';
 							        //    scope.workData.vidhanSabhaId = '';
-							            scope.workData.department = '';
 							        });
 							    }
 
@@ -1827,14 +2001,14 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 							    // -----------------------------
 							    // Checkbox toggle
 							    // -----------------------------
-							    $checkboxes.change(function () {
+							    $checkboxes.off('change').change(function () {
 							        refreshAll();
 							    });
 
 							    // -----------------------------
 							    // Dropdown Add Column
 							    // -----------------------------
-							    $dropdown.change(function () {
+							    $dropdown.off('change').change(function () {
 							        let selected = $(this).val();
 							        if (!selected) return;
 
@@ -1849,7 +2023,7 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 							    // -----------------------------
 							    // Select All / Deselect All
 							    // -----------------------------
-							    $toggleBtn.click(function () {
+							    $toggleBtn.off('click').click(function () {
 							        let doSelect = $(this).text() === "Select All";
 							        $checkboxes.prop("checked", doSelect);
 							        refreshAll();
@@ -1858,16 +2032,16 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 							    // -----------------------------
 							    // Dropdown Animation
 							    // -----------------------------
-							    $("#dropdownBtn").click(function (e) {
+							    $("#dropdownBtn").off('click').click(function (e) {
 							        e.stopPropagation();
 							        $("#dropdownContainer").slideToggle(150);
 							    });
 
-							    $(document).click(function () {
+							    $(document).off('click.dropdownClose').on('click.dropdownClose', function () {
 							        $("#dropdownContainer").slideUp(150);
 							    });
 
-							    $("#dropdownContainer").click(function (e) {
+							    $("#dropdownContainer").off('click.stopProp').on('click.stopProp', function (e) {
 							        e.stopPropagation();
 							    });
 
@@ -2003,7 +2177,7 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				<div class="modal-header">
 					<h5 class="modal-title" id="exampleModalLabel">
-						Work No:- {{workNo}} <br /> Progress Level:-
+						Work No:- {{modalWorkNo}} <br /> Progress Level:-
 						{{levelOfCompletion}} <br /> Work Name:- {{workName}}
 
 					</h5>
@@ -2111,13 +2285,15 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-secondary"
-                            data-dismiss="modal">
+                            data-dismiss="modal"
+							th:disabled="${roleName != 'ROLE_DM'}" >
                         Cancel
                     </button>
 
                     <!-- SUBMIT BUTTON -->
                     <button type="submit"
-                            class="btn btn-primary">
+                            class="btn btn-primary" 
+							th:disabled="${roleName != 'ROLE_DM'}">
                         Save
                     </button>
                     </div>
@@ -2210,12 +2386,25 @@ $('#dmRemarkModal').on('hidden.bs.modal', function () {
 									
 										<td>
 									
-											<a class="btn btn-primary" target="_blank" ng-click="openAttachmentModal(remark.documentId)"
+											<!-- <a class="btn btn-primary" target="_blank" ng-click="openAttachmentModal(remark.documentId)"
 												ng-if="remark.documentId != null" 
 												>
 												View Attachment
-											</a>
-									
+											</a> -->
+									<!-- <button type="button"
+        class="btn btn-primary"
+    
+		ng-click="$event.stopPropagation(); openAttachmentModal(remark.documentId)"
+        ng-if="remark.documentId != null">
+    View Attachment
+</button> -->
+<button type="button"
+        class="btn btn-xs btn-primary m-1"
+        ng-click="$event.preventDefault();
+                  $event.stopPropagation();
+                  openAttachmentModal(remark.documentId)">
+    View Attachment
+</button>
 									
 										</td>
 										<!--<td>
@@ -2406,9 +2595,11 @@ window.openProgressImages = function (rowIndex) {
         return;
     }
 
-    // ✅ Filter + sort DESC by createdDate
+    // Show all progress images that have a document id (workStatusId may be null from older data)
     window.currentImageList = data.docs
-        .filter(doc => doc.workStatusId === 10)
+        .filter(function (doc) {
+            return doc && doc.documentId != null;
+        })
         .sort(function (a, b) {
             return new Date(b.createdDate) - new Date(a.createdDate); // DESC
         });
@@ -2418,7 +2609,7 @@ window.openProgressImages = function (rowIndex) {
     // AngularJS scope update
     const scope = angular.element(document.getElementById('imageModal')).scope();
     scope.$apply(function () {
-        scope.workNo = data.workNo;
+        scope.modalWorkNo = data.workNo;
         scope.levelOfCompletion = data.levelOfCompletion;
         scope.workName = data.workName;
 
@@ -2440,7 +2631,7 @@ window.openProgressImages = function (rowIndex) {
 		window.showImageAt = function (index) {
 			if (index >= 0 && index < window.currentImageList.length) {
 				const doc = window.currentImageList[index];
-				const url = getBaseUrl() + '/downloadDocumentWSPro/' + doc.documentId;
+				const url = 'downloadDocumentWSPro/' + doc.documentId;
 				document.getElementById('modalImage').src = url;
 
 
@@ -2473,7 +2664,7 @@ window.openProgressImages = function (rowIndex) {
 		};
 
 		//Delete Work
-		$('#dynamic-w-table').on("click", ".delete-btn", function (e) {
+		$('#dynamic-w-table').off("click", ".delete-btn").on("click", ".delete-btn", function (e) {
 			//alert("call")
 			e.preventDefault();
 
@@ -2611,7 +2802,3 @@ window.openProgressImages = function (rowIndex) {
 })();
 /*]]>*/
 </script>
-
-</body>
-
-</html>

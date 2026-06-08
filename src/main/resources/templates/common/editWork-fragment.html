@@ -1,0 +1,146 @@
+<!-- Fragment template for AJAX loading - no DOCTYPE, html, head, body tags -->
+<div>
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a><span th:text="#{home}">Home</span></a></li>
+		<li class="breadcrumb-item"><a href="#manageOngoingWorks"><span th:text="#{manageWorks}">Manage Work</span></a></li>
+		<li class="breadcrumb-item active"><span>View &amp; Update Work </span></li>
+		<li class="breadcrumb-item active"><span><b> WorkId :- {{workData.workNo}} </b></span></li>
+		<li class="breadcrumb-menu d-md-down-none">
+			<div class="btn-group" role="group" aria-label="Button group">
+				<a class="btn" href="#" data-ng-click="doTheBack()"><i class="icon-arrow-left-circle"></i> &nbsp;<span th:text="#{back}">Back</span></a>
+			</div>
+		</li>
+	</ol>
+
+	<div class="container-fluid">
+		<div class="animated fadeIn">
+			<div class="row" data-ng-init="loadWorkDetails(mode);">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header top-header"></div>
+						<div class="col-md-12">
+							<div data-ng-if="responseObject.errorMessage != null" class="text-danger">
+								<strong>Error!</strong>
+								<p>{{responseObject.errorMessage}}</p>
+							</div>
+						</div>
+
+						<div class="wizard bg-white mb-3">
+							<div class="wizard-inner">
+								<ul class="nav nav-tabs nav-justified border-0 bg-white" role="tablist">
+									<li role="presentation" class="nav-item"><a href=".step1" data-toggle="tab" aria-controls="step1" role="tab" title="Step 1" class="nav-link active"> <span class="fa fa-file-text-o"></span> <span>Work Details <em class="count"></em></span></a></li>
+									<li th:if="${( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN') }" role="presentation" class="nav-item"><a href=".step3" data-toggle="tab" data-ng-click="tabChange('step3')" aria-controls="step3" role="tab" title="Step 3" class="nav-link   stopVald"> <span class="fa fa-map-o"></span> <span>Sanction Details <em class="count"></em></span></a></li>
+									<li th:if="${( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN')}" role="presentation" class="nav-item"><a href=".step4" data-toggle="tab" data-ng-click="tabChange('step4'); scrollStatusChange();" aria-controls="step4" role="tab" title="Step 4" class="nav-link  stopVald"> <span class="fa fa-credit-card"></span> <span>Contractor's Details <em class="count"></em></span></a></li>
+									<li th:if="${ ( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN')}" role="presentation" class="nav-item"><a href=".step5" data-toggle="tab" data-ng-click="tabChange('step5')" aria-controls="step5" role="tab" title="Step 5" class="nav-link  stopVald"> <span class="fa fa-credit-card"></span> <span>Work Progress Details<em class="count"></em></span></a></li>
+									<li th:if="${ ( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN')}" role="presentation" class="nav-item"><a href=".step6" data-toggle="tab" data-ng-click="tabChange('step6')" aria-controls="step6" role="tab" title="Step 6" class="nav-link  stopVald"> <span class="fa fa-credit-card"></span> <span> Completion Certificate<em class="count"></em></span></a></li>
+									<li th:if="${roleName=='ROLE_DEPARTMENT'  }" role="presentation" class="nav-item"><a href=".step2" data-ng-click="tabChange('step2')" data-toggle="tab" aria-controls="step2" role="tab" title="Step 2" class="nav-link  "> <span class="fa fa-road"></span> <span>Department Remark<em class="count"></em></span></a></li>
+								</ul>
+							</div>
+
+							<div class="tab-content">
+								<!-- /tab1 -->
+								<div class="tab-pane active step1" role="tabpanel" id="step1">
+									<div th:if="${roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_SU' || roleName == 'ROLE_CEO' }">
+										<div th:replace="common/work/editWorkDetail :: edit_workDetails"></div>
+									</div>
+									<div th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT' ||  roleName=='ROLE_DEPT_DISTRICT' || roleName == 'ROLE_CEO' }">
+										<div th:replace="common/work/viewWorkDetails:: view_workDetails"></div>
+									</div>
+								</div>
+
+								<!-- /tab3 -->
+								<div class="tab-pane  step3" role="tabpanel" id="step3">
+									<div th:if="${(roleName=='ROLE_SU'  ||roleName=='ROLE_DM' ||roleName=='ROLE_SAU' )    }">
+										<div th:replace="common/work/viewTenderDetails :: view_TenderDetails"></div>
+									</div>
+									<div th:if="${roleName=='ROLE_DISTRICT'  || roleName=='ROLE_DEPARTMENT'}">
+										<div th:replace="common/work/editTender :: edit_Tender"></div>
+									</div>
+								</div>
+
+								<!-- /tab4 -->
+								<div class="tab-pane  step4" role="tabpanel" id="step4">
+									<div th:if="${ roleName==null}">
+										<div th:replace="common/work/viewContractorDetails :: view_ContractorDetails"></div>
+									</div>
+									<div th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT' || roleName=='ROLE_DEPARTMENT' ||roleName=='ROLE_SU'  ||roleName=='ROLE_DM' ||  roleName=='ROLE_DEPT_DISTRICT'}">
+										<div th:replace="common/work/editContractorDetails :: edit_contractorDetails"></div>
+									</div>
+								</div>
+
+								<!-- /tab5 -->
+								<div class="tab-pane  step5" role="tabpanel" id="step5">
+									<div th:if="${ roleName=='ROLE_SU'  ||roleName=='ROLE_DM' ||  roleName=='ROLE_DEPT_DISTRICT' }">
+										<div th:replace="common/work/viewWorkProgressDetails :: view_WorkProgressDetails"></div>
+									</div>
+									<div th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT'  || roleName=='ROLE_DEPARTMENT'}">
+										<div th:replace="common/work/editWorkProgress :: edit_workProgress"></div>
+									</div>
+								</div>
+
+								<!-- /tab6 -->
+								<div class="tab-pane  step6" role="tabpanel" id="step6">
+									<div th:if="${roleName=='ROLE_SU'  ||roleName=='ROLE_DM' ||  roleName=='ROLE_DEPT_DISTRICT' }">
+										<div th:replace="common/work/viewCCDetails :: view_CCDetails"></div>
+									</div>
+									<div th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT' || roleName=='ROLE_DEPARTMENT'}">
+										<div th:replace="common/work/editCCDetails :: edit_CCDetails"></div>
+									</div>
+								</div>
+								<div class="tab-pane  step2" role="tabpanel" id="step2">
+									<div th:if="${roleName=='ROLE_DEPARTMENT'  || roleName=='ROLE_SYSTEM_ADMIN' }">
+										<div th:replace="common/work/viewDmRemarks :: view_dmRemark"></div>
+									</div>
+									<div th:if="${roleName=='ROLE_SAU'  ||roleName=='ROLE_DISTRICT' ||  roleName=='ROLE_DEPT_DISTRICT' }">
+										<div th:replace="common/work/editDmRemarks :: edit_dmRemark"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">
+					Work No. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :- {{workDataCC.workNo}} <br /> Progress Level :- {{workDataProgress.workSubStatusNameE}}
+				</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div id="imageset" class="modal-body">
+				<div class="image-box">
+					<img src="{{imageurl}}" class="img-fluid" data-target="#add-sor-popup_1" data-toggle="modal" />
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="imageenlargemodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">
+					Work No. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :- {{workDataCC.workNo}} <br /> Progress Level :- {{workDataProgress.workSubStatusNameE}}
+				</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div id="imageset" class="modal-body">
+				<div class="image-box">
+					<img src="{{imageurl}}" class="img-fluid" data-target="#add-sor-popup_1" data-toggle="modal" />
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

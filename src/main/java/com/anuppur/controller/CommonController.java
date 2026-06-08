@@ -24,10 +24,9 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.http.HttpRequest;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -145,7 +144,7 @@ import com.anuppur.util.DMSUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import groovyjarjarcommonscli.ParseException;
+import java.text.ParseException;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -201,60 +200,138 @@ public class CommonController extends BaseController {
 	@Autowired
 	private SuperAdminService superAdminService;
 
+//	@RequestMapping(value = "/changepassword", method = RequestMethod.GET)
+//	public ModelAndView viewChangePasswordForm(HttpServletRequest request) {
+//
+//		user = DMSUtil.getUserDetail();
+//		logger.info("User - {}, Role - {} - Displaying Change password page", user.getUsername(),
+//				user.getAuthorities());
+//
+//		ModelAndView modelAndView = new ModelAndView("common/changepassword");
+//		return modelAndView;
+//
+//	}
+
 	@RequestMapping(value = "/changepassword", method = RequestMethod.GET)
 	public ModelAndView viewChangePasswordForm(HttpServletRequest request) {
 
-		user = DMSUtil.getUserDetail();
-		logger.info("User - {}, Role - {} - Displaying Change password page", user.getUsername(),
-				user.getAuthorities());
+	    User user = DMSUtil.getUserDetail();
 
-		ModelAndView modelAndView = new ModelAndView("common/changepassword");
-		return modelAndView;
+	    logger.info("User - {}, Role - {} - Displaying Change password page",
+	            user.getUsername(),
+	            user.getAuthorities());
 
+	    return new ModelAndView("common/changepassword");
 	}
-
+	
 	// Method to handle user password change functionality.
+//	@RequestMapping(value = "/dochangepassword", method = RequestMethod.POST)
+//	public ResponseObject changePassword(@RequestBody ChangePasswordBean changePassword, HttpServletRequest request)
+//			throws Exception {
+//
+//		user = DMSUtil.getUserDetail();
+//		logger.info("User - {}, Role - {} - Changing password", user.getUsername(), user.getAuthorities());
+//
+//		ResponseObject response = new ResponseObject();
+//
+//		User user = DMSUtil.getUserDetail();
+//
+//		Users userEntity = userService.findByUserName(user.getUsername());
+//
+//		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//
+//		if (!StringUtils.isEmpty(changePassword.getCurrentPassword())
+//				&& !passwordEncoder.matches(changePassword.getCurrentPassword(), userEntity.getPassword())) {
+//
+//			response.setErrorMessage("Current password is not valid.");
+//			logger.error("User - {}, Role - {} - Current password is not valid.", user.getUsername(),
+//					user.getAuthorities());
+//			return response;
+//		}
+//
+//		if ((!StringUtils.isEmpty(changePassword.getPassword())
+//				&& !StringUtils.isEmpty(changePassword.getConfirmPassword()))
+//				&& (!changePassword.getPassword().equals(changePassword.getConfirmPassword()))) {
+//
+//			response.setErrorMessage("New password and confirm password not matched.");
+//			logger.error("User - {}, Role - {} - New password and confirm password not matched.", user.getUsername(),
+//					user.getAuthorities());
+//			return response;
+//		}
+//
+//		changePassword.setPassword(passwordEncoder.encode(changePassword.getPassword()));
+//		userService.changePassword(changePassword, user.getUsername());
+//		response.setSuccessMessage("You have successfully changed the password.");
+//		logger.info("User - {}, Role - {} - You have successfully changed the password.", user.getUsername(),
+//				user.getAuthorities());
+//		return response;
+//
+//	}
+	
 	@RequestMapping(value = "/dochangepassword", method = RequestMethod.POST)
-	public ResponseObject changePassword(@RequestBody ChangePasswordBean changePassword, HttpServletRequest request)
-			throws Exception {
+	@ResponseBody
+	public ResponseObject changePassword(
+	        @RequestBody ChangePasswordBean changePassword,
+	        HttpServletRequest request) throws Exception {
 
-		user = DMSUtil.getUserDetail();
-		logger.info("User - {}, Role - {} - Changing password", user.getUsername(), user.getAuthorities());
+	    User user = DMSUtil.getUserDetail();
 
-		ResponseObject response = new ResponseObject();
+	    logger.info("User - {}, Role - {} - Changing password",
+	            user.getUsername(),
+	            user.getAuthorities());
 
-		User user = DMSUtil.getUserDetail();
+	    ResponseObject response = new ResponseObject();
 
-		Users userEntity = userService.findByUserName(user.getUsername());
+	    Users userEntity = userService.findByUserName(user.getUsername());
 
-		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-		if (!StringUtils.isEmpty(changePassword.getCurrentPassword())
-				&& !passwordEncoder.matches(changePassword.getCurrentPassword(), userEntity.getPassword())) {
+	    // Validate current password
+	    if (!StringUtils.isEmpty(changePassword.getCurrentPassword())
+	            && !passwordEncoder.matches(
+	                    changePassword.getCurrentPassword(),
+	                    userEntity.getPassword())) {
 
-			response.setErrorMessage("Current password is not valid.");
-			logger.error("User - {}, Role - {} - Current password is not valid.", user.getUsername(),
-					user.getAuthorities());
-			return response;
-		}
+	        response.setErrorMessage("Current password is not valid.");
 
-		if ((!StringUtils.isEmpty(changePassword.getPassword())
-				&& !StringUtils.isEmpty(changePassword.getConfirmPassword()))
-				&& (!changePassword.getPassword().equals(changePassword.getConfirmPassword()))) {
+	        logger.error("User - {}, Role - {} - Current password is not valid.",
+	                user.getUsername(),
+	                user.getAuthorities());
 
-			response.setErrorMessage("New password and confirm password not matched.");
-			logger.error("User - {}, Role - {} - New password and confirm password not matched.", user.getUsername(),
-					user.getAuthorities());
-			return response;
-		}
+	        return response;
+	    }
 
-		changePassword.setPassword(passwordEncoder.encode(changePassword.getPassword()));
-		userService.changePassword(changePassword, user.getUsername());
-		response.setSuccessMessage("You have successfully changed the password.");
-		logger.info("User - {}, Role - {} - You have successfully changed the password.", user.getUsername(),
-				user.getAuthorities());
-		return response;
+	    // Validate new password and confirm password
+	    if (!StringUtils.isEmpty(changePassword.getPassword())
+	            && !StringUtils.isEmpty(changePassword.getConfirmPassword())
+	            && !changePassword.getPassword()
+	                    .equals(changePassword.getConfirmPassword())) {
 
+	        response.setErrorMessage(
+	                "New password and confirm password not matched.");
+
+	        logger.error("User - {}, Role - {} - Password mismatch.",
+	                user.getUsername(),
+	                user.getAuthorities());
+
+	        return response;
+	    }
+
+	    // Encode password
+	    changePassword.setPassword(
+	            passwordEncoder.encode(changePassword.getPassword()));
+
+	    // Save password
+	    userService.changePassword(changePassword, user.getUsername());
+
+	    response.setSuccessMessage(
+	            "You have successfully changed the password.");
+
+	    logger.info("User - {}, Role - {} - Password changed successfully.",
+	            user.getUsername(),
+	            user.getAuthorities());
+
+	    return response;
 	}
 
 //	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT', 'ROLE_CEO')")
@@ -471,7 +548,7 @@ public class CommonController extends BaseController {
 
 	}
 
-	@RequestMapping(value = "/manageOngoingWorks", method = RequestMethod.GET)
+	@RequestMapping(value = "/manageOngoingWorks", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
 	public ModelAndView manageOngoingWorks(HttpServletRequest request,
 			@RequestParam(required = false) String departmentId,
 			@RequestParam(required = false) String financialYearId,
@@ -879,25 +956,33 @@ public class CommonController extends BaseController {
 		// String searchByDivision= request.getParameter("searchByDivision");
 
 		String searchByDivision = "0";
-		// Fetch Page display length
-		Integer pageDisplayLength = Integer.valueOf(request.getParameter("iDisplayLength"));
+		// Fetch Page display length. DataTables may send legacy iDisplayLength or 1.10 length.
+		String displayLengthParam = request.getParameter("iDisplayLength");
+		if (StringUtils.isEmpty(displayLengthParam)) {
+			displayLengthParam = request.getParameter("length");
+		}
+		Integer pageDisplayLength = !StringUtils.isEmpty(displayLengthParam) ? Integer.valueOf(displayLengthParam) : 10;
 
-		if (null != request.getParameter("iDisplayStart")) {
-			pageNumber = (Integer.valueOf(request.getParameter("iDisplayStart")) / pageDisplayLength);
+		String displayStartParam = request.getParameter("iDisplayStart");
+		if (StringUtils.isEmpty(displayStartParam)) {
+			displayStartParam = request.getParameter("start");
+		}
+		if (!StringUtils.isEmpty(displayStartParam)) {
+			pageNumber = (Integer.valueOf(displayStartParam) / pageDisplayLength);
 		}
 
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		WorkJson workJson = commonService.fetchWorksList(pageable,
 				!StringUtils.isEmpty(searchParameterWorkNo) ? searchParameterWorkNo : null,
@@ -1096,25 +1181,33 @@ public class CommonController extends BaseController {
 		// String searchByDivision= request.getParameter("searchByDivision");
 
 		String searchByDivision = "0";
-		// Fetch Page display length
-		Integer pageDisplayLength = Integer.valueOf(request.getParameter("iDisplayLength"));
+		// Fetch Page display length. DataTables may send legacy iDisplayLength or 1.10 length.
+		String displayLengthParam = request.getParameter("iDisplayLength");
+		if (StringUtils.isEmpty(displayLengthParam)) {
+			displayLengthParam = request.getParameter("length");
+		}
+		Integer pageDisplayLength = !StringUtils.isEmpty(displayLengthParam) ? Integer.valueOf(displayLengthParam) : 10;
 
-		if (null != request.getParameter("iDisplayStart")) {
-			pageNumber = (Integer.valueOf(request.getParameter("iDisplayStart")) / pageDisplayLength);
+		String displayStartParam = request.getParameter("iDisplayStart");
+		if (StringUtils.isEmpty(displayStartParam)) {
+			displayStartParam = request.getParameter("start");
+		}
+		if (!StringUtils.isEmpty(displayStartParam)) {
+			pageNumber = (Integer.valueOf(displayStartParam) / pageDisplayLength);
 		}
 
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		WorkJson workJson = commonService.fetchHandoverWorksList(pageable,
 				!StringUtils.isEmpty(searchParameterWorkNo) ? searchParameterWorkNo : null,
@@ -1164,25 +1257,35 @@ public class CommonController extends BaseController {
 		// String searchParameterWorkNo = request.getParameter("searchBoxValWorkNo");
 
 		String searchByDivision = "0";
-		// Fetch Page display length
-		Integer pageDisplayLength = Integer.valueOf(request.getParameter("iDisplayLength"));
+		// Fetch Page display length. DataTables may send legacy iDisplayLength or 1.10 length.
+		String progressDisplayLengthParam = request.getParameter("iDisplayLength");
+		if (StringUtils.isEmpty(progressDisplayLengthParam)) {
+			progressDisplayLengthParam = request.getParameter("length");
+		}
+		Integer pageDisplayLength = !StringUtils.isEmpty(progressDisplayLengthParam)
+				? Integer.valueOf(progressDisplayLengthParam)
+				: 10;
 
-		if (null != request.getParameter("iDisplayStart")) {
-			pageNumber = (Integer.valueOf(request.getParameter("iDisplayStart")) / pageDisplayLength);
+		String progressDisplayStartParam = request.getParameter("iDisplayStart");
+		if (StringUtils.isEmpty(progressDisplayStartParam)) {
+			progressDisplayStartParam = request.getParameter("start");
+		}
+		if (!StringUtils.isEmpty(progressDisplayStartParam)) {
+			pageNumber = (Integer.valueOf(progressDisplayStartParam) / pageDisplayLength);
 		}
 
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		TASAReviseJson tsReviseJson = commonService.fetchTSASRevisedList(pageable,
 				!StringUtils.isEmpty(typeDoc) ? typeDoc : null, !StringUtils.isEmpty(rvOrderNo) ? rvOrderNo : null,
@@ -1230,25 +1333,35 @@ public class CommonController extends BaseController {
 		// String searchParameterWorkNo = request.getParameter("searchBoxValWorkNo");
 
 		String searchByDivision = "0";
-		// Fetch Page display length
-		Integer pageDisplayLength = Integer.valueOf(request.getParameter("iDisplayLength"));
+		// Fetch Page display length. DataTables may send legacy iDisplayLength or 1.10 length.
+		String expensesDisplayLengthParam = request.getParameter("iDisplayLength");
+		if (StringUtils.isEmpty(expensesDisplayLengthParam)) {
+			expensesDisplayLengthParam = request.getParameter("length");
+		}
+		Integer pageDisplayLength = !StringUtils.isEmpty(expensesDisplayLengthParam)
+				? Integer.valueOf(expensesDisplayLengthParam)
+				: 10;
 
-		if (null != request.getParameter("iDisplayStart")) {
-			pageNumber = (Integer.valueOf(request.getParameter("iDisplayStart")) / pageDisplayLength);
+		String expensesDisplayStartParam = request.getParameter("iDisplayStart");
+		if (StringUtils.isEmpty(expensesDisplayStartParam)) {
+			expensesDisplayStartParam = request.getParameter("start");
+		}
+		if (!StringUtils.isEmpty(expensesDisplayStartParam)) {
+			pageNumber = (Integer.valueOf(expensesDisplayStartParam) / pageDisplayLength);
 		}
 
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		WorkProgressImagesJson workProgressImagesJson = commonService.fetchProgressImagesList(pageable,
 				!StringUtils.isEmpty(workStatusName) ? workStatusName : null,
@@ -1299,25 +1412,35 @@ public class CommonController extends BaseController {
 		// String searchParameterWorkNo = request.getParameter("searchBoxValWorkNo");
 
 		String searchByDivision = "0";
-		// Fetch Page display length
-		Integer pageDisplayLength = Integer.valueOf(request.getParameter("iDisplayLength"));
+		// Fetch Page display length. DataTables may send legacy iDisplayLength or 1.10 length.
+		String expensesDisplayLengthParam = request.getParameter("iDisplayLength");
+		if (StringUtils.isEmpty(expensesDisplayLengthParam)) {
+			expensesDisplayLengthParam = request.getParameter("length");
+		}
+		Integer pageDisplayLength = !StringUtils.isEmpty(expensesDisplayLengthParam)
+				? Integer.valueOf(expensesDisplayLengthParam)
+				: 10;
 
-		if (null != request.getParameter("iDisplayStart")) {
-			pageNumber = (Integer.valueOf(request.getParameter("iDisplayStart")) / pageDisplayLength);
+		String expensesDisplayStartParam = request.getParameter("iDisplayStart");
+		if (StringUtils.isEmpty(expensesDisplayStartParam)) {
+			expensesDisplayStartParam = request.getParameter("start");
+		}
+		if (!StringUtils.isEmpty(expensesDisplayStartParam)) {
+			pageNumber = (Integer.valueOf(expensesDisplayStartParam) / pageDisplayLength);
 		}
 
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "year"));// default sorting
+			sort = Sort.by(Direction.DESC, "year");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		ExpensesDataJson expensesDataJson = commonService.fetchExpensesDataList(pageable,
 				!StringUtils.isEmpty(totalExpensess) ? totalExpensess : null,
@@ -1327,6 +1450,18 @@ public class CommonController extends BaseController {
 
 				!StringUtils.isEmpty(year) ? year : null, !StringUtils.isEmpty(createdDate) ? createdDate : null,
 				workTypeId);
+
+		if (expensesDataJson == null) {
+			expensesDataJson = new ExpensesDataJson();
+			expensesDataJson.setAaData(new ArrayList<>());
+			expensesDataJson.setiTotalRecords(0);
+			expensesDataJson.setiTotalDisplayRecords(0);
+		}
+
+		String sEcho = request.getParameter("sEcho");
+		if (!StringUtils.isEmpty(sEcho)) {
+			expensesDataJson.setsEcho(sEcho);
+		}
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(expensesDataJson);
@@ -1769,17 +1904,46 @@ public class CommonController extends BaseController {
 
 	}
 
+	@RequestMapping(value = "getCountId/{workId}", method = RequestMethod.GET)
+	public Long getContractorCountByWorkId(@PathVariable Long workId, HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		logger.info("User - {}, Role - {} - Fetching contractor count for work {}", user.getUsername(),
+				user.getAuthorities(), workId);
+		return commonService.countContractorsByWorkId(workId);
+	}
+
 	// Method to display the form for editing ongoing work based on the provided ID.
 	@RequestMapping(value = "/editWork/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditWorkForm(@PathVariable String id, HttpServletRequest request) {
 
-		user = DMSUtil.getUserDetail();
-		logger.info("User - {}, Role - {} - Displaying Edit OngoingWork Form", user.getUsername(),
-				user.getAuthorities());
-		ModelAndView modelAndView = new ModelAndView("common/editWork");
-		UserBean userBean = fetchLoggedInUserDetails(request);
-		modelAndView.addObject("roleName", userBean.getLoggedInUserRole());
-		return modelAndView;
+		try {
+			user = DMSUtil.getUserDetail();
+			logger.info("User - {}, Role - {} - Displaying Edit OngoingWork Form", user.getUsername(),
+					user.getAuthorities());
+			
+			// Check if this is an AJAX request
+			String ajaxHeader = request.getHeader("X-Requested-With");
+			ModelAndView modelAndView;
+			
+			if ("XMLHttpRequest".equals(ajaxHeader)) {
+				// For AJAX requests, return a fragment view without full HTML structure
+				modelAndView = new ModelAndView("common/editWork-fragment");
+			} else {
+				// For direct page access, return the full page
+				modelAndView = new ModelAndView("common/editWork");
+			}
+			
+			UserBean userBean = fetchLoggedInUserDetails(request);
+			modelAndView.addObject("roleName", userBean.getLoggedInUserRole());
+			return modelAndView;
+		} catch (Exception ex) {
+			logger.error("Error while preparing editWork view for id {}: {}", id, ex.getMessage(), ex);
+			// Return a minimal fragment to avoid truncated responses for AJAX clients
+			ModelAndView fallback = new ModelAndView("common/editWork-fragment");
+			fallback.addObject("roleName", "UNKNOWN");
+			fallback.addObject("fragmentError", "An error occurred rendering the edit form. Check server logs.");
+			return fallback;
+		}
 	}
 
 	// Method to display the edit form for viewing ongoing work details.
@@ -2063,15 +2227,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "implAgencyname"));// default sorting
+			sort = Sort.by(Direction.ASC, "implAgencyname");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		ImplAgencyJson implAgencyJson = commonService.getAllImplAgency(pageable, searchBoxVal);
 
@@ -2111,15 +2275,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "headName"));// default sorting
+			sort = Sort.by(Direction.ASC, "headName");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		HeadJson headJson = commonService.getAllHead(pageable, searchBoxVal);
 
@@ -2153,15 +2317,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "schemeName"));// default sorting
+			sort = Sort.by(Direction.ASC, "schemeName");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		SchemeJson schemeJson = commonService.getAllScheme(pageable, searchBoxVal);
 
@@ -2195,15 +2359,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "sorYear"));// default sorting
+			sort = Sort.by(Direction.ASC, "sorYear");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		SorJson sorJson = commonService.getAllSor(pageable, searchBoxVal);
 
@@ -2896,13 +3060,7 @@ public class CommonController extends BaseController {
 			HttpServletResponse response) throws Exception {
 		logger.error(" downloadDocument =");
 
-		String scheme = request.getScheme();     // http
-	    String serverName = request.getServerName(); // localhost
-	    String baseUrl = scheme + "://" + serverName;
-		
 		String fileName = commonService.fetchDownloadDocumentWSPro(documentId);
-		// System.err.println("fileName>>"+fileName);
-		// String fileName = commonService.fetchDownloadFileName(documentId);
 
 		if (fileName != null) {
 			File file = new File(fileName);
@@ -2917,39 +3075,42 @@ public class CommonController extends BaseController {
 			// Use try-with-resources for safe handling of InputStream and OutputStream
 			try (InputStream is = new FileInputStream(file); OutputStream os = response.getOutputStream()) {
 
-				// MIME type of the file (set as generic binary)
-			//	response.setContentType("application/octet-stream");
-				// Response header for file download
-		//		response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
-				
-				
-				
-				
+				// Detect MIME type — default to image/jpeg for images
 				String contentType = request.getServletContext().getMimeType(file.getName());
 				if (contentType == null) {
-				  //  contentType = "image/jpeg"; // default
-					contentType = "application/octet-stream"; 
+					String nameLower = file.getName().toLowerCase();
+					if (nameLower.endsWith(".jpg") || nameLower.endsWith(".jpeg")) {
+						contentType = "image/jpeg";
+					} else if (nameLower.endsWith(".png")) {
+						contentType = "image/png";
+					} else if (nameLower.endsWith(".gif")) {
+						contentType = "image/gif";
+					} else if (nameLower.endsWith(".pdf")) {
+						contentType = "application/pdf";
+					} else {
+						contentType = "application/octet-stream";
+					}
 				}
 				response.setContentType(contentType);
-			    response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
-			    response.setContentLengthLong(file.length());
-
+				// Use "inline" so images display directly in <img> tags and modals
+				response.setHeader("Content-Disposition", "inline; filename=\"" + file.getName() + "\"");
+				response.setContentLengthLong(file.length());
 
 				// Read from the file and write into the response
-				byte[] buffer = new byte[1024];
+				byte[] buffer = new byte[4096];
 				int len;
 				while ((len = is.read(buffer)) != -1) {
 					os.write(buffer, 0, len);
 				}
 
-				os.flush(); // Ensure everything is written to the output stream
+				os.flush();
 			} catch (IOException e) {
 				logger.error("Error while processing file: {}", fileName, e);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while processing file");
 			}
 		} else {
 			logger.error("Invalid file name for documentId: {}", documentId);
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file name");
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found for documentId: " + documentId);
 		}
 
 	}
@@ -3757,15 +3918,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "subDelayReason"));// default sorting
+			sort = Sort.by(Direction.ASC, "subDelayReason");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		SdrJson sdrJson = commonService.getAllSdr(pageable, searchBoxVal);
 
@@ -3964,7 +4125,7 @@ public class CommonController extends BaseController {
 
 	// Method to fetch the list of work tender end dates.
 	@RequestMapping(value = "/fetchWorkTenderEndDate", method = RequestMethod.GET)
-	public List<WorkTenderBean> getWorkTenderEndDate(HttpRequest request) {
+	public List<WorkTenderBean> getWorkTenderEndDate(HttpServletRequest request) {
 		logger.info("call==============");
 		return commonService.getWorkTenderEndDate();
 
@@ -4026,15 +4187,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		WorkJson workJson = commonService.fetchWorksAaIssuedList(pageable,
 				!StringUtils.isEmpty(searchParameterWorkNo) ? searchParameterWorkNo : null,
@@ -4094,15 +4255,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		UserJson userJson = superAdminService.getAllAgencyusers(pageable, searchBoxVal, status, username, emailId);
 
@@ -4356,15 +4517,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "blockId"));// default sorting
+			sort = Sort.by(Direction.ASC, "blockId");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		BlockJson blockJson = commonService.fetchBlockForDistrict(pageable, searchBoxVal, districtId);
 
@@ -4435,15 +4596,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		WorkJson workJson = commonService.fetchWorkForReport(pageable,
 				!StringUtils.isEmpty(searchParameterWorkNo) ? searchParameterWorkNo : null,
@@ -4544,15 +4705,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "year"));// default sorting
+			sort = Sort.by(Direction.DESC, "year");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		WorkStatusJson WorkstatusDataJson = commonService.fetchWorkStatusDataList(workId);
 
@@ -4601,15 +4762,15 @@ public class CommonController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "year"));// default sorting
+			sort = Sort.by(Direction.DESC, "year");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		WorkStatusJson WorkstatusDataJson = commonService.fetchWorkStatusDataListCC(workId);
 
@@ -4861,7 +5022,7 @@ public class CommonController extends BaseController {
 
 	    try {
 
-	    	 List<Work> works = (List<Work>) workRepository.findAll(workIds);
+	    	 List<Work> works = (List<Work>) workRepository.findAllById(workIds);
 
 	    	 works.sort((a, b) -> b.getId().compareTo(a.getId()));
 	        Sheet sheet = workbook.createSheet("Works");
@@ -5369,13 +5530,22 @@ public class CommonController extends BaseController {
 	          HttpServletRequest request) {
 
 
-	      int start = Integer.parseInt(request.getParameter("start"));  
-	      int length = Integer.parseInt(request.getParameter("length")); 
-	      int draw = Integer.parseInt(request.getParameter("draw"));    
+	      int start = !StringUtils.isEmpty(request.getParameter("start"))
+	              ? Integer.parseInt(request.getParameter("start"))
+	              : 0;
+	      int length = !StringUtils.isEmpty(request.getParameter("length"))
+	              ? Integer.parseInt(request.getParameter("length"))
+	              : 10;
+	      int draw = !StringUtils.isEmpty(request.getParameter("draw"))
+	              ? Integer.parseInt(request.getParameter("draw"))
+	              : 1;
 
 	      List<FinancialAgencyBean> fullList = commonService.fetchFinancialAgencyByWorkId(workId);
 
 	      int total = fullList.size();
+	      if (start > total) {
+	          start = 0;
+	      }
 	      int end = Math.min(start + length, total);
 
 	      List<FinancialAgencyBean> paginatedList = fullList.subList(start, end);
@@ -5392,6 +5562,7 @@ public class CommonController extends BaseController {
 	      response.put("recordsTotal", total);
 	      response.put("recordsFiltered", total);
 	      response.put("data", paginatedList);  // <--- IMPORTANT (new format)
+	      response.put("totalExpenditure", commonService.sumFinancialAgencyExpenditureByWorkId(workId));
 
 	      return ResponseEntity.ok(response);
 	  }
@@ -5401,7 +5572,14 @@ public class CommonController extends BaseController {
 	  public ResponseEntity<String> saveFinancialAgencyEnteredCost(
 	          @RequestBody List<FinancialAgencyBean> list) {
 
+	      Long workIdForSync = null;
 	      for (FinancialAgencyBean bean : list) {
+
+	          if (bean.getExpenditure() == null || bean.getExpenditure() <= 0) {
+	              continue;
+	          }
+
+	          workIdForSync = bean.getWorkId();
 
 	          String result = commonService.updateFinancialAgencyCost(
 	                  bean.getId(),
@@ -5409,10 +5587,13 @@ public class CommonController extends BaseController {
 	                  bean.getWorkId()
 	          );
 
-	          // ❗ Agar koi validation message aaya
 	          if (!"SUCCESS".equalsIgnoreCase(result)) {
-	              return ResponseEntity.ok(result);   // 👈 frontend ko message
+	              return ResponseEntity.ok(result);
 	          }
+	      }
+
+	      if (workIdForSync != null) {
+	          commonService.syncWorkProgressExpenditureFromFinancialAgency(workIdForSync);
 	      }
 
 	      return ResponseEntity.ok("SUCCESS");
@@ -5545,4 +5726,3 @@ public class CommonController extends BaseController {
 				return commonService.fetchDepartmentRemarksList();
 			}
 }
-

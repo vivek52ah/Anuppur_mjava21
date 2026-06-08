@@ -75,7 +75,7 @@ public class AesUtil {
                 | InvalidAlgorithmParameterException
                 | IllegalBlockSizeException
                 | BadPaddingException e) {
-            return null;
+            throw new IllegalStateException("Cipher operation failed", e);
         }
     }
     
@@ -87,7 +87,7 @@ public class AesUtil {
             return key;
         }
         catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            return null;
+            throw new IllegalStateException("Key generation failed", e);
         }
     }
     
@@ -119,7 +119,7 @@ public class AesUtil {
     }
     
     private IllegalStateException fail(Exception e) {
-        return null;
+        return new IllegalStateException("Operation failed", e);
     }
 
 }

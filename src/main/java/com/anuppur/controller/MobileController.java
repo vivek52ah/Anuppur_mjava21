@@ -8,8 +8,8 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ import com.anuppur.service.impl.Blacklisttoken;
 import com.anuppur.util.JwtUtil;
 import com.anuppur.util.SHAHashingUtil;
 
-import groovyjarjarcommonscli.ParseException;
+import java.text.ParseException;
 
 /**
  * @author sumit
@@ -107,7 +107,7 @@ public class MobileController extends BaseController {
             UserBean user = userService.fetchUserDetailsByUserName(loginRequest.getUserName());
             if (null != user && null != user.getId()) {
             	 PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
- 		        StringBuffer encodedPassword = com.anuppur.util.SHAHashingUtil.encryptPassword(loginRequest.getPassword());
+ 		        StringBuilder encodedPassword = com.anuppur.util.SHAHashingUtil.encryptPassword(loginRequest.getPassword());
  		        if (passwordEncoder.matches(encodedPassword, user.getPassword())) {
  		        	//authresponse.setId(user.getId());
  		        	authresponse.setUserId(user.getId().toString());
@@ -118,7 +118,7 @@ public class MobileController extends BaseController {
  		        	authresponse.setMobileNo(user.getMobileNo());}
  		        	authresponse.setDepartmentNAme(user.getDepartmentName());
  		        	if(user.getDesignationId()!= null) {
- 		        	authresponse.setDesignation(designationRepository.findOne(user.getDesignationId()).getDesignationNameEnglish());}
+ 		        	authresponse.setDesignation(designationRepository.findById(user.getDesignationId()).orElse(null).getDesignationNameEnglish());}
  		        	
  		        }
             	
@@ -147,7 +147,7 @@ public class MobileController extends BaseController {
 		    if (null != user && null != user.getId()) {
 
 		        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		        StringBuffer encodedPassword = com.anuppur.util.SHAHashingUtil.encryptPassword(bean.getPassword());
+		        StringBuilder encodedPassword = com.anuppur.util.SHAHashingUtil.encryptPassword(bean.getPassword());
 		        if (passwordEncoder.matches(encodedPassword, user.getPassword())) {
 
 		        	responseBean.setStatusCode(200L);

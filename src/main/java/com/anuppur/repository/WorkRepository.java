@@ -20,122 +20,162 @@ import com.anuppur.entity.Work;
 public interface WorkRepository extends JpaRepository<Work, Long>{
 	
 	
-	Page<Work>  findByWorkStatusNotIn(Pageable pageable,String status);
+	@Query(value = "SELECT * FROM t_work WHERE work_status != :status", nativeQuery = true)
+	Page<Work>  findByWorkStatusNotIn(Pageable pageable, @Param("status") String status);
 	
-	Work findByWorkHeadContainingAndStatusNotIn(String headName, String disabled);
+	@Query(value = "SELECT * FROM t_work WHERE work_head LIKE CONCAT('%', :headName, '%') AND status != :disabled LIMIT 1", nativeQuery = true)
+	Work findByWorkHeadContainingAndStatusNotIn(@Param("headName") String headName, @Param("disabled") String disabled);
 	
-	Page<Work>  findByStatusNotIn(Pageable pageable,String status);
+	@Query(value = "SELECT * FROM t_work WHERE status != :status", nativeQuery = true)
+	Page<Work>  findByStatusNotIn(Pageable pageable, @Param("status") String status);
 	
-	Page<Work> findByWorkNameContainingAndStatusNotIn(Pageable pageable,String workName,String status);
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND status != :status", nativeQuery = true)
+	Page<Work> findByWorkNameContainingAndStatusNotIn(Pageable pageable, @Param("workName") String workName, @Param("status") String status);
 	
-	Page<Work> findByWorkTypeContainingAndStatusNotIn(Pageable pageable,String workType,String status);
+	@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND status != :status", nativeQuery = true)
+	Page<Work> findByWorkTypeContainingAndStatusNotIn(Pageable pageable, @Param("workType") String workType, @Param("status") String status);
 	
-	Page<Work> findByDivisionCodeAndStatusNotIn(Pageable pageable,Long divisionCode,String status);
+	@Query(value = "SELECT * FROM t_work WHERE division_code = :divisionCode AND status != :status", nativeQuery = true)
+	Page<Work> findByDivisionCodeAndStatusNotIn(Pageable pageable, @Param("divisionCode") Long divisionCode, @Param("status") String status);
 	
-	Page<Work> findByDistrictCodeAndStatusNotIn(Pageable pageable,String districtCode,String status);
+	@Query(value = "SELECT * FROM t_work WHERE district_code = :districtCode AND status != :status", nativeQuery = true)
+	Page<Work> findByDistrictCodeAndStatusNotIn(Pageable pageable, @Param("districtCode") String districtCode, @Param("status") String status);
 	
-	Page<Work> findByFinancialYearContainingAndStatusNotIn(Pageable pageable,String financialYear,String status);
+	@Query(value = "SELECT * FROM t_work WHERE financial_year LIKE CONCAT('%', :financialYear, '%') AND status != :status", nativeQuery = true)
+	Page<Work> findByFinancialYearContainingAndStatusNotIn(Pageable pageable, @Param("financialYear") String financialYear, @Param("status") String status);
 	
-	long countByWorkStatusNotIn(String count);
+	@Query(value = "SELECT count(*) FROM t_work WHERE work_status != :count", nativeQuery = true)
+	long countByWorkStatusNotIn(@Param("count") String count);
 	
-	long countByStatusNotIn(String count);
+	@Query(value = "SELECT count(*) FROM t_work WHERE status != :count", nativeQuery = true)
+	long countByStatusNotIn(@Param("count") String count);
 
-	Page<Work> findByWorkNameContainingAndDivisionCodeAndStatusNotIn(Pageable pageable, String workName,
-			Long divisionCode, String statusDeleted);
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND division_code = :divisionCode AND status != :statusDeleted", nativeQuery = true)
+	Page<Work> findByWorkNameContainingAndDivisionCodeAndStatusNotIn(Pageable pageable, @Param("workName") String workName,
+			@Param("divisionCode") Long divisionCode, @Param("statusDeleted") String statusDeleted);
 
-	Page<Work> findByWorkTypeContainingAndDivisionCodeAndStatusNotIn(Pageable pageable, String workType,
-			Long divisionCode, String statusDeleted);
+	@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND division_code = :divisionCode AND status != :statusDeleted", nativeQuery = true)
+	Page<Work> findByWorkTypeContainingAndDivisionCodeAndStatusNotIn(Pageable pageable, @Param("workType") String workType,
+			@Param("divisionCode") Long divisionCode, @Param("statusDeleted") String statusDeleted);
 
-	Page<Work> findByFinancialYearContainingAndDivisionCodeAndStatusNotIn(Pageable pageable, String financialYear,
-			Long divisionCode, String statusDeleted);
+	@Query(value = "SELECT * FROM t_work WHERE financial_year LIKE CONCAT('%', :financialYear, '%') AND division_code = :divisionCode AND status != :statusDeleted", nativeQuery = true)
+	Page<Work> findByFinancialYearContainingAndDivisionCodeAndStatusNotIn(Pageable pageable, @Param("financialYear") String financialYear,
+			@Param("divisionCode") Long divisionCode, @Param("statusDeleted") String statusDeleted);
 
-	Page<Work> findByWorkNameContainingAndDistrictCodeAndStatusNotIn(Pageable pageable, String workName,
-			String districtCode, String statusDeleted);
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND district_code = :districtCode AND status != :statusDeleted", nativeQuery = true)
+	Page<Work> findByWorkNameContainingAndDistrictCodeAndStatusNotIn(Pageable pageable, @Param("workName") String workName,
+			@Param("districtCode") String districtCode, @Param("statusDeleted") String statusDeleted);
 
-	Page<Work> findByWorkTypeContainingAndDistrictCodeAndStatusNotIn(Pageable pageable, String workType,
-			String districtCode, String statusDeleted);
+	@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND district_code = :districtCode AND status != :statusDeleted", nativeQuery = true)
+	Page<Work> findByWorkTypeContainingAndDistrictCodeAndStatusNotIn(Pageable pageable, @Param("workType") String workType,
+			@Param("districtCode") String districtCode, @Param("statusDeleted") String statusDeleted);
 
-	Page<Work> findByFinancialYearContainingAndDistrictCodeAndStatusNotIn(Pageable pageable, String financialYear,
-			String districtCode, String statusDeleted);
+	@Query(value = "SELECT * FROM t_work WHERE financial_year LIKE CONCAT('%', :financialYear, '%') AND district_code = :districtCode AND status != :statusDeleted", nativeQuery = true)
+	Page<Work> findByFinancialYearContainingAndDistrictCodeAndStatusNotIn(Pageable pageable, @Param("financialYear") String financialYear,
+			@Param("districtCode") String districtCode, @Param("statusDeleted") String statusDeleted);
 
-	Page<Work> findByWorkNameContainingAndWorkTypeAndFinancialYearAndStatusNotIn(Pageable pageable, String workName,
-			String workType, String financialYear, String statusDeleted);
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND work_type = :workType AND financial_year = :financialYear AND status != :statusDeleted", nativeQuery = true)
+	Page<Work> findByWorkNameContainingAndWorkTypeAndFinancialYearAndStatusNotIn(Pageable pageable, @Param("workName") String workName,
+			@Param("workType") String workType, @Param("financialYear") String financialYear, @Param("statusDeleted") String statusDeleted);
 
-	Work findBySchemeContainingAndStatusNotIn(String schemeName, String statusDeleted);
+	@Query(value = "SELECT * FROM t_work WHERE scheme LIKE CONCAT('%', :schemeName, '%') AND status != :statusDeleted LIMIT 1", nativeQuery = true)
+	Work findBySchemeContainingAndStatusNotIn(@Param("schemeName") String schemeName, @Param("statusDeleted") String statusDeleted);
 
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND division_code = :divisionCode AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 	Page<Work> findByWorkNameContainingAndDivisionCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable,
-			String workName, Long divisionCode, String statusDeleted, String workStatusHandover);
+			@Param("workName") String workName, @Param("divisionCode") Long divisionCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
+	@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND division_code = :divisionCode AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 	Page<Work> findByWorkTypeContainingAndDivisionCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable,
-			String workType, Long divisionCode, String statusDeleted, String workStatusHandover);
+			@Param("workType") String workType, @Param("divisionCode") Long divisionCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
+	@Query(value = "SELECT * FROM t_work WHERE financial_year LIKE CONCAT('%', :financialYear, '%') AND division_code = :divisionCode AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 	Page<Work> findByFinancialYearContainingAndDivisionCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable,
-			String financialYear, Long divisionCode, String statusDeleted, String workStatusHandover);
+			@Param("financialYear") String financialYear, @Param("divisionCode") Long divisionCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	Page<Work> findByDivisionCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable, Long divisionCode,
-			String statusDeleted, String workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE division_code = :divisionCode AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
+	Page<Work> findByDivisionCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable, @Param("divisionCode") Long divisionCode,
+			@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND district_code = :districtCode AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 	Page<Work> findByWorkNameContainingAndDistrictCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable,
-			String workName, String districtCode, String statusDeleted, String workStatusHandover);
+			@Param("workName") String workName, @Param("districtCode") String districtCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
+	@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND district_code = :districtCode AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 	Page<Work> findByWorkTypeContainingAndDistrictCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable,
-			String workType, String districtCode, String statusDeleted, String workStatusHandover);
+			@Param("workType") String workType, @Param("districtCode") String districtCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
+	@Query(value = "SELECT * FROM t_work WHERE financial_year LIKE CONCAT('%', :financialYear, '%') AND district_code = :districtCode AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 	Page<Work> findByFinancialYearContainingAndDistrictCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable,
-			String financialYear, String districtCode, String statusDeleted, String workStatusHandover);
+			@Param("financialYear") String financialYear, @Param("districtCode") String districtCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	Page<Work> findByDistrictCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable, String districtCode,
-			String statusDeleted, String workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE district_code = :districtCode AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
+	Page<Work> findByDistrictCodeAndStatusNotInAndWorkStatusNotIn(Pageable pageable, @Param("districtCode") String districtCode,
+			@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	Page<Work> findByWorkNameContainingAndStatusNotInAndWorkStatusNotIn(Pageable pageable, String workName,
-			String statusDeleted, String workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
+	Page<Work> findByWorkNameContainingAndStatusNotInAndWorkStatusNotIn(Pageable pageable, @Param("workName") String workName,
+			@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	Page<Work> findByWorkTypeContainingAndStatusNotInAndWorkStatusNotIn(Pageable pageable, String workType,
-			String statusDeleted, String workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
+	Page<Work> findByWorkTypeContainingAndStatusNotInAndWorkStatusNotIn(Pageable pageable, @Param("workType") String workType,
+			@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	Page<Work> findByFinancialYearContainingAndStatusNotInAndWorkStatusNotIn(Pageable pageable, String financialYear,
-			String statusDeleted, String workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE financial_year LIKE CONCAT('%', :financialYear, '%') AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
+	Page<Work> findByFinancialYearContainingAndStatusNotInAndWorkStatusNotIn(Pageable pageable, @Param("financialYear") String financialYear,
+			@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	Page<Work> findByStatusNotInAndWorkStatusNotIn(Pageable pageable, String statusDeleted, String workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
+	Page<Work> findByStatusNotInAndWorkStatusNotIn(Pageable pageable, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	Page<Work> findByWorkNameContainingAndDivisionCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, String workName,
-			Long divisionCode, String statusDeleted, Long workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND division_code = :divisionCode AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
+	Page<Work> findByWorkNameContainingAndDivisionCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, @Param("workName") String workName,
+			@Param("divisionCode") Long divisionCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") Long workStatusHandover);
 
-	Page<Work> findByWorkTypeContainingAndDivisionCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, String workType,
-			Long divisionCode, String statusDeleted, String workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND division_code = :divisionCode AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
+	Page<Work> findByWorkTypeContainingAndDivisionCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, @Param("workType") String workType,
+			@Param("divisionCode") Long divisionCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
+	@Query(value = "SELECT * FROM t_work WHERE financial_year LIKE CONCAT('%', :financialYear, '%') AND division_code = :divisionCode AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
 	Page<Work> findByFinancialYearContainingAndDivisionCodeAndStatusNotInAndWorkStatusIn(Pageable pageable,
-			Long financialYear, Long divisionCode, String statusDeleted, String workStatusHandover);
+			@Param("financialYear") Long financialYear, @Param("divisionCode") Long divisionCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	@Query("from Work a where 1=1 and (a.workName=COALESCE(:workName,a.workName)) and (a.divisionCode=COALESCE(:divisionCode,a.divisionCode)) and (a.divisionId=COALESCE(:divisionId,a.divisionId)) and (a.districtId=COALESCE(:districtId,a.districtId)) and (a.workSubtypeId=COALESCE(:workSubtypeId,a.workSubtypeId)) and (a.workStatus=COALESCE(:workStatus,a.workStatus)) and (a.financialYear=COALESCE(:financialYear,a.financialYear)) and (a.workType=COALESCE(:workType,a.workType)) and (a.implementationAgency=COALESCE(:agency,a.implementationAgency)) and a.workStatus in ('12') and a.status not in ('Deleted')")
+	@Query(value = "SELECT * FROM t_work a WHERE 1=1 AND (a.work_name = COALESCE(:workName, a.work_name)) AND (a.division_code = COALESCE(:divisionCode, a.division_code)) AND (a.division_id = COALESCE(:divisionId, a.division_id)) AND (a.district_id = COALESCE(:districtId, a.district_id)) AND (a.work_subtype_id = COALESCE(:workSubtypeId, a.work_subtype_id)) AND (a.work_status = COALESCE(:workStatus, a.work_status)) AND (a.financial_year = COALESCE(:financialYear, a.financial_year)) AND (a.work_type = COALESCE(:workType, a.work_type)) AND (a.implementation_agency = COALESCE(:agency, a.implementation_agency)) AND a.work_status IN ('12') AND a.status NOT IN ('Deleted')", nativeQuery = true)
 	Page<Work> findByDivisionCode(Pageable pageable, @Param("workName") String workName, @Param("divisionCode") Long divisionCode,
 			@Param("divisionId") Long divisionId, @Param("districtId") Long districtId, @Param("workSubtypeId") Integer workSubTypeIdInt, @Param("workStatus") String workStatusId, @Param("financialYear") Long financialYearId, @Param("workType") Long workTypeId,  @Param("agency") Long agency);
 	
-	Page<Work> findByDivisionCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, Long divisionCode,
-			String statusDeleted, Long workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE division_code = :divisionCode AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
+	Page<Work> findByDivisionCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, @Param("divisionCode") Long divisionCode,
+			@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") Long workStatusHandover);
 
-	Page<Work> findByWorkNameContainingAndDistrictCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, String workName,
-			String districtCode, String statusDeleted, Long workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND district_code = :districtCode AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
+	Page<Work> findByWorkNameContainingAndDistrictCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, @Param("workName") String workName,
+			@Param("districtCode") String districtCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") Long workStatusHandover);
 
-	Page<Work> findByWorkTypeContainingAndDistrictCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, String workType,
-			String districtCode, String statusDeleted, String workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND district_code = :districtCode AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
+	Page<Work> findByWorkTypeContainingAndDistrictCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, @Param("workType") String workType,
+			@Param("districtCode") String districtCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	@Query("from Work a where 1=1 and (a.workName=COALESCE(:workName,a.workName)) and (a.districtCode=COALESCE(:districtCode,a.districtCode)) and (a.divisionId=COALESCE(:divisionId,a.divisionId)) and (a.districtId=COALESCE(:districtId,a.districtId)) and (a.workSubtypeId=COALESCE(:workSubtypeId,a.workSubtypeId)) and (a.workStatus=COALESCE(:workStatus,a.workStatus)) and (a.financialYear=COALESCE(:financialYear,a.financialYear)) and (a.workType=COALESCE(:workType,a.workType)) and (a.implementationAgency=COALESCE(:agency,a.implementationAgency)) and a.workStatus in ('12') and a.status not in ('Deleted')")
+	@Query(value = "SELECT * FROM t_work a WHERE 1=1 AND (a.work_name = COALESCE(:workName, a.work_name)) AND (a.district_code = COALESCE(:districtCode, a.district_code)) AND (a.division_id = COALESCE(:divisionId, a.division_id)) AND (a.district_id = COALESCE(:districtId, a.district_id)) AND (a.work_subtype_id = COALESCE(:workSubtypeId, a.work_subtype_id)) AND (a.work_status = COALESCE(:workStatus, a.work_status)) AND (a.financial_year = COALESCE(:financialYear, a.financial_year)) AND (a.work_type = COALESCE(:workType, a.work_type)) AND (a.implementation_agency = COALESCE(:agency, a.implementation_agency)) AND a.work_status IN ('12') AND a.status NOT IN ('Deleted')", nativeQuery = true)
 	Page<Work> findByDistrictCodeContainingAndDistrictCodeAndStatusNotInAndWorkStatusIn(Pageable pageable,@Param("workName") String workName, @Param("districtCode") String districtCode,
 			@Param("divisionId") Long divisionId, @Param("districtId") Long districtId, @Param("workSubtypeId") Integer workSubTypeIdInt, @Param("workStatus") String workStatusId, @Param("financialYear") Long financialYearId, @Param("workType") Long workTypeId, @Param("agency") Long agency);
 	
 	
+	@Query(value = "SELECT * FROM t_work WHERE financial_year LIKE CONCAT('%', :financialYear, '%') AND district_code = :districtCode AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
 	Page<Work> findByFinancialYearContainingAndDistrictCodeAndStatusNotInAndWorkStatusIn(Pageable pageable,
-			Long financialYear, String districtCode, String statusDeleted, String workStatusHandover);
+			@Param("financialYear") Long financialYear, @Param("districtCode") String districtCode, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
-	Page<Work> findByDistrictCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, String districtCode,
-			String statusDeleted, Long workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE district_code = :districtCode AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
+	Page<Work> findByDistrictCodeAndStatusNotInAndWorkStatusIn(Pageable pageable, @Param("districtCode") String districtCode,
+			@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") Long workStatusHandover);
 
-	Page<Work> findByWorkNameContainingAndStatusNotInAndWorkStatusIn(Pageable pageable, String workName,
-			String statusDeleted, Long workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
+	Page<Work> findByWorkNameContainingAndStatusNotInAndWorkStatusIn(Pageable pageable, @Param("workName") String workName,
+			@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") Long workStatusHandover);
 
-	Page<Work> findByWorkTypeContainingAndStatusNotInAndWorkStatusIn(Pageable pageable, String workType,
-			String statusDeleted, String workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
+	Page<Work> findByWorkTypeContainingAndStatusNotInAndWorkStatusIn(Pageable pageable, @Param("workType") String workType,
+			@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 	
 	
 	/*
@@ -153,12 +193,13 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 	 * Long financialYearId, String statusDeleted, Long workStatusHandover);
 	 */
 	
-	@Query(" from Work a where 1=1 and (a.workName=COALESCE(:workName,a.workName)) and (a.divisionId=COALESCE(:divisionId,a.divisionId)) and (a.districtId=COALESCE(:districtId,a.districtId)) and (a.workSubtypeId=COALESCE(:workSubtypeId,a.workSubtypeId)) and (a.workStatus=COALESCE(:workStatus,a.workStatus)) and (a.financialYear=COALESCE(:financialYear,a.financialYear)) and (a.workType=COALESCE(:workType,a.workType)) and (a.implementationAgency=COALESCE(:agency,a.implementationAgency)) and a.workStatus in ('12') and a.status not in ('Deleted')")
+	@Query(value = "SELECT * FROM t_work a WHERE 1=1 AND (a.work_name = COALESCE(:workName, a.work_name)) AND (a.division_id = COALESCE(:divisionId, a.division_id)) AND (a.district_id = COALESCE(:districtId, a.district_id)) AND (a.work_subtype_id = COALESCE(:workSubtypeId, a.work_subtype_id)) AND (a.work_status = COALESCE(:workStatus, a.work_status)) AND (a.financial_year = COALESCE(:financialYear, a.financial_year)) AND (a.work_type = COALESCE(:workType, a.work_type)) AND (a.implementation_agency = COALESCE(:agency, a.implementation_agency)) AND a.work_status IN ('12') AND a.status NOT IN ('Deleted')", nativeQuery = true)
 	Page<Work> findByDivisionNameContainingAndStatusNotInAndWorkStatusIn(Pageable pageable, @Param("workName") String workName,
 			@Param("divisionId") Long divisionId, @Param("districtId") Long districtId,
 			@Param("workSubtypeId") Integer workSubTypeIdInt, @Param("workStatus") String workStatusName, @Param("financialYear") Long financialYearId,  @Param("workType") Long workTypeId, @Param("agency") Long agency);
 	
-	Page<Work> findByStatusNotInAndWorkStatusIn(Pageable pageable, String statusDeleted, Long workStatusHandover);
+	@Query(value = "SELECT * FROM t_work WHERE status != :statusDeleted AND work_status = :workStatusHandover", nativeQuery = true)
+	Page<Work> findByStatusNotInAndWorkStatusIn(Pageable pageable, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") Long workStatusHandover);
      
 	
 	@Query(value="SELECT count(*) from t_work where status in ('Active') and (scheme is not null) and (financial_year is not null) and (work_head is not null)", nativeQuery=true)
@@ -892,46 +933,50 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 
 						
 
-							Work findByIdAndStatusNotIn(Long workId, String statusDeleted);
+							@Query(value = "SELECT * FROM t_work WHERE id = :workId AND status != :statusDeleted LIMIT 1", nativeQuery = true)
+							Work findByIdAndStatusNotIn(@Param("workId") Long workId, @Param("statusDeleted") String statusDeleted);
 
+							@Query(value = "SELECT * FROM t_work WHERE work_name LIKE CONCAT('%', :workName, '%') AND implementation_agency = :implAgency AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 							Page<Work> findByWorkNameContainingAndImplementationAgencyAndStatusNotInAndWorkStatusNotIn(
-									Pageable pageable, String workName, ImplementationAgency implAgency,
-									String statusDeleted, String workStatusHandover);
+									Pageable pageable, @Param("workName") String workName, @Param("implAgency") ImplementationAgency implAgency,
+									@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
+							@Query(value = "SELECT * FROM t_work WHERE work_type LIKE CONCAT('%', :workType, '%') AND implementation_agency = :implAgency AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 							Page<Work> findByWorkTypeContainingAndImplementationAgencyAndStatusNotInAndWorkStatusNotIn(
-									Pageable pageable, String workType, ImplementationAgency implAgency,
-									String statusDeleted, String workStatusHandover);
+									Pageable pageable, @Param("workType") String workType, @Param("implAgency") ImplementationAgency implAgency,
+									@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
+							@Query(value = "SELECT * FROM t_work WHERE financial_year LIKE CONCAT('%', :financialYear, '%') AND implementation_agency = :implAgency AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 							Page<Work> findByFinancialYearContainingAndImplementationAgencyAndStatusNotInAndWorkStatusNotIn(
-									Pageable pageable, String financialYear, ImplementationAgency implAgency,
-									String statusDeleted, String workStatusHandover);
+									Pageable pageable, @Param("financialYear") String financialYear, @Param("implAgency") ImplementationAgency implAgency,
+									@Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
+							@Query(value = "SELECT * FROM t_work WHERE implementation_agency = :implAgency AND status != :statusDeleted AND work_status != :workStatusHandover", nativeQuery = true)
 							Page<Work> findByImplementationAgencyAndStatusNotInAndWorkStatusNotIn(Pageable pageable,
-									ImplementationAgency implAgency, String statusDeleted, String workStatusHandover);
+									@Param("implAgency") ImplementationAgency implAgency, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") String workStatusHandover);
 
 
-							@Query(" from Work a where 1=1 and (a.workName=COALESCE(:workName,a.workName)) and (a.workType=COALESCE(:workType,a.workType)) and (a.financialYear=COALESCE(:financialYear,a.financialYear))    and (a.districtId=COALESCE(:districtId,a.districtId))  and (a.implementationAgency=COALESCE(:agency,a.implementationAgency)) and (a.workStatus=COALESCE(:workStatus,a.workStatus)) and a.workStatus not in ('Handed Over') and a.status not in ('Deleted')")
+							@Query(value = "SELECT * FROM t_work a WHERE 1=1 AND (a.work_name = COALESCE(:workName, a.work_name)) AND (a.work_type = COALESCE(:workType, a.work_type)) AND (a.financial_year = COALESCE(:financialYear, a.financial_year)) AND (a.district_id = COALESCE(:districtId, a.district_id)) AND (a.implementation_agency = COALESCE(:agency, a.implementation_agency)) AND (a.work_status = COALESCE(:workStatus, a.work_status)) AND a.status NOT IN ('Deleted', 'Handed Over')", nativeQuery = true)
 							Page<Work> fetchAllWorksByDivision(Pageable pageable, @Param("workName") String workName, @Param("workType") Long workType,
 									 @Param("financialYear")  String financialYear,  @Param("districtId") Long districtId,  @Param("workStatus") String workStatusName,@Param("agency") Long agency  );
 							
 							
-							@Query(" from Work a where 1=1 and (a.workName=COALESCE(:workName,a.workName)) and (a.workType=COALESCE(:workType,a.workType)) and (a.financialYear=COALESCE(:financialYear,a.financialYear)) and (a.districtCode=COALESCE(:districtCode,a.districtCode)) and (a.divisionId=COALESCE(:divisionId,a.divisionId)) and (a.districtId=COALESCE(:districtId,a.districtId)) and (a.implementationAgency=COALESCE(:agency,a.implementationAgency)) and (:workPriorityId IS NULL OR a.workPriorityId = :workPriorityId) and (:financialHeadId IS NULL OR a.financialHeadId = :financialHeadId) and (:vidhanSabhaId IS NULL OR a.vidhanSabhaId = :vidhanSabhaId) and (a.workSubtypeId=COALESCE(:workSubtypeId,a.workSubtypeId)) and (a.workStatus=COALESCE(:workStatus,a.workStatus)) and a.workStatus not in ('Handed Over') and a.status not in ('Deleted')")
+							@Query(value = "SELECT * FROM t_work a WHERE 1=1 AND (a.work_name = COALESCE(:workName, a.work_name)) AND (a.work_type = COALESCE(:workType, a.work_type)) AND (a.financial_year = COALESCE(:financialYear, a.financial_year)) AND (a.district_code = COALESCE(:districtCode, a.district_code)) AND (a.division_id = COALESCE(:divisionId, a.division_id)) AND (a.district_id = COALESCE(:districtId, a.district_id)) AND (a.implementation_agency = COALESCE(:agency, a.implementation_agency)) AND (:workPriorityId IS NULL OR a.work_priority_id = :workPriorityId) AND (:financialHeadId IS NULL OR a.financial_head_id = :financialHeadId) AND (:vidhanSabhaId IS NULL OR a.vidhan_sabha_id = :vidhanSabhaId) AND (a.work_subtype_id = COALESCE(:workSubtypeId, a.work_subtype_id)) AND (a.work_status = COALESCE(:workStatus, a.work_status)) AND a.status NOT IN ('Deleted', 'Handed Over')", nativeQuery = true)
 							Page<Work> fetchAllWorksByDistrict(Pageable pageable, @Param("workName") String workName, @Param("workType") Long workType,
 									 @Param("financialYear")  String financialYear, @Param("districtCode") String districtCode,@Param("agency") Long agency, @Param("divisionId") Long divisionId, @Param("districtId") Long districtId, @Param("workSubtypeId") Integer workSubTypeIdInt, @Param("workStatus") String workStatusName, @Param("workPriorityId") Long workPriorityId, @Param("financialHeadId") Long financialHeadId, @Param("vidhanSabhaId") Long vidhanSabhaId);
 	
-							@Query(" from Work a where 1=1 and (a.workName=COALESCE(:workName,a.workName)) and (a.workType=COALESCE(:workType,a.workType)) and (a.financialYear=COALESCE(:financialYear,a.financialYear)) and (a.divisionId=COALESCE(:divisionId,a.divisionId)) and (a.districtId=COALESCE(:districtId,a.districtId)) and (a.implementationAgency=COALESCE(:agency,a.implementationAgency)) and (a.workSubtypeId=COALESCE(:workSubtypeId,a.workSubtypeId)) and (:workPriorityId IS NULL OR a.workPriorityId = :workPriorityId) and (:financialHeadId IS NULL OR a.financialHeadId = :financialHeadId) and (:vidhanSabhaId IS NULL OR a.vidhanSabhaId = :vidhanSabhaId) and (a.workStatus=COALESCE(:workStatus,a.workStatus)) and a.workStatus not in ('Handed Over') and a.status not in ('Deleted')")
+							@Query(value = "SELECT * FROM t_work a WHERE 1=1 AND (a.work_name = COALESCE(:workName, a.work_name)) AND (a.work_type = COALESCE(:workType, a.work_type)) AND (a.financial_year = COALESCE(:financialYear, a.financial_year)) AND (a.division_id = COALESCE(:divisionId, a.division_id)) AND (a.district_id = COALESCE(:districtId, a.district_id)) AND (a.implementation_agency = COALESCE(:agency, a.implementation_agency)) AND (a.work_subtype_id = COALESCE(:workSubtypeId, a.work_subtype_id)) AND (:workPriorityId IS NULL OR a.work_priority_id = :workPriorityId) AND (:financialHeadId IS NULL OR a.financial_head_id = :financialHeadId) AND (:vidhanSabhaId IS NULL OR a.vidhan_sabha_id = :vidhanSabhaId) AND (a.work_status = COALESCE(:workStatus, a.work_status)) AND a.status NOT IN ('Deleted', 'Handed Over')", nativeQuery = true)
 							Page<Work> fetchAllWorksByAgency(Pageable pageable, @Param("workName") String workName, @Param("workType") Long workType,
 									 @Param("financialYear")  String financialYear, @Param("agency") Long agency, @Param("divisionId") Long divisionId, @Param("districtId") Long districtId, @Param("workSubtypeId") Integer workSubTypeIdInt, @Param("workStatus") String workStatusName, @Param("workPriorityId") Long workPriorityId, @Param("financialHeadId") Long financialHeadId, @Param("vidhanSabhaId") Long vidhanSabhaId);
 							
 							
-							@Query(" from Work a where 1=1 and (a.workName=COALESCE(:workName,a.workName)) and (a.workType=COALESCE(:workType,a.workType)) and (a.financialYear=COALESCE(:financialYear,a.financialYear)) and (a.divisionId=COALESCE(:divisionId,a.divisionId)) and (a.districtId=COALESCE(:districtId,a.districtId)) and (a.districtCode=COALESCE(:districtCode,a.districtCode)) and (a.workSubtypeId=COALESCE(:workSubtypeId,a.workSubtypeId)) and (a.implementationAgency=COALESCE(:agency,a.implementationAgency)) and (:workPriorityId IS NULL OR a.workPriorityId = :workPriorityId) and (:financialHeadId IS NULL OR a.financialHeadId = :financialHeadId) and (:vidhanSabhaId IS NULL OR a.vidhanSabhaId = :vidhanSabhaId) and (a.workStatus=COALESCE(:workStatus,a.workStatus)) and a.workStatus not in ('Handed Over') and a.status not in ('Deleted')")
+							@Query(value = "SELECT * FROM t_work a WHERE 1=1 AND (a.work_name = COALESCE(:workName, a.work_name)) AND (a.work_type = COALESCE(:workType, a.work_type)) AND (a.financial_year = COALESCE(:financialYear, a.financial_year)) AND (a.division_id = COALESCE(:divisionId, a.division_id)) AND (a.district_id = COALESCE(:districtId, a.district_id)) AND (a.district_code = COALESCE(:districtCode, a.district_code)) AND (a.work_subtype_id = COALESCE(:workSubtypeId, a.work_subtype_id)) AND (a.implementation_agency = COALESCE(:agency, a.implementation_agency)) AND (:workPriorityId IS NULL OR a.work_priority_id = :workPriorityId) AND (:financialHeadId IS NULL OR a.financial_head_id = :financialHeadId) AND (:vidhanSabhaId IS NULL OR a.vidhan_sabha_id = :vidhanSabhaId) AND (a.work_status = COALESCE(:workStatus, a.work_status)) AND a.status NOT IN ('Deleted', 'Handed Over')", nativeQuery = true)
 							Page<Work> fetchAllDeptDistrict(Pageable pageable, @Param("workName") String workName, @Param("workType") Long workType,
 									 @Param("financialYear")  String financialYear, @Param("districtCode") String districtCode, @Param("divisionId") Long divisionId, @Param("districtId") Long districtId, @Param("workSubtypeId") Integer workSubTypeIdInt, @Param("workStatus") String workStatusName,@Param("agency") Long agency, @Param("workPriorityId") Long workPriorityId, @Param("financialHeadId") Long financialHeadId, @Param("vidhanSabhaId") Long vidhanSabhaId);
 							
 							
 							
-							@Query("from Work a where 1=1 and (LOWER(a.workName) LIKE LOWER(CONCAT('%', COALESCE(:workName, ''), '%')))\r\n"
-									+ " and (a.workType=COALESCE(:workType,a.workType)) and (a.financialYear=COALESCE(:financialYear,a.financialYear))  and (a.districtId=COALESCE(:districtId,a.districtId))  and (a.implementationAgency=COALESCE(:agency,a.implementationAgency)) and (:workPriorityId IS NULL OR a.workPriorityId = :workPriorityId) and (:financialHeadId IS NULL OR a.financialHeadId = :financialHeadId) and (:vidhanSabhaId IS NULL OR a.vidhanSabhaId = :vidhanSabhaId) and (a.workStatus=COALESCE(:workStatus,a.workStatus)) and a.status not in ('Deleted')   " )
+							@Query(value = "SELECT * FROM t_work a WHERE 1=1 AND (LOWER(a.work_name) LIKE LOWER(CONCAT('%', COALESCE(:workName, ''), '%'))) AND (a.work_type = COALESCE(:workType, a.work_type)) AND (a.financial_year = COALESCE(:financialYear, a.financial_year)) AND (a.district_id = COALESCE(:districtId, a.district_id)) AND (a.implementation_agency = COALESCE(:agency, a.implementation_agency)) AND (:workPriorityId IS NULL OR a.work_priority_id = :workPriorityId) AND (:financialHeadId IS NULL OR a.financial_head_id = :financialHeadId) AND (:vidhanSabhaId IS NULL OR a.vidhan_sabha_id = :vidhanSabhaId) AND (a.work_status = COALESCE(:workStatus, a.work_status)) AND a.status NOT IN ('Deleted')", nativeQuery = true)
 						    Page<Work> findAllByStatusNotDeleted(Pageable pageable, @Param("workName") String workName, @Param("workType") Long workType,
 									 @Param("financialYear") String financialYear,  @Param("districtId") Long districtId,  @Param("workStatus") String workStatusName, @Param("agency") Long agency, @Param("workPriorityId") Long workPriorityId, @Param("financialHeadId") Long financialHeadId, @Param("vidhanSabhaId") Long vidhanSabhaId);
 							
@@ -1281,12 +1326,12 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 								    		+ "group by 1, a.scheme_state, a.scheme_nhm, a.scheme_ecrp2, a.scheme_others", nativeQuery=true)
 									List<Object[]> fetchSchemeYearWiseWorkByDistrict(@Param("district_code") String districtCode, @Param("implementation_agency") ImplementationAgency implementationAgency);
 										
-									@Query("SELECT w FROM Work w " +
+									@Query(value = "SELECT * FROM t_work w " +
 									           "WHERE w.status = 'Active' " +
-									           "AND w.workStatus = 'AA Issued' " +
+									           "AND w.work_status = 'AA Issued' " +
 									           "AND (w.scheme IS NOT NULL AND w.scheme != '') " +
-									           "AND (w.financialYear IS NOT NULL AND w.financialYear != '') " +
-									           "AND (w.workHead IS NOT NULL AND w.workHead != '')")
+									           "AND (w.financial_year IS NOT NULL AND w.financial_year != '') " +
+									           "AND (w.work_head IS NOT NULL AND w.work_head != '')", nativeQuery = true)
 									    Page<Work> findActiveWorks(Pageable pageable);
 
 									//List<Work> findByWorkStatusIn(String[] workStatusVerification);
@@ -1349,7 +1394,7 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 									Page<Work> findByWorkStatusAndWorkNameContainingAndFinancialYearAndCreatedBy(
 											Pageable pageable, Long long1, String workName, Long long2,
 											String username);
-									@Query(" from Work a where 1=1 and (a.workName=COALESCE(:workName,a.workName)) and (a.workType=COALESCE(:workType,a.workType)) and (a.financialYear=COALESCE(:financialYear,a.financialYear))    and (a.districtId=COALESCE(:districtId,a.districtId))  and (a.implementationAgency=COALESCE(:agency,a.implementationAgency)) and (:workPriorityId IS NULL OR a.workPriorityId = :workPriorityId) and (:financialHeadId IS NULL OR a.financialHeadId = :financialHeadId) and (:vidhanSabhaId IS NULL OR a.vidhanSabhaId = :vidhanSabhaId) and (a.workStatus=COALESCE(:workStatus,a.workStatus)) and a.workStatus not in ('Handed Over') and a.status not in ('Deleted') and a.createdBy = :username")
+									@Query(value = "SELECT * FROM t_work a WHERE 1=1 AND (a.work_name = COALESCE(:workName, a.work_name)) AND (a.work_type = COALESCE(:workType, a.work_type)) AND (a.financial_year = COALESCE(:financialYear, a.financial_year)) AND (a.district_id = COALESCE(:districtId, a.district_id)) AND (a.implementation_agency = COALESCE(:agency, a.implementation_agency)) AND (:workPriorityId IS NULL OR a.work_priority_id = :workPriorityId) AND (:financialHeadId IS NULL OR a.financial_head_id = :financialHeadId) AND (:vidhanSabhaId IS NULL OR a.vidhan_sabha_id = :vidhanSabhaId) AND (a.work_status = COALESCE(:workStatus, a.work_status)) AND a.status NOT IN ('Deleted', 'Handed Over') AND a.created_by = :username", nativeQuery = true)
 									
 									Page<Work> fetchAllWorksByDivision(Pageable pageable, @Param("workName") String workName, @Param("workType") Long workType,
 											 @Param("financialYear")  String financialYear,  @Param("districtId") Long districtId,  @Param("workStatus") String workStatusName,@Param("agency") Long agency ,@Param("username") String username, @Param("workPriorityId") Long workPriorityId, @Param("financialHeadId") Long financialHeadId, @Param("vidhanSabhaId") Long vidhanSabhaId);
@@ -1474,7 +1519,8 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 
 
 
-								List<Work> findById(Long workId);
+								@Query("SELECT w FROM Work w WHERE w.id = :workId")
+								List<Work> findAllByWorkId(@Param("workId") Long workId);
 
 								List<Work> findByStatus(String statusActive);
 

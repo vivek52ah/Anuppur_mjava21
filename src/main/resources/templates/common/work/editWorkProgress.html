@@ -1,33 +1,40 @@
 <div th:fragment="edit_workProgress">
 	<form
 		data-ng-submit="createWorkProgressData(workFormProgress.$valid, APPdfFile, 'Edit' ,workprogressimages,WProdfFile )"
-		name="workFormProgress" enctype="multipart/form-data" id="workFormId"
-		novalidate="novalidate">
+		name="workFormProgress" enctype="multipart/form-data" id="workFormId" novalidate="novalidate">
 
 
 
-		<div class="card" data-ng-init="workProgressImagesData=[];"
-			data-ng-hide="workDataContractor.workStatus=='notContractorIssued'"
-			data-ng-show="workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'">
-			<div class="card-header">
+		<div class="card" data-ng-init="workProgressImagesData=[];">			<div class="card-header">
 				<span>Work Progress</span>
 			</div>
-			<div class="card-body">
+
+			<!-- Locked message: shown when contractor details (step 4) not yet completed
+			<div class="card-body text-center py-4"
+				data-ng-show="workDataContractor.workStatus=='notContractorIssued'">
+				<i class="fa fa-lock fa-2x text-muted mb-2"></i>
+				<p class="text-muted mt-2">
+					<strong>Step 5 is locked.</strong><br/>
+					Please complete <strong>Contractor's Details (Step 4)</strong> first to unlock Work Progress Details.
+				</p>
+			</div> -->
+
+			<div class="card-body"
+				data-ng-hide="workDataContractor.workStatus=='notContractorIssued' || workDataProgress.progressUpdated=='11' || workDataProgress.progressUpdated=='12' || workDataProgress.progressUpdated=='13'">
 				<div class="row">
 					<div class="col-md-12">
-						<div data-ng-if="responseObject.errorMessage != null"
-							class="text-danger">
+						<div data-ng-if="responseObject.errorMessage != null" class="text-danger">
 							<strong>Error!</strong>
 							<p>{{responseObject.errorMessage}}</p>
 						</div>
 					</div>
 				</div>
-				
-				
-			
-				
+
+
+
+
 				<div class="row">
-							
+
 					<div class="form-group col-sm-4"
 						data-ng-hide="workDataTender.workStatusId=='13'   || workDataTender.workStatusId=='12' "
 						data-ng-init="loadWorkStatusProgressByFlag('5');">
@@ -45,29 +52,28 @@
 								style="background-color: {{workStatus.color}}"
 								value="{{workStatus.workStatusId}}" >{{workStatus.workStatusNameE}}</option> -->
 
-																									<!-- 	| orderBy : 'workStatusNameE' -->
-							<option
-								data-ng-if="workDataProgress.progressUpdated=='notSelected'"
+							<!-- 	| orderBy : 'workStatusNameE' -->
+							<option data-ng-if="workDataProgress.progressUpdated=='notSelected'"
 								data-ng-repeat="workStatus in workProStatus "
-								style="background-color: {{workStatus.color"
-								value="{{workStatus.workStatusId}}">{{workStatus.workStatusNameE}}</option>
-																									<!-- | orderBy : 'workStatusNameE' -->
+								 value="{{workStatus.workStatusId}}">
+								{{workStatus.workStatusNameE}}</option>
+							<!-- | orderBy : 'workStatusNameE' -->
 							<option data-ng-if="workDataProgress.progressUpdated=='9'"
 								data-ng-repeat="workStatus in workProStatus "
-								style="background-color: {{workStatus.color"
-								value="{{workStatus.workStatusId}}">{{workStatus.workStatusNameE}}</option>
-																							<!-- | orderBy : 'workStatusNameE' -->
+								 value="{{workStatus.workStatusId}}">
+								{{workStatus.workStatusNameE}}</option>
+							<!-- | orderBy : 'workStatusNameE' -->
 							<option data-ng-if="workDataProgress.progressUpdated=='10'"
 								data-ng-repeat="workStatus in workProStatus "
 								data-ng-disabled="workStatus.workStatusNameE=='Not Started' "
-								style="background-color: {{workStatus.color"
-								value="{{workStatus.workStatusId}}">{{workStatus.workStatusNameE}}</option>  
-																							<!-- | orderBy : 'workStatusNameE' -->
-							<option data-ng-if="workDataProgress.progressUpdated=='11'" 
+								value="{{workStatus.workStatusId}}">
+								{{workStatus.workStatusNameE}}</option>
+							<!-- | orderBy : 'workStatusNameE' -->
+							<option data-ng-if="workDataProgress.progressUpdated=='11'"
 								data-ng-repeat="workStatus in workProStatus "
 								data-ng-disabled="workStatus.workStatusNameE=='Not Started' || workStatus.workStatusNameE=='In-Progress'"
-								style="background-color: {{workStatus.color"
-								value="{{workStatus.workStatusId}}">{{workStatus.workStatusNameE}}</option>
+								 value="{{workStatus.workStatusId}}">
+								{{workStatus.workStatusNameE}}</option>
 						</select>
 						<div data-ng-show="workFormProgress.$submitted">
 							<p class="help-block" style="color: red;"
@@ -79,19 +85,17 @@
 					</div>
 
 
-					
 
-					
+
+
 					<!-- data-ng-change="loadPercByWorkSubStatus(workDataProgress.workSubStatusId);loadWorkSubDelayReasonBySubWorkStatus(workDataProgress.workSubStatusId)" -->
-						
+
 					<div class="form-group col-sm-4"
 						data-ng-show="workDataProgress.workStatusId=='9' || workDataProgress.workStatusId=='10'">
-						<label><span
-							data-ng-show="workDataProgress.workStatusId=='9'">Reason
-								of Delay</span> <span
-							data-ng-show="workDataProgress.workStatusId=='10'">Level
-								of Completion</span> <span class="aestrick">&#42;</span></label> <select class="form-control" id="workSubStatus"
-							required="required"
+						<label><span data-ng-show="workDataProgress.workStatusId=='9'">Reason
+								of Delay</span> <span data-ng-show="workDataProgress.workStatusId=='10'">Level
+								of Completion</span> <span class="aestrick">&#42;</span></label> <select
+							class="form-control" id="workSubStatus" required="required"
 							data-ng-model="workDataProgress.workSubStatusId"
 							data-ng-change="workDataProgress.workSubStatus!=null;workDataProgress.workSubDelayReason=null;workDataProgress.remarks=null;"
 							name="workSubStatus">
@@ -102,13 +106,14 @@
 							</option>
 						</select>
 						<div data-ng-show="workDataProgress.workStatusId =='9'">
-						<div data-ng-show="workFormProgress.$submitted">
-							<p class="help-block" style="color: red;"
-								data-ng-show="workFormProgress.workSubStatus.$error.required">
-								<span th:text="#{pleaseSelect}">Please select</span> <span>Reason
-									of Delay</span>
-							</p>
-						</div></div>
+							<div data-ng-show="workFormProgress.$submitted">
+								<p class="help-block" style="color: red;"
+									data-ng-show="workFormProgress.workSubStatus.$error.required">
+									<span th:text="#{pleaseSelect}">Please select</span> <span>Reason
+										of Delay</span>
+								</p>
+							</div>
+						</div>
 						<div data-ng-show="workFormProgress.$submitted &amp;&amp; workDataProgress.workStatusId=='10' ">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workFormProgress.workSubStatus.$error.required">
@@ -122,16 +127,15 @@
 					<!-- data-ng-change="loadPercByWorkSubStatus(workDataProgress.workSubStatusId)" -->
 					<div class="form-group col-sm-4"
 						data-ng-show="workDataProgress.workStatusId!=='9' &amp;&amp; workDataProgress.workSubStatusId=='4'">
-						<label><span
-							data-ng-show="workDataProgress.workStatusId!=='9'">Sub
+						<label><span data-ng-show="workDataProgress.workStatusId!=='9'">Sub
 								Reason of Delay</span> <span class="aestrick">&#42;</span></label> <select
 							class="form-control" id="workSubDelayReason" required="required"
-							data-ng-model="workDataProgress.workSubDelayReasonId"
-							name="workSubDelayReason">
+							data-ng-model="workDataProgress.workSubDelayReasonId" name="workSubDelayReason">
 							<option value="" disabled="disabled">--Select--</option>
 							<option
 								data-ng-repeat="workSubDelayReason in worksSubDelayReason | orderBy : 'subDelayReason'"
-								value="{{workSubDelayReason.workSubDelayReasonId}}">{{workSubDelayReason.subDelayReason}}</option>
+								value="{{workSubDelayReason.workSubDelayReasonId}}">
+								{{workSubDelayReason.subDelayReason}}</option>
 						</select>
 						<div data-ng-show="workFormProgress.$submitted">
 							<p class="help-block" style="color: red;"
@@ -149,33 +153,30 @@
 					workDataProgress.workSubStatusId=='7'||workDataProgress.workSubStatusId=='8'||workDataProgress.workSubStatusId=='9'">
 						<div class="form-group"
 							data-ng-hide="workDataProgress.workSubStatusId==null ||workDataProgress.workStatusId=='11'||workDataProgress.workStatusId=='9'">
-							<label> 
-							<span data-ng-show="workDataProgress.workSubStatusId >= 12"
-								>Upload
-									 Image File</span>
-							<span
-								data-ng-show="workDataProgress.workSubStatusId=='5'">Upload
+							<label>
+								<span data-ng-show="workDataProgress.workSubStatusId >= 12">Upload
+									Image File</span>
+								<span data-ng-show="workDataProgress.workSubStatusId=='5'">Upload
 									Foundation Level Image File</span> <span
-								data-ng-show="workDataProgress.workSubStatusId=='6'">Upload
+									data-ng-show="workDataProgress.workSubStatusId=='6'">Upload
 									Plinth Level Image File</span> <span
-								data-ng-show="workDataProgress.workSubStatusId=='7'">Upload
+									data-ng-show="workDataProgress.workSubStatusId=='7'">Upload
 									Lintel Level Image File</span> <span
-								data-ng-show="workDataProgress.workSubStatusId=='8'">Upload
+									data-ng-show="workDataProgress.workSubStatusId=='8'">Upload
 									Roof Level Image File</span> <span
-								data-ng-show="workDataProgress.workSubStatusId=='9'">Upload
+									data-ng-show="workDataProgress.workSubStatusId=='9'">Upload
 									Finishing Level Image File</span> <span
-								data-ng-show="workDataProgress.workSubStatusId=='10'">Upload
+									data-ng-show="workDataProgress.workSubStatusId=='10'">Upload
 									Renovation Image File</span> <span
-								data-ng-show="workDataProgress.workSubStatusId=='11'">Upload
-									Dismentling Image File</span> 
-							</label> <input type='file' accept="image/*"
-								class="form-control" file-model="WProdfFile" name="WProdfFile"
-								id="WProdfFile" /><span data-ng-show="workDataProgress.proSubFileId==null"><b>(jpeg, png, jpg file with max size 30 mb)</b></span>
+									data-ng-show="workDataProgress.workSubStatusId=='11'">Upload
+									Dismentling Image File</span>
+							</label> <input type='file' accept="image/*" class="form-control" file-model="WProdfFile"
+								name="WProdfFile" id="WProdfFile" /><span
+								data-ng-show="workDataProgress.proSubFileId==null"><b>(jpeg, png, jpg file with max size
+									30 mb)</b></span>
 
-							<p class="help-block"
-								data-ng-show="workDataProgress.proSubFileId!=null">
-								<span th:text="#{downloadCurrentFile}"></span> <a
-									style="cursor: pointer;"
+							<p class="help-block" data-ng-show="workDataProgress.proSubFileId!=null">
+								<span th:text="#{downloadCurrentFile}"></span> <a style="cursor: pointer;"
 									data-ng-click="downloadDocumentProgress(workDataProgress.proSubFileId)">
 									<img th:src="@{/img/download.ico}" style="width: 7%;" alt="" />
 								</a>
@@ -210,13 +211,10 @@
 					</div>
 
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataProgress.workSubStatusId== 12">
+					<div class="form-group col-sm-4" data-ng-show="workDataProgress.workSubStatusId== 12">
 						<label><span>Other Reason</span><span class="aestrick">&#42;</span></label>
-						<textarea class="form-control" id="otherReasonDelay"
-							data-ng-required="true"
-							data-ng-model="workDataProgress.otherReasonDelay"
-							name="otherReasonDelay"></textarea>
+						<textarea class="form-control" id="otherReasonDelay" data-ng-required="true"
+							data-ng-model="workDataProgress.otherReasonDelay" name="otherReasonDelay"></textarea>
 						<div data-ng-show="workFormProgress.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workForm.otherReasonDelay.$error.required">
@@ -234,7 +232,7 @@
 				<div class="row">
 
 
-				<!-- 	<div class="form-group col-sm-4"
+					<!-- 	<div class="form-group col-sm-4"
 						data-ng-show="workDataProgress.workSubStatusId=='9' ">
 						<label><span>Reason</span></label>
 						<textarea class="form-control" id="otherReasonDelay"
@@ -277,10 +275,10 @@
 
 					<div class="form-group col-sm-4"
 						data-ng-show="workDataProgress.workStatusId=='10' || workDataProgress.workSubStatusId=='9'">
-						<label><span>Physical Percentage</span><span
-							class="aestrick">&#42;</span></label> <select class="form-control"
-							id="perc" required="required" data-ng-change="workDataProgress.remarks = null;"
-							data-ng-model="workDataProgress.perc" name="perc">
+						<label><span>Physical Percentage</span><span class="aestrick">&#42;</span></label> <select
+							class="form-control" id="perc" required="required"
+							data-ng-change="workDataProgress.remarks = null;" data-ng-model="workDataProgress.perc"
+							name="perc">
 							<option disabled="disabled" value="">-- Select --</option>
 							<!-- Use ng-options to generate options -->
 							<option data-ng-repeat="i in percOptions" value="{{i}}"
@@ -291,14 +289,10 @@
 
 
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataProgress.workStatusId=='9'">
-						<label><span>Action Taken for Delayed</span><span
-							class="aestrick">&#42;</span></label>
-						<textarea class="form-control" id="actiontakendelay"
-							required="required"
-							data-ng-model="workDataProgress.actionTakenDelay"
-							name="actiontakendelay"></textarea>
+					<div class="form-group col-sm-4" data-ng-show="workDataProgress.workStatusId=='9'">
+						<label><span>Action Taken for Delayed</span><span class="aestrick">&#42;</span></label>
+						<textarea class="form-control" id="actiontakendelay" required="required"
+							data-ng-model="workDataProgress.actionTakenDelay" name="actiontakendelay"></textarea>
 						<div data-ng-show="workFormProgress.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workForm.actiontakendelay.$error.required">
@@ -311,28 +305,26 @@
 
 
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataProgress.workStatusId=='10'">
-						<label><span>Stipulated Date of Completion</span><span
-							class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker10"
-							data-target-input="nearest">
-							<!-- <input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker10" name="stipulateDate"
+					<div class="form-group col-sm-4" data-ng-show="workDataProgress.workStatusId=='10'">
+						<label><span>Stipulated Date of Completion</span><span class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker26" data-target-input="nearest">
+
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker26"
+								name="stipulateDate" required="required" placeholder="DD-MM-YYYY"
+								data-ng-model="workDataProgress.stipulatedDateCompleted" id="stipulateDate"
+								autocomplete="off"  readonly="readonly"/>
+
+
+							<!-- <input type="text" class="form-control" id="stipulateDate"
 								required="required"
 								data-ng-model="workDataProgress.stipulatedDateCompleted"
-								id="stipulateDate" autocomplete="off" /> -->
+								name="stipulateDate" readonly="readonly"/> -->
 
 
-							<input type="text" class="form-control" id="stipulateDate"
-								required="required"
-								data-ng-model="workDataProgress.stipulatedDateCompleted"
-								name="stipulateDate" disabled="disabled" />
-
-
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker10" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker26"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
+
 									<i class="fa fa-calendar"></i>
 								</div>
 							</div>
@@ -348,21 +340,18 @@
 					</div>
 
 
-			
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataProgress.workStatusId=='10'">
+
+					<div class="form-group col-sm-4" data-ng-show="workDataProgress.workStatusId=='10'">
 						<label><span>In case of Delay, Work Likely to be
 								Completed On</span></label>
-						<div class="input-group date" id="datetimepicker5"
-							data-target-input="nearest">
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker5" name="likelyDate"
-								required="required" placeholder="DD-MM-YYYY"
-								data-ng-model="workDataProgress.likelyDateCompleted"
-								id="likelyDate" autocomplete="off" />
+						<div class="input-group date" id="datetimepicker5" data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker5"
+								name="likelyDate" required="required" placeholder="DD-MM-YYYY"
+								data-ng-model="workDataProgress.likelyDateCompleted" id="likelyDate"
+								autocomplete="off" />
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker5" data-toggle="datetimepicker">
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker5"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -377,29 +366,24 @@
 							</p>
 						</div> -->
 					</div>
-								<script>
-								$('#datetimepicker8').datetimepicker({
-									maxDate : moment(),
-									minDate : moment('01/01/1995', 'DD/MM/YYYY'),
-									format : 'DD/MM/YYYY'
-										 
-								});
-								
-								</script>
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataProgress.workStatusId=='11'">
-						<label><span>Date of Completion</span><span
-							class="aestrick">&#42;</span></label>
-						<div class="input-group date" id="datetimepicker8"
-							data-target-input="nearest">
-							<input type="text" class="form-control datetimepicker-input"
-								data-target="#datetimepicker8" name="datecomplete"
-								required="required" placeholder="DD-MM-YYYY"
-								data-ng-model="workDataProgress.dateCompletion"
-								id="datecomplete" autocomplete="off" />
+					<script>
+						$('#datetimepicker8').datetimepicker({
+							maxDate: moment(),
+							minDate: moment('01/01/1995', 'DD/MM/YYYY'),
+							format: 'DD/MM/YYYY'
 
-							<div class="input-group-append input-group-addon"
-								data-target="#datetimepicker8" data-toggle="datetimepicker">
+						});
+
+					</script>
+					<div class="form-group col-sm-4" data-ng-show="workDataProgress.workStatusId=='11'">
+						<label><span>Date of Completion</span><span class="aestrick">&#42;</span></label>
+						<div class="input-group date" id="datetimepicker8" data-target-input="nearest">
+							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker8"
+								name="datecomplete" required="required" placeholder="DD-MM-YYYY"
+								data-ng-model="workDataProgress.dateCompletion" id="datecomplete" autocomplete="off" />
+
+							<div class="input-group-append input-group-addon" data-target="#datetimepicker8"
+								data-toggle="datetimepicker">
 								<div class="input-group-text">
 									<i class="fa fa-calendar"></i>
 								</div>
@@ -431,7 +415,7 @@
 						</div>
 					</div> -->
 
-				<!-- 	<div class="form-group col-sm-4" >
+					<!-- 	<div class="form-group col-sm-4" >
 						<label><span>Remarksassd</span><span class="aestrick">&#42;</span></label>
 						<textarea class="form-control" id="remarks" required="required"
 							data-ng-model="workDataProgress.remarks" name="remarks"
@@ -454,7 +438,7 @@
 			</div>
 
 			<div id="page-wp-div"
-				data-ng-show="successRespondeWS=='success' ||workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'"
+				data-ng-show="workDataProgress.progressUpdated=='9' || workDataProgress.progressUpdated=='10' || workDataProgress.progressUpdated=='11' || workDataProgress.progressUpdated=='12' || workDataProgress.progressUpdated=='13' || successRespondeWS=='success'"
 				data-ng-hide="workDataContractor.workStatus=='notContractorIssued'">
 				<div class="container-fluid" style="margin-top: 10px">
 
@@ -488,9 +472,11 @@
 														<th nowrap="nowrap">Action Taken for Delayed</th>
 														<th nowrap="nowrap">Remarks</th>
 														<th><span>Date of updation</span></th>
-														<th><p class="help-block">
+														<th>
+															<p class="help-block">
 																<span>Download File</span>
-															</p></th>
+															</p>
+														</th>
 
 													</tr>
 												</thead>
@@ -508,101 +494,107 @@
 				</div>
 
 			</div>
-             <div id="imageModal" class="image-modal">
-    <div class="image-modal-content">
-        <span class="close" onclick="closeImageModal()">&times;</span>
-        <div id="imageList"></div>
-    </div>
-</div>
-<div id="myDiv" style="display: none; border: 1px solid #ccc; padding: 10px;">
-    <br/>
-    <button type="button" onclick="closeDiv()" style="background-color: red; color: white; border: none; padding: 5px 10px; cursor: pointer; float: right;">Close</button>
-    <br/>
-    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-        &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<div  class="row col-sm-3" data-ng-repeat="ws in workGroupImagesDate" style="flex: 0 1 calc(20% - 10px); text-align: center; min-width: 100px; position: relative;">
-            <h5>({{ws.indexWS}}.)</h5>
-            <img src="{{ws.imagepath}}" alt="Work Image"   class="work-image"
-                 style="width: 100px; height: 100px; border: 1px solid #ccc; margin-bottom: 10px; 
-                        transition: transform 0.3s ease;"/>
-            
-            <p>Remarks: {{ws.remarks}}</p>
-            <!-- Download Button -->
-            <a href="{{ws.imagepath}}" download="{{ws.documentName}}">
-                <button type="button" style="background-color: blue; color: white; border: none; padding: 5px 10px; cursor: pointer;">Download Image</button>
-            </a>
-        </div> &nbsp; &nbsp; &nbsp; &nbsp;
-    </div>
+			<div id="imageModal" class="image-modal">
+				<div class="image-modal-content">
+					<span class="close" onclick="closeImageModal()">&times;</span>
+					<div id="imageList"></div>
+				</div>
+			</div>
+			<div id="myDiv" style="display: none; border: 1px solid #ccc; padding: 10px;">
+				<br />
+				<button type="button" onclick="closeDiv()"
+					style="background-color: red; color: white; border: none; padding: 5px 10px; cursor: pointer; float: right;">Close</button>
+				<br />
+				<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+					&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
+					&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;<div class="row col-sm-3"
+						data-ng-repeat="ws in workGroupImagesDate"
+						style="flex: 0 1 calc(20% - 10px); text-align: center; min-width: 100px; position: relative;">
+						<h5>({{ws.indexWS}}.)</h5>
+						<img src="{{ws.imagepath}}" alt="Work Image" class="work-image" style="width: 100px; height: 100px; border: 1px solid #ccc; margin-bottom: 10px; 
+                        transition: transform 0.3s ease;" />
 
-    <!-- Close button -->
-    &nbsp; &nbsp;
-<br/>
-    <!-- Download All Button -->
-    <button type="button" data-ng-click="dowloadWPGroupImages(workGroupImagesDate[0].documentId);" 
-            style="background-color: blue; color: white; border: none; padding: 5px 10px; cursor: pointer; float: right;">Download All</button>
-</div>
+						<p>Remarks: {{ws.remarks}}</p>
+						<!-- Download Button -->
+						<a href="{{ws.imagepath}}" download="{{ws.documentName}}">
+							<button type="button"
+								style="background-color: blue; color: white; border: none; padding: 5px 10px; cursor: pointer;">Download
+								Image</button>
+						</a>
+					</div> &nbsp; &nbsp; &nbsp; &nbsp;
+				</div>
 
-<style>
-    /* Enlarge image on hover */
-   
-   #myDiv .work-image:hover {
-        transform: scale(5);  /* Adjust the scale factor as needed */
-        z-index: 10;  /* Make sure the enlarged image is on top */
-    }
+				<!-- Close button -->
+				&nbsp; &nbsp;
+				<br />
+				<!-- Download All Button -->
+				<button type="button" data-ng-click="dowloadWPGroupImages(workGroupImagesDate[0].documentId);"
+					style="background-color: blue; color: white; border: none; padding: 5px 10px; cursor: pointer; float: right;">Download
+					All</button>
+			</div>
 
-    /* Optional: Adjust the image container for better positioning */
-    #myDiv .image-container {
-        position: relative;
-    }
-</style>
+			<style>
+				/* Enlarge image on hover */
+
+				#myDiv .work-image:hover {
+					transform: scale(5);
+					/* Adjust the scale factor as needed */
+					z-index: 10;
+					/* Make sure the enlarged image is on top */
+				}
+
+				/* Optional: Adjust the image container for better positioning */
+				#myDiv .image-container {
+					position: relative;
+				}
+			</style>
 
 
-<!-- Modal for Enlarged Image -->
+			<!-- Modal for Enlarged Image -->
 
 
-<script>
-    // Function to open the modal with the enlarged image
-    function enlargeImage(imagePath) {
-       
-        // Set the source of the image in the modal
-        modalImage.src = imagePath;
-        $('#imageenlargemodal').modal('show');
-        // Show the modal
-       
-    }
+			<script>
+				// Function to open the modal with the enlarged image
+				function enlargeImage(imagePath) {
 
-    // Function to close the modal
-    function closeModal() {
-        const modal = document.getElementById('imageModal');
-        modal.style.display = 'none';
-    }
-</script>
+					// Set the source of the image in the modal
+					modalImage.src = imagePath;
+					$('#imageenlargemodal').modal('show');
+					// Show the modal
+
+				}
+
+				// Function to close the modal
+				function closeModal() {
+					const modal = document.getElementById('imageModal');
+					modal.style.display = 'none';
+				}
+			</script>
 
 
 
 			<div class="card-header">
 				<span>Financial Progress Details</span>
 			</div>
-			<div class="card-body">
+			<div class="card-body"
+			data-ng-show="workDataProgress.progressUpdated=='9' || workDataProgress.progressUpdated=='10' || workDataProgress.progressUpdated=='11' || workDataProgress.progressUpdated=='12' || workDataProgress.progressUpdated=='13'">
 
 
 				<div class="row" data-ng-hide="workDataProgress.workStatusId=='9' "
-					data-ng-show="workDataProgress.workStatusId=='11' || workDataProgress.workStatusId=='10' || workDataProgress.workStatus='notProgressIssued'">
+					data-ng-show="workDataProgress.workStatusId=='11' || workDataProgress.workStatusId=='10' || workDataProgress.workStatus=='notProgressIssued'">
 
 
 
 					<div class="form-group col-sm-4">
 
 
-						<label><span
-							data-ng-show="workDataProgress.totalExpensess==null">Expenditure
+						<label><span data-ng-show="workDataProgress.totalExpensess==null">Expenditure
 								in Last Financial Year (In Lacs)</span> <span
-							data-ng-show="workDataProgress.totalExpensess!=null">Total
+								data-ng-show="workDataProgress.totalExpensess!=null">Total
 								Expenditure till date (In Lacs)</span> <span class="aestrick">&#42;</span></label>
-						<input type="number" min="0" class="form-control"
-							id="totalExpensess" required="required"
-							data-ng-model="workDataProgress.totalExpensess"
-							name="totalExpensess" data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/"
-							step="0.01" disabled="disabled" />
+						<input type="number" min="0" class="form-control" id="totalExpensess" required="required"
+							data-ng-model="workDataProgress.totalExpensess" name="totalExpensess"
+							data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01" readonly="readonly" />
 
 						<!-- <div data-ng-show="workFormProgress.$submitted">
 							<div>
@@ -627,16 +619,14 @@
 					</div>
 
 					<!--  data-ng-change="ExpensesCaluculation()" -->
-					<!--<div class="form-group col-sm-4">
+					<!-- <div class="form-group col-sm-4"> -->
 
-						<label><span>Expenditure in Current Financial Year
-								(In Lacs)</span><span class="aestrick">&#42;</span></label> <input
-							type="number" min="0" class="form-control number-OnlyTwoDecimal"
-							id="expensessUptoMarch" required="required"
-							data-ng-model="workDataProgress.expensessUptoMarch"
-							name="expensessUptoMarch" disabled="disabled" />
-							</div>-->
-						<!-- <div data-ng-show="workFormProgress.$submitted">
+						<!-- <label><span>Expenditure in Current Financial Year
+								(In Lacs)</span><span class="aestrick">&#42;</span></label> <input type="number" min="0"
+							class="form-control number-OnlyTwoDecimal" id="expensessUptoMarch" required="required"
+							data-ng-model="workDataProgress.expensessUptoMarch" name="expensessUptoMarch" />
+					</div> -->
+					<!-- <div data-ng-show="workFormProgress.$submitted">
 							<div>
 								<p class="help-block" style="color: red;">
 									<span class="help-block"
@@ -646,7 +636,7 @@
 							</div>
 						</div> -->
 
-						<!-- 	<div data-ng-show="workFormProgress.$submitted">
+					<!-- 	<div data-ng-show="workFormProgress.$submitted">
 							<div data-ng-show=" workDataProgress.workStatusId=='11' ">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workFormProgress.expensessUptoMarch.$error.required">
@@ -656,25 +646,23 @@
 						</div>
 						</div> -->
 
-					
-
-					<!--<div class="form-group col-sm-4">
-						<label><span>Expenditure in this Month (In Lacs)</span></label> <input type="number" min="0"
-							class="form-control number-OnlyTwoDecimal"
-							id="expensessCurrentFy" 
-							data-ng-model="workDataProgress.expensessCurrentFy"
-							name="expensessCurrentFy" disabled="disabled" />
-					</div>-->
-
-				</div>
-				
-
-
-			<!-- 	<div class="row" data-ng-show="workDataProgress.workStatusId=='9' "
-					data-ng-hide="workDataProgress.workStatusId=='11' || workDataProgress.workStatusId=='10' || workDataProgress.workStatus=='notProgressIssued'"> -->
 
 
 					<!-- <div class="form-group col-sm-4">
+						<label><span>Expenditure in this Month (In Lacs)</span></label> <input type="number" min="0"
+							class="form-control number-OnlyTwoDecimal" id="expensessCurrentFy"
+							data-ng-model="workDataProgress.expensessCurrentFy" name="expensessCurrentFy" />
+					</div> -->
+
+				</div>
+
+
+
+				<!-- 	<div class="row" data-ng-show="workDataProgress.workStatusId=='9' "
+					data-ng-hide="workDataProgress.workStatusId=='11' || workDataProgress.workStatusId=='10' || workDataProgress.workStatus=='notProgressIssued'"> -->
+
+
+				<!-- <div class="form-group col-sm-4">
 
 						<label><span>Expenditure till 31 March (A) (In Lacs
 								)</span></label> <input type="number" min="0" class="form-control"
@@ -686,7 +674,7 @@
 
 
 
-					<!-- <div class="form-group col-sm-4">
+				<!-- <div class="form-group col-sm-4">
 
 
 						<label><span>Expenditure in current financial year
@@ -700,7 +688,7 @@
 
 
 
-					<!-- <div class="form-group col-sm-4">
+				<!-- <div class="form-group col-sm-4">
 
 
 						<label><span>Total Updated Expenditure (A+B) (In
@@ -714,7 +702,7 @@
 
 
 
-					<!-- <div class="form-group col-sm-4">
+				<!-- <div class="form-group col-sm-4">
 						<div class="form-group">
 							<label> <span th:text="#{uploadProgressFile}">Upload
 									Work Progress Image File</span> 
@@ -731,94 +719,87 @@
 
 
 				<!-- </div>
- -->				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-								<div id="page-fa-div"
-				data-ng-hide="workDataProgress.workStatusId=='9' "
-					data-ng-show="workDataProgress.workStatusId=='11' || workDataProgress.workStatusId=='10' || workDataProgress.workStatus='notProgressIssued'">
-				<div class="container-fluid" style="margin-top: 10px">
+ -->
 
-					<div class="animated fadeIn">
 
-						<div class="row">
 
-							<div class="col-md-12">
 
-								<div class="card">
 
-									<div class="card-header">
-										<i class="fa fa-folder-open-o"></i> <span>Expenditure Breakdown</span>
-									</div>
 
-									<div class="card-body">
 
-										<div class="table-responsive responsive-md">
-											<table id="dynamic-fa-table"
-												class="table table-striped table-bordered table-hover table-outline">
 
-												<thead class="thead-default">
-													<tr>
 
-														
-														<th><span>S.No</span></th>
-														<th nowrap="nowrap">Financial Agency Name</th>
-														<th nowrap="nowrap">Cost</th>
-														<th nowrap="nowrap">Expenditure (Till Now)</th>
-														<th nowrap="nowrap">Balance</th>
-														<th nowrap="nowrap">Expenditure</th>
-														
-													</tr>
-												</thead>
-												
-											</table>
-											
+				<div id="page-fa-div"
+					data-ng-show="workDataProgress.progressUpdated=='9' || workDataProgress.progressUpdated=='10' || workDataProgress.progressUpdated=='11' || workDataProgress.progressUpdated=='12' || workDataProgress.progressUpdated=='13'">
+					<div class="container-fluid" style="margin-top: 10px">
+
+						<div class="animated fadeIn">
+
+							<div class="row">
+
+								<div class="col-md-12">
+
+									<div class="card">
+
+										<div class="card-header">
+											<i class="fa fa-folder-open-o"></i> <span>Expenditure Breakdown</span>
 										</div>
 
+										<div class="card-body">
+
+											<div class="table-responsive responsive-md">
+												<table id="dynamic-fa-table"
+													class="table table-striped table-bordered table-hover table-outline">
+
+													<thead class="thead-default">
+														<tr>
+
+
+															<th><span>S.No</span></th>
+															<th nowrap="nowrap">Financial Agency Name</th>
+															<th nowrap="nowrap">Cost</th>
+															<th nowrap="nowrap">Expenditure (Till Now)</th>
+															<th nowrap="nowrap">Balance</th>
+															<th nowrap="nowrap">Expenditure</th>
+
+														</tr>
+													</thead>
+
+												</table>
+
+											</div>
+
+										</div>
 									</div>
+									<!-- <button style="float: right;" class="btn btn-primary" data-ng-click="saveFinancialAgency()">Save</button> -->
 								</div>
-						<!-- <button style="float: right;" class="btn btn-primary" data-ng-click="saveFinancialAgency()">Save</button> -->
 							</div>
+
 						</div>
 
 					</div>
 
 				</div>
 
-			</div>
-				
-				
-				
-				
-				
-				
-				
-				
+
+
+
+
+
+
+
 			</div>
 
 		</div>
 
 		<div class="tab-footer text-right"
-			data-ng-hide="workDataContractor.workStatus=='notContractorIssued'|| workDataProgress.workStatusId=='12'||workDataProgress.workStatusId=='13'"
-			th:if="${roleName=='ROLE_SAU' ||roleName=='ROLE_DISTRICT' ||roleName=='ROLE_DEPARTMENT' }">
-			<button type="submit" class="btn  btn-success  next-button"
-				id="drafProbtn"
-				data-ng-show="workDataTender.workStatusId=='8' ||workDataProgress.workStatusId=='9' || workDataProgress.workStatusId=='10' || workDataProgress.workStatusId=='12'|| workDataProgress.workStatusId=='13'"
+			data-ng-hide="workDataProgress.progressUpdated=='11' || workDataProgress.progressUpdated=='12' || workDataProgress.progressUpdated=='13'">
+			<button type="submit" class="btn  btn-success  next-button" id="drafProbtn"
 				data-ng-click="finalSubmit=false;saveProDraft=true;saveProNext=false;">
 
 				<i class="las la-file-alt"></i>Save
 			</button>
-			<button type="submit" class="btn btn-primary next-button nexxt"
-				data-ng-show="workDataProgress.workStatusId=='11' || workDataProgress.workStatusId=='12' || workDataProgress.workStatusId=='13'"
-				id="finalProtbtn"
-				data-ng-hide="workDataTender.workStatusId=='8' || workDataProgress.workStatusId=='9' || workDataProgress.workStatusId=='10' || workDataProgress.workStatusId==null"
+			<button type="submit" class="btn btn-primary next-button nexxt" id="finalProtbtn"
 				data-ng-click="finalSubmit=false;saveProDraft=true;saveProNext=true;">
 				Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
 			</button>
@@ -826,8 +807,8 @@
 
 
 
-		<div class="alert alert-success alert-dismissible" role="alert"
-			id="myAlert" data-ng-if="successResponseProgress=='success'">
+		<div class="alert alert-success alert-dismissible" role="alert" id="myAlert"
+			data-ng-if="successResponseProgress=='success'">
 			<!-- <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> -->
 			<strong>Success!</strong> Work Status is changed now.
 		</div>
@@ -835,9 +816,8 @@
 
 	</form>
 
-	<div id="page-ex-div"
-		data-ng-hide="workDataContractor.workStatus=='notContractorIssued'"
-		data-ng-show="workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'">
+	<div id="page-ex-div" data-ng-hide="workDataContractor.workStatus=='notContractorIssued'"
+		data-ng-show="workDataProgress.progressUpdated=='9' || workDataProgress.progressUpdated=='10' || workDataProgress.progressUpdated=='11' || workDataProgress.progressUpdated=='12' || workDataProgress.progressUpdated=='13'">
 		<p></p>
 		<div style="margin-top: 10px">
 
@@ -895,7 +875,7 @@
 
 												<th><span>S.No</span></th>
 
-												<th>Total Expenditure till date  (In Lacs)</th>
+												<th>Total Expenditure till date (In Lacs)</th>
 												<th><span>Expenditure in Current Financial Year
 														(In Lacs)</span></th>
 												<th><span>Expenditure in this Month (In Lacs)</span></th>
@@ -918,32 +898,33 @@
 			</div>
 
 		</div>
-		
-		
-		
-		
-		
-		
-<div id="imageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageModalLabel">Images</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Images will be appended here -->
-            </div>
-        </div>
-    </div>
-</div>
-	</div>
-	
-	
 
-	
-	
-	
+
+
+
+
+
+		<div id="imageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+			aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="imageModalLabel">Images</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<!-- Images will be appended here -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
 </div>

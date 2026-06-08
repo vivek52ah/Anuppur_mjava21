@@ -1,4 +1,4 @@
-var dms = angular.module('dms', ['ngRoute','darthwade.dwLoading','ngIdle','ui.bootstrap']);
+var dms = angular.module('dms');
 
 dms.controller('RegistrationController', function($scope, $loading, $rootScope, $window, $routeParams, $http, $timeout) {
 	$scope.started = false;

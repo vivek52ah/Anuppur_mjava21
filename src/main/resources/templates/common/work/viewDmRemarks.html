@@ -77,8 +77,7 @@
 						<div class="col-sm-4">
 							<label>Uplaod Attachment </label>
 							<input type='file' accept="image/*,.pdf" class="form-control"
-																						 required="required"
-																						file-model="dmattachment" name="dmremarksAttachment" id="dmremarksAttachment" />
+																						 file-model="dmattachment" name="dmremarksAttachment" id="dmremarksAttachment" />
 															<span data-ng-show="workDataR.documentId==null"><b>(pdf file with max size 30 mb)</b></span>
 												
 												
@@ -100,6 +99,7 @@
 
 						<button type="submit" class="btn btn-primary next-button nexxt" 
 							id="finaltbtn"
+							data-ng-disabled="!workDataR.depertmentMasterId"
 							data-ng-click="finalSubmit=false;saveAsDraft=true;saveAndNext=true;">
 							Save <span class="fa fa-arrow-circle-right"></span>
 						</button>
@@ -222,7 +222,7 @@
 								          </td>
 								          <td >
 											
-											  <button type="button" data-ng-disabled="roleName === 'ROLE_DEPARTMENT' &amp;&amp; remark.roleCode === 'ROLE_DM' " class="btn btn-danger btn-sm" data-ng-click="deleteRemark(remark.id)" >
+											  <button type="button" data-ng-disabled="roleName === 'ROLE_DEPARTMENT' &amp;&amp; remark.roleCode === 'ROLE_DM' " class="btn btn-danger btn-sm" data-ng-click="deleteDepartmentRemark(remark.id)" >
 											    Delete
 											  </button>
 											  <button type="button" data-ng-disabled="roleName === 'ROLE_DEPARTMENT' &amp;&amp; remark.roleCode === 'ROLE_DM'" class="btn btn-danger btn-sm" data-ng-click="getDepartmentRemarksDetails(remark.id)">

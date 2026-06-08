@@ -31,7 +31,7 @@
 								class="icon-speedometer"></i><span th:text="#{dashboard}">Dashboard</span>
 						</a></li> -->
 
-						<!-- <li class="nav-item"><a class="nav-link" href="#manageusers"><i
+						<!-- <li class="nav-item"><a class="nav-link" href="#rrs"><i
 								class="fa fa-user"></i><span th:text="#{manageUsers}">Manage
 									Users</span></a></li> -->
 
@@ -75,9 +75,9 @@
 		</footer>
 
 		<div th:replace="fragments/footer :: footer" />
+		<script th:src="@{/angular/common/CommonRouting.js}"></script>
 		<script th:src="@{/angular/superAdmin/SuperAdminRouting.js}"></script>
 		<script th:src="@{/angular/superAdmin/SuperAdminController.js}"></script>
-		<script th:src="@{/angular/common/CommonRouting.js}"></script>
 		<script th:src="@{/angular/common/CommonController.js}"></script>
 		<script th:src="@{/angular/customdirective.js}"></script>
 	</div>

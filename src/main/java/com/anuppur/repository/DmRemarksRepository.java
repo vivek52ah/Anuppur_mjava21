@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.anuppur.entity.Block;
 import com.anuppur.entity.DmRemarks;
 
 public interface DmRemarksRepository extends JpaRepository<DmRemarks, Long>{

@@ -1,78 +1,77 @@
 package com.anuppur.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "t_work_financial_agency")
 public class WorkFinancialAgency {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
 
-    private Long financialHeadId;
+	private Long financialHeadId;
 
-    private Double cost;
+	private Double cost;
 
-    private Long workId;
-    
-    private Double expenditure;
-    
-    private Double totalCost;
+	private Long workId;
 
-	public final Long getId() {
+	private Double expenditure;
+
+	private Double totalCost;
+
+	public Long getId() {
 		return id;
 	}
 
-	public final void setId(Long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public final Long getFinancialHeadId() {
+	public Long getFinancialHeadId() {
 		return financialHeadId;
 	}
 
-	public final void setFinancialHeadId(Long financialHeadId) {
+	public void setFinancialHeadId(Long financialHeadId) {
 		this.financialHeadId = financialHeadId;
 	}
 
-	public final Double getCost() {
+	public Double getCost() {
 		return cost;
 	}
 
-	public final void setCost(Double cost) {
+	public void setCost(Double cost) {
 		this.cost = cost;
 	}
 
-	public final Long getWorkId() {
+	public Long getWorkId() {
 		return workId;
 	}
 
-	public final void setWorkId(Long workId) {
+	public void setWorkId(Long workId) {
 		this.workId = workId;
 	}
 
-	public final Double getExpenditure() {
+	public Double getExpenditure() {
 		return expenditure;
 	}
 
-	public final void setExpenditure(Double expenditure) {
+	public void setExpenditure(Double expenditure) {
 		this.expenditure = expenditure;
 	}
 
-	public final Double getTotalCost() {
+	public Double getTotalCost() {
 		return totalCost;
 	}
 
-	public final void setTotalCost(Double totalCost) {
+	public void setTotalCost(Double totalCost) {
 		this.totalCost = totalCost;
 	}
-    
-    
+
 }

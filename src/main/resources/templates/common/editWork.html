@@ -56,7 +56,7 @@
 	    data.points.forEach(function(point) {
 	    	var marker = L.marker([point.lattitude, point.longitude], { icon: customIcon })  // Use the custom icon here
             .addTo(mymap)
-            .bindPopup(`Latitude: ${point.lattitude}, Longitude: ${point.longitude}`); // Popup with lat/long
+            .bindPopup('Latitude: ' + point.lattitude + ', Longitude: ' + point.longitude);
 
 	        // Extend the bounds to include the current marker
 	        bounds.extend(marker.getLatLng());
@@ -679,6 +679,13 @@ td {
 				  useCurrent: false 
 		});
 
+        $('#datetimepicker26').datetimepicker({
+			minDate : moment('01/01/1995', 'DD/MM/YYYY'),
+			format : 'DD/MM/YYYY'
+				,
+				  useCurrent: false 
+		});
+
 	});
 	
 	
@@ -1027,253 +1034,7 @@ td {
 	
 	
 
-	////Work Progress 
-	var responseIndex = null;
-	function fetchProgressImagesList(workId) {
-		//	console.log("fetchProgressImagesList==== " + fetchProgressImagesList)
-		t = $("#dynamic-wp-table")
-				.DataTable(
-						{
-							"processing" : true,
-							"serverSide" : true,
-							"sort" : "position",
-							//bStateSave variable you can use to save state on client cookies: set value "true" 
-							"bStateSave" : false,
-							//Default: Page display length
-							"iDisplayLength" : 10,
-							"bInfo" : false,
-							"searching" : false,
-							"iPage" : false,
-							//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
-							"iDisplayStart" : 0,
-							"pagingType" : "full_numbers",
-							"aaSorting" : [],
-
-							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
-								$('td:eq(7)', nRow)
-								.html('');
-								console.log("aData.imagepath-------- " + aData.imagepath)
-					//			if(aData.moreImage == false){
-						       if (aData.imagepath && aData.imagepath !== "") {
-								if (aData.workStatusId == 10) {
-									$('td:eq(7)', nRow)
-											.html(
-													'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileWS('
-															+ (aData.documentId)
-															+ '); "><i class="fa fa-download"></i></a>');
-									
-								}
-								
-								$('td:eq(7)', nRow)
-								.append(
-										'<button class="btn btn-xs btn-warning" type="button"   title="Download File" onclick="return downloadFileWSDocumnt('+(aData.documentId)+',\'' + aData.workSubStatusNameE + '\' )"> <i class="fa fa-eye" ></i> </button>');
-							}
-							//	}
-							//	else{
-							//		$('td:eq(7)', nRow)
-							//	    .append(
-							//	        '<button class="btn btn-xs btn-warning" type="button" title="Download File" onclick="return openDiv(' + aData.documentId + ', \'' + aData.createdDate + '\')"> <i class="fa fa-file-image-o"></i> </button>'
-							//	    );
-							//		}
-								
-								if(aData.workStatusId == 9) {
-									$('td:eq(7)', nRow).html('<span >-</span>');
-								}
-							},
-							"sAjaxSource" : "fetchProgressImagesList/" + workId,
-
-							"columns" : [ {
-								"data" : "indexWS",
-								"bSortable" : false
-
-							}, {
-								"data" : "workStatusNameE",
-								"bSortable" : false
-							}, {
-								"data" : "workSubStatusNameE",
-								"bSortable" : false
-							}, {
-								"data" : "reasonDelay",
-								"bSortable" : false
-							}, /* {
-																				"data" : "workSubDelayReason",
-																				"bSortable" : false
-																			}, */{
-								"data" : "actionTakenDelay",
-								"bSortable" : false
-							}, {
-								"data" : "remarks",
-								"bSortable" : false,
-							    "render": function(data, type, row) {
-							        // Check if moreImage is true and replace the remarks value
-							        if (row.moreImage === true) {
-							            return '--'; // Return "--" if moreImage is true
-							        }
-							        return data; // Otherwise, return the original remarks value
-							    }
-							}, {
-								"data" : "createdDate",
-								"bSortable" : false
-							}, {
-								"data" : null,
-								"bSortable" : false
-							} ],
-						});
-		
-		
-	}
-
-	
-	function openDiv(workId, createdDate) {
-	    // Find the div you want to display. You can also dynamically create it.
-	    var div = $('#myDiv'); // Assuming you have a div with id="myDiv"
-	    
-	    // Set some content inside the div (optional)
-	     
-
-		angular.element("#dynamic-wp-table").scope().fetchImageByCreatedDate(createdDate);
-		
-	    // Show the div (make it visible)
-	    div.show(); // If div is initially hidden via CSS
-      
-	    return false; // Prevent any default action (if applicable)
-	}
-	function closeDiv() {
-	    $('#myDiv').hide(); // Hide the div
-	}
-	
-	function downloadFileWS(fileId) {
-	//	closeDiv();
-		return $('#page-wp-div').scope().downloadDocumentWSPro(fileId);
-	}
-	function downloadFileWSDocumnt(fileId,workSubStatusNameE) {
-	//	closeDiv();
-		return $('#page-wp-div').scope().downloadDocumentIdWSPro(fileId,workSubStatusNameE);
-	}
-	
-	<!-- Button trigger modal -->
-	
-
-	
-	
-	
-	////Work Expenses
-	var ex = null;
-	function fetchExpensesDataList(workId) {
-		//	console.log("fetchExpensesDataList===========")
-
-		ex = $("#dynamic-ex-table").DataTable({
-			"processing" : true,
-			"serverSide" : true,
-			"sort" : "position",
-			//bStateSave variable you can use to save state on client cookies: set value "true" 
-			"bStateSave" : false,
-			//Default: Page display length
-			"iDisplayLength" : 10,
-			"bInfo" : false,
-			"searching" : false,
-			"iPage" : true,
-			//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
-			"iDisplayStart" : 0,
-			"pagingType" : "full_numbers",
-			"aaSorting" : [],
-
-			/* "fnCreatedRow" : function(nRow, aData, iDataIndex) {
-				
-				$('td:eq(3)', nRow).html('<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileWS('+(aData.documentId)+'); "><i class="fa fa-download"></i></a>');
-				
-			}, */
-			"fnServerParams" : function(aoData) {
-
-				aoData.push({
-					"name" : "year",
-					"value" : $('#year').val()
-				});
-				/* aoData.push( { "name": "financialYear", "value": $('#financialYear').val()}); */
-
-			},
-			"sAjaxSource" : "fetchExpensesDataList/" + workId,
-
-			"columns" : [ {
-				"data" : "index",
-				"bSortable" : false
-
-			}, {
-				"data" : "totalExpensess",
-				"bSortable" : false
-			}, {
-				"data" : "expensessUptoMarch",
-				"bSortable" : false
-			}, {
-				"data" : "expensessCurrentFy",
-				"bSortable" : false
-			}, {
-				"data" : "year",
-				"bSortable" : false
-			}, {
-				"data" : "createdDate",
-				"bSortable" : false
-			} ],
-		});
-	}
-	function exDraw() {
-		ex.draw();
-	}
-
-	
-	
-	
-	function fetchFinancialAgency(workId) {
-	    $("#dynamic-fa-table").DataTable({
-	        "processing": true,
-	        "serverSide": true,
-	        "searching": false,
-	        "pagingType": "full_numbers",
-	        "aaSorting": [],
-	        "ajax": {
-	            "url": "fetchFinancialAgency/" + workId,
-	            "type": "GET",
-	            "dataSrc": function(json) {
-	                return json.data || []; // prevent undefined
-	            }
-	        },
-	        "columns": [
-	            {
-	                "data": null,
-	                "bSortable": false,
-	                "render": function(data, type, row, meta) {
-	                    return meta.row + meta.settings._iDisplayStart + 1;
-	                }
-	            },
-	            { "data": "financialAgencyName", "bSortable": false },
-	            { "data": "cost", "bSortable": false },
-	            { "data": "expenditure", "bSortable": false },
-	            { "data": "balance", "bSortable": false },
-	            {
-	                "data": "id",
-	                "bSortable": false,
-	                "render": function(data, type, row) {
-	                    return `<input type="text" class="form-control cost-input" data-id="${data}" data-workid="${row.workId}" data-financialheadid="${row.financialHeadId}" data-cost="${row.cost}"  />`;
-	                }
-	            }
-	        ],
-	        "initComplete": function(settings, json) {
-	            if (json && json.data) {
-	                var total = 0;
-	                json.data.forEach(function(row) {
-	                    var val = parseFloat(row.expenditure);
-	                    if (!isNaN(val)) total += val;
-	                });
-	                var scope = angular.element("#page-fa-div").scope();
-	                if (scope) {
-	                    scope.$apply(function() {
-	                        scope.workDataProgress.totalExpensess = parseFloat(total.toFixed(2));
-	                    });
-	                }
-	            }
-	        }
-	    });
-	}
+	/* Work Progress / Expenses / Financial Agency tables: /js/editWorkTables.js */
 
 	//]]>
 	
@@ -1362,6 +1123,7 @@ td {
 									<li 
 										th:if="${( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN') }" role="presentation"
 										class="nav-item"><a href=".step3" data-toggle="tab"
+										data-ng-click="tabChange('step3')"
 										aria-controls="step3" role="tab" title="Step 3"
 										class="nav-link   stopVald"> <span class="fa fa-map-o"></span>
 											<span>Sanction Details <em class="count"></em>
@@ -1371,10 +1133,10 @@ td {
 									<li 
 										th:if="${( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN')}" role="presentation"
 										class="nav-item"><a href=".step4" data-toggle="tab"
+										data-ng-click="tabChange('step4'); scrollStatusChange();"
 										aria-controls="step4" role="tab" title="Step 4"
 										class="nav-link  stopVald"> <span
-											class="fa fa-credit-card"
-											data-ng-click="scrollStatusChange();"></span> <span>Contractor’s
+											class="fa fa-credit-card"></span> <span>Contractor’s
 												Details <em class="count"></em>
 										</span>
 									</a></li>
@@ -1382,6 +1144,7 @@ td {
 									<li 
 										th:if="${ ( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN')}" role="presentation"
 										class="nav-item"><a href=".step5" data-toggle="tab"
+										data-ng-click="tabChange('step5')"
 										aria-controls="step5" role="tab" title="Step 5"
 										class="nav-link  stopVald"> <span
 											class="fa fa-credit-card"></span> <span>Work Progress
@@ -1392,6 +1155,7 @@ td {
 									<li 
 										th:if="${ ( roleName=='ROLE_DEPARTMENT' || roleName=='ROLE_DM' ||  roleName=='ROLE_SYSTEM_ADMIN')}" role="presentation"
 										class="nav-item"><a href=".step6" data-toggle="tab"
+										data-ng-click="tabChange('step6')"
 										aria-controls="step6" role="tab" title="Step 6"
 										class="nav-link  stopVald"> <span
 											class="fa fa-credit-card"></span> <span> Completion
@@ -1399,6 +1163,7 @@ td {
 										</span>
 									</a></li>
 									<li th:if="${roleName=='ROLE_DEPARTMENT'  }" role="presentation" class="nav-item"><a href=".step2"
+																		data-ng-click="tabChange('step2')"
 																		data-toggle="tab" aria-controls="step2" role="tab"
 																		title="Step 2" class="nav-link  "> <span
 																			class="fa fa-road"></span> <span>Department Remark<em
@@ -1682,23 +1447,7 @@ td {
 		return false;
 	});
 
-	// ✅ Activate Sanction Details tab on edit page load
-	$(document).ready(function() {
-		// Check if this is an edit page (URL hash contains /editWork/)
-		var currentHash = window.location.hash;
-		if (currentHash.includes('editWork')) {
-			// This is an edit page, activate step3 (Sanction Details) tab
-			setTimeout(function() {
-				// Remove active class from step1
-				$('.nav-link.active').removeClass('active');
-				$('.tab-pane.active').removeClass('active');
-				
-				// Add active class to step3
-				$('a[href=".step3"]').addClass('active');
-				$('#step3').addClass('active');
-			}, 500);
-		}
-	});
+	// Keep Work Details (step1) active on load; tab data loads via tabChange() in CommonController
 
 	// ✅ Tab navigation handled in CommonController.js save functions
 	// No auto-navigation here to avoid double-triggering

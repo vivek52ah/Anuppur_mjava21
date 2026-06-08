@@ -2,33 +2,54 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org">
 <head>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css"/>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-<script th:src="@{/js/bootstrap-select.min.js}"></script>
-<script th:src="@{/js/bootstrap-select.js}"></script>
-
-<script>
-$('#photoUpdateDeptFilter').selectpicker({
-	actionsBox: true,
-	liveSearch: true,
-	noneSelectedText: '--Select Department--'
-});
+<script th:src="@{/js/language.js}"></script>
+<script type="text/javascript" th:inline="none">
+/*<![CDATA[*/
+function initPhotoUpdateReportSelectpickers() {
+	if (!window.jQuery || !$.fn.selectpicker) {
+		return;
+	}
+	var $dept = $('#photoUpdateDeptFilter');
+	if ($dept.length && !$dept.data('selectpicker')) {
+		$dept.selectpicker({
+			actionsBox: true,
+			liveSearch: true,
+			noneSelectedText: '--Select Department--'
+		});
+	}
+}
+window.initPhotoUpdateReportSelectpickers = initPhotoUpdateReportSelectpickers;
+/*]]>*/
 </script>
-
 <style>
-thead th { color: #076659; background-color: #D0EAEB; }
-.table th, .table td { text-align: center; vertical-align: middle; }
-.card { margin-bottom: 1.5rem; box-shadow: 0 0 7px rgb(0 0 0 / 70%); border-radius: 7px; }
-select#photoUpdateDeptFilter + button { background: #fff; border: 1px solid #ccc; }
-.dropdown-menu.show { width: 100% !important; }
-a.count-link { font-weight: bold; }
+.report-page-root thead th { color: #076659; background-color: #D0EAEB; }
+.report-page-root .table th,
+.report-page-root .table td { text-align: center; vertical-align: middle; }
+.report-page-root .card {
+	margin-bottom: 1.5rem;
+	box-shadow: 0 0 7px rgb(0 0 0 / 70%);
+	border-radius: 7px;
+}
+.report-page-root .card-body { overflow: visible; }
+.report-page-root select#photoUpdateDeptFilter + button {
+	background: #fff;
+	border: 1px solid #ccc;
+}
+.report-page-root .dropdown-menu.show { width: 100% !important; }
+.report-page-root a.count-link { font-weight: bold; }
+.report-page-root .report-table-wrap {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	overflow-x: auto;
+	overflow-y: visible;
+	-webkit-overflow-scrolling: touch;
+	clear: both;
+}
 </style>
 </head>
 
-<div id="page-div">
+<div id="page-div" class="report-page-root">
 	<ol class="breadcrumb">
 		<li class="breadcrumb-item"><a><span th:text="#{home}">Home</span></a></li>
 		<li class="breadcrumb-item active"><span>Photo Update Report</span></li>
@@ -40,79 +61,73 @@ a.count-link { font-weight: bold; }
 	</ol>
 
 	<div class="container-fluid">
-		<div class="animated fadeIn">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="card">
-						<div class="card-header">
-							<i class="fa fa-bar-chart"></i>
-							<span> Photo Update Report </span>
-						</div>
-						<div class="card-body" data-ng-init="loadPhotoUpdateDeptOptions()">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header">
+						<i class="fa fa-bar-chart"></i>
+						<span> Photo Update Report </span>
+					</div>
+					<div class="card-body" data-ng-init="loadPhotoUpdateDeptOptions();">
 
-							<!-- Filters -->
-							<div class="pr">
-								<form name="photoUpdateReportForm" novalidate="novalidate">
-									<fieldset class="legend-border">
-										<legend class="legend-border">Filters</legend>
-										<div class="row">
-
-											<!-- Department Filter -->
-											<div class="form-group col-sm-6">
-												<select multiple="multiple" class="form-control selectpicker"
-													id="photoUpdateDeptFilter"
-													name="photoUpdateDeptFilter"
-													data-live-search="true"
-													data-actions-box="true"
-													title="--Select Department--">
-													<option data-ng-repeat="dept in photoUpdateDeptOptions"
-														value="{{dept.implementationAgencyId}}">{{dept.implementationAgencyNameE}}</option>
-												</select>
-											</div>
-
+						<div class="pr">
+							<form name="photoUpdateReportForm" novalidate="novalidate">
+								<fieldset class="legend-border">
+									<legend class="legend-border">Filters</legend>
+									<div class="row">
+										<div class="form-group col-sm-6">
+											<select multiple="multiple" class="form-control selectpicker"
+												id="photoUpdateDeptFilter"
+												name="photoUpdateDeptFilter"
+												data-live-search="true"
+												data-actions-box="true"
+												title="--Select Department--">
+												<option data-ng-repeat="dept in photoUpdateDeptOptions"
+													value="{{dept.implementationAgencyId}}">{{dept.implementationAgencyNameE}}</option>
+											</select>
 										</div>
-									</fieldset>
-								</form>
-							</div>
+									</div>
+								</fieldset>
+							</form>
+						</div>
 
-							<!-- Action Buttons -->
-							<div class="form-group col-sm-12 text-right mt-2">
+						<div class="row">
+							<div class="col-12 text-right mb-3">
 								<button type="button" class="btn btn-primary"
 									data-ng-click="fetchPhotoUpdateReportData();">Search</button>
 								<button type="button" class="btn btn-secondary"
 									data-ng-click="resetPhotoUpdateFilters();">Reset</button>
 							</div>
-
-							<!-- Summary Table -->
-							<div class="table-responsive">
-								<table class="table table-bordered table-striped" style="width:100%">
-									<thead>
-										<tr>
-											<th>S.No</th>
-											<th>Department Name</th>
-											<th>Work Name</th>
-											<th>Total Works</th>
-											<th>Area Officer Name</th>
-											<th>Days</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr data-ng-if="!photoUpdateReportRows || photoUpdateReportRows.length === 0">
-											<td colspan="6">No data available</td>
-										</tr>
-										<tr data-ng-repeat="row in photoUpdateReportRows track by $index">
-											<td>{{$index + 1}}</td>
-											<td>{{row.departmentName}}</td>
-											<td>{{row.workName}}</td>
-											<td><a class="count-link" data-ng-href="{{getPhotoUpdateDetailUrl(row)}}">{{row.totalWorks}}</a></td>
-											<td>{{row.areaOfficerName}}</td>
-											<td>{{row.days}}</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-
 						</div>
+
+						<div class="report-table-wrap table-responsive responsive-md">
+							<table class="table table-bordered table-striped w-100">
+								<thead>
+									<tr>
+										<th>S.No</th>
+										<th>Department Name</th>
+										<th>Work Name</th>
+										<th>Total Works</th>
+										<th>Area Officer Name</th>
+										<th>Days</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr data-ng-if="!photoUpdateReportRows || photoUpdateReportRows.length === 0">
+										<td colspan="6">No data available</td>
+									</tr>
+									<tr data-ng-repeat="row in photoUpdateReportRows track by $index">
+										<td>{{$index + 1}}</td>
+										<td>{{row.departmentName}}</td>
+										<td>{{row.workName}}</td>
+										<td><a class="count-link" data-ng-href="{{getPhotoUpdateDetailUrl(row)}}">{{row.totalWorks}}</a></td>
+										<td>{{row.areaOfficerName}}</td>
+										<td>{{row.days}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
 					</div>
 				</div>
 			</div>

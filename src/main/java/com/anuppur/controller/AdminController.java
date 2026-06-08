@@ -6,7 +6,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,18 +61,18 @@ public class AdminController {
 		if (null == locale) {
 			request.getSession().setAttribute(
 					SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME,
-					new Locale("en"));
+					Locale.of("en"));
 		} else if (!StringUtils.isEmpty(language)
 				&& language.equals(DMSConstants.LOCALE_HI)) {
 
 			request.getSession().setAttribute(
 					SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME,
-					new Locale("hi"));
+					Locale.of("hi"));
 		} else if (!StringUtils.isEmpty(language)
 				&& language.equals(DMSConstants.LOCALE_EN)) {
 			request.getSession().setAttribute(
 					SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME,
-					new Locale("en"));
+					Locale.of("en"));
 		}
 
 		Locale updatedLocale = (Locale) request.getSession().getAttribute(

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import lombok.Data;
 
@@ -305,19 +305,19 @@ public class WorkTender extends Auditable implements Serializable {
 		this.documentUploadUa = documentUploadUa;
 	}
 
-	public final String getAgreementDate() {
+	public  String getAgreementDate() {
 		return agreementDate;
 	}
 
-	public final void setAgreementDate(String agreementDate) {
+	public  void setAgreementDate(String agreementDate) {
 		this.agreementDate = agreementDate;
 	}
 
-	public final String getAgreementNo() {
+	public  String getAgreementNo() {
 		return agreementNo;
 	}
 
-	public final void setAgreementNo(String agreementNo) {
+	public  void setAgreementNo(String agreementNo) {
 		this.agreementNo = agreementNo;
 	}
 

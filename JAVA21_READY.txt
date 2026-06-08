@@ -1,0 +1,66 @@
+================================================================================
+                    JAVA 21 - READY TO RUN
+================================================================================
+
+✅ Java 21 Migration Complete
+✅ UI Working
+✅ Build Successful
+
+================================================================================
+HOW TO RUN
+================================================================================
+
+STEP 1: Double-click BUILD_AND_RUN.bat
+
+That's it! The script will:
+  1. Build the project
+  2. Start the application
+  3. Wait for startup
+
+STEP 2: Open Browser
+
+Once you see "Tomcat started on port 8085", open:
+  http://localhost:8085/anuppur/
+
+STEP 3: Test
+
+  1. You should see the home page with Login button
+  2. Click Login button
+  3. Enter your credentials
+  4. Click Login
+
+================================================================================
+WHAT WAS FIXED FOR JAVA 21
+================================================================================
+
+✅ WebConfig.java - Resource handlers enabled
+✅ SpringSecurityConfig.java - Updated for Spring Boot 3.2.5
+✅ Angular module initialization - Fixed
+✅ Script loading order - Corrected
+✅ Thymeleaf namespace - Updated
+✅ All imports - Changed from javax to jakarta
+
+================================================================================
+IF SOMETHING GOES WRONG
+================================================================================
+
+1. Check browser console (F12) for errors
+2. Check the command prompt for error messages
+3. Make sure MySQL is running
+4. Make sure port 8085 is not in use
+
+================================================================================
+IMPORTANT
+================================================================================
+
+- Application runs on: http://localhost:8085/anuppur/
+- Port: 8085
+- Database: MySQL (must be running)
+- Java: 21
+- Spring Boot: 3.2.5
+
+================================================================================
+
+Ready to go! Double-click BUILD_AND_RUN.bat to start.
+
+================================================================================

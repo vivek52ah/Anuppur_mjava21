@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.ui.Model;
@@ -100,12 +101,12 @@ public class SystemAdminController extends BaseController {
 		String language = request.getParameter("lang");
 
 		if (null == locale) {
-			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("en"));
+			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, Locale.of("en"));
 		} else if (!StringUtils.isEmpty(language) && language.equals(DMSConstants.LOCALE_HI)) {
 
-			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("hi"));
+			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, Locale.of("hi"));
 		} else if (!StringUtils.isEmpty(language) && language.equals(DMSConstants.LOCALE_EN)) {
-			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("en"));
+			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, Locale.of("en"));
 		}
 
 		Locale updatedLocale = (Locale) request.getSession()
@@ -189,15 +190,15 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "roleName"));// default sorting
+			sort = Sort.by(Direction.ASC, "roleName");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 		// systemAdminService.fetchRoles()
 		RoleJson implAgencyJson = systemAdminService.fetchRoles(pageable);
 
@@ -236,15 +237,15 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "schemeName"));// default sorting
+			sort = Sort.by(Direction.ASC, "schemeName");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		SchemeJson implAgencyJson = systemAdminService.fetchAllSchemes(pageable, searchBoxVal);
 
@@ -323,15 +324,15 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		WorkCategoryJson workCategoryJson = systemAdminService.getWorkCategryByDistrictId(pageable, searchBoxVal);
 
@@ -483,15 +484,15 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		UserJson userJson = superAdminService.getAllUsers(pageable, fetchLoggedInUserDetails(request), searchBoxVal,
 				mobileNo, status, username, emailId);
@@ -739,14 +740,14 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "workCategoryId"));// default sorting
+			sort = Sort.by(Direction.DESC, "workCategoryId");// default sorting
 		}
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 		WorkCategoryJson cJson = systemAdminService.getWorkFacility(pageable, searchBoxVal);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(cJson);
@@ -884,14 +885,14 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "workTypeId"));// default sorting
+			sort = Sort.by(Direction.DESC, "workTypeId");// default sorting
 		}
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 		workTypeJson cJson = systemAdminService.getWorkSubType(pageable, searchBoxVal);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(cJson);
@@ -973,14 +974,14 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "implementationAgencyId"));// default sorting
+			sort = Sort.by(Direction.DESC, "implementationAgencyId");// default sorting
 		}
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 		ImplAgencyJson cJson = systemAdminService.getImplAgencyy(pageable, searchBoxVal);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(cJson);
@@ -1132,14 +1133,14 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "districtId"));// default sorting
+			sort = Sort.by(Direction.ASC, "districtId");// default sorting
 		}
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 		DistrictJson cJson = systemAdminService.getAllDistrict(pageable, searchBoxVal);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(cJson);
@@ -1334,14 +1335,14 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.ASC, "gramPanchayatId"));// default sorting
+			sort = Sort.by(Direction.ASC, "gramPanchayatId");// default sorting
 		}
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 		GramPanchayatJson cJson = systemAdminService.getallGrampanchayat(pageable, searchBoxVal, districtId, blockId);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(cJson);
@@ -1350,7 +1351,7 @@ public class SystemAdminController extends BaseController {
 
 	// Mehtod for Getting Page of Pending User Page
 	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_SAU','ROLE_DEPARTMENT','ROLE_DM')")
-	@RequestMapping(value = "/managePendingUsers", method = RequestMethod.GET)
+	@RequestMapping(value = "/managePendingUsers", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
 	public ModelAndView viewmanagePendingUsers(HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -1397,15 +1398,15 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "id"));// default sorting
+			sort = Sort.by(Direction.DESC, "id");// default sorting
 		}
 
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 
 		UserJson userJson = superAdminService.fetchUserListForApproval(pageable, fetchLoggedInUserDetails(request),
 				searchBoxVal, status, username, emailId);
@@ -1487,14 +1488,14 @@ public class SystemAdminController extends BaseController {
 		Sort sort = null;
 		if (sColName != null) {
 			if (StringUtils.equals("asc", sSortDir)) {
-				sort = new Sort(new Sort.Order(Direction.ASC, sColName));
+				sort = Sort.by(Direction.ASC, sColName);
 			} else {
-				sort = new Sort(new Sort.Order(Direction.DESC, sColName));
+				sort = Sort.by(Direction.DESC, sColName);
 			}
 		} else {
-			sort = new Sort(new Sort.Order(Direction.DESC, "workSubtypeId"));// default sorting
+			sort = Sort.by(Direction.DESC, "workSubtypeId");// default sorting
 		}
-		Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 		WorkSubtypeJson cJson = systemAdminService.getWorkSubTypes(pageable, searchBoxVal);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(cJson);

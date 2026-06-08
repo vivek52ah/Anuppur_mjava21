@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
@@ -18,7 +19,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +66,7 @@ public class APIBased {
 	
 	public StringBuilder base64_to_binary(String base64_str) {
 		// String base64_str = "MDQw";
-	        byte[] decode = DatatypeConverter.parseBase64Binary(base64_str);
+	        byte[] decode = Base64.getDecoder().decode(base64_str);
 
 	        StringBuilder sb = new StringBuilder();
 	        for (int i = 0; i < decode.length; i++){

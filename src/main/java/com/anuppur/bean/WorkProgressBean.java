@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import com.anuppur.entity.DocumentUploadWorkProgress;

@@ -98,32 +98,104 @@
 	</style>
 	<script>
 		function openModal(workId, userAssignee) {
-
-			window.currentWorkId = workId;  //
+			console.log('Global openModal called with workId:', workId, 'userAssignee:', userAssignee);
+			
+			window.currentWorkId = workId;
 			window.currentUser = userAssignee;
 			currentu = userAssignee;
-			//alert(window.currentUser)
-			t2.draw();
-			// alert(workId)
-			// $('#exampleModal .modal-body').append('<p>Work ID: ' + workId + '</p>');
-			// Open the modal using Bootstrap's modal method
-			$('#exampleModal2').modal('show');
+			
+			// Refresh DataTable
+			if (typeof t2 !== 'undefined' && t2 !== null) {
+				console.log('Refreshing DataTable t2');
+				t2.draw();
+			} else if (typeof fetchUserList === 'function') {
+				console.log('Calling fetchUserList');
+				fetchUserList();
+			}
+			
+			// Open the modal with multiple fallback methods
+			try {
+				var modalElement = document.getElementById('exampleModal2');
+				if (!modalElement) {
+					console.error('Modal element #exampleModal2 not found');
+					return;
+				}
+				
+				// Try jQuery Bootstrap modal
+				if (typeof $ !== 'undefined' && $.fn && $.fn.modal) {
+					console.log('Opening modal with jQuery Bootstrap');
+					$('#exampleModal2').modal('show');
+				}
+				// Try Bootstrap 5 Modal
+				else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+					console.log('Opening modal with Bootstrap 5');
+					var modal = new bootstrap.Modal(modalElement);
+					modal.show();
+				}
+				// Fallback: manual CSS
+				else {
+					console.log('Opening modal with CSS fallback');
+					modalElement.style.display = 'block';
+					modalElement.classList.add('show');
+					document.body.classList.add('modal-open');
+					
+					// Add backdrop
+					var backdrop = document.createElement('div');
+					backdrop.className = 'modal-backdrop fade show';
+					backdrop.id = 'modal-backdrop-custom';
+					document.body.appendChild(backdrop);
+				}
+			} catch (error) {
+				console.error('Error in global openModal:', error);
+			}
 		}
 		function assignUser(userId) {
-			// alert(userId);
+			console.log('assignUser called with userId:', userId);
+			
 			if (confirm("You are Assigning this User to work ")) {
-
 				angular.element("#dynamic-table2").scope().assignUser(window.currentWorkId, userId);
 
 				setTimeout(function () {
-					$('#exampleModal2').modal('hide');
-					t2.draw();
-					window.location.reload();
+					// Close modal with multiple methods
+					try {
+						var modalElement = document.getElementById('exampleModal2');
+						
+						// Try jQuery Bootstrap modal
+						if (typeof $ !== 'undefined' && $.fn && $.fn.modal) {
+							$('#exampleModal2').modal('hide');
+						}
+						// Try Bootstrap 5 Modal
+						else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+							var modal = bootstrap.Modal.getInstance(modalElement);
+							if (modal) {
+								modal.hide();
+							}
+						}
+						// Fallback: manual CSS
+						else {
+							modalElement.style.display = 'none';
+							modalElement.classList.remove('show');
+							document.body.classList.remove('modal-open');
+							
+							// Remove backdrop
+							var backdrop = document.getElementById('modal-backdrop-custom');
+							if (backdrop) {
+								backdrop.remove();
+							}
+						}
+						
+						// Refresh DataTable
+						if (typeof t2 !== 'undefined' && t2 !== null) {
+							t2.draw();
+						}
+						
+						window.location.reload();
+					} catch (error) {
+						console.error('Error closing modal:', error);
+						window.location.reload();
+					}
 				}, 500);
-
 			}
-
-
 		};
 
 	</script>
@@ -148,8 +220,7 @@
 						<div class="work-status-tiles">
 <ul class="nav nav-pills work-status-nav">
     <li class="nav-item"
-        ng-repeat="workStatus in worksStatus"
-        ng-if="workData.isTenders=='1' || workStatus.workStatusId=='8'">
+        ng-repeat="workStatus in worksStatus">
 
         <a href="javascript:void(0)"
            class="nav-link"
@@ -169,6 +240,7 @@
 						</div>
 					</div>
 			 
+				
 				<div class="row">
 					<div class="form-group col-sm-4 " data-ng-if="workDataTender.workStatusId=='8'">
 						<label><span>Re-Tender Count </span></label> <input type="number"
@@ -194,7 +266,8 @@
 
 
 					<div class="form-group col-sm-4">
-						<label><span th:text="#{workOrderDate}">Work Order
+						<label ng-click="showAssignOfficer = !showAssignOfficer"
+       style="cursor:pointer;"><span th:text="#{workOrderDate}">Work Order
 								Date </span><span data-ng-show="workData.isTenders == 1 || workData.isTenders == true"
 								class="aestrick">&#42;</span></label>
 						<div class="input-group date" id="datetimepicker2" data-target-input="nearest">
@@ -204,7 +277,7 @@
 								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
 								placeholder="DD/MM/YYYY" data-ng-model="workDataTender.workOrderDate" id="workOrderDate"
 								autocomplete="off"
-								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 
 
 							<div class="input-group-append input-group-addon" data-target="#datetimepicker2"
@@ -238,10 +311,10 @@
 							<label> <span>Upload Work Order.</span> <span data-ng-show="workData.isTenders == 1"
 									class="aestrick">&#42;</span>
 							</label> <input
-								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; workDataTender.workStatusId=='8' workDataTender.tenderFileId == null"
+								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; workDataTender.workStatusId=='8' &amp;&amp; workDataTender.tenderFileId == null"
 								type='file' accept=".pdf" class="form-control" data-file-model="ldTdfFile"
 								name="ldTdfFile" id="ldTdfFile"
-								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 							<div class="">
 								<p class="help-block" data-ng-show="workDataTender.tenderFileId!=null">
 									<span th:text="#{downloadCurrentFile}"></span> <a style="cursor: pointer;"
@@ -287,7 +360,7 @@
 								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
 								type='file' accept=".pdf" class="form-control" file-model="dTTTFile" name="dsFile"
 								id="dsFile"
-								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 							<div class="">
 								<p class="help-block" data-ng-show="workData.drawingId!=null">
 									<span th:text="#{downloadCurrentFile}"></span> <a style="cursor: pointer;"
@@ -338,7 +411,7 @@
 							</label> <input type='file' accept=".pdf" class="form-control" file-model="ldTULFile"
 								name="ldTULFile" id="ldTULFile"
 								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
-								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 							<div class="">
 								<p class="help-block" data-ng-show="workDataTender.uLoiId!=null">
 									<span th:text="#{downloadCurrentFile}"></span> <a style="cursor: pointer;"
@@ -380,7 +453,7 @@
 							</label> <input type='file' accept=".pdf" class="form-control" file-model="ldUAFile"
 								name="ldUAFile" id="ldUAFile"
 								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
-								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 							<div class="">
 								<p class="help-block" data-ng-show="workDataTender.uAId!=null">
 									<span th:text="#{downloadCurrentFile}"></span> <a style="cursor: pointer;"
@@ -423,7 +496,7 @@
 						<input class="form-control" id="agreementNo" data-ng-model="workDataTender.agreementNo"
 							name="agreementNo"
 							data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
-							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+							data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.agreementNo.$error.required">
@@ -451,7 +524,7 @@
 								name="agreementDate" placeholder="DD/MM/YYYY"
 								data-ng-model="workDataTender.agreementDate" id="agreementDate" autocomplete="off"
 								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
-								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 
 
 							<div class="input-group-append input-group-addon" data-target="#datetimepicker24"
@@ -487,7 +560,7 @@
 						<label><span>SOR Year</span></label> <select class="form-control" id="sorYear"
 							data-ng-model="workDataTender.sorYear" name="sorYear"
 							data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
-							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)">
+							data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'">
 							<option value="" disabled="disabled">--Select--</option>
 							<option data-ng-repeat="sorYear in sorYears | orderBy : 'sorYear'"
 								value="{{sorYear.sorYearId}}">{{sorYear.sorYearName}}</option>
@@ -512,13 +585,13 @@
 								checked="checked" data-ng-change="workDataTender.contractAmount=null"
 								data-ng-model="workData.isTender" value="1"
 								data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders=='1'"
-								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 							<span>Yes</span>
 						</label> <label class="radio-inline"> <input type="radio" name="isTender"
 								data-ng-model="workData.isTender" value="0"
 								data-ng-change="workDataTender.tenderPercentage =null;workDataTender.contractAmount = null"
 								data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTenders=='1'"
-								data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 							<span>No</span>
 						</label>
 
@@ -535,7 +608,7 @@
 							data-ng-model="workDataTender.tenderPercentage" data-ng-change="PercentageCaluculation();"
 							data-ng-paste="paste($event)" data-ng-keydown="removeTagOnBackspace($event)"
 							name="tenderPer"
-							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+							data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 						<!-- <div data-ng-show="workTenderForm.$submitted">
 					
 												<p class="help-block" style="color: red;"
@@ -564,7 +637,7 @@
 							data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; workData.isTender == '1'   &amp;&amp;  workData.isTenders=='1' "
 							id="rateStatus" data-ng-model="workDataTender.rateStatus" name="rateStatus"
 							data-ng-change="PercentageCaluculation();"
-							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)">
+							data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'">
 
 							<option value="" disabled="disabled">--Select--</option>
 							<option>Above</option>
@@ -597,7 +670,7 @@
 							data-ng-change="PercentageCaluculation();" name="pacAmount"
 							data-ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" step="0.01"
 							data-ng-required="workDataTender.workStatusId=='8' &amp;&amp; (workData.isTenders == 1 || workData.isTenders == true)"
-							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+							data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 
 
 
@@ -666,7 +739,7 @@
 							data-ng-model="workDataTender.contractTenure" name="tsTenure"
 							data-ng-change="DateCaluculationByMonth(workDataTender.workOrderDate,workDataTender.contractTenure);"
 							data-ng-keydown="removeTagOnBackspace($event)"
-							data-ng-disabled="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null)" />
+							data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 
 						<div data-ng-show="workTenderForm.$submitted">
 							<div data-ng-show="workDataTender.workStatusId=='8'">
@@ -693,7 +766,7 @@
 						<div class="input-group date" id="datetimepicker6" data-target-input="nearest">
 
 							<input type="text" class="form-control" id="tenderOpeningDate" placeholder="DD-MM-YYYY"
-								data-ng-model="workDataTender.workCompletionDate | date: 'dd/MM/yyyy'"
+								data-ng-model="workDataTender.workCompletionDate"
 								name="tenderOpeningDate" disabled="disabled"
 								data-ng-required="(workData.isTenders == 1 || workData.isTenders == true) &amp;&amp; (workDataTender.workStatusId=='8')"
 								  />
@@ -731,7 +804,7 @@
 						<label><span>Remarks</span><span class="aestrick">&#42;</span></label>
 						<textarea class="form-control" id="remarks" required="required"
 							data-ng-model="workDataTender.remarks" name="remarks"
-							data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null"></textarea>
+							data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'"></textarea>
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.remarks.$error.required">
@@ -746,7 +819,7 @@
 						<textarea class="form-control" id="remarks" data-ng-required="workDataTender.workStatusId=='8'"
 							data-ng-model="workDataTender.remarks" name="remarks"
 							maxlength="1001"
-							data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null  || workDataTender.loaIssuedDate==null"></textarea>
+							data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'"></textarea>
 						<div
 							data-ng-show="workTenderForm.$submitted || workTenderForm.remarks.$touched || workDataTender.remarks.length > 1000">
 							<p class="help-block" style="color: red;"
@@ -797,6 +870,7 @@
 						});
 
 					</script>
+					<!-- Status 3: Tender Called Date + E-Tender No. ONLY -->
 					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='3'">
 						<label><span>Tender Called Date</span> <span class="aestrick">&#42;</span> </label>
 						<div class="input-group date" id="datetimepicker16" data-target-input="nearest">
@@ -804,148 +878,111 @@
 								data-ng-required="workDataTender.workStatusId=='3'" data-target="#datetimepicker16"
 								name="tenderCalledDate" placeholder="DD/MM/YYYY"
 								data-ng-model="workDataTender.tenderCalledDate"
-								data-ng-disabled="workDataTender.tenderUpdated=='4' || workDataTender.tenderUpdated=='5' || workDataTender.tenderUpdated=='6' || workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8'"
+								data-ng-disabled="workDataTender.tenderUpdated=='3' || workDataTender.tenderUpdated=='4' || workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8'"
 								id="tenderCalledDate" autocomplete="off" />
-
 							<div class="input-group-append input-group-addon" data-target="#datetimepicker16"
 								data-toggle="datetimepicker">
-								<div class="input-group-text">
-									<i class="fa fa-calendar"></i>
-								</div>
+								<div class="input-group-text"><i class="fa fa-calendar"></i></div>
 							</div>
 						</div>
-
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.tenderCalledDate.$error.required">
-								<span th:text="#{pleaseEnter}">Please enter</span>Tender Called
-								Date <span></span>
+								<span th:text="#{pleaseEnter}">Please enter</span> Tender Called Date
 							</p>
 						</div>
 					</div>
 
-
 					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='3'">
-						<label><span>E-Tender No.</span><span class="aestrick">&#42;</span></label> <input type="text"
-							data-ng-required="workDataTender.workStatusId=='3'" class="form-control" id="eTenderNo"
-							data-ng-disabled="workDataTender.tenderUpdated=='4' || workDataTender.tenderUpdated=='5' || workDataTender.tenderUpdated=='6' || workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8'"
+						<label><span>E-Tender No.</span><span class="aestrick">&#42;</span></label>
+						<input type="text" data-ng-required="workDataTender.workStatusId=='3'"
+							class="form-control" id="eTenderNo"
+							data-ng-disabled="workDataTender.tenderUpdated=='3' || workDataTender.tenderUpdated=='4' || workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8'"
 							data-ng-model="workDataTender.eTenderNo" name="eTenderNo" ng-pattern="/^\d+$/" />
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.eTenderNo.$error.required">
-								<span th:text="#{pleaseEnter}">Please enter</span> <span>E Tender
-									NO</span>
+								<span th:text="#{pleaseEnter}">Please enter</span> <span>E Tender NO</span>
 							</p>
-
 						</div>
 						<p class="help-block" style="color: red;"
 							data-ng-show="workTenderForm.eTenderNo.$error.pattern">
-							<span th:text="#{pleaseEnter}">Please enter</span> <span>Number only
-							</span>
+							<span th:text="#{pleaseEnter}">Please enter</span> <span>Number only</span>
 						</p>
 					</div>
 
-
-
-
-
-
+					<!-- Status 4: Tender Received Date ONLY — enabled only after status 3 saved -->
 					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='4'">
 						<label><span>Tender Received Date</span><span class="aestrick">&#42;</span></label>
 						<div class="input-group date" id="datetimepicker17" data-target-input="nearest">
 							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker17"
 								name="tenderReceivedDate" placeholder="DD/MM/YYYY"
 								data-ng-required="workDataTender.workStatusId=='4'"
-								data-ng-disabled="workDataTender.tenderUpdated=='5' || workDataTender.tenderUpdated=='6' || workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8' || workDataTender.tenderCalledDate==null"
+								data-ng-disabled="workDataTender.tenderUpdated!='3'"
 								data-ng-model="workDataTender.tenderReceivedDate" id="tenderReceivedDate"
 								autocomplete="off" />
-
-
 							<div class="input-group-append input-group-addon" data-target="#datetimepicker17"
 								data-toggle="datetimepicker">
-								<div class="input-group-text">
-									<i class="fa fa-calendar"></i>
-								</div>
+								<div class="input-group-text"><i class="fa fa-calendar"></i></div>
 							</div>
 						</div>
-
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.tenderReceivedDate.$error.required">
-								<span th:text="#{pleaseEnter}">Please enter</span>Tender
-								Received Date<span></span>
+								<span th:text="#{pleaseEnter}">Please enter</span> Tender Received Date
 							</p>
 						</div>
-
 					</div>
 
-
-
-
-
-
+					<!-- Status 14: Re-Tender Date ONLY — enabled only after status 3 saved -->
 					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='14'">
 						<label><span>Re-Tender Date</span></label>
 						<div class="input-group date" id="datetimepicker18" data-target-input="nearest">
 							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker18"
 								name="reTenderDate" placeholder="DD/MM/YYYY"
-								data-ng-disabled="workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8' || workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null"
+								data-ng-disabled="workDataTender.tenderUpdated=='7' || workDataTender.tenderUpdated=='8'"
 								data-ng-model="workDataTender.reTenderDate" id="reTenderDate" autocomplete="off" />
-
-
 							<div class="input-group-append input-group-addon" data-target="#datetimepicker18"
 								data-toggle="datetimepicker">
-								<div class="input-group-text">
-									<i class="fa fa-calendar"></i>
-								</div>
+								<div class="input-group-text"><i class="fa fa-calendar"></i></div>
 							</div>
 						</div>
-
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.reTenderDate.$error.required">
-								<span th:text="#{pleaseEnter}">Please enter</span>Re-Tender Date
-								<span></span>
+								<span th:text="#{pleaseEnter}">Please enter</span> Re-Tender Date
 							</p>
 						</div>
-
 					</div>
+
 					<script>
 						$('#datetimepicker21').datetimepicker({
 							maxDate: moment(),
 							minDate: moment('01/01/1995', 'DD/MM/YYYY'),
 							format: 'DD/MM/YYYY'
-
 						});
 					</script>
 
-
+					<!-- Status 7: LoA Issued Date ONLY — enabled only after status 4 saved -->
 					<div class="form-group col-sm-4" data-ng-show="workDataTender.workStatusId=='7'">
 						<label><span>LoA Issued Date</span><span class="aestrick">&#42;</span></label>
 						<div class="input-group date" id="datetimepicker21" data-target-input="nearest">
 							<input type="text" class="form-control datepicker-input" data-target="#datetimepicker21"
 								name="loaIssuedDate" placeholder="DD/MM/YYYY"
 								data-ng-required="workDataTender.workStatusId=='7'"
-								data-ng-disabled="workDataTender.tenderUpdated=='8' || workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null "
+								data-ng-disabled="workDataTender.tenderUpdated!='4'"
 								data-ng-model="workDataTender.loaIssuedDate" id="loaIssuedDate" autocomplete="off" />
-
-
 							<div class="input-group-append input-group-addon" data-target="#datetimepicker21"
 								data-toggle="datetimepicker">
-								<div class="input-group-text">
-									<i class="fa fa-calendar"></i>
-								</div>
+								<div class="input-group-text"><i class="fa fa-calendar"></i></div>
 							</div>
 						</div>
-
 						<div data-ng-show="workTenderForm.$submitted">
 							<p class="help-block" style="color: red;"
 								data-ng-show="workTenderForm.loaIssuedDate.$error.required">
-								<span th:text="#{pleaseEnter}">Please enter</span>LOA Issued
-								Date<span></span>
+								<span th:text="#{pleaseEnter}">Please enter</span> LOA Issued Date
 							</p>
 						</div>
-
 					</div>
 				</div>
 				<div class="row"
@@ -978,7 +1015,7 @@
 							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker9"
 								name="startDate" placeholder="DD/MM/YYYY" data-ng-model="workDataTender.startDate"
 								id="startDate" autocomplete="off"
-								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null || workDataTender.loaIssuedDate==null" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 
 
 							<div class="input-group-append input-group-addon" data-target="#datetimepicker9"
@@ -1033,7 +1070,7 @@
 							<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker10"
 								name="endDate" placeholder="DD/MM/YYYY" data-ng-model="workDataTender.endDate"
 								id="endDate" autocomplete="off"
-								data-ng-disabled="workDataTender.tenderCalledDate==null || workDataTender.tenderReceivedDate==null || workDataTender.loaIssuedDate==null" />
+								data-ng-disabled="workDataTender.tenderUpdated!='7' &amp;&amp; workDataTender.tenderUpdated!='8'" />
 
 
 							<div class="input-group-append input-group-addon" data-target="#datetimepicker10"
@@ -1089,10 +1126,11 @@
 				</div>
 			</div> 
 
-			<div class="tab-footer bg-light rounded text-right pr-2" data-ng-show="workDataProgress.workStatus=='notProgressIssued'"
-				th:if="${roleName=='ROLE_DISTRICT'|| roleName=='ROLE_DEPARTMENT'}">
+			<div class="tab-footer bg-light rounded text-right pr-2"
+				th:if="${roleName=='ROLE_DISTRICT'|| roleName=='ROLE_DEPARTMENT'}"
+				data-ng-hide="workDataProgress.progressUpdated=='11' || workDataProgress.progressUpdated=='12' || workDataProgress.progressUpdated=='13'">
 				<button type="submit" class="btn  btn-success  next-button"
-					data-ng-show="workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13' || workDataTender.workStatusId=='14' || workDataTender.workStatusId=='3' || workDataTender.workStatusId=='4' || workDataTender.workStatusId=='7' || workDataTender.workStatusId==null"
+					data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13' || workDataTender.workStatusId=='14' || workDataTender.workStatusId=='3' || workDataTender.workStatusId=='4' || workDataTender.workStatusId=='7' || workDataTender.workStatusId==null"
 					id="drafTtbtn"
 					data-ng-click="finalSubmit=false;saveTDraft=true;saveTNext=false;uploadedDrawingFiles">
 					<i class="las la-file-alt"></i>Save
@@ -1112,7 +1150,7 @@
 		</div>
 	</form>
 	</div>
-	<script type="text/javascript">
+	<script type="text/javascript" th:inline="none">
 		/*<![CDATA[*/
 		//Plug-in to fetch page data 
 
@@ -1140,8 +1178,8 @@
 						"buttons": [
 
 						],
-						"lengthMenu": [[10, 25, 50, 100000],
-						[10, 25, 50, "All"]],
+						"lengthMenu": [ [10, 25, 50, 100000],
+						[10, 25, 50, "All"] ],
 
 						"fnDrawCallback": function () {
 
@@ -1385,7 +1423,7 @@
 				</div>
 			</div>
 		</div>
-		<script>
+		<script th:inline="none">
 			var t2 = null;
 			function fetchUserList() {
 
@@ -1407,8 +1445,8 @@
 
 							"buttons": [
 							],
-							"lengthMenu": [[10, 25, 50, 100000],
-							[10, 25, 50, "All"]],
+							"lengthMenu": [ [10, 25, 50, 100000],
+							[10, 25, 50, "All"] ],
 
 							"fnDrawCallback": function () {
 
@@ -1549,12 +1587,12 @@
 	<div class="card-header">
 		Assign Area Officer
 	</div>
-	<div class="card-body">
-		<div class="row"
-			data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='13'">
+	<div class="card-body" ng-show="workDataTender.workStatusId=='8'" >
+		<div class="row">
 			<div class="col-sm-2">
 				<button type="button" class="btn btn-success"
-					ng-click="openModal(workData.workId,workData.userAssignee)">
+					ng-click="openModal(workData.workId || null, workData.userAssignee || null)"
+					title="Click to assign an area officer to this work">
 					Assign Officer
 				</button>
 

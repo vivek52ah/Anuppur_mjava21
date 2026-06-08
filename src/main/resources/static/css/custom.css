@@ -492,6 +492,18 @@ select.form-control {
 .responsive-md{
 	display: block; width: 100%; overflow-x: auto;
 }
+.report-table-wrap {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	overflow-x: auto;
+	overflow-y: visible;
+	-webkit-overflow-scrolling: touch;
+	clear: both;
+}
+.report-page-root .card-body {
+	overflow: visible;
+}
 .sidebar .nav-dropdown-items .nav-dropdown-items li a {
     padding-left: 4rem;
 }

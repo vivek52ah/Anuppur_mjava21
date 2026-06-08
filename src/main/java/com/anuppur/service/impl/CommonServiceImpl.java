@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 //import org.thymeleaf.util.StringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -254,7 +255,7 @@ import com.anuppur.service.NotificationService;
 import com.anuppur.service.SuperAdminService;
 import com.anuppur.util.DMSUtil;
 
-import groovyjarjarcommonscli.ParseException;
+import java.text.ParseException;
 
 @Service
 public class CommonServiceImpl implements CommonService {
@@ -305,7 +306,7 @@ public class CommonServiceImpl implements CommonService {
 	// sumit
 	@Value("${stagepassing.imageUrl}")
 	private String imageUrl;
-	
+
 	@Value("${file.temp.zip.dir}")
 	private String tempZipDir;
 
@@ -469,30 +470,29 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private com.anuppur.repository.areaofficerrecordRepository areaOfficerRecordRepository;
-	
+
 	@Autowired
 	private WorkRepositoryCustomImpl workRepositoryCustomImpl;
 
 	@Autowired
 	private FinancialAgencyRepository financialAgencyRepository;
-	
+
 	@Autowired
 	private DepartmentMasterRepository departmentMasterRepository;
-	
+
 	@Autowired
 	private DepartmentRemarksRepository departmentRemarksRepository;
-	
-	@Autowired
-	private CommonService commonService;
-	
-	@Override
-	public WorkJson fetchWorksList(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
-			List<Long> fyList, List<Long> agencyList, String blockId, String workStatus, String districtId,
-			String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList,
-			List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark, List<Long> departmentList) {
 
-		
-		
+//	@Autowired
+//	private CommonService commonService;
+//	
+	@Override
+	public WorkJson fetchWorksList(Pageable pageable, String workNo, String workName, String scheme,
+			List<Long> workTypeList, List<Long> fyList, List<Long> agencyList, String blockId, String workStatus,
+			String districtId, String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList,
+			List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter,
+			String departmentRemark, List<Long> departmentList) {
+
 		Integer workSubTypeIdInt = null;
 		if (workSubTypeId != null) {
 			try {
@@ -506,7 +506,7 @@ public class CommonServiceImpl implements CommonService {
 		User user = DMSUtil.getUserDetail();
 
 		Users userEntity = userRepository.findByUsernameAndStatus(user.getUsername(), DMSConstants.STATUS_ACTIVE);
-		
+
 		// Handle null userEntity
 		if (userEntity == null) {
 			logger.warn("User entity not found for username: {}", user.getUsername());
@@ -522,7 +522,7 @@ public class CommonServiceImpl implements CommonService {
 		String districtCode = "";
 		ImplementationAgency implAgency = null;
 		String r = role.toString();
-		
+
 		// logger.info("ROLEEEE....." + r);
 		if (r.contains("ROLE_DEPARTMENT")) {
 			Division division = userEntity.getDivision();
@@ -579,64 +579,74 @@ public class CommonServiceImpl implements CommonService {
 			Long divisionIds = null;
 			if (divisionId != null) {
 				divisionIds = Long.valueOf(divisionId);
-//				divisionName = divisionRepository.findOne(Long.valueOf(divisionId)).getDivisionName();
+//				divisionName = divisionRepository.findById(Long.valueOf(divisionId)).orElse(null).getDivisionName();
 			}
 
 			Long districtIds = null;
 			if (districtId != null) {
 				districtIds = Long.valueOf(districtId);
-//				districtName = districtRepository.findOne(Long.valueOf(districtId)).getDistrictName();
+//				districtName = districtRepository.findById(Long.valueOf(districtId)).orElse(null).getDistrictName();
 			}
 			String gpName = null;
-			
-			
-			
+
 			// Sumit
 			workTypeList = (workTypeList == null || workTypeList.isEmpty()) ? null : workTypeList;
-			fyList       = (fyList == null || fyList.isEmpty()) ? null : fyList;
-			agencyList   = (agencyList == null || agencyList.isEmpty()) ? null : agencyList;
-			statusList   = (statusList == null || statusList.isEmpty()) ? null : statusList;
+			fyList = (fyList == null || fyList.isEmpty()) ? null : fyList;
+			agencyList = (agencyList == null || agencyList.isEmpty()) ? null : agencyList;
+			statusList = (statusList == null || statusList.isEmpty()) ? null : statusList;
 			priorityList = (priorityList == null || priorityList.isEmpty()) ? null : priorityList;
-			headList     = (headList == null || headList.isEmpty()) ? null : headList;
-			vsList       = (vsList == null || vsList.isEmpty()) ? null : vsList;
-			blockIdList  = (blockIdList == null || blockIdList.isEmpty()) ? null : blockIdList;
-			
-			// Convert workStatus string (COMPLETED/ONGOING/NOT_STARTED) to statusList if not already set
+			headList = (headList == null || headList.isEmpty()) ? null : headList;
+			vsList = (vsList == null || vsList.isEmpty()) ? null : vsList;
+			blockIdList = (blockIdList == null || blockIdList.isEmpty()) ? null : blockIdList;
+
+			// Convert workStatus string (COMPLETED/ONGOING/NOT_STARTED) to statusList if
+			// not already set
 			if (statusList == null && workStatus != null && !workStatus.isEmpty()) {
 				Long flag = null;
-				if ("COMPLETED".equalsIgnoreCase(workStatus)) flag = 5L; // workStatusId=11
-				else if ("ONGOING".equalsIgnoreCase(workStatus)) flag = 5L; // workStatusId=10
-				else if ("NOT_STARTED".equalsIgnoreCase(workStatus)) flag = 5L; // workStatusId=9
+				if ("COMPLETED".equalsIgnoreCase(workStatus))
+					flag = 5L; // workStatusId=11
+				else if ("ONGOING".equalsIgnoreCase(workStatus))
+					flag = 5L; // workStatusId=10
+				else if ("NOT_STARTED".equalsIgnoreCase(workStatus))
+					flag = 5L; // workStatusId=9
 				// Since all three share flag=5, use direct IDs instead
 				statusList = new ArrayList<>();
-				if ("COMPLETED".equalsIgnoreCase(workStatus)) statusList.add(11L);
-				else if ("ONGOING".equalsIgnoreCase(workStatus)) statusList.add(10L);
-				else if ("NOT_STARTED".equalsIgnoreCase(workStatus)) statusList.add(9L);
-				if (statusList.isEmpty()) statusList = null;
+				if ("COMPLETED".equalsIgnoreCase(workStatus))
+					statusList.add(11L);
+				else if ("ONGOING".equalsIgnoreCase(workStatus))
+					statusList.add(10L);
+				else if ("NOT_STARTED".equalsIgnoreCase(workStatus))
+					statusList.add(9L);
+				if (statusList.isEmpty())
+					statusList = null;
 			}
 
-			
-			
 			if (r.contains("ROLE_DEPARTMENT")) {
 				if (departmentList != null && !departmentList.isEmpty()) {
 					// When department filter is explicitly set, use generic query with dept filter
 					works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
-							null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark, departmentList);
+							null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList,
+							departmentRemark, departmentList);
 				} else if (agencyList != null && !agencyList.isEmpty()) {
-					// When agency filter is explicitly set (e.g. from dept-wise report), skip division filter
+					// When agency filter is explicitly set (e.g. from dept-wise report), skip
+					// division filter
 					works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
-							null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark, null);
+							null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList,
+							departmentRemark, null);
 				} else {
 					works = workRepositoryCustomImpl.fetchAllWorksByDivision(pageable, workNo, workTypeList, fyList,
-							districtIds, statusList, agencyList, null, priorityList, headList,
-							vsList, divisionCode, departmentRemark, blockIdList, workNameFilter);
+							districtIds, statusList, agencyList, null, priorityList, headList, vsList, divisionCode,
+							departmentRemark, blockIdList, workNameFilter);
 				}
 			}
 
 			else if (r.contains("ROLE_DISTRICT")) {
-				// Parameter order: pageable, workNo, workTypeList, fyList, districtCode, agencyList, divisionIds, districtIds, workSubTypeIdInt, statusList, priorityList, headList, vsList, departmentRemark, blockIdList, workNameFilter
+				// Parameter order: pageable, workNo, workTypeList, fyList, districtCode,
+				// agencyList, divisionIds, districtIds, workSubTypeIdInt, statusList,
+				// priorityList, headList, vsList, departmentRemark, blockIdList, workNameFilter
 				works = workRepositoryCustomImpl.fetchAllWorksByDistrict(pageable, workNo, workTypeList, fyList,
-						districtCode, agencyList, divisionIds, districtIds, workSubTypeIdInt, statusList, priorityList, headList, vsList, departmentRemark, blockIdList, workNameFilter);
+						districtCode, agencyList, divisionIds, districtIds, workSubTypeIdInt, statusList, priorityList,
+						headList, vsList, departmentRemark, blockIdList, workNameFilter);
 			}
 
 //			else if (r.contains("ROLE_SAU")) {
@@ -655,14 +665,20 @@ public class CommonServiceImpl implements CommonService {
 				// works = workRepository.fetchAllWorksByAgency(pageable, workName, workType,
 				// financialYear, agency, divisionName, districtName, workSubTypeIdInt,
 				// workStatusName);
-				// Parameter order: pageable, workNo, workTypeId, financialYear, districtId, workStatusId, agency, workPriority, financialHead, vidhanSabha, workNameFilter, blockId, departmentRemark
-				works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
-						null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark, departmentList);
-				
+				// Parameter order: pageable, workNo, workTypeId, financialYear, districtId,
+				// workStatusId, agency, workPriority, financialHead, vidhanSabha,
+				// workNameFilter, blockId, departmentRemark
+				works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList, null,
+						statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList,
+						departmentRemark, departmentList);
+
 			} else {
-				// Parameter order: pageable, workNo, workTypeId, financialYear, districtId, workStatusId, agency, workPriority, financialHead, vidhanSabha, workNameFilter, blockId, departmentRemark
-				works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList,
-						null, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark, departmentList);
+				// Parameter order: pageable, workNo, workTypeId, financialYear, districtId,
+				// workStatusId, agency, workPriority, financialHead, vidhanSabha,
+				// workNameFilter, blockId, departmentRemark
+				works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workNo, workTypeList, fyList, null,
+						statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList,
+						departmentRemark, departmentList);
 			}
 
 			// added by sumit
@@ -675,13 +691,14 @@ public class CommonServiceImpl implements CommonService {
 
 					int index = pageable.getPageNumber() * pageable.getPageSize();
 					for (Work work : entityList) {
-						
+
 						// WorkBean bean = convertWorkEntityToBean(work, "All");
 						WorkBean bean = convertWorkEntityToBeans1(work, "All");
 						if (work.getUserAssignee() != null) {
 							bean.setUserAssignee(work.getUserAssignee());
 
-							bean.setUserAssigneeName(userRepository.findOne(work.getUserAssignee()).getEmailId());
+							bean.setUserAssigneeName(
+									userRepository.findById(work.getUserAssignee()).orElse(null).getEmailId());
 						}
 						bean.setIndex(++index);
 
@@ -705,12 +722,12 @@ public class CommonServiceImpl implements CommonService {
 						StringBuilder dmRemarkMaster = new StringBuilder();
 						if (dmRemarks != null) {
 							String createdTimeStr = dmRemarks.getCreated_time();
-							if (dmRemarks.getRemark() != null && !dmRemarks.getRemark().isEmpty() ) {
+							if (dmRemarks.getRemark() != null && !dmRemarks.getRemark().isEmpty()) {
 								dmRemark.append(dmRemarks.getRemark());
 							} else {
 								bean.setDmRemakrs("-");
 							}
-							
+
 							if (createdTimeStr != null && !createdTimeStr.trim().isEmpty()) {
 								try {
 									SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
@@ -727,9 +744,9 @@ public class CommonServiceImpl implements CommonService {
 							}
 						} else {
 							bean.setDmAproveRejectDate(null);
-							 deptRemarks.append("-");
+							deptRemarks.append("-");
 						}
-						
+
 						bean.setDmRemakrs(dmRemark.toString());
 						beanList.add(bean);
 					}
@@ -752,7 +769,7 @@ public class CommonServiceImpl implements CommonService {
 		WorkReportBean bean = new WorkReportBean();
 
 		bean.setWorkName(w.getWorkName());
-		bean.setFinancialYear(financialYearRepository.findOne(w.getFinancialYear()).getFinancialYear());
+		bean.setFinancialYear(financialYearRepository.findById(w.getFinancialYear()).orElse(null).getFinancialYear());
 
 		return null;
 	}
@@ -1078,13 +1095,13 @@ public class CommonServiceImpl implements CommonService {
 		Long workTypeId = null;
 		if (workType != null) {
 			workTypeId = Long.valueOf(workType);
-//			districtName = districtRepository.findOne(Long.valueOf(districtId)).getDistrictName();
+//			districtName = districtRepository.findById(Long.valueOf(districtId)).orElse(null).getDistrictName();
 		}
 
 		Long agency = null;
 		if (implementationAgency != null) {
 			agency = Long.valueOf(implementationAgency);
-//				districtName = districtRepository.findOne(Long.valueOf(districtId)).getDistrictName();
+//				districtName = districtRepository.findById(Long.valueOf(districtId)).orElse(null).getDistrictName();
 		}
 
 		WorkJson workJson = null;
@@ -1119,23 +1136,24 @@ public class CommonServiceImpl implements CommonService {
 
 			String blockName = null;
 			if (blockId != null) {
-				blockName = blockRepository.findOne(Long.valueOf(blockId)).getBlockName();
+				blockName = blockRepository.findById(Long.valueOf(blockId)).orElse(null).getBlockName();
 			}
 			Long divisionIds = null;
 			if (divisionId != null) {
 				divisionIds = Long.valueOf(divisionId);
-//				divisionName = divisionRepository.findOne(Long.valueOf(divisionId)).getDivisionName();
+//				divisionName = divisionRepository.findById(Long.valueOf(divisionId)).orElse(null).getDivisionName();
 			}
 			Long districtIds = null;
 			if (districtId != null) {
 				districtIds = Long.valueOf(districtId);
-//				districtName = districtRepository.findOne(Long.valueOf(districtId)).getDistrictName();
+//				districtName = districtRepository.findById(Long.valueOf(districtId)).orElse(null).getDistrictName();
 			}
 			// String gpName = null;
 
 			String workStatusName = null;
 			if (workStatusId != null) {
-				workStatusName = workStatusRepository.findOne(Long.valueOf(workStatusId)).getWorkStatusNameE();
+				workStatusName = workStatusRepository.findById(Long.valueOf(workStatusId)).orElse(null)
+						.getWorkStatusNameE();
 			}
 			String gpName = null;
 
@@ -1396,7 +1414,10 @@ public class CommonServiceImpl implements CommonService {
 
 			// Long workId=(Long) searchParameterWorkName ;
 
-			wpPage = documentUploadWorkProgressRepository.findByWorkId(workId);
+			List<DocumentUploadWorkProgress> progressRows = documentUploadWorkProgressRepository.findAllByWorkId(workId);
+			if (progressRows != null && !progressRows.isEmpty()) {
+				wpPage = progressRows;
+			}
 
 			if (wpPage != null) {
 				// List<TSASReviseWork> entityList = tsPage.getContent();
@@ -1415,7 +1436,7 @@ public class CommonServiceImpl implements CommonService {
 							WorkSubStatus workSubStatus = workSubStatusRepository
 									.findByWorkSubStatusId(documentUploadWorkProgress.getWorkSubStatusId());
 							bean.setWorkSubStatusId(workSubStatus.getWorkSubStatusId());
-							if (documentUploadWorkProgress.getWorkStatusNameE().equals("In-Progress")) {
+							if ("In-Progress".equals(documentUploadWorkProgress.getWorkStatusNameE())) {
 								bean.setWorkSubStatusNameE(workSubStatus.getWorkSubStatusNameE());
 								bean.setReasonDelay("-");
 							} else {
@@ -1437,7 +1458,7 @@ public class CommonServiceImpl implements CommonService {
 
 						if (documentUploadWorkProgress.getWorkSubDelayReasonId() != null) {
 							WorkSubDelayReson subDelay = workSubDelayResonRepository
-									.findOne(documentUploadWorkProgress.getWorkSubDelayReasonId());
+									.findById(documentUploadWorkProgress.getWorkSubDelayReasonId()).orElse(null);
 							bean.setWorkSubDelayReason(subDelay.getSubDelayReason());
 						} else {
 							bean.setWorkSubDelayReason("-");
@@ -1451,9 +1472,9 @@ public class CommonServiceImpl implements CommonService {
 						bean.setLattitude(documentUploadWorkProgress.getLattitude());
 						bean.setLongitude(documentUploadWorkProgress.getLongitude());
 						bean.setAddress(documentUploadWorkProgress.getAddress());
-						if(bean.getDocumentName() != null) {
-						bean.setImagepath(imageUrl.substring(0, 21) + "/anuppur/mobile/downloadDocumentWSPro/"
-								+ bean.getDocumentId());
+						if (bean.getDocumentName() != null) {
+							bean.setImagepath(imageUrl.substring(0, 21) + "/anuppur/mobile/downloadDocumentWSPro/"
+									+ bean.getDocumentId());
 						}
 						/*
 						 * List<DocumentUploadWorkProgress> byWorkIdAndCreatedDate =
@@ -1465,18 +1486,21 @@ public class CommonServiceImpl implements CommonService {
 						beanList.add(bean);
 					}
 
-					//beanList = beanList.stream().filter(distinctByKey(DocumentUploadWorkProgressBean::getCreatedDate)) // Filter
-																														// distinct
-																														// by
-																														// createdDate
-					//		.collect(Collectors.toList());
-					//AtomicInteger indexa = new AtomicInteger(1);
+					// beanList =
+					// beanList.stream().filter(distinctByKey(DocumentUploadWorkProgressBean::getCreatedDate))
+					// // Filter
+					// distinct
+					// by
+					// createdDate
+					// .collect(Collectors.toList());
+					// AtomicInteger indexa = new AtomicInteger(1);
 
-				//	beanList.forEach(bean -> bean.setIndexWS(indexa.getAndIncrement()));
+					// beanList.forEach(bean -> bean.setIndexWS(indexa.getAndIncrement()));
 
 				}
 				json = new WorkProgressImagesJson();
-				json.setiTotalRecords(documentUploadWorkProgressRepository.countByEnabled((short) 1));
+				json.setiTotalRecords((long) beanList.size());
+				json.setiTotalDisplayRecords((long) beanList.size());
 
 				json.setAaData(beanList);
 			}
@@ -1491,74 +1515,62 @@ public class CommonServiceImpl implements CommonService {
 	public ExpensesDataJson fetchExpensesDataList(Pageable pageable, Object totalExpensess, Object expensessUptoMarch,
 			Object expensessCurrentFy, String year, Object createdDate, Long workTypeId) {
 
-		ExpensesDataJson json = null;
-		User user = DMSUtil.getUserDetail();
-
-		Users userEntity = userRepository.findByUsernameAndStatus(user.getUsername(), DMSConstants.STATUS_ACTIVE);
-
-		Collection<GrantedAuthority> role = user.getAuthorities();
+		ExpensesDataJson json = new ExpensesDataJson();
+		json.setAaData(new ArrayList<>());
+		json.setiTotalRecords(0);
+		json.setiTotalDisplayRecords(0);
 
 		try {
-			List<ExpensesData> exPage = null;
-
-			// Long workId=(Long) searchParameterWorkName ;
-			if (year != null) {
+			List<ExpensesData> exPage;
+			if (year != null && !year.isEmpty()) {
 				Long newYear = Long.parseLong((String) year);
-				exPage = expensesDataRepository.findByYearAndWorkIdIn(newYear, workTypeId);
+				exPage = expensesDataRepository.findByYearAndWorkIdIn(newYear, Collections.singletonList(workTypeId));
 			} else {
 				exPage = expensesDataRepository.findByWorkId(workTypeId);
 			}
-
-			if (exPage != null) {
-				// List<TSASReviseWork> entityList = tsPage.getContent();
-				List<ExpensesDataBean> beanList = new ArrayList<>();
-				if (exPage != null && !exPage.isEmpty()) {
-
-					int index = pageable.getPageNumber() * pageable.getPageSize();
-					BigDecimal totalprev = new BigDecimal(0);
-					for (ExpensesData expensesData : exPage) {
-
-						ExpensesDataBean bean = new ExpensesDataBean();
-						bean.setIndex(++index);
-						// bean.setCreatedDate(expensesData.getCreatedDate());
-						bean.setCreatedDate(DMSUtil.convertDateToString(expensesData.getCreatedDate()));
-						bean.setExpensessCurrentFy(expensesData.getExpensessCurrentFy());
-						bean.setExpensessUptoMarch(expensesData.getExpensessUptoMarch());
-						if (expensesData.getTotalExpensess() == null) {
-
-							ExpensesData da = new ExpensesData();
-
-							da.setExpId(expensesData.getExpId());
-							da.setTotalExpensess(bean.getExpensessUptoMarch().add(totalprev));
-							da.setCreatedDate(expensesData.getCreatedDate());
-							da.setExpensessCurrentFy(expensesData.getExpensessCurrentFy());
-							da.setExpensessUptoMarch(expensesData.getExpensessUptoMarch());
-							da.setYear(expensesData.getYear());
-
-							bean.setTotalExpensess(bean.getExpensessUptoMarch()
-									.add(expensesDataRepository.findByWorkId(workTypeId).get(0).getTotalExpensess()));
-
-							// bean.setTotalExpensess(bean.getExpensessCurrentFy().add(totalprev));//.add(expensesDataRepository.findByWorkId(workTypeId).get(0).getExpensessCurrentFy()));
-							totalprev = bean.getTotalExpensess();
-
-						} else {
-							bean.setTotalExpensess(
-									expensesData.getTotalExpensess().add(expensesData.getExpensessCurrentFy()));
-							totalprev = expensesData.getTotalExpensess();
-						}
-
-						bean.setYear(expensesData.getYear());
-						beanList.add(bean);
-					}
-				}
-				json = new ExpensesDataJson();
-				json.setiTotalRecords(10);
-
-				json.setAaData(beanList);
+			if (exPage == null) {
+				exPage = Collections.emptyList();
 			}
+
+			List<ExpensesDataBean> beanList = new ArrayList<>();
+			int index = pageable.getPageNumber() * pageable.getPageSize();
+			BigDecimal totalprev = BigDecimal.ZERO;
+
+			for (ExpensesData expensesData : exPage) {
+				ExpensesDataBean bean = new ExpensesDataBean();
+				bean.setIndex(++index);
+				bean.setCreatedDate(DMSUtil.convertDateToString(expensesData.getCreatedDate()));
+
+				BigDecimal currentFy = expensesData.getExpensessCurrentFy() != null ? expensesData.getExpensessCurrentFy()
+						: BigDecimal.ZERO;
+				BigDecimal uptoMarch = expensesData.getExpensessUptoMarch() != null ? expensesData.getExpensessUptoMarch()
+						: BigDecimal.ZERO;
+				bean.setExpensessCurrentFy(currentFy);
+				bean.setExpensessUptoMarch(uptoMarch);
+
+				if (expensesData.getTotalExpensess() == null) {
+					BigDecimal baseTotal = BigDecimal.ZERO;
+					List<ExpensesData> allForWork = expensesDataRepository.findByWorkId(workTypeId);
+					if (allForWork != null && !allForWork.isEmpty() && allForWork.get(0).getTotalExpensess() != null) {
+						baseTotal = allForWork.get(0).getTotalExpensess();
+					}
+					bean.setTotalExpensess(uptoMarch.add(baseTotal));
+					totalprev = bean.getTotalExpensess();
+				} else {
+					bean.setTotalExpensess(expensesData.getTotalExpensess().add(currentFy));
+					totalprev = expensesData.getTotalExpensess();
+				}
+
+				bean.setYear(expensesData.getYear());
+				beanList.add(bean);
+			}
+
+			json.setAaData(beanList);
+			json.setiTotalRecords(beanList.size());
+			json.setiTotalDisplayRecords(beanList.size());
 			return json;
 		} catch (Exception e) {
-			logger.error("An exception occurred.", e);
+			logger.error("fetchExpensesDataList failed for workId {}", workTypeId, e);
 			return json;
 		}
 	}
@@ -1598,7 +1610,7 @@ public class CommonServiceImpl implements CommonService {
 			if (work.getWorkSubtypeId() != null) {
 				workBean.setWorkSubTypeId(work.getWorkSubtypeId());
 				workBean.setWorkSubTypeName(
-						workSubTypeRepository.findOne(work.getWorkSubtypeId()).getWorkSubTypeNameE());
+						workSubTypeRepository.findById(work.getWorkSubtypeId()).orElse(null).getWorkSubTypeNameE());
 			}
 
 			// workBean.setWorkType(work.getWorkType());
@@ -1613,7 +1625,7 @@ public class CommonServiceImpl implements CommonService {
 			workBean.setIsGeoTagged(isGeoTagged);
 
 			if (null != work.getFinancialYear()) {
-				FinancialYear financialYear = financialYearRepository.findOne(work.getFinancialYear());
+				FinancialYear financialYear = financialYearRepository.findById(work.getFinancialYear()).orElse(null);
 				if (null != financialYear) {
 					workBean.setFinancialYear(financialYear.getId());
 					workBean.setFinancialYearName(financialYear.getFinancialYear());
@@ -1622,7 +1634,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getScheme() != null) {
 
-				Schemes schemes = schemeRepository.findOne(work.getScheme());
+				Schemes schemes = schemeRepository.findById(work.getScheme()).orElse(null);
 				if (schemes != null) {
 					workBean.setScheme(schemes.getSchemeName());
 					workBean.setSchemeId(schemes.getId());
@@ -1632,7 +1644,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getSchemeState() != null) {
 
-				Schemes schemesSate = schemeRepository.findOne(work.getSchemeState());
+				Schemes schemesSate = schemeRepository.findById(work.getSchemeState()).orElse(null);
 				workBean.setSchemeState(schemesSate.getSchemeName());
 				workBean.setSchemeStateId(schemesSate.getId());
 
@@ -1640,7 +1652,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getSchemeNhm() != null) {
 
-				Schemes schemesNhm = schemeRepository.findOne(work.getSchemeNhm());
+				Schemes schemesNhm = schemeRepository.findById(work.getSchemeNhm()).orElse(null);
 				workBean.setSchemeNhm(schemesNhm.getSchemeName());
 				workBean.setSchemeNhmId(schemesNhm.getId());
 
@@ -1648,7 +1660,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getSchemeEcrp2() != null) {
 
-				Schemes schemesEcpr = schemeRepository.findOne(work.getSchemeEcrp2());
+				Schemes schemesEcpr = schemeRepository.findById(work.getSchemeEcrp2()).orElse(null);
 				workBean.setSchemeEcpr2(schemesEcpr.getSchemeName());
 				workBean.setSchemeEcpr2Id(schemesEcpr.getId());
 
@@ -1659,7 +1671,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getSchemeOthers() != null) {
 
-				Schemes schemesOthers = schemeRepository.findOne(work.getSchemeOthers());
+				Schemes schemesOthers = schemeRepository.findById(work.getSchemeOthers()).orElse(null);
 				workBean.setSchemeOthers(schemesOthers.getSchemeName());
 				workBean.setSchemeOthersId(schemesOthers.getId());
 
@@ -1682,7 +1694,7 @@ public class CommonServiceImpl implements CommonService {
 			// WorkType workType =
 			// workTypeRepository.findByWorkTypeNameE(work.getWorkType());
 			if (null != work.getWorkType()) {
-				WorkType workType = workTypeRepository.findOne(work.getWorkType());
+				WorkType workType = workTypeRepository.findById(work.getWorkType()).orElse(null);
 				if (null != workType) {
 					workBean.setWorkType(workType.getWorkTypeNameE());
 					workBean.setWorkTypeId(workType.getWorkTypeId());
@@ -1693,14 +1705,14 @@ public class CommonServiceImpl implements CommonService {
 
 			{
 
-				WorkSubType workSubType = workSubTypeRepository.findOne(work.getWorkSubtypeId());
+				WorkSubType workSubType = workSubTypeRepository.findById(work.getWorkSubtypeId()).orElse(null);
 				workBean.setWorkSubTypeId(workSubType.getWorkSubtypeId());
 				workBean.setWorkSubTypeName(workSubType.getWorkSubTypeNameE());
 
 			}
 
 			if (work.getWorkCategoryId() != null) {
-				WorkCategory workCategory = workCategoryRepository.findOne(work.getWorkCategoryId());
+				WorkCategory workCategory = workCategoryRepository.findById(work.getWorkCategoryId()).orElse(null);
 				workBean.setWorkCategoryId(workCategory.getWorkCategoryId());
 				workBean.setWorkCategoryName(workCategory.getWorkCategoryNameE());
 
@@ -1708,7 +1720,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getCategorySubtypeId() != null) {
 
-				SubCategory subCategory = subCategoryRepository.findOne(work.getCategorySubtypeId());
+				SubCategory subCategory = subCategoryRepository.findById(work.getCategorySubtypeId()).orElse(null);
 				workBean.setCategorySubTypeName(subCategory.getCategorySubTypeNameE());
 				workBean.setCategorySubTypeId(subCategory.getCategorySubTypeId());
 
@@ -1716,7 +1728,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getWorkHead() != null) {
 				// WorkHead workHead = workHeadRepository.findByHeadName(work.getWorkHead());
-				WorkHead workHead = workHeadRepository.findOne(work.getWorkHead());
+				WorkHead workHead = workHeadRepository.findById(work.getWorkHead()).orElse(null);
 				if (workHead != null) {
 					workBean.setHeadId(workHead.getId());
 					// workBean.setHead(work.getWorkHead() != null ? work.getWorkHead() : "NA");
@@ -1725,25 +1737,25 @@ public class CommonServiceImpl implements CommonService {
 			}
 			if (work.getHeadState() != null) {
 				workBean.setHeadStateId(work.getHeadState());
-				WorkHead workHead = workHeadRepository.findOne(work.getHeadState());
+				WorkHead workHead = workHeadRepository.findById(work.getHeadState()).orElse(null);
 				workBean.setHeadState(workHead.getHeadName() != null ? workHead.getHeadName() : "NA");
 			}
 
 			if (work.getHeadNhm() != null) {
 				workBean.setHeadNhmId(work.getHeadNhm());
-				WorkHead workHead = workHeadRepository.findOne(work.getHeadState());
+				WorkHead workHead = workHeadRepository.findById(work.getHeadState()).orElse(null);
 				workBean.setHeadNhm(workHead.getHeadName() != null ? workHead.getHeadName() : "NA");
 			}
 
 			if (work.getHeadEcrp2() != null) {
 				workBean.setHeadEcpr2Id(work.getHeadEcrp2());
-				WorkHead workHead = workHeadRepository.findOne(work.getHeadState());
+				WorkHead workHead = workHeadRepository.findById(work.getHeadState()).orElse(null);
 				workBean.setHeadEcpr2(workHead.getHeadName() != null ? workHead.getHeadName() : "NA");
 			}
 
 			if (work.getHeadOthers() != null) {
 				workBean.setHeadOthersId(work.getHeadOthers());
-				WorkHead workHead = workHeadRepository.findOne(work.getHeadState());
+				WorkHead workHead = workHeadRepository.findById(work.getHeadState()).orElse(null);
 				workBean.setHeadOthers(workHead.getHeadName() != null ? workHead.getHeadName() : "NA");
 			}
 
@@ -1782,7 +1794,7 @@ public class CommonServiceImpl implements CommonService {
 			workBean.setDistrictId(district.getDistrictId());
 			workBean.setDistrictCode(district.getDistrictCode());
 			if (null != work.getDivisionCode()) {
-				Division division = divisionRepository.findOne(work.getDivisionCode());
+				Division division = divisionRepository.findById(work.getDivisionCode()).orElse(null);
 
 				workBean.setDivisionId(division.getDivisionId());
 				// workBean.setDivisionName(work.getDivisionName());
@@ -1817,7 +1829,7 @@ public class CommonServiceImpl implements CommonService {
 				workBean.setConstituencyName(lc.getConstituencyName());
 
 			}
-			WorkStatus workStatus = workStatusRepository.findOne(work.getWorkStatus());
+			WorkStatus workStatus = workStatusRepository.findById(work.getWorkStatus()).orElse(null);
 			if (null != workStatus) {
 				workBean.setWorkStatusName(workStatus.getWorkStatusNameE());
 				workBean.setWorkStatusId(workStatus.getId());
@@ -1847,44 +1859,46 @@ public class CommonServiceImpl implements CommonService {
 			workBean.setAsRemarks(work.getAsRemarks());
 			workBean.setIsTenders(work.getIsTenders());
 			if (null != work.getWorkPriorityId()) {
-				WorkPriority workPriority = workPriorityRepository.findOne(work.getWorkPriorityId());
+				WorkPriority workPriority = workPriorityRepository.findById(work.getWorkPriorityId()).orElse(null);
 				workBean.setWorkPriorityId(workPriority.getId());
 				workBean.setWorkPriority(workPriority.getWorkPriorityName());
 			}
 
-			/*if (null != work.getFinancialHeadId()) {
-				FinancialHead financialHead = financialHeadRepository.findOne(work.getFinancialHeadId());
-				workBean.setFinancialHeadId(financialHead.getId());
-				workBean.setFinancialHeadName(financialHead.getFinancialHeadName());
-			}*/
+			/*
+			 * if (null != work.getFinancialHeadId()) { FinancialHead financialHead =
+			 * financialHeadRepository.findById(work.getFinancialHeadId()).orElse(null);
+			 * workBean.setFinancialHeadId(financialHead.getId());
+			 * workBean.setFinancialHeadName(financialHead.getFinancialHeadName()); }
+			 */
 
 			if (null != work.getVidhanSabhaId()) {
-				VidhanSabha vidhanSabha = vidhanSabhaRepositorys.findOne(work.getVidhanSabhaId());
+				VidhanSabha vidhanSabha = vidhanSabhaRepositorys.findById(work.getVidhanSabhaId()).orElse(null);
 				workBean.setVidhanSabhaId(vidhanSabha.getId());
 				workBean.setVidhanSabhaName(vidhanSabha.getVidhanSabhaName());
 			}
-			
+
 			List<WorkFinancialAgency> workFinancialAgency = financialAgencyRepository.findByWorkId(work.getId());
-			if(workFinancialAgency != null) {
+			if (workFinancialAgency != null) {
 				List<FinancialAgencyBean> beanList = new ArrayList<FinancialAgencyBean>();
-			for (WorkFinancialAgency entity : workFinancialAgency) {
-				FinancialAgencyBean bean = new FinancialAgencyBean();
-				bean.setId(entity.getId());
-				bean.setFinancialHeadId(entity.getFinancialHeadId());
-				bean.setCost(entity.getCost());
-				bean.setTotalCost(entity.getTotalCost());
-				
-				// Fetch and set the financial head name
-				if (entity.getFinancialHeadId() != null) {
-					FinancialHead financialHead = financialHeadRepository.findOne(entity.getFinancialHeadId());
-					if (financialHead != null) {
-						bean.setFinancialAgencyName(financialHead.getFinancialHeadName());
+				for (WorkFinancialAgency entity : workFinancialAgency) {
+					FinancialAgencyBean bean = new FinancialAgencyBean();
+					bean.setId(entity.getId());
+					bean.setFinancialHeadId(entity.getFinancialHeadId());
+					bean.setCost(entity.getCost());
+					bean.setTotalCost(entity.getTotalCost());
+
+					// Fetch and set the financial head name
+					if (entity.getFinancialHeadId() != null) {
+						FinancialHead financialHead = financialHeadRepository.findById(entity.getFinancialHeadId())
+								.orElse(null);
+						if (financialHead != null) {
+							bean.setFinancialAgencyName(financialHead.getFinancialHeadName());
+						}
 					}
+
+					beanList.add(bean);
 				}
-				
-				beanList.add(bean);
-			}
-			workBean.setFinancialHeads(beanList);
+				workBean.setFinancialHeads(beanList);
 			}
 		}
 
@@ -2018,7 +2032,7 @@ public class CommonServiceImpl implements CommonService {
 			bean.setEnabled(entity.getEnabled());
 			if (entity.getImplAgencyType() != null) {
 				ImplementationAgencyType implementationAgencyType = implAgencyTypeRepository
-						.findOne(entity.getImplAgencyType());
+						.findById(entity.getImplAgencyType()).orElse(null);
 				bean.setImplAgencyType(
 						implementationAgencyType != null ? implementationAgencyType.getImplAgencyType() : "-");
 			} else {
@@ -2260,7 +2274,7 @@ public class CommonServiceImpl implements CommonService {
 
 			PhysicalPercentageBean physicalPercentageBean = new PhysicalPercentageBean();
 
-			WorkSubStatus workSubStatus = workSubStatusRepository.findOne(workSubStatusId);
+			WorkSubStatus workSubStatus = workSubStatusRepository.findById(workSubStatusId).orElse(null);
 			PhysicalPercentageNew physicalPercentageNew = physicalPercentageNewRepository
 					.findByWorkSubStatus(workSubStatus);
 			physicalPercentageBean = convertPhysicalPercentNewEntityToBean(physicalPercentageNew);
@@ -2292,7 +2306,7 @@ public class CommonServiceImpl implements CommonService {
 
 			PhysicalPercentageUpgradationBean phyPercentageUpgradationBean = new PhysicalPercentageUpgradationBean();
 
-			WorkSubStatus workSubStatus = workSubStatusRepository.findOne(workSubStatusId);
+			WorkSubStatus workSubStatus = workSubStatusRepository.findById(workSubStatusId).orElse(null);
 			PhysicalPercentageUpgradation physicalPercentageUpgradation = physicalPercentageUpgradationRepository
 					.findByWorkSubStatus(workSubStatus);
 			phyPercentageUpgradationBean = convertPhysicalPercentUpgradEntityToBean(physicalPercentageUpgradation);
@@ -2592,8 +2606,8 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public List<WorkStatusBean> fetchWorkStatusByWorkType(Long workTypeId) {
 		try {
-			List<WorkStatus> list = workStatusRepository
-					.findByWorkTypeAndEnabled(workTypeRepository.findOne(workTypeId), DMSConstants.ENABLED);
+			List<WorkStatus> list = workStatusRepository.findByWorkTypeAndEnabled(
+					workTypeRepository.findById(workTypeId).orElse(null), DMSConstants.ENABLED);
 
 			List<WorkStatusBean> beanList = new ArrayList<>();
 			for (WorkStatus workStatus : list) {
@@ -2635,7 +2649,7 @@ public class CommonServiceImpl implements CommonService {
 			if (bean != null) {
 				Work entity = null;
 				if (null != bean.getId()) {
-					entity = workRepository.findOne(bean.getId());
+					entity = workRepository.findById(bean.getId()).orElse(null);
 
 				} else {
 					entity = new Work();
@@ -2647,7 +2661,7 @@ public class CommonServiceImpl implements CommonService {
 				District district = districtRepository.findByDistrictNameAndEnabled(bean.getDistrictName(),
 						DMSConstants.ENABLED);
 				if (bean.getSchemeId() != null) {
-					Schemes scheme = schemeRepository.findOne(bean.getSchemeId());
+					Schemes scheme = schemeRepository.findById(bean.getSchemeId()).orElse(null);
 				}
 
 				if (bean.getTsDocumentUpload() != null) {
@@ -2680,8 +2694,9 @@ public class CommonServiceImpl implements CommonService {
 				}
 				if (DMSUtil.getUserDetail() != null && r.contains("ROLE_DEPARTMENT")) {
 
-					Division division = divisionRepository.findOne(userRepository
-							.findByUsername(DMSUtil.getUserDetail().getUsername()).getDivision().getDivisionId());
+					Division division = divisionRepository.findById(userRepository
+							.findByUsername(DMSUtil.getUserDetail().getUsername()).getDivision().getDivisionId())
+							.orElse(null);
 					// entity.setDivisionName(division.getDivisionName());
 					if (bean.getDivisionId() != null) {
 						entity.setDivisionId(bean.getDivisionId());
@@ -2705,13 +2720,14 @@ public class CommonServiceImpl implements CommonService {
 				if (work != null) {
 					// updateWorkCount();
 					if (bean.getFinancialYear() != null) {
-						FinancialYear financialYear = financialYearRepository.findOne(bean.getFinancialYear());
+						FinancialYear financialYear = financialYearRepository.findById(bean.getFinancialYear())
+								.orElse(null);
 						work.setWorkNo(DMSConstants.DHS + "_" + financialYear.getFinancialYear() + "_" + work.getId());
 					}
 					responseObject.setId(work.getId());
 					responseObject.setNumber(work.getWorkNo());
 
-					// ✅ Save Financial Head Rows (INSERT HERE)
+					// ? Save Financial Head Rows (INSERT HERE)
 //				    if (bean.getFinancialHeads() != null) {
 //
 //				        for (FinancialAgencyBean fhBean : bean.getFinancialHeads()) {
@@ -2724,42 +2740,37 @@ public class CommonServiceImpl implements CommonService {
 //				            financialAgencyRepository.save(wf);
 //				        }
 //				    }
-				
-				
-				
+
 					if (bean.getFinancialHeads() != null) {
 
-					    for (FinancialAgencyBean fhBean : bean.getFinancialHeads()) {
+						for (FinancialAgencyBean fhBean : bean.getFinancialHeads()) {
 
-					        WorkFinancialAgency wf = null;
+							WorkFinancialAgency wf = null;
 
-					        // 🔍 If ID exists → fetch and update
-					        if (fhBean.getFinancialAgencyId() != null) {
-					            wf = financialAgencyRepository.findOne(fhBean.getFinancialAgencyId());
-					        }
-					       
-					        // 🆕 If no existing row → create new
-					        if (wf == null) {
-					            wf = new WorkFinancialAgency();
-					            wf.setWorkId(work.getId()); // always required for new rows
-					            wf.setFinancialHeadId(fhBean.getFinancialHeadId());
-						        wf.setCost(fhBean.getCost());
-						        wf.setTotalCost(fhBean.getTotalCost());      // if bean me ho
-						        wf.setExpenditure(fhBean.getExpenditure()); 
-					        }
+							// ?? If ID exists ? fetch and update
+							if (fhBean.getFinancialAgencyId() != null) {
+								wf = financialAgencyRepository.findById(fhBean.getFinancialAgencyId()).orElse(null);
+							}
 
-					        // 🔄 COMMON: UPDATE/INSERT ALL FIELDS
-					        wf.setFinancialHeadId(fhBean.getFinancialHeadId());
-					        wf.setCost(fhBean.getCost());
-					        wf.setTotalCost(fhBean.getTotalCost());      // if bean me ho
-					        wf.setExpenditure(fhBean.getExpenditure());  // if bean me ho
-					        financialAgencyRepository.save(wf);
-					    }
+							// ?? If no existing row ? create new
+							if (wf == null) {
+								wf = new WorkFinancialAgency();
+								wf.setWorkId(work.getId()); // always required for new rows
+								wf.setFinancialHeadId(fhBean.getFinancialHeadId());
+								wf.setCost(fhBean.getCost());
+								wf.setTotalCost(fhBean.getTotalCost()); // if bean me ho
+								wf.setExpenditure(fhBean.getExpenditure());
+							}
+
+							// ?? COMMON: UPDATE/INSERT ALL FIELDS
+							wf.setFinancialHeadId(fhBean.getFinancialHeadId());
+							wf.setCost(fhBean.getCost());
+							wf.setTotalCost(fhBean.getTotalCost()); // if bean me ho
+							wf.setExpenditure(fhBean.getExpenditure()); // if bean me ho
+							financialAgencyRepository.save(wf);
+						}
 					}
 
-					
-				
-				
 				}
 
 			}
@@ -2781,7 +2792,7 @@ public class CommonServiceImpl implements CommonService {
 	 * 
 	 * System.out.println("TSASDEtails...." + tsasWorkbean.getWorkId());
 	 * 
-	 * Work works = workRepository.findOne(tsasWorkbean.getWorkId());
+	 * Work works = workRepository.findById(tsasWorkbean.getWorkId()).orElse(null);
 	 * 
 	 * try { if (tsasWorkbean != null) { TSASWork entity = null;
 	 * 
@@ -2790,8 +2801,8 @@ public class CommonServiceImpl implements CommonService {
 	 * 
 	 * 
 	 * entity = new TSASWork();
-	 * entity.setWork(workRepository.findOne(tsasWorkbean.getWorkId()));
-	 * entity.setAsAmt(works.getAsAmt()); entity.setAsDate(works.getAsDate());
+	 * entity.setWork(workRepository.findById(tsasWorkbean.getWorkId()).orElse(null)
+	 * ); entity.setAsAmt(works.getAsAmt()); entity.setAsDate(works.getAsDate());
 	 * entity.setAsNo(works.getAsNo()); entity.setAsRemarks(works.getAsRemarks());
 	 * entity.setTsAmt(works.getTsAmt()); entity.setTsDate(works.getTsDate());
 	 * entity.setTsNo(works.getTsNo()); entity.setTsRemarks(works.getTsRemarks());
@@ -2815,7 +2826,8 @@ public class CommonServiceImpl implements CommonService {
 	 * responseObject = new ResponseObject();
 	 * System.err.println("tsasWorkbean.getWorkId()======== " +
 	 * tsasWorkbean.getWorkId()); Work work =
-	 * workRepository.findOne(tsasWorkbean.getWorkId()); String workNo = null;
+	 * workRepository.findById(tsasWorkbean.getWorkId()).orElse(null); String workNo
+	 * = null;
 	 * 
 	 * 
 	 * if (!StringUtils.isEmpty(tsasWorkbean.getStatus())) {
@@ -2878,7 +2890,7 @@ public class CommonServiceImpl implements CommonService {
 			logger.info("Processing TSASDetails for Work ID: " + workId);
 
 			// Fetch the related Work entity once
-			Work work = workRepository.findOne(workId);
+			Work work = workRepository.findById(workId).orElse(null);
 			if (work == null) {
 				throw new Exception("Work not found for WorkId: " + workId);
 			}
@@ -2939,7 +2951,7 @@ public class CommonServiceImpl implements CommonService {
 				entity = new TSASReviseWork();
 
 				responseObject = new ResponseObject();
-				Work work = workRepository.findOne(tsasReviseWorkBean.getWorkId());
+				Work work = workRepository.findById(tsasReviseWorkBean.getWorkId()).orElse(null);
 				String workNo = null;
 
 				if (!StringUtils.isEmpty(tsasReviseWorkBean.getStatus())) {
@@ -2989,7 +3001,7 @@ public class CommonServiceImpl implements CommonService {
 				entity = new TSASReviseWork();
 
 				responseObject = new ResponseObject();
-				Work work = workRepository.findOne(tsasReviseWorkBean.getWorkId());
+				Work work = workRepository.findById(tsasReviseWorkBean.getWorkId()).orElse(null);
 				String workNo = null;
 
 				if (!StringUtils.isEmpty(tsasReviseWorkBean.getStatus())) {
@@ -3051,7 +3063,7 @@ public class CommonServiceImpl implements CommonService {
 				}
 
 				responseObject = new ResponseObject();
-				Work work = workRepository.findOne(workProgressBean.getWorkId());
+				Work work = workRepository.findById(workProgressBean.getWorkId()).orElse(null);
 				TSASWork tsasWork = tsasWorkRepository.findByWorkId(workProgressBean.getWorkId());
 				WorkTender tender = workTenderRepository.findByWorkId(workProgressBean.getWorkId());
 
@@ -3080,7 +3092,8 @@ public class CommonServiceImpl implements CommonService {
 				entity = workProgressRepository.save(entity);
 
 				if (entity != null) {
-					WorkStatus workStatus = workStatusRepository.findOne(workProgressBean.getWorkStatusId());
+					WorkStatus workStatus = workStatusRepository.findById(workProgressBean.getWorkStatusId())
+							.orElse(null);
 					// entity.setWorkStatus(workStatus.getWorkStatusNameE());
 					entity.setWorkStatusId(workStatus.getId());
 					// work.setWorkStatus(workStatus.getWorkStatusNameE());
@@ -3120,26 +3133,26 @@ public class CommonServiceImpl implements CommonService {
 				entity = new DocumentUploadWorkProgress();
 
 				responseObject = new ResponseObject();
-				Work work = workRepository.findOne(uplDocumentUploadWorkProgressBean.getWorkId());
+				Work work = workRepository.findById(uplDocumentUploadWorkProgressBean.getWorkId()).orElse(null);
 				String workNo = null;
 				DocumentUploadWorkProgress documentUpload = null;
 				if (uplDocumentUploadWorkProgressBean.getFile() != null) {
 					logger.info("WorkStatusnkdncknd.." + uplDocumentUploadWorkProgressBean.getWorkSubStatusId());
-					 documentUpload = DMSUtil.uploadWorkProgressDocument(
-							documentRootPath + workWorkProgressDocumentPath,
+					documentUpload = DMSUtil.uploadWorkProgressDocument(documentRootPath + workWorkProgressDocumentPath,
 							uplDocumentUploadWorkProgressBean.getWorkId(), uplDocumentUploadWorkProgressBean.getFile(),
 							null, "blank", uplDocumentUploadWorkProgressBean.getWorkSubStatusId(),
 							uplDocumentUploadWorkProgressBean.getWorkStatusId());
-					 WorkStatus workStatusId = workStatusRepository
-								.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId());
-					 	documentUpload.setWorkStatusId(workStatusId.getId());
-						documentUpload.setWorkStatusNameE(workStatusId.getWorkStatusNameE());
-						documentUpload.setPerc(uplDocumentUploadWorkProgressBean.getPerc());
-					 documentUploadWorkProgressRepository.save(documentUpload);
-				}else if (uplDocumentUploadWorkProgressBean.getFile() == null && uplDocumentUploadWorkProgressBean.getWorkStatusId() == 10){
+					WorkStatus workStatusId = workStatusRepository
+							.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId()).orElse(null);
+					documentUpload.setWorkStatusId(workStatusId.getId());
+					documentUpload.setWorkStatusNameE(workStatusId.getWorkStatusNameE());
+					documentUpload.setPerc(uplDocumentUploadWorkProgressBean.getPerc());
+					documentUploadWorkProgressRepository.save(documentUpload);
+				} else if (uplDocumentUploadWorkProgressBean.getFile() == null
+						&& uplDocumentUploadWorkProgressBean.getWorkStatusId() == 10) {
 					documentUpload = new DocumentUploadWorkProgress();
 					WorkStatus workStatusId = workStatusRepository
-							.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId());
+							.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId()).orElse(null);
 					documentUpload.setWorkStatusId(workStatusId.getId());
 					documentUpload.setWorkStatusNameE(workStatusId.getWorkStatusNameE());
 					documentUpload.setWorkSubStatusId(uplDocumentUploadWorkProgressBean.getWorkSubStatusId());
@@ -3171,7 +3184,7 @@ public class CommonServiceImpl implements CommonService {
 					documentUpload1.setWorkSubStatusId(uplDocumentUploadWorkProgressBean.getWorkSubStatusId());
 					documentUpload1.setActionTakenDelay(uplDocumentUploadWorkProgressBean.getActionTakenDelay());
 					WorkStatus workStatusId = workStatusRepository
-							.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId());
+							.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId()).orElse(null);
 					documentUpload1.setWorkStatusId(workStatusId.getId());
 					documentUpload1.setWorkStatusNameE(workStatusId.getWorkStatusNameE());
 					documentUpload1.setRemarks(uplDocumentUploadWorkProgressBean.getRemarks());
@@ -3205,21 +3218,39 @@ public class CommonServiceImpl implements CommonService {
 				responseObject = new ResponseObject();
 				YearStatus yearStatus = yearStatusRepository.findByYear(expensesDataBean.getYear());
 
+				Long status = 1L;
 				if (yearStatus != null) {
-					Long status = yearStatus.getStatus();
+					status = yearStatus.getStatus();
+				} else {
+					logger.warn("YearStatus not found for year {}, using default status for workId {}",
+							expensesDataBean.getYear(), expensesDataBean.getWorkId());
+				}
+
+				if (expensesDataBean.getWorkId() != null) {
+					List<Long> statusList = new ArrayList<>();
+					statusList.add(status);
 					List<ExpensesData> expensesData = expensesDataRepository
-							.findByWorkIdAndStatusIn(expensesDataBean.getWorkId(), yearStatus.getStatus());
+							.findByWorkIdAndStatusIn(expensesDataBean.getWorkId(), statusList);
 
+					List<Long> statusList2 = new ArrayList<>();
+					statusList2.add((long) 1);
 					List<ExpensesData> expensesData2 = expensesDataRepository
-							.findByWorkIdAndStatusIn(expensesDataBean.getWorkId(), (long) 1);
+							.findByWorkIdAndStatusIn(expensesDataBean.getWorkId(), statusList2);
 
-					if (expensesDataBean.getExpensessCurrentFy() != null) {
-						if (expensesData.size() != 0) {
+					BigDecimal expenseCurrentFy = expensesDataBean.getExpensessCurrentFy();
+					if (expenseCurrentFy == null && expensesDataBean.getTotalExpensess() != null) {
+						expenseCurrentFy = expensesDataBean.getTotalExpensess();
+					}
+					BigDecimal expenseUptoMarch = expensesDataBean.getExpensessUptoMarch() != null
+							? expensesDataBean.getExpensessUptoMarch()
+							: BigDecimal.ZERO;
+
+					// Only save if user actually provided a positive value — skip 0/null rows
+					if (expenseCurrentFy != null && expenseCurrentFy.compareTo(BigDecimal.ZERO) > 0) {						if (expensesData.size() != 0) {
 							entity.setCreatedDate(new Date());
 							entity.setWorkId(expensesDataBean.getWorkId());
-							entity.setExpensessCurrentFy(expensesDataBean.getExpensessCurrentFy());
-							BigDecimal expensesfinalMonth = expensesDataBean.getExpensessUptoMarch()
-									.add(expensesDataBean.getExpensessCurrentFy());
+							entity.setExpensessCurrentFy(expenseCurrentFy);
+							BigDecimal expensesfinalMonth = expenseUptoMarch.add(expenseCurrentFy);
 							entity.setExpensessUptoMarch(expensesfinalMonth);
 							entity.setMonth(expensesDataBean.getMonth());
 							entity.setYear(expensesDataBean.getYear());
@@ -3243,9 +3274,8 @@ public class CommonServiceImpl implements CommonService {
 						} else {
 							entity.setCreatedDate(new Date());
 							entity.setWorkId(expensesDataBean.getWorkId());
-							entity.setExpensessCurrentFy(expensesDataBean.getExpensessCurrentFy());
-							BigDecimal expensesfinalMonth = expensesDataBean.getExpensessUptoMarch()
-									.add(expensesDataBean.getExpensessCurrentFy());
+							entity.setExpensessCurrentFy(expenseCurrentFy);
+							BigDecimal expensesfinalMonth = expenseUptoMarch.add(expenseCurrentFy);
 							entity.setExpensessUptoMarch(expensesfinalMonth);
 
 							logger.info("MonthAmount......" + expensesDataBean.getTotalExpensess());
@@ -3254,7 +3284,7 @@ public class CommonServiceImpl implements CommonService {
 
 							// BigDecimal
 							// expYearlyAmount=expensesDataBean.getExpensessUptoMarch().add(expensesDataBean.getTotalExpensess());
-							if (expensesDataBean.getExpensessUptoMarch().equals(BigDecimal.ZERO)) {
+							if (expenseUptoMarch.equals(BigDecimal.ZERO)) {
 								entity.setTotalExpensess(expensesDataBean.getTotalExpensess());
 								// entity.setTotalExpensess(expensesDataBean.getExpensessCurrentFy());
 							} else {
@@ -3271,22 +3301,26 @@ public class CommonServiceImpl implements CommonService {
 
 								}
 								if (status == 2) {
+									List<Long> workIdList = new ArrayList<>();
+									workIdList.add(expensesDataBean.getWorkId());
 									BigDecimal expYearlyAmount = expensesDataRepository
-											.sumExpensesAmount(expensesDataBean.getWorkId());
-									BigDecimal newExpensesTotal = expYearlyAmount
-											.add(expensesDataBean.getExpensessCurrentFy());
+											.sumExpensesAmount(workIdList);
+									BigDecimal newExpensesTotal = expYearlyAmount.add(expenseCurrentFy);
 									BigDecimal finalAmtTotal = newExpensesTotal
-											.add(expensesDataBean.getTotalExpensess());
+											.add(expensesDataBean.getTotalExpensess() != null
+													? expensesDataBean.getTotalExpensess()
+													: BigDecimal.ZERO);
 									entity.setTotalExpensess(finalAmtTotal);
 								} else {
 
+									List<Long> workIdList = new ArrayList<>();
+									workIdList.add(expensesDataBean.getWorkId());
 									BigDecimal expYearlyAmount = expensesDataRepository
-											.sumExpensesAmount(expensesDataBean.getWorkId());
-									BigDecimal newExpensesTotal = expYearlyAmount
-											.add(expensesDataBean.getExpensessCurrentFy());
-									if(newExpensesTotal != null) {
-									BigDecimal finalAmtTotal = newExpensesTotal.add(firstTotalGet);
-									entity.setTotalExpensess(finalAmtTotal);
+											.sumExpensesAmount(workIdList);
+									BigDecimal newExpensesTotal = expYearlyAmount.add(expenseCurrentFy);
+									if (newExpensesTotal != null) {
+										BigDecimal finalAmtTotal = newExpensesTotal.add(firstTotalGet);
+										entity.setTotalExpensess(finalAmtTotal);
 									}
 								}
 
@@ -3302,10 +3336,14 @@ public class CommonServiceImpl implements CommonService {
 									+ expensesDataBean.getTotalExpensess());
 
 						}
+
 					}
 
-					expensesDataRepository.save(entity);
-					responseObject.setId(expensesDataBean.getWorkId());
+					if (entity.getWorkId() != null) {
+						expensesDataRepository.save(entity);
+						responseObject.setId(expensesDataBean.getWorkId());
+						responseObject.setSuccessMessage("Expenses saved successfully!");
+					}
 				}
 
 			}
@@ -3364,92 +3402,64 @@ public class CommonServiceImpl implements CommonService {
 		logger.info("StipulatedDateCompleted..." + bean.getStipulatedDateCompleted());
 		logger.info("LikelyDateCompleted..." + bean.getWorkSubStatusId());
 		// System.err.println("bean.getWorkId==========" + bean.getWorkId());
-		entity.setWork(workRepository.findOne(bean.getWorkId()));
+		entity.setWork(workRepository.findById(bean.getWorkId()).orElse(null));
 		// entity.setWorkStatusId(bean.getWorkStatusId());
-		entity.setWorkSubStatusId(bean.getWorkSubStatusId());
-//		entity.setWorkSubDelayReasonId(new WorkSubDelayReson(bean.getWorkSubDelayReasonId()));
-		entity.setWorkSubDelayReasonId(bean.getWorkSubDelayReasonId());
-		entity.setOtherReasonDelay(bean.getOtherReasonDelay());
-		entity.setActionTakenDelay(bean.getActionTakenDelay());
-		entity.setStipulatedDateCompleted(bean.getStipulatedDateCompleted());
-		entity.setLikelyDateCompleted(bean.getLikelyDateCompleted());
-		entity.setDateCompletion(bean.getDateCompletion());
-		entity.setDateHandOver(bean.getDateHandOver());
-		entity.setRemarks(bean.getRemarks());
-		entity.setPerc(bean.getPerc());
+		if (bean.getWorkSubStatusId() != null) {
+			entity.setWorkSubStatusId(bean.getWorkSubStatusId());
+		}
+		if (bean.getWorkSubDelayReasonId() != null) {
+			entity.setWorkSubDelayReasonId(bean.getWorkSubDelayReasonId());
+		}
+		if (bean.getOtherReasonDelay() != null) {
+			entity.setOtherReasonDelay(bean.getOtherReasonDelay());
+		}
+		if (bean.getActionTakenDelay() != null) {
+			entity.setActionTakenDelay(bean.getActionTakenDelay());
+		}
+		if (bean.getStipulatedDateCompleted() != null) {
+			entity.setStipulatedDateCompleted(bean.getStipulatedDateCompleted());
+		}
+		if (bean.getLikelyDateCompleted() != null) {
+			entity.setLikelyDateCompleted(bean.getLikelyDateCompleted());
+		}
+		if (bean.getDateCompletion() != null) {
+			entity.setDateCompletion(bean.getDateCompletion());
+		}
+		if (bean.getDateHandOver() != null) {
+			entity.setDateHandOver(bean.getDateHandOver());
+		}
+		if (bean.getRemarks() != null) {
+			entity.setRemarks(bean.getRemarks());
+		}
+		if (bean.getPerc() != null) {
+			entity.setPerc(bean.getPerc());
+		}
 		// entity.setExpensessUptoMarch(bean.getExpensessUptoMarch());
-		YearStatus yearStatus = yearStatusRepository.findByYear(bean.getYear());
-
-		if (yearStatus != null) {
-			Long status = yearStatus.getStatus();
-			List<ExpensesData> expensesData = expensesDataRepository.findByWorkIdAndStatusIn(bean.getWorkId(),
-					yearStatus.getStatus());
-			List<ExpensesData> expensesData2 = expensesDataRepository.findByWorkIdAndStatusIn(bean.getWorkId(),
-					(long) 1);
-			if (bean.getExpensessCurrentFy() != null) {
-				if (expensesData.size() != 0) {
-					BigDecimal expensesfinalMonth = bean.getExpensessUptoMarch().add(bean.getExpensessCurrentFy());
-					// BA requirement added by sumit
-					BigDecimal totalExpensess = bean.getTotalExpensess().add(bean.getExpensessCurrentFy());
-					entity.setExpensessUptoMarch(expensesfinalMonth);
-					entity.setTotalExpensess(totalExpensess);
-					entity.setExpensessCurrentFy(bean.getExpensessCurrentFy());
-				} else {
-
-					entity.setExpensessCurrentFy(bean.getExpensessCurrentFy());
-
-					// entity.setTotalExpensess(bean.getTotalExpensess());
-
-					if (bean.getExpensessUptoMarch().equals(BigDecimal.ZERO)) {
-						entity.setTotalExpensess(bean.getTotalExpensess());
-						BigDecimal expensesfinalMonth = bean.getExpensessUptoMarch().add(bean.getExpensessCurrentFy());
-						entity.setExpensessUptoMarch(expensesfinalMonth);
-					} else {
-						BigDecimal firstTotalGet = BigDecimal.ZERO;
-						if (expensesData2.size() != 0) {
-
-							for (int i = 0; i < expensesData2.size(); i++) {
-								if (i == 0) {
-									firstTotalGet = expensesData2.get(i).getTotalExpensess();
-									break;
-								}
-
-							}
-
-						}
-						if (status == 2) {
-							if(bean.getWorkId() != null) {
-							BigDecimal expYearlyAmount = expensesDataRepository.sumExpensesAmount(bean.getWorkId());
-							if (expYearlyAmount != null) {
-								BigDecimal newExpensesTotal = expYearlyAmount.add(bean.getExpensessCurrentFy());
-								BigDecimal finalAmtTotal = newExpensesTotal.add(bean.getTotalExpensess());
-								entity.setTotalExpensess(finalAmtTotal);
-							}
-							}
-						} else {
-							if(bean.getWorkId() != null) {
-							BigDecimal expYearlyAmount = expensesDataRepository.sumExpensesAmount(bean.getWorkId());
-							if(expYearlyAmount != null) {
-							BigDecimal newExpensesTotal = expYearlyAmount.add(bean.getExpensessCurrentFy());
-							BigDecimal finalAmtTotal = newExpensesTotal.add(firstTotalGet);
-							entity.setTotalExpensess(finalAmtTotal);
-							}
-							}
-						}
-
-						entity.setExpensessUptoMarch(BigDecimal.ZERO);
-
-					}
-					BigDecimal totalExpensess = bean.getTotalExpensess().add(bean.getExpensessCurrentFy());
-					entity.setTotalExpensess(totalExpensess);
-
+		if (bean.getExpensessCurrentFy() != null
+				&& bean.getExpensessCurrentFy().compareTo(BigDecimal.ZERO) > 0) {
+			entity.setExpensessCurrentFy(bean.getExpensessCurrentFy());
+			BigDecimal uptoMarch = bean.getExpensessUptoMarch() != null ? bean.getExpensessUptoMarch()
+					: BigDecimal.ZERO;
+			entity.setExpensessUptoMarch(uptoMarch.add(bean.getExpensessCurrentFy()));
+			if (bean.getTotalExpensess() != null) {
+				entity.setTotalExpensess(bean.getTotalExpensess());
+			} else if (bean.getWorkId() != null) {
+				Double agencyTotal = sumFinancialAgencyExpenditureByWorkId(bean.getWorkId());
+				if (agencyTotal != null) {
+					entity.setTotalExpensess(BigDecimal.valueOf(agencyTotal));
 				}
 			}
-
+		} else if (bean.getWorkId() != null) {
+			Double agencyTotal = sumFinancialAgencyExpenditureByWorkId(bean.getWorkId());
+			if (agencyTotal != null && agencyTotal > 0) {
+				entity.setTotalExpensess(BigDecimal.valueOf(agencyTotal));
+			} else if (bean.getTotalExpensess() != null) {
+				entity.setTotalExpensess(bean.getTotalExpensess());
+			}
 		}
 
 		// entity.setStatus(bean.getStatus());
-		entity.setCreatedDate(new Date());
+		entity.setCreatedDate(java.time.LocalDateTime.now());
 		entity.setWorkRequestStatusId(bean.getWorkRequestStatusId());
 		entity.setOtherReasonDelay(bean.getOtherReasonDelay());
 
@@ -3482,7 +3492,7 @@ public class CommonServiceImpl implements CommonService {
 				}
 
 				response = new ResponseObject();
-				Work work = workRepository.findOne(workTenderBean.getWorkId());
+				Work work = workRepository.findById(workTenderBean.getWorkId()).orElse(null);
 				TSASWork tsasWork = tsasWorkRepository.findByWorkId(workTenderBean.getWorkId());
 
 				if (!StringUtils.isEmpty(workTenderBean.getStatus())) {
@@ -3494,8 +3504,8 @@ public class CommonServiceImpl implements CommonService {
 				// Save Work Order file (pac)
 				if (workTenderBean.getPac() != null && !workTenderBean.getPac().isEmpty()) {
 					DocumentUpload docWorkOrder = DMSUtil.uploadTenderWorkDocument(
-							documentRootPath + workTenderSanctionDocumentPath, "blank",
-							workTenderBean.getPac(), null, "Tender");
+							documentRootPath + workTenderSanctionDocumentPath, "blank", workTenderBean.getPac(), null,
+							"Tender");
 					documentRepository.save(docWorkOrder);
 					workTender.setDocumentUpload(docWorkOrder);
 				}
@@ -3503,14 +3513,15 @@ public class CommonServiceImpl implements CommonService {
 				// Save LOA file (ldtul)
 				if (workTenderBean.getLdtul() != null && !workTenderBean.getLdtul().isEmpty()) {
 					DocumentUpload docLoi = DMSUtil.uploadTenderWorkDocumentUloi(
-							documentRootPath + workTenderSanctionDocumentPath, "blank",
-							workTenderBean.getLdtul(), null, "Tender");
+							documentRootPath + workTenderSanctionDocumentPath, "blank", workTenderBean.getLdtul(), null,
+							"Tender");
 					documentRepository.save(docLoi);
 					workTender.setDocumentUploadLoi(docLoi);
 				}
 
 				// Save Agreement file (uploadAgreementforWork)
-				if (workTenderBean.getUploadAgreementforWork() != null && !workTenderBean.getUploadAgreementforWork().isEmpty()) {
+				if (workTenderBean.getUploadAgreementforWork() != null
+						&& !workTenderBean.getUploadAgreementforWork().isEmpty()) {
 					DocumentUpload docAgreement = DMSUtil.uploadTenderWorkDocumentUploadAgreement(
 							documentRootPath + workTenderSanctionDocumentPath, "blank",
 							workTenderBean.getUploadAgreementforWork(), null, "Tender");
@@ -3543,7 +3554,8 @@ public class CommonServiceImpl implements CommonService {
 					workTenderCount.setTenderUniqId(alphaNumId);
 					workTenderCount.setWorkId(workTender.getWork().getId());
 					workTenderCount.setCount(count);
-					WorkStatus workStatus = workStatusRepository.findOne(workTenderBean.getWorkStatusId());
+					WorkStatus workStatus = workStatusRepository.findById(workTenderBean.getWorkStatusId())
+							.orElse(null);
 					workTenderCount.setStatus(workStatus.getWorkStatusNameE());
 					workTenderCount.setStatusId(workStatus.getId());
 					workTenderCountRepository.save(workTenderCount);
@@ -3631,42 +3643,37 @@ public class CommonServiceImpl implements CommonService {
 			workTender.setLoaIssuedDate(workTenderBean.getLoaIssuedDate());
 		}
 
-		if (workTenderBean.getWorkCompletionDate() != null 
-		        && !workTenderBean.getWorkCompletionDate().trim().isEmpty()) {
+		if (workTenderBean.getWorkCompletionDate() != null
+				&& !workTenderBean.getWorkCompletionDate().trim().isEmpty()) {
 
-		    try {
-		        // Frontend date format
-		        SimpleDateFormat inputFormat =
-		                new SimpleDateFormat("E MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)", Locale.ENGLISH);
+			try {
+				// Frontend date format
+				SimpleDateFormat inputFormat = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)",
+						Locale.ENGLISH);
 
-		        Date inputDate = inputFormat.parse(workTenderBean.getWorkCompletionDate());
+				Date inputDate = inputFormat.parse(workTenderBean.getWorkCompletionDate());
 
-		        // Required DB format
-		        SimpleDateFormat outputFormat =
-		                new SimpleDateFormat("dd/MM/yyyy");
+				// Required DB format
+				SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-		        String formattedDate = outputFormat.format(inputDate);
+				String formattedDate = outputFormat.format(inputDate);
 
-		        workTender.setWorkCompletionDate(formattedDate);
+				workTender.setWorkCompletionDate(formattedDate);
 
-		    
-
-
-		} catch (java.text.ParseException e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-			logger.error("Cannot parse bean to entity", e);
-		}
+			} catch (java.text.ParseException e) {
+				// TODO Auto-generated catch block
+				// e.printStackTrace();
+				logger.error("Cannot parse bean to entity", e);
+			}
 		}
 		workTender.setRemarks(workTenderBean.getRemarks());
-		workTender.setWork(workRepository.findOne(workTenderBean.getWorkId()));
+		workTender.setWork(workRepository.findById(workTenderBean.getWorkId()).orElse(null));
 		workTender.setWorkRequestStatusId(workTenderBean.getWorkRequestStatusId());
 		if (workTenderBean.getSorYear() != null) {
 			workTender.setSorYear(workTenderBean.getSorYear());
 		}
 		workTender.setAgreementDate(workTenderBean.getAgreementDate());
 		workTender.setAgreementNo(workTenderBean.getAgreementNo());
-		
 
 	}
 
@@ -3684,12 +3691,13 @@ public class CommonServiceImpl implements CommonService {
 				 * workTender = workTenderRepository.findByWorkId(contractorBean.getWorkId());
 				 * if (workTender !=null) { if (workTender.getWorkStatus().equals("WO Issued"))
 				 * { if (contractorBean.getWorkId() != null) { entity =
-				 * contractorRepository.findByWorkId(contractorBean.getWorkId()); if (entity !=
+				 * contractorRepository.findByWork_Id(contractorBean.getWorkId()); if (entity !=
 				 * null) {
 				 * 
 				 * } else { entity = new Contractor(); } } else { entity = new Contractor(); }
 				 * 
-				 * // Work work = workRepository.findOne(contractorBean.getWorkId());
+				 * // Work work =
+				 * workRepository.findById(contractorBean.getWorkId()).orElse(null);
 				 * 
 				 * if (!StringUtils.isEmpty(contractorBean.getStatus())) {
 				 * entity.setStatus(contractorBean.getStatus()); } else {
@@ -3708,18 +3716,19 @@ public class CommonServiceImpl implements CommonService {
 				 * responseObject; }
 				 */
 
-				if (contractorBean.getWorkId() != null) {
-					entity = contractorRepository.findByWorkId(contractorBean.getWorkId());
-					if (entity != null) {
-
-					} else {
-						entity = new Contractor();
-					}
-				} else {
+				if (contractorBean.getId() != null) {
+					entity = contractorRepository.findById(contractorBean.getId()).orElse(null);
+				}
+				if (entity == null && contractorBean.getWorkId() != null) {
+					entity = contractorRepository.findByWork_Id(contractorBean.getWorkId());
+				}
+				if (entity == null) {
 					entity = new Contractor();
+					Long maxId = contractorRepository.findMaxId();
+					entity.setId((maxId == null ? 0L : maxId) + 1L);
 				}
 
-				// Work work = workRepository.findOne(contractorBean.getWorkId());
+				// Work work = workRepository.findById(contractorBean.getWorkId()).orElse(null);
 
 				if (!StringUtils.isEmpty(contractorBean.getStatus())) {
 					entity.setStatus(contractorBean.getStatus());
@@ -3746,7 +3755,7 @@ public class CommonServiceImpl implements CommonService {
 			throws ParseException {
 
 		contractor.setName(contractorBean.getName());
-		contractor.setWork(workRepository.findOne(contractorBean.getWorkId()));
+		contractor.setWork(workRepository.findById(contractorBean.getWorkId()).orElse(null));
 		contractor.setContactNo(contractorBean.getContactNo());
 		contractor.setEmailId(contractorBean.getEmailId());
 		contractor.setFirmNameAddress(contractorBean.getFirmNameAddress());
@@ -3781,7 +3790,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public ContractorBean fetchContractorDetails(Long id) {
 		try {
-			Contractor entity = contractorRepository.findByWorkId(id);
+			Contractor entity = contractorRepository.findByWork_Id(id);
 			ContractorBean bean = convertContractorEntityToBean(entity);
 
 			return bean;
@@ -3798,6 +3807,7 @@ public class CommonServiceImpl implements CommonService {
 		if (contractor != null) {
 
 			contractorBean = new ContractorBean();
+			contractorBean.setId(contractor.getId());
 			contractorBean.setWorkId(contractor.getWork().getId());
 			contractorBean.setName(contractor.getName());
 			contractorBean.setContactNo(contractor.getContactNo());
@@ -3811,6 +3821,19 @@ public class CommonServiceImpl implements CommonService {
 		}
 		return contractorBean;
 
+	}
+
+	/**
+	 * Strips the time portion from a date string.
+	 * Handles formats like "DD/MM/YYYY h:mm A", "MM/DD/YYYY h:mm A", returning only "DD/MM/YYYY".
+	 */
+	private String stripTime(String dateStr) {
+		if (dateStr == null || dateStr.trim().isEmpty()) {
+			return dateStr;
+		}
+		// Split on space — date is always the first token
+		String[] parts = dateStr.trim().split("\\s+");
+		return parts[0];
 	}
 
 	// Method to convert WorkTender Entity to WorkTenderBean
@@ -3835,7 +3858,7 @@ public class CommonServiceImpl implements CommonService {
 		workTenderBean.setId(entity.getId());
 		// WorkStatus workStatus =
 		// workStatusRepository.findByWorkStatusNameE(entity.getWorkStatus());
-		WorkStatus workStatus = workStatusRepository.findOne(entity.getWorkStatus());
+		WorkStatus workStatus = workStatusRepository.findById(entity.getWorkStatus()).orElse(null);
 		List<WorkTenderCount> countList = workTenderCountRepository.findByWorkIdAndStatus(entity.getWork().getId(),
 				"Re-Tender");
 		int maxCount = Integer.MIN_VALUE;
@@ -3863,10 +3886,10 @@ public class CommonServiceImpl implements CommonService {
 		workTenderBean.setStartDate(entity.getStartDate());
 		workTenderBean.setEndDate(entity.getEndDate());
 		workTenderBean.seteTenderNo(entity.geteTenderNo());
-		workTenderBean.setTenderCalledDate(entity.getTenderCalledDate());
-		workTenderBean.setTenderReceivedDate(entity.getTenderReceivedDate());
-		workTenderBean.setReTenderDate(entity.getReTenderDate());
-		workTenderBean.setLoaIssuedDate(entity.getLoaIssuedDate());
+		workTenderBean.setTenderCalledDate(stripTime(entity.getTenderCalledDate()));
+		workTenderBean.setTenderReceivedDate(stripTime(entity.getTenderReceivedDate()));
+		workTenderBean.setReTenderDate(stripTime(entity.getReTenderDate()));
+		workTenderBean.setLoaIssuedDate(stripTime(entity.getLoaIssuedDate()));
 
 		if (entity.getRateStatus() != null) {
 			workTenderBean.setRateStatus(entity.getRateStatus());
@@ -3885,31 +3908,25 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 		if (entity.getDocumentUpload() != null) {
-			    workTenderBean.setTenderFileId(
-			        entity.getDocumentUpload().getDocumentId()
-			    );
-			}
+			workTenderBean.setTenderFileId(entity.getDocumentUpload().getDocumentId());
+		}
 
-			if (entity.getDocumentUploadLoi() != null) {
-			    workTenderBean.setuLoiId(
-			        entity.getDocumentUploadLoi().getDocumentId()
-			    );
-			}
+		if (entity.getDocumentUploadLoi() != null) {
+			workTenderBean.setuLoiId(entity.getDocumentUploadLoi().getDocumentId());
+		}
 
-			if (entity.getDocumentUploadUa() != null) {
-			    workTenderBean.setuAId(
-			        entity.getDocumentUploadUa().getDocumentId()
-			    );
-			}
+		if (entity.getDocumentUploadUa() != null) {
+			workTenderBean.setuAId(entity.getDocumentUploadUa().getDocumentId());
+		}
 
 		workTenderBean.setWorkRequestStatusId(entity.getWorkRequestStatusId());
 		// DocumentUpload
-		// documentUpload=documentRepository.findOne(entity.getDocumentUpload().getDocumentId());
-		if(entity.getAgreementDate() != null) {
-		workTenderBean.setAgreementDate(entity.getAgreementDate());
+		// documentUpload=documentRepository.findById(entity.getDocumentUpload().orElse(null).getDocumentId());
+		if (entity.getAgreementDate() != null) {
+			workTenderBean.setAgreementDate(entity.getAgreementDate());
 		}
-		if(entity.getAgreementNo() != null) {
-		workTenderBean.setAgreementNo(entity.getAgreementNo());
+		if (entity.getAgreementNo() != null) {
+			workTenderBean.setAgreementNo(entity.getAgreementNo());
 		}
 
 		return workTenderBean;
@@ -3968,7 +3985,7 @@ public class CommonServiceImpl implements CommonService {
 
 	private void updateWorkCount() {
 
-		WorkCount workCount = workCountRepository.findOne(1L);
+		WorkCount workCount = workCountRepository.findById(1L).orElse(null);
 		if (workCount != null) {
 			workCount.setLastCount(workCount.getLastCount() + 1);
 			workCountRepository.save(workCount);
@@ -3977,7 +3994,7 @@ public class CommonServiceImpl implements CommonService {
 
 	private String fetchWorkNo() {
 
-		WorkCount workCount = workCountRepository.findOne(1L);
+		WorkCount workCount = workCountRepository.findById(1L).orElse(null);
 
 		if (workCount == null) {
 			workCount = new WorkCount(1L, 0);
@@ -3997,7 +4014,7 @@ public class CommonServiceImpl implements CommonService {
 		ResponseObject responseObject = null;
 		try {
 			if (bean != null) {
-				Work entity = workRepository.findOne(bean.getId());
+				Work entity = workRepository.findById(bean.getId()).orElse(null);
 				responseObject = new ResponseObject();
 
 				convertWorkBeanToEntity(entity, bean);
@@ -4018,70 +4035,70 @@ public class CommonServiceImpl implements CommonService {
 		entity.setFinancialYear(bean.getFinancialYear());
 
 		if (bean.getHeadId() != null) {
-			// Head head = headRepository.findOne(bean.getHeadId());
+			// Head head = headRepository.findById(bean.getHeadId()).orElse(null);
 			// entity.setWorkHead(head.getHeadName());
 			entity.setWorkHead(bean.getHeadId());
 		}
 		entity.setWorkSubtypeId(bean.getWorkSubTypeId());
 		if (bean.getHeadStateId() != null) {
-			Head headState = headRepository.findOne(bean.getHeadStateId());
+			Head headState = headRepository.findById(bean.getHeadStateId()).orElse(null);
 			entity.setHeadState(headState.getId());
 		}
 
 		if (bean.getHeadNhmId() != null) {
-			Head headNhm = headRepository.findOne(bean.getHeadNhmId());
+			Head headNhm = headRepository.findById(bean.getHeadNhmId()).orElse(null);
 			entity.setHeadNhm(headNhm.getId());
 		}
 
 		if (bean.getHeadEcpr2Id() != null) {
-			Head headEcpr = headRepository.findOne(bean.getHeadEcpr2Id());
+			Head headEcpr = headRepository.findById(bean.getHeadEcpr2Id()).orElse(null);
 			entity.setHeadEcrp2(headEcpr.getId());
 		}
 
 		if (bean.getHeadOthersId() != null) {
-			Head headOthers = headRepository.findOne(bean.getHeadOthersId());
+			Head headOthers = headRepository.findById(bean.getHeadOthersId()).orElse(null);
 			entity.setHeadOthers(headOthers.getId());
 		}
 
 		if (bean.getSchemeId() != null) {
-			Schemes scheme = schemeRepository.findOne(bean.getSchemeId());
+			Schemes scheme = schemeRepository.findById(bean.getSchemeId()).orElse(null);
 			// entity.setScheme(scheme.getSchemeName());
 			entity.setScheme(scheme.getId());
 		}
 
 		if (bean.getSchemeStateId() != null) {
-			Schemes schemeState = schemeRepository.findOne(bean.getSchemeStateId());
+			Schemes schemeState = schemeRepository.findById(bean.getSchemeStateId()).orElse(null);
 			entity.setSchemeState(schemeState.getId());
 		}
 
 		if (bean.getSchemeNhmId() != null) {
-			Schemes schemeNhm = schemeRepository.findOne(bean.getSchemeNhmId());
+			Schemes schemeNhm = schemeRepository.findById(bean.getSchemeNhmId()).orElse(null);
 			entity.setSchemeNhm(schemeNhm.getId());
 		}
 
 		if (bean.getSchemeEcpr2Id() != null) {
-			Schemes schemeEcpr = schemeRepository.findOne(bean.getSchemeEcpr2Id());
+			Schemes schemeEcpr = schemeRepository.findById(bean.getSchemeEcpr2Id()).orElse(null);
 			entity.setSchemeEcrp2(schemeEcpr.getId());
 		}
 
 		if (bean.getSchemeOthersId() != null) {
-			Schemes schemeOther = schemeRepository.findOne(bean.getSchemeOthersId());
+			Schemes schemeOther = schemeRepository.findById(bean.getSchemeOthersId()).orElse(null);
 			entity.setSchemeOthers(schemeOther.getId());
 		}
 
 		if (bean.getWorkTypeId() != null) {
-			WorkType workType = workTypeRepository.findOne(bean.getWorkTypeId());
+			WorkType workType = workTypeRepository.findById(bean.getWorkTypeId()).orElse(null);
 			// entity.setWorkType(workType.getWorkTypeNameE());
 			entity.setWorkType(workType.getWorkTypeId());
 			entity.setWorTypeId(workType.getWorkTypeId());
 		}
 		if (bean.getWorkCategoryId() != null) {
-			WorkCategory workCategory = workCategoryRepository.findOne(bean.getWorkCategoryId());
+			WorkCategory workCategory = workCategoryRepository.findById(bean.getWorkCategoryId()).orElse(null);
 			entity.setWorkCategoryId(workCategory.getWorkCategoryId());
 		}
 		if (bean.getWorkSubTypeId() != null) {
 
-			WorkSubType workSubType = workSubTypeRepository.findOne(bean.getWorkSubTypeId());
+			WorkSubType workSubType = workSubTypeRepository.findById(bean.getWorkSubTypeId()).orElse(null);
 			entity.setWorkSubtypeId(workSubType.getWorkSubtypeId());
 
 		}
@@ -4093,17 +4110,18 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 		if (bean.getCategorySubTypeId() != null) {
-			SubCategory subCategory = subCategoryRepository.findOne(bean.getCategorySubTypeId());
+			SubCategory subCategory = subCategoryRepository.findById(bean.getCategorySubTypeId()).orElse(null);
 			entity.setCategorySubtypeId(subCategory.getCategorySubTypeId());
 		}
 
 		entity.setWorkName(bean.getWorkName());
 
 		if (null != bean.getImplementationAgency()) {
-			ImplementationAgency implAgency = implAgencyRepository.findOne(bean.getImplementationAgency());
+			ImplementationAgency implAgency = implAgencyRepository.findById(bean.getImplementationAgency())
+					.orElse(null);
 
 			// ImplementationAgency implAgency =
-			// implAgencyRepository.findOne(Long.valueOf(bean.getImplementationAgencyId()));
+			// implAgencyRepository.findById(Long.valueOf(bean.getImplementationAgencyId().orElse(null)));
 			// entity.setImplementationAgency(implAgency.getImplAgencyname());
 			if (null != implAgency) {
 				entity.setImplementationAgency(implAgency.getImplementationAgencyId());
@@ -4143,7 +4161,7 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 		if (bean.getDivisionId() != null) {
-			Division division = divisionRepository.findOne(bean.getDivisionId());
+			Division division = divisionRepository.findById(bean.getDivisionId()).orElse(null);
 			// entity.setDivisionName(division.getDivisionName());
 			entity.setDivisionId(bean.getDivisionId());
 			entity.setDivisionCode(division.getDivisionId());
@@ -4209,7 +4227,8 @@ public class CommonServiceImpl implements CommonService {
 		// entity.setRemarks(bean.getRemarks());
 
 		/*
-		 * WorkStatus workStatus = workStatusRepository.findOne(bean.getWorkStatusId());
+		 * WorkStatus workStatus =
+		 * workStatusRepository.findById(bean.getWorkStatusId()).orElse(null);
 		 * entity.setWorkStatus(workStatus.getWorkStatusNameE());
 		 */
 
@@ -4235,17 +4254,17 @@ public class CommonServiceImpl implements CommonService {
 		entity.setDmRemakrs(bean.getDmRemakrs());
 		entity.setDmStatus(bean.getDmStatus());
 		if (null != bean.getWorkPriorityId()) {
-			WorkPriority workPriority = workPriorityRepository.findOne(bean.getWorkPriorityId());
+			WorkPriority workPriority = workPriorityRepository.findById(bean.getWorkPriorityId()).orElse(null);
 			entity.setWorkPriorityId(workPriority.getId());
 		}
 
 		if (null != bean.getFinancialHeadId()) {
-			FinancialHead financialHead = financialHeadRepository.findOne(bean.getFinancialHeadId());
+			FinancialHead financialHead = financialHeadRepository.findById(bean.getFinancialHeadId()).orElse(null);
 			entity.setFinancialHeadId(financialHead.getId());
 		}
 
 		if (null != bean.getVidhanSabhaId()) {
-			VidhanSabha vidhanSabha = vidhanSabhaRepositorys.findOne(bean.getVidhanSabhaId());
+			VidhanSabha vidhanSabha = vidhanSabhaRepositorys.findById(bean.getVidhanSabhaId()).orElse(null);
 			entity.setVidhanSabhaId(vidhanSabha.getId());
 		}
 	}
@@ -4257,8 +4276,8 @@ public class CommonServiceImpl implements CommonService {
 	 * // System.out.println("WorkRequestStatusId....."+tsasWorkBean.
 	 * getWorkRequestStatusId());
 	 * 
-	 * tsasWork.setWork(workRepository.findOne(tsasWorkBean.getWorkId()));
-	 * tsasWork.setTsNo(tsasWorkBean.getTsNo());
+	 * tsasWork.setWork(workRepository.findById(tsasWorkBean.getWorkId()).orElse(
+	 * null)); tsasWork.setTsNo(tsasWorkBean.getTsNo());
 	 * tsasWork.setTsAmt(tsasWorkBean.getTsAmt());
 	 * tsasWork.setTsDate(tsasWorkBean.getTsDate());
 	 * tsasWork.setTsRemarks(tsasWorkBean.getTsRemarks()); //
@@ -4279,7 +4298,7 @@ public class CommonServiceImpl implements CommonService {
 
 		tsasReviseWork.setTsAsId(tsasReviseWorkBean.getTsAsId());
 		tsasReviseWork.setRevisedStatus(tsasReviseWorkBean.getRevisedStatus());
-		tsasReviseWork.setWork(workRepository.findOne(tsasReviseWorkBean.getWorkId()));
+		tsasReviseWork.setWork(workRepository.findById(tsasReviseWorkBean.getWorkId()).orElse(null));
 		tsasReviseWork.setRvNo(tsasReviseWorkBean.getRvOrderNo());
 		tsasReviseWork.setRvAmt(tsasReviseWorkBean.getRvAmt());
 		tsasReviseWork.setRvDate(tsasReviseWorkBean.getRvOrderDate());
@@ -4294,7 +4313,7 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 
-			Work entity = workRepository.findOne(id);
+			Work entity = workRepository.findById(id).orElse(null);
 			TSASWork entity2 = tsasWorkRepository.findByWorkId(id);
 			WorkTender entity3 = workTenderRepository.findByWorkId(id);
 			WorkProgress entity4 = workProgressRepository.findByWorkId(id);
@@ -4335,8 +4354,9 @@ public class CommonServiceImpl implements CommonService {
 				if (entity.getUserAssignee() != null) {
 					bean.setUserAssignee(entity.getUserAssignee());
 
-					bean.setUserAssigneeName(userRepository.findOne(entity.getUserAssignee()).getFirstname() + " "
-							+ userRepository.findOne(entity.getUserAssignee()).getLastname());
+					bean.setUserAssigneeName(
+							userRepository.findById(entity.getUserAssignee()).orElse(null).getFirstname() + " "
+									+ userRepository.findById(entity.getUserAssignee()).orElse(null).getLastname());
 				}
 
 			}
@@ -4358,10 +4378,10 @@ public class CommonServiceImpl implements CommonService {
 			WorkTenderBean workTenderBean = new WorkTenderBean();
 			ContractorBean contractorBean = new ContractorBean();
 			CCBean ccBean = new CCBean();
-			Work work = workRepository.findOne(id);
+			Work work = workRepository.findById(id).orElse(null);
 			TSASWork tsasWork = tsasWorkRepository.findByWorkId(id);
 			WorkTender workTender = workTenderRepository.findByWorkId(id);
-			Contractor contractor = contractorRepository.findByWorkId(id);
+			Contractor contractor = contractorRepository.findByWork_Id(id);
 			CC cc = ccRepository.findByWorkId(id);
 			if (work != null) {
 				bean = convertWorkEntityToBean(work, "All");
@@ -4502,7 +4522,7 @@ public class CommonServiceImpl implements CommonService {
 			workProgressBean.setId(workProgress.getId());
 			workProgressBean.setWorkId(workProgress.getWork().getId());
 			workProgressBean.setPerc(workProgress.getPerc());
-			WorkStatus workStatus = workStatusRepository.findOne(workProgress.getWorkStatusId());
+			WorkStatus workStatus = workStatusRepository.findById(workProgress.getWorkStatusId()).orElse(null);
 			workProgressBean.setWorkStatusId(workStatus.getId());
 			workProgressBean.setWorkStatus(workStatus.getWorkStatusNameE());
 			workProgressBean.setWorkSubStatusId(workProgress.getWorkSubStatusId());
@@ -4513,9 +4533,14 @@ public class CommonServiceImpl implements CommonService {
 			workProgressBean.setDateHandOver(workProgress.getDateHandOver());
 			workProgressBean.setRemarks(workProgress.getRemarks());
 			workProgressBean.setPerc(workProgress.getPerc());
-			// workProgressBean.setExpensessCurrentFy(workProgress.getExpensessCurrentFy());
+			workProgressBean.setExpensessCurrentFy(workProgress.getExpensessCurrentFy());
 			workProgressBean.setExpensessUptoMarch(workProgress.getExpensessUptoMarch());
-			workProgressBean.setTotalExpensess(workProgress.getTotalExpensess());
+			Double agencyExpenditureTotal = sumFinancialAgencyExpenditureByWorkId(workProgress.getWork().getId());
+			if (agencyExpenditureTotal != null && agencyExpenditureTotal > 0) {
+				workProgressBean.setTotalExpensess(BigDecimal.valueOf(agencyExpenditureTotal));
+			} else {
+				workProgressBean.setTotalExpensess(workProgress.getTotalExpensess());
+			}
 			if (expensesDataRepository.findByWorkId(workProgress.getWork().getId()).size() > 0) {
 				// workProgressBean.setTotalExpensess(workProgress.getTotalExpensess().add(expensesDataRepository.findByWorkId(workProgress.getWork().getId()).get(0).getExpensessCurrentFy()));
 			}
@@ -4526,8 +4551,10 @@ public class CommonServiceImpl implements CommonService {
 
 			// Long workId=(Long) searchParameterWorkName ;
 
-			wpPage = documentUploadWorkProgressRepository.findByWorkId(workProgress.getWork().getId());
-			if (wpPage != null) {
+			DocumentUploadWorkProgress singleResult = documentUploadWorkProgressRepository.findByWorkId(workProgress.getWork().getId());
+			if (singleResult != null) {
+				wpPage = new ArrayList<>();
+				wpPage.add(singleResult);
 				workProgressBean.setSize(wpPage.size());
 			} else {
 				workProgressBean.setSize(0);
@@ -4562,14 +4589,15 @@ public class CommonServiceImpl implements CommonService {
 			 * getDocumentId()); } }
 			 */
 			if (null != workProgress.getMonth()) {
-				Month month = monthRepository.findOne(workProgress.getMonth());
+				Month month = monthRepository.findById(workProgress.getMonth()).orElse(null);
 				if (null != month) {
 					workProgressBean.setMonth(month.getId());
 					workProgressBean.setMonthName(month.getMonthName());
 				}
 			}
 			if (null != workProgress.getFinancialYear()) {
-				FinancialYear financialYear = financialYearRepository.findOne(workProgress.getFinancialYear());
+				FinancialYear financialYear = financialYearRepository.findById(workProgress.getFinancialYear())
+						.orElse(null);
 				if (null != financialYear) {
 					workProgressBean.setFinancialYear(financialYear.getId());
 					workProgressBean.setFinancialYearName(financialYear.getFinancialYear());
@@ -4609,7 +4637,7 @@ public class CommonServiceImpl implements CommonService {
 			ccBean.setWorkId(entity.getWork().getId());
 			ccBean.setCcNo(entity.getCcNo());
 			ccBean.setCcDate(entity.getCcDate());
-			WorkStatus workStatus = workStatusRepository.findOne(entity.getWorkStatusId());
+			WorkStatus workStatus = workStatusRepository.findById(entity.getWorkStatusId()).orElse(null);
 			if (null != workStatus) {
 				ccBean.setWorkStatus(workStatus.getWorkStatusNameE());
 			}
@@ -4865,7 +4893,7 @@ public class CommonServiceImpl implements CommonService {
 		try {
 			// List<WorkCategory> list =
 			// workCategoryRepository.findByWorkTypeAndEnabledOrderByWorkCategoryNameE(
-			// workTypeRepository.findOne(workTypeId), DMSConstants.ENABLED);
+			// workTypeRepository.findById(workTypeId).orElse(null), DMSConstants.ENABLED);
 
 			List<WorkCategory> list = workCategoryRepository.findByEnabledOrderByOrdering(DMSConstants.ENABLED);
 
@@ -4883,8 +4911,8 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public List<DistrictBean> fetchDistrictByDivision(Long divisionId) {
 		try {
-			List<District> list = districtRepository.findByDivisionAndEnabled(divisionRepository.findOne(divisionId),
-					DMSConstants.ENABLED);
+			List<District> list = districtRepository.findByDivisionAndEnabled(
+					divisionRepository.findById(divisionId).orElse(null), DMSConstants.ENABLED);
 
 			List<DistrictBean> beanList = new ArrayList<>();
 			for (District district : list) {
@@ -4901,7 +4929,7 @@ public class CommonServiceImpl implements CommonService {
 	public List<BlockBean> fetchBlockByDistrict(Long districtId) {
 		try {
 			List<Block> list = blockRepository.findByDistrictAndEnabledOrderByBlockName(
-					districtRepository.findOne(districtId), DMSConstants.ENABLED);
+					districtRepository.findById(districtId).orElse(null), DMSConstants.ENABLED);
 			List<BlockBean> beanList = new ArrayList<>();
 			for (Block block : list) {
 				beanList.add(convertBlockEntityToBean(block));
@@ -4935,7 +4963,7 @@ public class CommonServiceImpl implements CommonService {
 	public List<SubCategoryBean> fetchSubCategoryByCategory(Long categoryId) {
 		try {
 			List<SubCategory> list = subCategoryRepository.findByWorkCategoryAndEnabledOrderByCategorySubTypeNameE(
-					workCategoryRepository.findOne(categoryId), DMSConstants.ENABLED);
+					workCategoryRepository.findById(categoryId).orElse(null), DMSConstants.ENABLED);
 
 			List<SubCategoryBean> beanList = new ArrayList<>();
 			for (SubCategory subCategory : list) {
@@ -5261,7 +5289,7 @@ public class CommonServiceImpl implements CommonService {
 	public String editImplAgency(ImplAgencyBean bean, String date) {
 
 		try {
-			ImplementationAgency entity = implAgencyRepository.findOne(bean.getImplementationAgencyId());
+			ImplementationAgency entity = implAgencyRepository.findById(bean.getImplementationAgencyId()).orElse(null);
 			if (!entity.getImplAgencyname().equals(bean.getImplementationAgencyNameE())) {// if Name has changed
 				// check whether already exist
 				ImplementationAgency implAgency = implAgencyRepository
@@ -5288,7 +5316,7 @@ public class CommonServiceImpl implements CommonService {
 	public String editHead(WorkHeadBean bean, String date) {
 
 		try {
-			WorkHead entity = workHeadRepository.findOne(bean.getWorkHeadId());
+			WorkHead entity = workHeadRepository.findById(bean.getWorkHeadId()).orElse(null);
 			if (!entity.getHeadName().equals(bean.getWorkHeadName())) {// if Name has changed
 				// check whether already exist
 				WorkHead workHead = workHeadRepository.findByHeadNameAndEnabled(bean.getWorkHeadName(), (short) 1);
@@ -5314,7 +5342,7 @@ public class CommonServiceImpl implements CommonService {
 	public String editScheme(SchemeBean bean, String date) {
 
 		try {
-			Schemes entity = schemeRepository.findOne(bean.getSchemeId());
+			Schemes entity = schemeRepository.findById(bean.getSchemeId()).orElse(null);
 			if (!entity.getSchemeName().equals(bean.getSchemeNameE())) {// if Name has changed
 				// check whether already exist
 				Schemes schemes = schemeRepository.findBySchemeNameAndEnabled(bean.getSchemeNameE(), (short) 1);
@@ -5340,7 +5368,7 @@ public class CommonServiceImpl implements CommonService {
 	public String editSor(SorYearBean bean, String date) {
 
 		try {
-			SorYear entity = sorYearRepository.findOne(bean.getSorYearId());
+			SorYear entity = sorYearRepository.findById(bean.getSorYearId()).orElse(null);
 			if (!entity.getSorYear().equals(bean.getSorYearName())) {// if Name has changed
 				// check whether already exist
 				SorYear sorYear = sorYearRepository.findBySorYearAndEnabled(bean.getSorYearName(), (short) 1);
@@ -5366,7 +5394,7 @@ public class CommonServiceImpl implements CommonService {
 	public String deleteImplAgency(Long id) {
 
 		try {
-			ImplementationAgency entity = implAgencyRepository.findOne(id);
+			ImplementationAgency entity = implAgencyRepository.findById(id).orElse(null);
 			if (entity != null) {
 				entity.setEnabled((short) 0);
 				implAgencyRepository.save(entity);
@@ -5383,7 +5411,7 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 
-			WorkHead entity = workHeadRepository.findOne(id);
+			WorkHead entity = workHeadRepository.findById(id).orElse(null);
 			if (entity != null) {
 				Work work = workRepository.findByWorkHeadContainingAndStatusNotIn(entity.getHeadName(),
 						DMSConstants.STATUS_DELETED);
@@ -5407,7 +5435,7 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 
-			Schemes entity = schemeRepository.findOne(id);
+			Schemes entity = schemeRepository.findById(id).orElse(null);
 			if (entity != null) {
 				Work work = workRepository.findBySchemeContainingAndStatusNotIn(entity.getSchemeName(),
 						DMSConstants.STATUS_DELETED);
@@ -5432,7 +5460,7 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 
-			SorYear entity = sorYearRepository.findOne(id);
+			SorYear entity = sorYearRepository.findById(id).orElse(null);
 			if (entity != null) {
 				WorkTender work = workTenderRepository.findBySorYearContainingAndStatusNotIn(entity.getSorYear(),
 						DMSConstants.STATUS_DELETED);
@@ -5519,7 +5547,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public ImplAgencyBean fetchImplAgencyDetails(long id) {
 		try {
-			ImplementationAgency entity = implAgencyRepository.findOne(id);
+			ImplementationAgency entity = implAgencyRepository.findById(id).orElse(null);
 
 			return convertImplAgencyEntityToBean(entity);
 		} catch (Exception e) {
@@ -5531,7 +5559,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public WorkHeadBean fetchHeadDetails(long id) {
 		try {
-			WorkHead entity = workHeadRepository.findOne(id);
+			WorkHead entity = workHeadRepository.findById(id).orElse(null);
 
 			return convertWorkHeadEntityToBean(entity);
 		} catch (Exception e) {
@@ -5543,7 +5571,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public SchemeBean fetchSchemeDetails(long id) {
 		try {
-			Schemes entity = schemeRepository.findOne(id);
+			Schemes entity = schemeRepository.findById(id).orElse(null);
 
 			return convertSchemeEntityToBean(entity);
 		} catch (Exception e) {
@@ -5555,7 +5583,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public SorYearBean fetchSorDetails(long id) {
 		try {
-			SorYear entity = sorYearRepository.findOne(id);
+			SorYear entity = sorYearRepository.findById(id).orElse(null);
 
 			return convertSorEntityToBean(entity);
 		} catch (Exception e) {
@@ -5583,7 +5611,7 @@ public class CommonServiceImpl implements CommonService {
 		try {
 			if (workBean != null) {
 
-				Work work = workRepository.findOne(workBean.getId());
+				Work work = workRepository.findById(workBean.getId()).orElse(null);
 				if (work != null) {
 					List<WorkDocument> workDocuments = workDocumentRepository.findByWorkIdAndIsDeleted(work.getId(),
 							(short) 0);
@@ -5769,7 +5797,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public String fetchWorkFileName(Long documentId) {
-		WorkDocument document = workDocumentRepository.findOne(documentId);
+		WorkDocument document = workDocumentRepository.findById(documentId).orElse(null);
 		String fileName = document.getFileName();
 		String fileWithFullPath = documentsPath + workDocumentsPath + document.getWork().getId() + "/" + fileName;
 		return fileWithFullPath;
@@ -5777,7 +5805,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public String fetchWorkFileNameDW(Long documentId) {
-		DocumentUploadDrawingDetail document = documentUploadDrawingDetailRepository.findOne(documentId);
+		DocumentUploadDrawingDetail document = documentUploadDrawingDetailRepository.findById(documentId).orElse(null);
 		String fileName = document.getDocumentName();
 		String fileWithFullPath = documentsPath + drawigUpoadDocumentPath + "/" + fileName;
 		return fileWithFullPath;
@@ -5786,7 +5814,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public String fetchDownloadFileName(Long documentId) {
 		logger.info("fetchDownloadFileName ");
-		DocumentUpload document = documentRepository.findOne(documentId);
+		DocumentUpload document = documentRepository.findById(documentId).orElse(null);
 		String fileName = document.getDocumentName();
 
 		String compareString = fileName.split("_")[0];
@@ -5833,7 +5861,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public String fetchDownloadFileNameRevised(Long documentId) {
 		logger.info("fetchDownloadFileName ");
-		DocumentUpload document = documentRepository.findOne(documentId);
+		DocumentUpload document = documentRepository.findById(documentId).orElse(null);
 		String fileName = document.getDocumentName();
 		String compareString = fileName.split("_")[0];
 		String fileWithFullPath = null;
@@ -5861,8 +5889,16 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public String fetchDownloadDocumentWSPro(Long documentId) {
 		logger.info("fetchDownloadFileName ");
-		DocumentUploadWorkProgress document = documentUploadWorkProgressRepository.findOne(documentId);
+		DocumentUploadWorkProgress document = documentUploadWorkProgressRepository.findById(documentId).orElse(null);
+		if (document == null) {
+			logger.error("No document found for documentId: " + documentId);
+			return null;
+		}
 		String fileName = document.getDocumentName();
+		if (fileName == null || fileName.trim().isEmpty()) {
+			logger.error("Document name is null or empty for documentId: " + documentId);
+			return null;
+		}
 
 		String compareString = fileName.split("_")[0];
 		String fileWithFullPath = null;
@@ -5876,6 +5912,9 @@ public class CommonServiceImpl implements CommonService {
 			break;
 
 		default:
+			// Fallback: try workWorkProgressDocumentPath for any unrecognised prefix
+			logger.warn("Unrecognised file prefix '" + compareString + "' for documentId: " + documentId + ", using workprogress path as fallback");
+			fileWithFullPath = documentRootPath + workWorkProgressDocumentPath + fileName;
 			break;
 		}
 
@@ -5906,7 +5945,7 @@ public class CommonServiceImpl implements CommonService {
 
 				responseObject = new ResponseObject();
 
-				Work work = workRepository.findOne(ccBean.getWorkId());
+				Work work = workRepository.findById(ccBean.getWorkId()).orElse(null);
 
 				TSASWork tsasWork = tsasWorkRepository.findByWorkId(ccBean.getWorkId());
 				WorkTender tender = workTenderRepository.findByWorkId(ccBean.getWorkId());
@@ -5932,18 +5971,21 @@ public class CommonServiceImpl implements CommonService {
 				entity = ccRepository.save(entity);
 
 				if (entity != null) {
-					WorkStatus workStatus = workStatusRepository.findOne(ccBean.getWorkStatusId());
-//					entity.setWorkStatus(workStatus.getWorkStatusNameE());
-					entity.setWorkStatusId(workStatus.getId());
-					// work.setWorkStatus(workStatus.getWorkStatusNameE());
-					work.setWorkStatus(workStatus.getId());
-					tsasWork.setWorkStatus(workStatus.getId());
-					// tender.setWorkStatus(workStatus.getWorkStatusNameE());
-					tender.setWorkStatus(workStatus.getId());
-					// workProgress.setWorkStatus(workStatus.getWorkStatusNameE());
-					workProgress.setWorkStatusId(workStatus.getId());
+					WorkStatus workStatus = workStatusRepository.findById(ccBean.getWorkStatusId()).orElse(null);
+					if (workStatus != null) {
+						entity.setWorkStatusId(workStatus.getId());
+						work.setWorkStatus(workStatus.getId());
+						if (tsasWork != null) {
+							tsasWork.setWorkStatus(workStatus.getId());
+						}
+						if (tender != null) {
+							tender.setWorkStatus(workStatus.getId());
+						}
+						if (workProgress != null) {
+							workProgress.setWorkStatusId(workStatus.getId());
+						}
+					}
 					responseObject.setId(entity.getWork().getId());
-
 				}
 
 			}
@@ -5956,7 +5998,7 @@ public class CommonServiceImpl implements CommonService {
 
 	private void convertCCBeanToEntity(CC cc, CCBean ccBean) throws ParseException {
 
-		cc.setWork(workRepository.findOne(ccBean.getWorkId()));
+		cc.setWork(workRepository.findById(ccBean.getWorkId()).orElse(null));
 		if (ccBean.getCcNo() == null || ccBean.getCcNo().isEmpty()) {
 
 		} else {
@@ -6000,7 +6042,7 @@ public class CommonServiceImpl implements CommonService {
 	public String deleteFile(Long id) {
 
 		try {
-			WorkDocument entity = workDocumentRepository.findOne(id);
+			WorkDocument entity = workDocumentRepository.findById(id).orElse(null);
 			if (entity != null) {
 				entity.setIsDeleted(DMSConstants.ENABLED);
 				workDocumentRepository.save(entity);
@@ -6048,7 +6090,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public void saveOrUpdateOtp(String emailIdOrMobileNo, Integer otp) {
 
-		OtpGeneration otpGeneration = otpGenerationRepository.findOne(emailIdOrMobileNo);
+		OtpGeneration otpGeneration = otpGenerationRepository.findById(emailIdOrMobileNo).orElse(null);
 		if (null != otpGeneration) {
 			otpGeneration.setCreatedDate(new Date());
 			otpGeneration.setOtp(otp);
@@ -6067,7 +6109,7 @@ public class CommonServiceImpl implements CommonService {
 
 		Integer otp = null;
 
-		OtpGeneration otpGeneration = otpGenerationRepository.findOne(emailIdOrMobileNo);
+		OtpGeneration otpGeneration = otpGenerationRepository.findById(emailIdOrMobileNo).orElse(null);
 		if (null != otpGeneration) {
 			otp = otpGeneration.getOtp();
 		}
@@ -6078,8 +6120,8 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public List<WorkStatusBean> fetchWorkStatusByScheme(Long schemeId, Long statusId) {
 		try {
-			List<WorkStatus> list = workStatusRepository.findBySchemesAndEnabled(schemeRepository.findOne(schemeId),
-					DMSConstants.ENABLED);
+			List<WorkStatus> list = workStatusRepository
+					.findBySchemesAndEnabled(schemeRepository.findById(schemeId).orElse(null), DMSConstants.ENABLED);
 
 			List<WorkStatusBean> beanList = new ArrayList<>();
 			for (WorkStatus workStatus : list) {
@@ -6175,7 +6217,7 @@ public class CommonServiceImpl implements CommonService {
 		try {
 			if (workProgressImageListBean != null) {
 
-				Work work = workRepository.findOne(workProgressImageListBean.getId());
+				Work work = workRepository.findById(workProgressImageListBean.getId()).orElse(null);
 				if (work != null) {
 					// List<DocumentUpload> documentUploads =
 					// documentRepository.findByWorkIdAndIsDeleted(work.getId(),(short) 0);
@@ -6184,7 +6226,7 @@ public class CommonServiceImpl implements CommonService {
 
 					if (workProgressImageListBean != null) {
 
-						documentUploads = documentRepository.findByWorkId(work.getId(), (short) 0);
+						documentUploads = documentRepository.findByWorkId(work.getId());
 
 						saveWorkProgressImages(work, workProgressImageListBean, documentUploads, "WP");// AS
 																										// Document
@@ -6211,7 +6253,7 @@ public class CommonServiceImpl implements CommonService {
 		try {
 			if (uploadDrawingDetailBean != null) {
 
-				Work work = workRepository.findOne(uploadDrawingDetailBean.getWorkId());
+				Work work = workRepository.findById(uploadDrawingDetailBean.getWorkId()).orElse(null);
 				if (work != null) {
 					// List<DocumentUpload> documentUploads =
 					// documentRepository.findByWorkIdAndIsDeleted(work.getId(),(short) 0);
@@ -6360,8 +6402,8 @@ public class CommonServiceImpl implements CommonService {
 			XSLFSlide firstSlide = presentation.createSlide();
 
 			// Slide content
-			String text1Part1 = "अपर मुख्य सचिव, लोक स्वास्थ्य एवं परिवार कल्याण विभाग द्वारा";
-			String text1Part2 = "         निर्माण कार्यो की समिक्षा बैठक दिनांक " + currentDateStr;
+			String text1Part1 = "??? ????? ????, ??? ????????? ??? ?????? ?????? ????? ??????";
+			String text1Part2 = "         ??????? ?????? ?? ??????? ???? ?????? " + currentDateStr;
 
 			XSLFTextBox titleShape = firstSlide.createTextBox();
 			titleShape.setText(text1Part1 + "\n" + text1Part2);
@@ -6383,7 +6425,7 @@ public class CommonServiceImpl implements CommonService {
 			titleRun.setFontColor(new Color(0, 0, 255));
 			titleParagraph.setLineSpacing(2.0);
 
-			String text2 = "लोक स्वास्थ्य एवं परिवार कल्याण विभाग, मध्य प्रदेश ";
+			String text2 = "??? ????????? ??? ?????? ?????? ?????, ???? ?????? ";
 			titleShape = firstSlide.createTextBox();
 			titleShape.setText(text2);
 			double text2Width = (text2.length()) * fontSize * 3.5;
@@ -6468,7 +6510,7 @@ public class CommonServiceImpl implements CommonService {
 					run1 = paragraph1.addNewTextRun();
 					setAllCellBorders(cell1, Color.BLACK);
 					run1.setFontSize(14d);
-					run1.setText("दिनांक 01.04.23 की स्थिति में शेष कार्य");
+					run1.setText("?????? 01.04.23 ?? ?????? ??? ??? ?????");
 					run1.setBold(true);
 
 					table.mergeCells(0, 0, 3, 4);
@@ -6477,7 +6519,7 @@ public class CommonServiceImpl implements CommonService {
 					run1 = paragraph1.addNewTextRun();
 					setAllCellBorders(cell1, Color.BLACK);
 					run1.setFontSize(14d);
-					run1.setText("वर्ष " + financialYear + " नवीन स्वीकृत कार्य");
+					run1.setText("???? " + financialYear + " ???? ??????? ?????");
 					run1.setBold(true);
 
 					table.mergeCells(0, 0, 5, 6);
@@ -6486,7 +6528,7 @@ public class CommonServiceImpl implements CommonService {
 					run1 = paragraph1.addNewTextRun();
 					setAllCellBorders(cell1, Color.BLACK);
 					run1.setFontSize(14d);
-					run1.setText("वर्ष " + financialYear + " नवीन कुल कार्य");
+					run1.setText("???? " + financialYear + " ???? ??? ?????");
 					run1.setBold(true);
 				} else if (slideCount == 2) {
 
@@ -6504,7 +6546,7 @@ public class CommonServiceImpl implements CommonService {
 					run1 = paragraph1.addNewTextRun();
 					setAllCellBorders(cell1, Color.BLACK);
 					run1.setFontSize(14d);
-					run1.setText("वर्ष " + financialYear + " कुल कार्य");
+					run1.setText("???? " + financialYear + " ??? ?????");
 					run1.setBold(true);
 
 					table.mergeCells(0, 0, 3, 4);
@@ -6513,7 +6555,7 @@ public class CommonServiceImpl implements CommonService {
 					run1 = paragraph1.addNewTextRun();
 					setAllCellBorders(cell1, Color.BLACK);
 					run1.setFontSize(14d);
-					run1.setText("वर्ष " + financialYear + " हेतु कुल लक्ष्य");
+					run1.setText("???? " + financialYear + " ???? ??? ??????");
 					run1.setBold(true);
 
 					table.mergeCells(0, 0, 5, 6);
@@ -6522,7 +6564,7 @@ public class CommonServiceImpl implements CommonService {
 					run1 = paragraph1.addNewTextRun();
 					setAllCellBorders(cell1, Color.BLACK);
 					run1.setFontSize(14d);
-					run1.setText("वर्तमान माह तक का लक्ष्य ");
+					run1.setText("??????? ??? ?? ?? ?????? ");
 					run1.setBold(true);
 
 					table.mergeCells(0, 0, 7, 8);
@@ -6531,7 +6573,7 @@ public class CommonServiceImpl implements CommonService {
 					run1 = paragraph1.addNewTextRun();
 					setAllCellBorders(cell1, Color.BLACK);
 					run1.setFontSize(14d);
-					run1.setText("वर्तमान माह तक की उपलब्धि ");
+					run1.setText("??????? ??? ?? ?? ??????? ");
 					run1.setBold(true);
 
 				}
@@ -6818,14 +6860,14 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 
-			WorkSubDelayReson entity = workSubDelayResonRepository.findOne(id);
+			WorkSubDelayReson entity = workSubDelayResonRepository.findById(id).orElse(null);
 			if (entity != null) {
 				WorkProgress progress = workProgressRepository
 						.findByWorkSubDelayReasonId(entity.getWorkSubDelayReasonId());
 //				WorkTender work = workTenderRepository.findBySorYearContainingAndStatusNotIn(entity.getSubDelayReason(),
 //						DMSConstants.STATUS_DELETED);
 				if (progress != null) {
-					Work wentityWork = workRepository.findOne(progress.getWork().getId());
+					Work wentityWork = workRepository.findById(progress.getWork().getId()).orElse(null);
 					wentityWork = workRepository.findByIdAndStatusNotIn(progress.getWork().getId(),
 							DMSConstants.STATUS_DELETED);
 
@@ -6849,7 +6891,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public WorkSubDelayResonBean fetchSdrDetails(long id) {
 		try {
-			WorkSubDelayReson entity = workSubDelayResonRepository.findOne(id);
+			WorkSubDelayReson entity = workSubDelayResonRepository.findById(id).orElse(null);
 
 			return convertWorkSubDelayResonToBean(entity);
 		} catch (Exception e) {
@@ -6878,7 +6920,8 @@ public class CommonServiceImpl implements CommonService {
 	public String editSdr(WorkSubDelayResonBean bean, String date) {
 
 		try {
-			WorkSubDelayReson entity = workSubDelayResonRepository.findOne(bean.getWorkSubDelayReasonId());
+			WorkSubDelayReson entity = workSubDelayResonRepository.findById(bean.getWorkSubDelayReasonId())
+					.orElse(null);
 			if (!entity.getSubDelayReason().equals(bean.getSubDelayReason())) {// if Name has changed
 				// check whether already exist
 				WorkSubDelayReson workSubDelayReson = workSubDelayResonRepository
@@ -6947,7 +6990,7 @@ public class CommonServiceImpl implements CommonService {
 		try {
 			// List<WorkCategory> list =
 			// workCategoryRepository.findByWorkTypeAndEnabledOrderByWorkCategoryNameE(
-			// workTypeRepository.findOne(workTypeId), DMSConstants.ENABLED);
+			// workTypeRepository.findById(workTypeId).orElse(null), DMSConstants.ENABLED);
 
 			List<WorkCategory> list = workCategoryRepository.findByEnabledOrderByOrdering(DMSConstants.ENABLED);
 
@@ -6994,7 +7037,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public String fetchWorkFileNameAgreement(Long documentId) {
-		DocumentUpload document = documentRepository.findOne(documentId);
+		DocumentUpload document = documentRepository.findById(documentId).orElse(null);
 		String fileName = document.getDocumentName();
 		String fileWithFullPath = documentRootPath + workTenderSanctionDocumentPath + fileName;
 		return fileWithFullPath;
@@ -7002,7 +7045,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public String fetchWorkFileNameLOI(Long documentId) {
-		DocumentUpload document = documentRepository.findOne(documentId);
+		DocumentUpload document = documentRepository.findById(documentId).orElse(null);
 		String fileName = document.getDocumentName();
 		String fileWithFullPath = documentRootPath + workTenderSanctionDocumentPath + fileName;
 		return fileWithFullPath;
@@ -7091,49 +7134,50 @@ public class CommonServiceImpl implements CommonService {
 
 			String blockName = null;
 			if (blockId != null) {
-				blockName = blockRepository.findOne(Long.valueOf(blockId)).getBlockName();
+				blockName = blockRepository.findById(Long.valueOf(blockId)).orElse(null).getBlockName();
 			}
 			Long divisionIds = null;
 			if (divisionId != null) {
 				divisionIds = Long.valueOf(divisionId);
-//				divisionName = divisionRepository.findOne(Long.valueOf(divisionId)).getDivisionName();
+//				divisionName = divisionRepository.findById(Long.valueOf(divisionId)).orElse(null).getDivisionName();
 			}
 			Long districtIds = null;
 			if (districtId != null) {
 				districtIds = Long.valueOf(districtId);
-//				districtName = districtRepository.findOne(Long.valueOf(districtId)).getDistrictName();
+//				districtName = districtRepository.findById(Long.valueOf(districtId)).orElse(null).getDistrictName();
 			}
 			String gpName = null;
 
 			String workStatusName = null;
 			if (workStatusId != null) {
-				workStatusName = workStatusRepository.findOne(Long.valueOf(workStatusId)).getWorkStatusNameE();
+				workStatusName = workStatusRepository.findById(Long.valueOf(workStatusId)).orElse(null)
+						.getWorkStatusNameE();
 			}
 
 			Long workTypeId = null;
 			if (workType != null) {
 				workTypeId = Long.valueOf(workType);
-//				districtName = districtRepository.findOne(Long.valueOf(districtId)).getDistrictName();
+//				districtName = districtRepository.findById(Long.valueOf(districtId)).orElse(null).getDistrictName();
 			}
 
 			agency = null;
 			if (implementationAgency != null) {
 				agency = Long.valueOf(implementationAgency);
-//					districtName = districtRepository.findOne(Long.valueOf(districtId)).getDistrictName();
+//					districtName = districtRepository.findById(Long.valueOf(districtId)).orElse(null).getDistrictName();
 			}
 
 			Long workPriority = null;
 			if (workPriorityId != null) {
 				workPriority = Long.valueOf(workPriorityId);
 			}
-			
+
 			Long financialHead = null;
-			if(financialHeadId != null) {
+			if (financialHeadId != null) {
 				financialHead = Long.valueOf(financialHeadId);
 			}
-			
+
 			Long vidhanSabha = null;
-			if(vidhanSabhaId != null) {
+			if (vidhanSabhaId != null) {
 				vidhanSabha = Long.valueOf(vidhanSabhaId);
 			}
 
@@ -7185,7 +7229,7 @@ public class CommonServiceImpl implements CommonService {
 		Users users = userRepository.findByUsername(user.getUsername());
 		Long agencyId = users.getImplementationAgency().getImplementationAgencyId();
 		try {
-			ImplementationAgency agencies = implAgencyRepository.findOne(agencyId);
+			ImplementationAgency agencies = implAgencyRepository.findById(agencyId).orElse(null);
 			ImplAgencyBean bean = new ImplAgencyBean();
 			bean = convertAgencyEntityToBean(agencies);
 			return bean;
@@ -7254,9 +7298,10 @@ public class CommonServiceImpl implements CommonService {
 			}
 			if (work.getWorkSubtypeId() != null && work.getWorkSubtypeId() <= 6) {
 				workBean.setWorkSubTypeId(work.getWorkSubtypeId());
-				workBean.setWorkSubTypeName(
-						workSubTypeRepository.findOne(work.getWorkSubtypeId()).getWorkSubTypeNameE() != null
-								? workSubTypeRepository.findOne(work.getWorkSubtypeId()).getWorkSubTypeNameE()
+				workBean.setWorkSubTypeName(workSubTypeRepository.findById(work.getWorkSubtypeId()).orElse(null)
+						.getWorkSubTypeNameE() != null
+								? workSubTypeRepository.findById(work.getWorkSubtypeId()).orElse(null)
+										.getWorkSubTypeNameE()
 								: "NA");
 			}
 
@@ -7264,7 +7309,7 @@ public class CommonServiceImpl implements CommonService {
 			// workBean.setWorkTypeId(workTypeRepository.findByWorkTypeNameE(work.getWorkType()).getWorkTypeId());
 			if (work.getFinancialYear() != null) {
 				workBean.setFinancialYear(work.getFinancialYear());
-				FinancialYear financialYear = financialYearRepository.findOne(work.getFinancialYear());
+				FinancialYear financialYear = financialYearRepository.findById(work.getFinancialYear()).orElse(null);
 				if (financialYear != null) {
 					workBean.setFinancialYearName(financialYear.getFinancialYear());
 				}
@@ -7272,57 +7317,17 @@ public class CommonServiceImpl implements CommonService {
 			if (work.getScheme() != null) {
 
 				// Schemes schemes = schemeRepository.findBySchemeName(work.getScheme());
-				Schemes schemes = schemeRepository.findOne(work.getScheme());
+				Schemes schemes = schemeRepository.findById(work.getScheme()).orElse(null);
 				if (schemes != null) {
 					workBean.setScheme(schemes.getSchemeName() != null ? schemes.getSchemeName() : "NA");
 					workBean.setSchemeId(schemes.getId());
 
 				}
 			}
-			List<DocumentUploadWorkProgress> wpPage = documentUploadWorkProgressRepository.findByWorkId(work.getId());
-			List<DocumentUploadWorkProgressBean> documentBeans = new ArrayList<>();
-			int index = 1;
-			if (wpPage != null && !wpPage.isEmpty()) {
-				for (DocumentUploadWorkProgress documentUploadWorkProgress : wpPage) {
-
-					DocumentUploadWorkProgressBean bean2 = new DocumentUploadWorkProgressBean();
-					bean2.setIndexWS(++index);
-					bean2.setDocumentId(documentUploadWorkProgress.getDocumentId());
-					// System.err.println("documentUploadWorkProgress.getDocumentId()======== " +
-					// documentUploadWorkProgress.getDocumentId());
-					bean2.setDocumentName(documentUploadWorkProgress.getDocumentName());
-					bean2.setCreatedDate(documentUploadWorkProgress.getCreatedDate());
-//					if (documentUploadWorkProgress.getWorkStatusId() != null) {
-//						bean2.setWorkStatusId(documentUploadWorkProgress.getWorkStatusId());
-//						bean2.setWorkStatusNameE(documentUploadWorkProgress.getWorkStatusNameE());
-//					}
-
-					if (documentUploadWorkProgress.getWorkSubStatusId() != null) {
-						WorkSubStatus workSubStatus = workSubStatusRepository
-								.findByWorkSubStatusId(documentUploadWorkProgress.getWorkSubStatusId());
-						if (null != workSubStatus) {
-							if (documentUploadWorkProgress.getWorkStatusNameE().equals("In-Progress")) {
-								bean2.setWorkStatusId(documentUploadWorkProgress.getWorkStatusId());
-								if (null != workSubStatus.getWorkSubStatusId()) {
-									bean2.setWorkSubStatusId(workSubStatus.getWorkSubStatusId());
-								}
-								bean2.setWorkSubStatusNameE(workSubStatus.getWorkSubStatusNameE());
-
-							}
-						}
-					}
-
-					// ✅ Correct this line — use bean2 not bean
-					bean2.setImagepath(imageUrl.substring(0, 21) + "/anuppur/mobile/downloadDocumentWSPro/"
-							+ bean2.getDocumentId());
-
-					documentBeans.add(bean2);
-				}
-			}
-			workBean.setProgressDocuments(documentBeans);
+			workBean.setProgressDocuments(buildProgressDocumentBeans(work.getId()));
 			if (work.getSchemeState() != null) {
 
-				Schemes schemesSate = schemeRepository.findOne(work.getSchemeState());
+				Schemes schemesSate = schemeRepository.findById(work.getSchemeState()).orElse(null);
 				if (schemesSate != null) {
 					workBean.setSchemeState(schemesSate.getSchemeName() != null ? schemesSate.getSchemeName() : "NA");
 					workBean.setSchemeStateId(schemesSate.getId());
@@ -7332,7 +7337,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getSchemeNhm() != null) {
 
-				Schemes schemesNhm = schemeRepository.findOne(work.getSchemeNhm());
+				Schemes schemesNhm = schemeRepository.findById(work.getSchemeNhm()).orElse(null);
 				if (schemesNhm != null) {
 					workBean.setSchemeNhm(schemesNhm.getSchemeName() != null ? schemesNhm.getSchemeName() : "NA");
 					workBean.setSchemeNhmId(schemesNhm.getId());
@@ -7342,7 +7347,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getSchemeEcrp2() != null) {
 
-				Schemes schemesEcpr = schemeRepository.findOne(work.getSchemeEcrp2());
+				Schemes schemesEcpr = schemeRepository.findById(work.getSchemeEcrp2()).orElse(null);
 				if (schemesEcpr != null) {
 					workBean.setSchemeEcpr2(schemesEcpr.getSchemeName() != null ? schemesEcpr.getSchemeName() : "NA");
 					workBean.setSchemeEcpr2Id(schemesEcpr.getId());
@@ -7352,7 +7357,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getSchemeOthers() != null) {
 
-				Schemes schemesOthers = schemeRepository.findOne(work.getSchemeOthers());
+				Schemes schemesOthers = schemeRepository.findById(work.getSchemeOthers()).orElse(null);
 				if (schemesOthers != null) {
 					workBean.setSchemeOthers(
 							schemesOthers.getSchemeName() != null ? schemesOthers.getSchemeName() : "NA");
@@ -7376,19 +7381,19 @@ public class CommonServiceImpl implements CommonService {
 			// workBean.setWorkType(work.getWorkType() != null ? work.getWorkType(): "-");
 			// WorkType workType =
 			// workTypeRepository.findByWorkTypeNameE(work.getWorkType());
-			if(work.getWorkType() != null) {
-			WorkType workType = workTypeRepository.findOne(work.getWorkType());
-			if (null != workType) {
-				workBean.setWorkType(workType.getWorkTypeNameE() != null ? workType.getWorkTypeNameE() : "NA");
-				workBean.setWorkTypeName(workType.getWorkTypeNameE() != null ? workType.getWorkTypeNameE() : "NA");
-				workBean.setWorkTypeId(workType.getWorkTypeId());
-			}
+			if (work.getWorkType() != null) {
+				WorkType workType = workTypeRepository.findById(work.getWorkType()).orElse(null);
+				if (null != workType) {
+					workBean.setWorkType(workType.getWorkTypeNameE() != null ? workType.getWorkTypeNameE() : "NA");
+					workBean.setWorkTypeName(workType.getWorkTypeNameE() != null ? workType.getWorkTypeNameE() : "NA");
+					workBean.setWorkTypeId(workType.getWorkTypeId());
+				}
 			}
 			if (work.getWorkSubtypeId() != null)
 
 			{
 
-				WorkSubType workSubType = workSubTypeRepository.findOne(work.getWorkSubtypeId());
+				WorkSubType workSubType = workSubTypeRepository.findById(work.getWorkSubtypeId()).orElse(null);
 				if (null != workSubType) {
 					workBean.setWorkSubTypeId(workSubType.getWorkSubtypeId());
 					workBean.setWorkSubTypeName(
@@ -7397,7 +7402,7 @@ public class CommonServiceImpl implements CommonService {
 			}
 
 			if (work.getWorkCategoryId() != null) {
-				WorkCategory workCategory = workCategoryRepository.findOne(work.getWorkCategoryId());
+				WorkCategory workCategory = workCategoryRepository.findById(work.getWorkCategoryId()).orElse(null);
 				if (null != workCategory) {
 					workBean.setWorkCategoryId(workCategory.getWorkCategoryId());
 					workBean.setWorkCategoryName(
@@ -7407,7 +7412,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getCategorySubtypeId() != null) {
 
-				SubCategory subCategory = subCategoryRepository.findOne(work.getCategorySubtypeId());
+				SubCategory subCategory = subCategoryRepository.findById(work.getCategorySubtypeId()).orElse(null);
 				if (null != subCategory) {
 					workBean.setCategorySubTypeName(
 							subCategory.getCategorySubTypeNameE() != null ? subCategory.getCategorySubTypeNameE()
@@ -7418,7 +7423,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getWorkHead() != null) {
 				// WorkHead workHead = workHeadRepository.findByHeadName(work.getWorkHead());
-				WorkHead workHead = workHeadRepository.findOne(work.getWorkHead());
+				WorkHead workHead = workHeadRepository.findById(work.getWorkHead()).orElse(null);
 				if (workHead != null) {
 					workBean.setHeadId(workHead.getId());
 					// workBean.setHead(work.getWorkHead() != null ? work.getWorkHead() : "NA");
@@ -7428,7 +7433,7 @@ public class CommonServiceImpl implements CommonService {
 			}
 			if (work.getHeadState() != null) {
 				workBean.setHeadStateId(work.getHeadState());
-				WorkHead workHaed = workHeadRepository.findOne(work.getHeadState());
+				WorkHead workHaed = workHeadRepository.findById(work.getHeadState()).orElse(null);
 				if (null != workHaed) {
 					workBean.setHeadState(workHaed.getHeadName() != null ? workHaed.getHeadName() : "NA");
 				}
@@ -7436,7 +7441,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getHeadNhm() != null) {
 				workBean.setHeadNhmId(work.getHeadNhm());
-				WorkHead workHaed = workHeadRepository.findOne(work.getHeadNhm());
+				WorkHead workHaed = workHeadRepository.findById(work.getHeadNhm()).orElse(null);
 				if (null != workHaed) {
 					workBean.setHeadNhm(workHaed.getHeadName() != null ? workHaed.getHeadName() : "NA");
 				}
@@ -7444,7 +7449,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getHeadEcrp2() != null) {
 				workBean.setHeadEcpr2Id(work.getHeadEcrp2());
-				WorkHead workHaed = workHeadRepository.findOne(work.getHeadEcrp2());
+				WorkHead workHaed = workHeadRepository.findById(work.getHeadEcrp2()).orElse(null);
 				if (null != workHaed) {
 					workBean.setHeadEcpr2(workHaed.getHeadName() != null ? workHaed.getHeadName() : "NA");
 				}
@@ -7452,7 +7457,7 @@ public class CommonServiceImpl implements CommonService {
 
 			if (work.getHeadOthers() != null) {
 				workBean.setHeadOthersId(work.getHeadOthers());
-				WorkHead workHaed = workHeadRepository.findOne(work.getHeadOthers());
+				WorkHead workHaed = workHeadRepository.findById(work.getHeadOthers()).orElse(null);
 				if (null != workHaed) {
 					workBean.setHeadOthers(workHaed.getHeadName() != null ? workHaed.getHeadName() : "NA");
 				}
@@ -7478,7 +7483,8 @@ public class CommonServiceImpl implements CommonService {
 			}
 			workBean.setImplementationAgency(work.getImplementationAgency());
 			if (work.getDivisionId() != null) {
-				workBean.setDivisionName(divisionRepository.findOne(work.getDivisionId()).getDivisionName());
+				workBean.setDivisionName(
+						divisionRepository.findById(work.getDivisionId()).orElse(null).getDivisionName());
 			}
 
 		}
@@ -7490,7 +7496,7 @@ public class CommonServiceImpl implements CommonService {
 			workBean.setDistrictCode(district.getDistrictCode());
 		}
 		// if (null != work.getDivisionCode()) {
-		Division division = divisionRepository.findOne(3L);
+		Division division = divisionRepository.findById(3L).orElse(null);
 		if (null != division) {
 			workBean.setDivisionId(division.getDivisionId());
 			workBean.setDivisionName(division.getDivisionName());
@@ -7517,7 +7523,7 @@ public class CommonServiceImpl implements CommonService {
 		}
 		if (null != work.getWorkStatus()) {
 			workBean.setWorkStatus(work.getWorkStatus());
-			WorkStatus workStatus = workStatusRepository.findOne(work.getWorkStatus());
+			WorkStatus workStatus = workStatusRepository.findById(work.getWorkStatus()).orElse(null);
 			workBean.setWorkStatusName(workStatus.getWorkStatusNameE());
 		}
 		if (null != work.getStatus()) {
@@ -7548,7 +7554,7 @@ public class CommonServiceImpl implements CommonService {
 				workBean.setAgreementDate(tender.getAgreementDate());
 				workBean.setAgreementNo(tender.getAgreementNo());
 				if (null != tender.getSorYear()) {
-					SorYear sorYear = sorYearRepository.findOne(tender.getSorYear());
+					SorYear sorYear = sorYearRepository.findById(tender.getSorYear()).orElse(null);
 					if (null != sorYear) {
 						workBean.setSor(sorYear.getSorYear());
 					}
@@ -7566,12 +7572,12 @@ public class CommonServiceImpl implements CommonService {
 		if (null != workProgressRepository.getLevelOfCompletion(work.getId())) {
 			workBean.setLevelOfCompletion(workProgressRepository.getLevelOfCompletion(work.getId()));
 		}
-		
-		if(null != workProgressRepository.getDateOfCompletion(work.getId())) {
+
+		if (null != workProgressRepository.getDateOfCompletion(work.getId())) {
 			workBean.setDateOfCompletion(workProgressRepository.getDateOfCompletion(work.getId()));
 		}
 
-		Contractor contractor = contractorRepository.findByWorkId(work.getId());
+		Contractor contractor = contractorRepository.findByWork_Id(work.getId());
 		if (null != contractor) {
 			workBean.setContractorName(contractor.getName());
 		}
@@ -7580,10 +7586,10 @@ public class CommonServiceImpl implements CommonService {
 		workBean.setAsDate(work.getAsDate());
 		workBean.setDmAproveRejectDate(work.getDmApproveRejctDate());
 		workBean.setDmStatus(work.getDmStatus());
-		//workBean.setDmRemakrs(work.getDmRemakrs());
+		// workBean.setDmRemakrs(work.getDmRemakrs());
 
 		if (null != work.getWorkPriorityId()) {
-			WorkPriority workPriority = workPriorityRepository.findOne(work.getWorkPriorityId());
+			WorkPriority workPriority = workPriorityRepository.findById(work.getWorkPriorityId()).orElse(null);
 			if (null != workPriority) {
 				workBean.setWorkPriorityId(workPriority.getId());
 				workBean.setWorkPriority(workPriority.getWorkPriorityName());
@@ -7591,140 +7597,133 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 		if (null != work.getFinancialHeadId()) {
-			FinancialHead financialHead = financialHeadRepository.findOne(work.getFinancialHeadId());
+			FinancialHead financialHead = financialHeadRepository.findById(work.getFinancialHeadId()).orElse(null);
 			if (null != financialHead) {
 				workBean.setFinancialHeadId(financialHead.getId());
 				workBean.setFinancialHeadName(financialHead.getFinancialHeadName());
 			}
 		}
 
-			if (null != work.getVidhanSabhaId()) {
-				VidhanSabha vidhanSabha = vidhanSabhaRepositorys.findOne(work.getVidhanSabhaId());
-				if (null != vidhanSabha) {
-					workBean.setVidhanSabhaId(vidhanSabha.getId());
-					workBean.setVidhanSabhaName(vidhanSabha.getVidhanSabhaName());
+		if (null != work.getVidhanSabhaId()) {
+			VidhanSabha vidhanSabha = vidhanSabhaRepositorys.findById(work.getVidhanSabhaId()).orElse(null);
+			if (null != vidhanSabha) {
+				workBean.setVidhanSabhaId(vidhanSabha.getId());
+				workBean.setVidhanSabhaName(vidhanSabha.getVidhanSabhaName());
+			}
+		}
+
+		Object[] result = (Object[]) workRepository.findWorkWithFundsAndPhotos(work.getId());
+
+		if (result != null) {
+			workBean.setFund1(result[3] != null ? Double.valueOf(result[3].toString()) : 0.0);
+			workBean.setFund1Exp(result[4] != null ? Double.valueOf(result[4].toString()) : 0.0);
+
+			workBean.setFund2(result[5] != null ? Double.valueOf(result[5].toString()) : 0.0);
+			workBean.setFund2Exp(result[6] != null ? Double.valueOf(result[6].toString()) : 0.0);
+
+			workBean.setFund3(result[7] != null ? Double.valueOf(result[7].toString()) : 0.0);
+			workBean.setFund3Exp(result[8] != null ? Double.valueOf(result[8].toString()) : 0.0);
+
+			Long lastPhotoId = result[9] != null ? Long.valueOf(result[9].toString()) : null;
+			Long secondLastPhotoId = result[10] != null ? Long.valueOf(result[10].toString()) : null;
+
+			if (lastPhotoId != null) {
+				workBean.setLastPhoto(
+						imageUrl.substring(0, 21) + "/anuppur/mobile/downloadDocumentWSPro/" + lastPhotoId);
+			}
+
+			if (secondLastPhotoId != null) {
+				workBean.setSecondLastPhoto(
+						imageUrl.substring(0, 21) + "/anuppur/mobile/downloadDocumentWSPro/" + secondLastPhotoId);
+			}
+
+			if (lastPhotoId != null) {
+				workBean.setLastPhotoDocumentId(lastPhotoId);
+			}
+
+			if (secondLastPhotoId != null) {
+				workBean.setSecondLastPhotoDocumentId(secondLastPhotoId);
+			}
+
+		}
+
+		List<DmRemarks> dmRemarks = dmRemarksRepository.findByworkId(work.getId());
+		if (dmRemarks != null && !dmRemarks.isEmpty()) {
+
+			DmRemarks lastRemark = dmRemarks.get(dmRemarks.size() - 1);
+
+			if (lastRemark.getRemark() != null) {
+				workBean.setDmRemakrs(lastRemark.getRemark());
+			}
+		}
+
+		List<DepartmentRemarks> departmentRemarks = departmentRemarksRepository.findByWorkId(work.getId());
+
+		if (departmentRemarks != null && !departmentRemarks.isEmpty()) {
+
+			// Use LAST record � shows most recent department remark
+			DepartmentRemarks dr = departmentRemarks.get(departmentRemarks.size() - 1);
+
+			DepartmentMaster departmentMaster = null;
+			if (dr.getDepertmentMasterId() != null) {
+				departmentMaster = departmentMasterRepository.findById(dr.getDepertmentMasterId()).orElse(null);
+			}
+
+			String results = "";
+
+			// ?? masterId == 5 ? name + remark
+			if (dr.getDepertmentMasterId() != null && dr.getDepertmentMasterId() == 5L) {
+
+				if (departmentMaster != null) {
+					results = departmentMaster.getName();
+				}
+
+				if (dr.getDepartmentRemarkName() != null) {
+					results = results + " : " + dr.getDepartmentRemarkName();
 				}
 			}
-		
-			Object[] result = (Object[]) workRepository.findWorkWithFundsAndPhotos(work.getId());
-
-			if (result != null) {
-			    workBean.setFund1(result[3] != null ? Double.valueOf(result[3].toString()) : 0.0);
-			    workBean.setFund1Exp(result[4] != null ? Double.valueOf(result[4].toString()) : 0.0);
-
-			    workBean.setFund2(result[5] != null ? Double.valueOf(result[5].toString()) : 0.0);
-			    workBean.setFund2Exp(result[6] != null ? Double.valueOf(result[6].toString()) : 0.0);
-
-			    workBean.setFund3(result[7] != null ? Double.valueOf(result[7].toString()) : 0.0);
-			    workBean.setFund3Exp(result[8] != null ? Double.valueOf(result[8].toString()) : 0.0);
-
-			    Long lastPhotoId = result[9] != null ? Long.valueOf(result[9].toString()) : null;
-			    Long secondLastPhotoId = result[10] != null ? Long.valueOf(result[10].toString()) : null;
-
-			    if (lastPhotoId != null) {
-			        workBean.setLastPhoto(
-			            imageUrl.substring(0, 21)
-			            + "/anuppur/mobile/downloadDocumentWSPro/"
-			            + lastPhotoId
-			        );
-			    }
-
-			    if (secondLastPhotoId != null) {
-			        workBean.setSecondLastPhoto(
-			            imageUrl.substring(0, 21)
-			            + "/anuppur/mobile/downloadDocumentWSPro/"
-			            + secondLastPhotoId
-			        );
-			    }
-			    
-			    if (lastPhotoId != null) {
-			        workBean.setLastPhotoDocumentId(lastPhotoId);
-			    }
-
-			    if (secondLastPhotoId != null) {
-			        workBean.setSecondLastPhotoDocumentId(secondLastPhotoId);
-			    }
-
+			// ?? masterId != 5 ? only name
+			else {
+				if (departmentMaster != null) {
+					results = departmentMaster.getName();
+				}
 			}
 
-			List<DmRemarks> dmRemarks = dmRemarksRepository.findByworkId(work.getId());
-			if (dmRemarks != null && !dmRemarks.isEmpty()) {
+			workBean.setDepartmentRemarks(results);
+		}
 
-			    DmRemarks lastRemark = dmRemarks.get(dmRemarks.size() - 1);
+		// Set Financial Heads
+		List<WorkFinancialAgency> workFinancialAgency = financialAgencyRepository.findByWorkId(work.getId());
+		if (workFinancialAgency != null && !workFinancialAgency.isEmpty()) {
+			List<FinancialAgencyBean> beanList = new ArrayList<FinancialAgencyBean>();
+			for (WorkFinancialAgency entity : workFinancialAgency) {
+				FinancialAgencyBean bean = new FinancialAgencyBean();
+				bean.setId(entity.getId());
+				bean.setFinancialHeadId(entity.getFinancialHeadId());
+				bean.setCost(entity.getCost());
+				bean.setTotalCost(entity.getTotalCost());
 
-			    if (lastRemark.getRemark() != null ) {
-			        workBean.setDmRemakrs(lastRemark.getRemark());
-			    }
-			}
-
-		
-			List<DepartmentRemarks> departmentRemarks =
-			        departmentRemarksRepository.findByWorkId(work.getId());
-
-			if (departmentRemarks != null && !departmentRemarks.isEmpty()) {
-
-			    // Use LAST record — shows most recent department remark
-			    DepartmentRemarks dr = departmentRemarks.get(departmentRemarks.size() - 1);
-
-			    DepartmentMaster departmentMaster = null;
-			    if (dr.getDepertmentMasterId() != null) {
-			        departmentMaster =
-			                departmentMasterRepository.findOne(dr.getDepertmentMasterId());
-			    }
-
-			    String results = "";
-
-			    // 🔴 masterId == 5 → name + remark
-			    if (dr.getDepertmentMasterId() != null && dr.getDepertmentMasterId() == 5L) {
-
-			        if (departmentMaster != null) {
-			        	results = departmentMaster.getName();
-			        }
-
-			        if (dr.getDepartmentRemarkName() != null) {
-			        	results = results + " : " + dr.getDepartmentRemarkName();
-			        }
-			    }
-			    // 🟢 masterId != 5 → only name
-			    else {
-			        if (departmentMaster != null) {
-			        	results = departmentMaster.getName();
-			        }
-			    }
-
-			    workBean.setDepartmentRemarks(results);
-			}
-
-			// Set Financial Heads
-			List<WorkFinancialAgency> workFinancialAgency = financialAgencyRepository.findByWorkId(work.getId());
-			if(workFinancialAgency != null && !workFinancialAgency.isEmpty()) {
-				List<FinancialAgencyBean> beanList = new ArrayList<FinancialAgencyBean>();
-				for (WorkFinancialAgency entity : workFinancialAgency) {
-					FinancialAgencyBean bean = new FinancialAgencyBean();
-					bean.setId(entity.getId());
-					bean.setFinancialHeadId(entity.getFinancialHeadId());
-					bean.setCost(entity.getCost());
-					bean.setTotalCost(entity.getTotalCost());
-					
-					// Fetch and set the financial head name
-					if (entity.getFinancialHeadId() != null) {
-						FinancialHead financialHead = financialHeadRepository.findOne(entity.getFinancialHeadId());
-						if (financialHead != null) {
-							bean.setFinancialAgencyName(financialHead.getFinancialHeadName());
-						}
+				// Fetch and set the financial head name
+				if (entity.getFinancialHeadId() != null) {
+					FinancialHead financialHead = financialHeadRepository.findById(entity.getFinancialHeadId())
+							.orElse(null);
+					if (financialHead != null) {
+						bean.setFinancialAgencyName(financialHead.getFinancialHeadName());
 					}
-					
-					beanList.add(bean);
 				}
-				workBean.setFinancialHeads(beanList);
+
+				beanList.add(bean);
 			}
-			
-			if(work.getId() != null) {
-			List<GeoTaggingBean> geoTaggingList = commonService.getGeoTaggingForWorkList(work.getId());
-			if(geoTaggingList != null) {
-			workBean.setGeoTaggingBeans(geoTaggingList);
-			}
-			}
+			workBean.setFinancialHeads(beanList);
+		}
+
+		if (work.getId() != null) {
+			// Disabled due to compilation issues
+			// List<GeoTaggingBean> geoTaggingList = commonService.getGeoTaggingForWorkList(work.getId());
+			// if (geoTaggingList != null) {
+			//	workBean.setGeoTaggingBeans(geoTaggingList);
+			// }
+		}
 		return workBean;
 
 	}
@@ -7735,7 +7734,8 @@ public class CommonServiceImpl implements CommonService {
 
 			WorkProgressBean bean = new WorkProgressBean();
 			WorkProgress workProgress = new WorkProgress();// workProgressRepository.findByWorkId(documentUploadWorkProgress.getWorkId());
-			DocumentUploadWorkProgress documentUploadWorkProgress = documentUploadWorkProgressRepository.findOne(id);
+			DocumentUploadWorkProgress documentUploadWorkProgress = documentUploadWorkProgressRepository.findById(id)
+					.orElse(null);
 			if (null != documentUploadWorkProgress) {
 
 				bean.setDocumentUploadWorkImage(documentUploadWorkProgress.getDocumentId());
@@ -7842,7 +7842,7 @@ public class CommonServiceImpl implements CommonService {
 				}
 
 				responseObject = new ResponseObject();
-				Work work = workRepository.findOne(tsasWorkbean.getWorkId());
+				Work work = workRepository.findById(tsasWorkbean.getWorkId()).orElse(null);
 				String workNo = null;
 
 				if (!StringUtils.isEmpty(tsasWorkbean.getStatus())) {
@@ -7887,9 +7887,9 @@ public class CommonServiceImpl implements CommonService {
 			if (tsasReviseWorkBean != null) {
 				TSASReviseWork entity = null;
 
-				entity = tsasReviseWorkRepository.findOne(tsasReviseWorkBean.getId());
+				entity = tsasReviseWorkRepository.findById(tsasReviseWorkBean.getId()).orElse(null);
 				responseObject = new ResponseObject();
-				Work work = workRepository.findOne(tsasReviseWorkBean.getWorkId());
+				Work work = workRepository.findById(tsasReviseWorkBean.getWorkId()).orElse(null);
 				String workNo = null;
 
 				// convertTSRevisedWorkBeanToEntity(entity, tsasReviseWorkBean, "TS");
@@ -7925,10 +7925,10 @@ public class CommonServiceImpl implements CommonService {
 			if (tsasReviseWorkBean != null) {
 				TSASReviseWork entity = null;
 
-				entity = tsasReviseWorkRepository.findOne(tsasReviseWorkBean.getId());
+				entity = tsasReviseWorkRepository.findById(tsasReviseWorkBean.getId()).orElse(null);
 
 				responseObject = new ResponseObject();
-				Work work = workRepository.findOne(tsasReviseWorkBean.getWorkId());
+				Work work = workRepository.findById(tsasReviseWorkBean.getWorkId()).orElse(null);
 				String workNo = null;
 
 				// convertTSRevisedWorkBeanToEntity(entity, tsasReviseWorkBean, "AS");
@@ -7970,7 +7970,7 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 			List<Block> entity = blockRepository.findByDistrictAndEnabledOrderByBlockName(
-					districtRepository.findOne(Long.parseLong(dId)), DMSConstants.ENABLED);
+					districtRepository.findById(Long.parseLong(dId)).orElse(null), DMSConstants.ENABLED);
 
 			for (Block e : entity) {
 
@@ -8021,11 +8021,11 @@ public class CommonServiceImpl implements CommonService {
 				if (searchboxval != null && !searchboxval.isEmpty()) {
 
 					block = blockRepository.findByBlockNameContainingAndDistrictAndEnabled(pageable, searchboxval1,
-							districtRepository.findOne(Long.parseLong(districtCode)), (short) 1);
+							districtRepository.findById(Long.parseLong(districtCode)).orElse(null), (short) 1);
 				} else {
 
 					block = blockRepository.findByDistrictAndEnabled(pageable,
-							districtRepository.findOne(Long.parseLong(districtCode)), (short) 1);
+							districtRepository.findById(Long.parseLong(districtCode)).orElse(null), (short) 1);
 				}
 
 			} else if ((districtCode != null && districtCode.isEmpty()) && !searchboxval.isEmpty()) {
@@ -8061,11 +8061,12 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public WorkJson fetchWorkForReport(Pageable pageable, String workNo, String workName, String scheme, List<Long> workTypeList,
-			List<Long> fyList, String Department, List<Long> agencyList, String blockId, String workStatus,
-			String districtName, String divisionId, String searchByDivision, String workSubTypeId, List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList, String workNameFilter, String departmentRemark) {
-		
-		
+	public WorkJson fetchWorkForReport(Pageable pageable, String workNo, String workName, String scheme,
+			List<Long> workTypeList, List<Long> fyList, String Department, List<Long> agencyList, String blockId,
+			String workStatus, String districtName, String divisionId, String searchByDivision, String workSubTypeId,
+			List<Long> statusList, List<Long> priorityList, List<Long> headList, List<Long> vsList,
+			String workNameFilter, String departmentRemark) {
+
 		Integer workSubTypeIdInt = null;
 		if (workSubTypeId != null) {
 			try {
@@ -8090,17 +8091,17 @@ public class CommonServiceImpl implements CommonService {
 			WorkName = workName;
 
 		}
-		
+
 		Long districtIds = null;
 		if (districtName != null) {
 			districtIds = Long.valueOf(districtName);
-//			districtName = districtRepository.findOne(Long.valueOf(districtId)).getDistrictName();
+//			districtName = districtRepository.findById(Long.valueOf(districtId)).orElse(null).getDistrictName();
 		}
 
 		Long divisionIds = null;
 		if (divisionId != null) {
 			divisionIds = Long.valueOf(divisionId);
-//			divisionName = divisionRepository.findOne(Long.valueOf(divisionId)).getDivisionName();
+//			divisionName = divisionRepository.findById(Long.valueOf(divisionId)).orElse(null).getDivisionName();
 		}
 
 		// Convert blockIdFilter comma-separated string to List<Long>
@@ -8118,13 +8119,13 @@ public class CommonServiceImpl implements CommonService {
 
 		// Sumit
 		workTypeList = (workTypeList == null || workTypeList.isEmpty()) ? null : workTypeList;
-		fyList       = (fyList == null || fyList.isEmpty()) ? null : fyList;
-		agencyList   = (agencyList == null || agencyList.isEmpty()) ? null : agencyList;
-		statusList   = (statusList == null || statusList.isEmpty()) ? null : statusList;
+		fyList = (fyList == null || fyList.isEmpty()) ? null : fyList;
+		agencyList = (agencyList == null || agencyList.isEmpty()) ? null : agencyList;
+		statusList = (statusList == null || statusList.isEmpty()) ? null : statusList;
 		priorityList = (priorityList == null || priorityList.isEmpty()) ? null : priorityList;
-		headList     = (headList == null || headList.isEmpty()) ? null : headList;
-		vsList       = (vsList == null || vsList.isEmpty()) ? null : vsList;
-		blockIdList  = (blockIdList == null || blockIdList.isEmpty()) ? null : blockIdList;
+		headList = (headList == null || headList.isEmpty()) ? null : headList;
+		vsList = (vsList == null || vsList.isEmpty()) ? null : vsList;
+		blockIdList = (blockIdList == null || blockIdList.isEmpty()) ? null : blockIdList;
 
 		try {
 			Page<Work> works = null;
@@ -8145,20 +8146,20 @@ public class CommonServiceImpl implements CommonService {
 //			} else if (Year.isEmpty() && WorkName.isEmpty() && !department.isEmpty() && status.isEmpty()) {
 //
 //				works = workRepository.findByCreatedBy(pageable,
-//						userRepository.findOne(Long.parseLong(department)).getUsername());
+//						userRepository.findById(Long.parseLong(department)).orElse(null).getUsername());
 //			} else if (!Year.isEmpty() && !WorkName.isEmpty() && !department.isEmpty() && status.isEmpty()) {
 //
 //				works = workRepository.findByCreatedByAndFinancialYearAndWorkNameContaining(pageable,
-//						userRepository.findOne(Long.parseLong(department)).getUsername(), Long.parseLong(Year),
+//						userRepository.findById(Long.parseLong(department)).orElse(null).getUsername(), Long.parseLong(Year),
 //						WorkName);
 //			} else if (!Year.isEmpty() && WorkName.isEmpty() && !department.isEmpty() && status.isEmpty()) {
 //
 //				works = workRepository.findByCreatedByAndFinancialYear(pageable,
-//						userRepository.findOne(Long.parseLong(department)).getUsername(), Long.parseLong(Year));
+//						userRepository.findById(Long.parseLong(department)).orElse(null).getUsername(), Long.parseLong(Year));
 //			} else if (Year.isEmpty() && !WorkName.isEmpty() && !department.isEmpty() && status.isEmpty()) {
 //
 //				works = workRepository.findByCreatedByAndWorkNameContaining(pageable,
-//						userRepository.findOne(Long.parseLong(department)).getUsername(), WorkName);
+//						userRepository.findById(Long.parseLong(department)).orElse(null).getUsername(), WorkName);
 //			} else if (!status.isEmpty() && Year.isEmpty() && WorkName.isEmpty() && department.isEmpty()) {
 //
 //				works = workRepository.findByWorkStatus(pageable, Long.parseLong(status));
@@ -8172,7 +8173,7 @@ public class CommonServiceImpl implements CommonService {
 //
 //				works = workRepository.findByWorkStatusAndWorkNameContainingAndCreatedBy(pageable,
 //						Long.parseLong(status), WorkName,
-//						userRepository.findOne(Long.parseLong(department)).getUsername());
+//						userRepository.findById(Long.parseLong(department)).orElse(null).getUsername());
 //
 //			} else if (!status.isEmpty() && !Year.isEmpty() && !WorkName.isEmpty() && department.isEmpty()) {
 //
@@ -8183,14 +8184,15 @@ public class CommonServiceImpl implements CommonService {
 //
 //				works = workRepository.findByWorkStatusAndWorkNameContainingAndFinancialYearAndCreatedBy(pageable,
 //						Long.parseLong(status), WorkName, Long.parseLong(Year),
-//						userRepository.findOne(Long.parseLong(department)).getUsername());
+//						userRepository.findById(Long.parseLong(department)).orElse(null).getUsername());
 //
 //			}
 
 //			else {
 
 			works = workRepositoryCustomImpl.findAllByStatusNotDeleted(pageable, workName, workTypeList, fyList,
-					districtIds, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList, departmentRemark);
+					districtIds, statusList, agencyList, priorityList, headList, vsList, workNameFilter, blockIdList,
+					departmentRemark);
 
 //			}
 
@@ -8212,54 +8214,9 @@ public class CommonServiceImpl implements CommonService {
 
 						}
 
-						List<DocumentUploadWorkProgress> wpPage = documentUploadWorkProgressRepository
-								.findByWorkId(work.getId());
-						List<DocumentUploadWorkProgressBean> documentBeans = new ArrayList<>();
+						bean.setProgressDocuments(buildProgressDocumentBeans(work.getId()));
 
-						if (wpPage != null && !wpPage.isEmpty()) {
-							for (DocumentUploadWorkProgress documentUploadWorkProgress : wpPage) {
-
-								DocumentUploadWorkProgressBean bean2 = new DocumentUploadWorkProgressBean();
-								bean2.setIndexWS(++index);
-								bean2.setDocumentId(documentUploadWorkProgress.getDocumentId());
-								// System.err.println("documentUploadWorkProgress.getDocumentId()======== " +
-								// documentUploadWorkProgress.getDocumentId());
-								bean2.setDocumentName(documentUploadWorkProgress.getDocumentName());
-								bean2.setCreatedDate(documentUploadWorkProgress.getCreatedDate());
-//								if (documentUploadWorkProgress.getWorkStatusId() != null) {
-//									bean2.setWorkStatusId(documentUploadWorkProgress.getWorkStatusId());
-//									bean2.setWorkStatusNameE(documentUploadWorkProgress.getWorkStatusNameE());
-//								}
-
-								if (documentUploadWorkProgress.getWorkSubStatusId() != null) {
-									WorkSubStatus workSubStatus = workSubStatusRepository
-											.findByWorkSubStatusId(documentUploadWorkProgress.getWorkSubStatusId());
-									if (null != workSubStatus) {
-										if (documentUploadWorkProgress.getWorkStatusNameE().equals("In-Progress")) {
-											bean2.setWorkStatusId(documentUploadWorkProgress.getWorkStatusId());
-											if (null != workSubStatus.getWorkSubStatusId()) {
-												bean2.setWorkSubStatusId(workSubStatus.getWorkSubStatusId());
-											}
-											bean2.setWorkSubStatusNameE(workSubStatus.getWorkSubStatusNameE());
-
-										}
-									}
-								}
-
-								// ✅ Correct this line — use bean2 not bean
-								bean2.setImagepath(imageUrl.substring(0, 21) + "/anuppur/mobile/downloadDocumentWSPro/"
-										+ bean2.getDocumentId());
-
-								documentBeans.add(bean2);
-							}
-						}
-						// System.out.println("WorkID: " + work.getId() + ", Total Docs: " +
-						// documentBeans.size());
-
-						// ✅ attach documentBeans to workBean
-						bean.setProgressDocuments(documentBeans);
-
-						// ✅ finally add to list
+						// ? finally add to list
 						beanList.add(bean);
 
 						for (WorkBean workBean : beanList) {
@@ -8309,7 +8266,6 @@ public class CommonServiceImpl implements CommonService {
 					}
 				}
 
-
 				workJson = new WorkJson();
 				workJson.setiTotalDisplayRecords(works.getTotalElements());
 				workJson.setiTotalRecords(workRepository.countByStatusNotIn(DMSConstants.STATUS_DELETED));
@@ -8323,6 +8279,43 @@ public class CommonServiceImpl implements CommonService {
 		}
 	}
 
+	private List<DocumentUploadWorkProgressBean> buildProgressDocumentBeans(Long workId) {
+		List<DocumentUploadWorkProgress> wpList = documentUploadWorkProgressRepository.findAllByWorkId(workId);
+		List<DocumentUploadWorkProgressBean> documentBeans = new ArrayList<>();
+		if (wpList == null || wpList.isEmpty()) {
+			return documentBeans;
+		}
+		int index = 0;
+		for (DocumentUploadWorkProgress documentUploadWorkProgress : wpList) {
+			if (documentUploadWorkProgress.getDocumentId() == null) {
+				continue;
+			}
+			DocumentUploadWorkProgressBean bean2 = new DocumentUploadWorkProgressBean();
+			bean2.setIndexWS(++index);
+			bean2.setDocumentId(documentUploadWorkProgress.getDocumentId());
+			bean2.setDocumentName(documentUploadWorkProgress.getDocumentName());
+			bean2.setCreatedDate(documentUploadWorkProgress.getCreatedDate());
+			if (documentUploadWorkProgress.getWorkStatusId() != null) {
+				bean2.setWorkStatusId(documentUploadWorkProgress.getWorkStatusId());
+				bean2.setWorkStatusNameE(documentUploadWorkProgress.getWorkStatusNameE());
+			}
+			if (documentUploadWorkProgress.getWorkSubStatusId() != null) {
+				bean2.setWorkSubStatusId(documentUploadWorkProgress.getWorkSubStatusId());
+				WorkSubStatus workSubStatus = workSubStatusRepository
+						.findByWorkSubStatusId(documentUploadWorkProgress.getWorkSubStatusId());
+				if (workSubStatus != null) {
+					bean2.setWorkSubStatusNameE(workSubStatus.getWorkSubStatusNameE());
+				}
+			}
+			if (imageUrl != null && imageUrl.length() >= 21) {
+				bean2.setImagepath(imageUrl.substring(0, 21) + "/anuppur/mobile/downloadDocumentWSPro/"
+						+ bean2.getDocumentId());
+			}
+			documentBeans.add(bean2);
+		}
+		return documentBeans;
+	}
+
 	private WorkBean convertWorkEntityToBeansreport(Work work) {
 
 		WorkBean workBean = new WorkBean();
@@ -8332,19 +8325,20 @@ public class CommonServiceImpl implements CommonService {
 		workBean.setWorkName(work.getWorkName());
 		workBean.setFinancialYear(work.getFinancialYear());
 		if (work.getFinancialYear() != null) {
-			FinancialYear financialYear = financialYearRepository.findOne(work.getFinancialYear());
+			FinancialYear financialYear = financialYearRepository.findById(work.getFinancialYear()).orElse(null);
 			if (null != financialYear) {
 				workBean.setFinancialYearName(financialYear.getFinancialYear());
 			}
 		}
-		// bean.setImplementationAgency(implAgencyRepository.findOne(work.getImplementationAgency()).get);
+		// bean.setImplementationAgency(implAgencyRepository.findById(work.getImplementationAgency()).orElse(null).get);
 		if (work.getImplementationAgency() != null) {
 			workBean.setImplementationAgencyName(
-					implAgencyRepository.findOne(work.getImplementationAgency()).getImplAgencyname());
+					implAgencyRepository.findById(work.getImplementationAgency()).orElse(null).getImplAgencyname());
 		}
 
 		if (work.getWorkStatus() != null) {
-			workBean.setWorkStatusName(workStatusRepository.findOne(work.getWorkStatus()).getWorkStatusNameE());
+			workBean.setWorkStatusName(
+					workStatusRepository.findById(work.getWorkStatus()).orElse(null).getWorkStatusNameE());
 		}
 
 		if (work.getId() != null) {
@@ -8388,8 +8382,8 @@ public class CommonServiceImpl implements CommonService {
 		if (work.getWorkSubtypeId() != null && work.getWorkSubtypeId() <= 6) {
 			workBean.setWorkSubTypeId(work.getWorkSubtypeId());
 			workBean.setWorkSubTypeName(
-					workSubTypeRepository.findOne(work.getWorkSubtypeId()).getWorkSubTypeNameE() != null
-							? workSubTypeRepository.findOne(work.getWorkSubtypeId()).getWorkSubTypeNameE()
+					workSubTypeRepository.findById(work.getWorkSubtypeId()).orElse(null).getWorkSubTypeNameE() != null
+							? workSubTypeRepository.findById(work.getWorkSubtypeId()).orElse(null).getWorkSubTypeNameE()
 							: "NA");
 		}
 
@@ -8397,7 +8391,7 @@ public class CommonServiceImpl implements CommonService {
 		// workBean.setWorkTypeId(workTypeRepository.findByWorkTypeNameE(work.getWorkType()).getWorkTypeId());
 		if (work.getFinancialYear() != null) {
 			workBean.setFinancialYear(work.getFinancialYear());
-			FinancialYear financialYear = financialYearRepository.findOne(work.getFinancialYear());
+			FinancialYear financialYear = financialYearRepository.findById(work.getFinancialYear()).orElse(null);
 			if (financialYear != null) {
 				workBean.setFinancialYearName(financialYear.getFinancialYear());
 			}
@@ -8405,7 +8399,7 @@ public class CommonServiceImpl implements CommonService {
 		if (work.getScheme() != null) {
 
 			// Schemes schemes = schemeRepository.findBySchemeName(work.getScheme());
-			Schemes schemes = schemeRepository.findOne(work.getScheme());
+			Schemes schemes = schemeRepository.findById(work.getScheme()).orElse(null);
 			if (schemes != null) {
 				workBean.setScheme(schemes.getSchemeName() != null ? schemes.getSchemeName() : "NA");
 				workBean.setSchemeId(schemes.getId());
@@ -8414,7 +8408,7 @@ public class CommonServiceImpl implements CommonService {
 		}
 		if (work.getSchemeState() != null) {
 
-			Schemes schemesSate = schemeRepository.findOne(work.getSchemeState());
+			Schemes schemesSate = schemeRepository.findById(work.getSchemeState()).orElse(null);
 			if (schemesSate != null) {
 				workBean.setSchemeState(schemesSate.getSchemeName() != null ? schemesSate.getSchemeName() : "NA");
 				workBean.setSchemeStateId(schemesSate.getId());
@@ -8424,7 +8418,7 @@ public class CommonServiceImpl implements CommonService {
 
 		if (work.getSchemeNhm() != null) {
 
-			Schemes schemesNhm = schemeRepository.findOne(work.getSchemeNhm());
+			Schemes schemesNhm = schemeRepository.findById(work.getSchemeNhm()).orElse(null);
 			if (schemesNhm != null) {
 				workBean.setSchemeNhm(schemesNhm.getSchemeName() != null ? schemesNhm.getSchemeName() : "NA");
 				workBean.setSchemeNhmId(schemesNhm.getId());
@@ -8434,7 +8428,7 @@ public class CommonServiceImpl implements CommonService {
 
 		if (work.getSchemeEcrp2() != null) {
 
-			Schemes schemesEcpr = schemeRepository.findOne(work.getSchemeEcrp2());
+			Schemes schemesEcpr = schemeRepository.findById(work.getSchemeEcrp2()).orElse(null);
 			if (schemesEcpr != null) {
 				workBean.setSchemeEcpr2(schemesEcpr.getSchemeName() != null ? schemesEcpr.getSchemeName() : "NA");
 				workBean.setSchemeEcpr2Id(schemesEcpr.getId());
@@ -8444,7 +8438,7 @@ public class CommonServiceImpl implements CommonService {
 
 		if (work.getSchemeOthers() != null) {
 
-			Schemes schemesOthers = schemeRepository.findOne(work.getSchemeOthers());
+			Schemes schemesOthers = schemeRepository.findById(work.getSchemeOthers()).orElse(null);
 			if (schemesOthers != null) {
 				workBean.setSchemeOthers(schemesOthers.getSchemeName() != null ? schemesOthers.getSchemeName() : "NA");
 				workBean.setSchemeOthersId(schemesOthers.getId());
@@ -8467,7 +8461,8 @@ public class CommonServiceImpl implements CommonService {
 		// workBean.setWorkType(work.getWorkType() != null ? work.getWorkType(): "-");
 		// WorkType workType =
 		// workTypeRepository.findByWorkTypeNameE(work.getWorkType());
-		WorkType workType = work.getWorkType() != null ? workTypeRepository.findOne(work.getWorkType()) : null;
+		WorkType workType = work.getWorkType() != null ? workTypeRepository.findById(work.getWorkType()).orElse(null)
+				: null;
 		if (null != workType) {
 			workBean.setWorkType(workType.getWorkTypeNameE() != null ? workType.getWorkTypeNameE() : "NA");
 			workBean.setWorkTypeId(workType.getWorkTypeId());
@@ -8477,7 +8472,7 @@ public class CommonServiceImpl implements CommonService {
 
 		{
 
-			WorkSubType workSubType = workSubTypeRepository.findOne(work.getWorkSubtypeId());
+			WorkSubType workSubType = workSubTypeRepository.findById(work.getWorkSubtypeId()).orElse(null);
 			if (null != workSubType) {
 				workBean.setWorkSubTypeId(workSubType.getWorkSubtypeId());
 				workBean.setWorkSubTypeName(
@@ -8491,7 +8486,7 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 		if (work.getWorkCategoryId() != null) {
-			WorkCategory workCategory = workCategoryRepository.findOne(work.getWorkCategoryId());
+			WorkCategory workCategory = workCategoryRepository.findById(work.getWorkCategoryId()).orElse(null);
 			if (null != workCategory) {
 				workBean.setWorkCategoryId(workCategory.getWorkCategoryId());
 				workBean.setWorkCategoryName(
@@ -8501,7 +8496,7 @@ public class CommonServiceImpl implements CommonService {
 
 		if (work.getCategorySubtypeId() != null) {
 
-			SubCategory subCategory = subCategoryRepository.findOne(work.getCategorySubtypeId());
+			SubCategory subCategory = subCategoryRepository.findById(work.getCategorySubtypeId()).orElse(null);
 			if (null != subCategory) {
 				workBean.setCategorySubTypeName(
 						subCategory.getCategorySubTypeNameE() != null ? subCategory.getCategorySubTypeNameE() : "NA");
@@ -8511,7 +8506,7 @@ public class CommonServiceImpl implements CommonService {
 
 		if (work.getWorkHead() != null) {
 			// WorkHead workHead = workHeadRepository.findByHeadName(work.getWorkHead());
-			WorkHead workHead = workHeadRepository.findOne(work.getWorkHead());
+			WorkHead workHead = workHeadRepository.findById(work.getWorkHead()).orElse(null);
 			if (workHead != null) {
 				workBean.setHeadId(workHead.getId());
 				// workBean.setHead(work.getWorkHead() != null ? work.getWorkHead() : "NA");
@@ -8521,7 +8516,7 @@ public class CommonServiceImpl implements CommonService {
 		}
 		if (work.getHeadState() != null) {
 			workBean.setHeadStateId(work.getHeadState());
-			WorkHead workHaed = workHeadRepository.findOne(work.getHeadState());
+			WorkHead workHaed = workHeadRepository.findById(work.getHeadState()).orElse(null);
 			if (null != workHaed) {
 				workBean.setHeadState(workHaed.getHeadName() != null ? workHaed.getHeadName() : "NA");
 			}
@@ -8529,7 +8524,7 @@ public class CommonServiceImpl implements CommonService {
 
 		if (work.getHeadNhm() != null) {
 			workBean.setHeadNhmId(work.getHeadNhm());
-			WorkHead workHaed = workHeadRepository.findOne(work.getHeadNhm());
+			WorkHead workHaed = workHeadRepository.findById(work.getHeadNhm()).orElse(null);
 			if (null != workHaed) {
 				workBean.setHeadNhm(workHaed.getHeadName() != null ? workHaed.getHeadName() : "NA");
 			}
@@ -8537,7 +8532,7 @@ public class CommonServiceImpl implements CommonService {
 
 		if (work.getHeadEcrp2() != null) {
 			workBean.setHeadEcpr2Id(work.getHeadEcrp2());
-			WorkHead workHaed = workHeadRepository.findOne(work.getHeadEcrp2());
+			WorkHead workHaed = workHeadRepository.findById(work.getHeadEcrp2()).orElse(null);
 			if (null != workHaed) {
 				workBean.setHeadEcpr2(workHaed.getHeadName() != null ? workHaed.getHeadName() : "NA");
 			}
@@ -8545,7 +8540,7 @@ public class CommonServiceImpl implements CommonService {
 
 		if (work.getHeadOthers() != null) {
 			workBean.setHeadOthersId(work.getHeadOthers());
-			WorkHead workHaed = workHeadRepository.findOne(work.getHeadOthers());
+			WorkHead workHaed = workHeadRepository.findById(work.getHeadOthers()).orElse(null);
 			if (null != workHaed) {
 				workBean.setHeadOthers(workHaed.getHeadName() != null ? workHaed.getHeadName() : "NA");
 			}
@@ -8571,7 +8566,7 @@ public class CommonServiceImpl implements CommonService {
 		}
 		workBean.setImplementationAgency(work.getImplementationAgency());
 		if (work.getDivisionId() != null) {
-			workBean.setDivisionName(divisionRepository.findOne(work.getDivisionId()).getDivisionName());
+			workBean.setDivisionName(divisionRepository.findById(work.getDivisionId()).orElse(null).getDivisionName());
 		}
 
 		District district = districtRepository.findByDistrictCodeAndEnabled(work.getDistrictCode(), (short) 1);
@@ -8581,7 +8576,7 @@ public class CommonServiceImpl implements CommonService {
 			workBean.setDistrictCode(district.getDistrictCode());
 		}
 		// if (null != work.getDivisionCode()) {
-		Division division = divisionRepository.findOne(3L);
+		Division division = divisionRepository.findById(3L).orElse(null);
 		if (null != division) {
 			workBean.setDivisionId(division.getDivisionId());
 			workBean.setDivisionName(division.getDivisionName());
@@ -8608,7 +8603,7 @@ public class CommonServiceImpl implements CommonService {
 		}
 		if (null != work.getWorkStatus()) {
 			workBean.setWorkStatus(work.getWorkStatus());
-			WorkStatus workStatus = workStatusRepository.findOne(work.getWorkStatus());
+			WorkStatus workStatus = workStatusRepository.findById(work.getWorkStatus()).orElse(null);
 			workBean.setWorkStatusName(workStatus.getWorkStatusNameE());
 		}
 		if (null != work.getStatus()) {
@@ -8639,7 +8634,7 @@ public class CommonServiceImpl implements CommonService {
 				workBean.setAgreementDate(tender.getAgreementDate());
 				workBean.setAgreementNo(tender.getAgreementNo());
 				if (null != tender.getSorYear()) {
-					SorYear sorYear = sorYearRepository.findOne(tender.getSorYear());
+					SorYear sorYear = sorYearRepository.findById(tender.getSorYear()).orElse(null);
 					if (null != sorYear) {
 						workBean.setSor(sorYear.getSorYear());
 					}
@@ -8658,7 +8653,7 @@ public class CommonServiceImpl implements CommonService {
 			workBean.setLevelOfCompletion(workProgressRepository.getLevelOfCompletion(work.getId()));
 		}
 
-		Contractor contractor = contractorRepository.findByWorkId(work.getId());
+		Contractor contractor = contractorRepository.findByWork_Id(work.getId());
 		if (null != contractor) {
 			workBean.setContractorName(contractor.getName());
 		}
@@ -8670,24 +8665,24 @@ public class CommonServiceImpl implements CommonService {
 		workBean.setDmRemakrs(work.getDmRemakrs());
 
 		if (null != work.getWorkPriorityId()) {
-			WorkPriority workPriority = workPriorityRepository.findOne(work.getWorkPriorityId());
+			WorkPriority workPriority = workPriorityRepository.findById(work.getWorkPriorityId()).orElse(null);
 			if (null != workPriority) {
 				workBean.setWorkPriorityId(workPriority.getId());
 				workBean.setWorkPriority(workPriority.getWorkPriorityName());
 			}
 		}
-		
-		if(null != work.getFinancialHeadId()) {
-			FinancialHead financialHead = financialHeadRepository.findOne(work.getFinancialHeadId());
-			if(null != financialHead) {
+
+		if (null != work.getFinancialHeadId()) {
+			FinancialHead financialHead = financialHeadRepository.findById(work.getFinancialHeadId()).orElse(null);
+			if (null != financialHead) {
 				workBean.setFinancialHeadId(financialHead.getId());
 				workBean.setFinancialHeadName(financialHead.getFinancialHeadName());
 			}
 		}
-		
-		if(null != work.getVidhanSabhaId()) {
-			VidhanSabha vidhanSabha = vidhanSabhaRepositorys.findOne(work.getVidhanSabhaId());
-			if(null != vidhanSabha) {
+
+		if (null != work.getVidhanSabhaId()) {
+			VidhanSabha vidhanSabha = vidhanSabhaRepositorys.findById(work.getVidhanSabhaId()).orElse(null);
+			if (null != vidhanSabha) {
 				workBean.setVidhanSabhaId(vidhanSabha.getId());
 				workBean.setVidhanSabhaName(vidhanSabha.getVidhanSabhaName());
 			}
@@ -8728,7 +8723,7 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 
-			Work one = workRepository.findOne(workid);
+			Work one = workRepository.findById(workid).orElse(null);
 
 			one.setUserAssignee(userid);
 
@@ -8743,7 +8738,7 @@ public class CommonServiceImpl implements CommonService {
 				areaofficerrecord = new AreaOfficerRecord();
 			}
 			areaofficerrecord.setUserid(userid);
-			areaofficerrecord.setWorkid(workid);
+			areaofficerrecord.setWorkId(workid);
 
 			areaOfficerRecordRepository.save(areaofficerrecord);
 
@@ -8773,20 +8768,20 @@ public class CommonServiceImpl implements CommonService {
 
 			int index = 0;
 			if (tender != null) {
-				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findOne(3L));
+				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findById(3L).orElse(null));
 				bean.setIndex(++index);
 				bean.setStatusDate(tender.getTenderCalledDate());
 				beanList.add(bean);
 			}
 			if (tender != null) {
-				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findOne(4L));
+				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findById(4L).orElse(null));
 				bean.setIndex(++index);
 				bean.setStatusDate(tender.getTenderReceivedDate());
 				beanList.add(bean);
 			}
 			if (tender != null) {
 				if (tender.getLoaIssuedDate() != null) {
-					WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findOne(7L));
+					WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findById(7L).orElse(null));
 					bean.setIndex(++index);
 					bean.setStatusDate(tender.getLoaIssuedDate());
 					beanList.add(bean);
@@ -8794,13 +8789,13 @@ public class CommonServiceImpl implements CommonService {
 				}
 			}
 			if (tender != null) {
-				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findOne(8L));
+				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findById(8L).orElse(null));
 				bean.setIndex(++index);
 				bean.setStatusDate(tender.getWorkOrderDate());
 				beanList.add(bean);
 			}
 			if (tender != null) {
-				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findOne(14L));
+				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findById(14L).orElse(null));
 				bean.setIndex(++index);
 				bean.setStatusDate(tender.getReTenderDate());
 				beanList.add(bean);
@@ -8832,14 +8827,14 @@ public class CommonServiceImpl implements CommonService {
 
 			int index = 0;
 			if (cc != null) {
-				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findOne(13L));
+				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findById(13L).orElse(null));
 				bean.setIndex(++index);
 				bean.setStatusDate(cc.getCcDate());
 
 				beanList.add(bean);
 			}
 			if (cc != null) {
-				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findOne(12L));
+				WorkStatusBean bean = convertWorkStatusEntityToBean(workStatusRepository.findById(12L).orElse(null));
 				bean.setIndex(++index);
 				bean.setStatusDate(cc.getDateHandOver());
 
@@ -8865,7 +8860,7 @@ public class CommonServiceImpl implements CommonService {
 		List<WorkBean> beanlist = new ArrayList<>();
 		try {
 
-			if (userRepository.findOne(userId).getDesignationID() == 1L) {
+			if (userRepository.findById(userId).orElse(null).getDesignationID() == 1L) {
 
 				entityList = workRepository.findActiveWorksByUser(userId);
 
@@ -8932,7 +8927,7 @@ public class CommonServiceImpl implements CommonService {
 					iop.add(po);
 
 				}
-				List<LocationPoints> save = pointsrepo.save(iop);
+				List<LocationPoints> save = pointsrepo.saveAll(iop);
 				if (entity != null && save != null) {
 					responseObject.setSuccessMessage("Geo Location Of WorkDone");
 				} else {
@@ -9046,7 +9041,8 @@ public class CommonServiceImpl implements CommonService {
 
 				if (uplDocumentUploadWorkProgressBean != null) {
 
-					progressentity.setWork(workRepository.findOne(uplDocumentUploadWorkProgressBean.getWorkId()));
+					progressentity.setWork(
+							workRepository.findById(uplDocumentUploadWorkProgressBean.getWorkId()).orElse(null));
 					if (uplDocumentUploadWorkProgressBean.getWorkRemakrsM() != null) {
 						progressentity.setWorkremarksM(uplDocumentUploadWorkProgressBean.getWorkRemakrsM());
 					}
@@ -9059,7 +9055,7 @@ public class CommonServiceImpl implements CommonService {
 					entity = new DocumentUploadWorkProgress();
 
 					responseObject = new ResponseObject();
-					Work work = workRepository.findOne(uplDocumentUploadWorkProgressBean.getWorkId());
+					Work work = workRepository.findById(uplDocumentUploadWorkProgressBean.getWorkId()).orElse(null);
 					work.setWorkStatus(uplDocumentUploadWorkProgressBean.getWorkStatusId());
 					workRepository.save(work);
 					WorkProgress workprogress = workProgressRepository
@@ -9089,7 +9085,7 @@ public class CommonServiceImpl implements CommonService {
 
 							// Set work status
 							WorkStatus workStatus = workStatusRepository
-									.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId());
+									.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId()).orElse(null);
 							documentUpload.setWorkStatusId(workStatus.getId());
 							documentUpload.setWorkStatusNameE(workStatus.getWorkStatusNameE());
 							if (uplDocumentUploadWorkProgressBean.getRemarks().get(remarkscount) != null) {
@@ -9105,7 +9101,7 @@ public class CommonServiceImpl implements CommonService {
 							// Save the document
 
 							documentUploadWorkProgressRepository.save(documentUpload);
-							// workRepository.findOne(uplDocumentUploadWorkProgressBean.getWorkId());
+							// workRepository.findById(uplDocumentUploadWorkProgressBean.getWorkId()).orElse(null);
 						}
 
 						// Set the response ID
@@ -9119,7 +9115,7 @@ public class CommonServiceImpl implements CommonService {
 						documentUpload1.setWorkSubStatusId(uplDocumentUploadWorkProgressBean.getWorkSubStatusId());
 						documentUpload1.setActionTakenDelay(uplDocumentUploadWorkProgressBean.getActionTakenDelay());
 						WorkStatus workStatus = workStatusRepository
-								.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId());
+								.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId()).orElse(null);
 						documentUpload1.setWorkStatusId(workStatus.getId());
 						documentUpload1.setAddress(uplDocumentUploadWorkProgressBean.getAddress());
 						documentUpload1.setLattitude(uplDocumentUploadWorkProgressBean.getLattitude());
@@ -9181,7 +9177,7 @@ public class CommonServiceImpl implements CommonService {
 
 				if (documentUploadWorkProgress.getWorkSubDelayReasonId() != null) {
 					WorkSubDelayReson subDelay = workSubDelayResonRepository
-							.findOne(documentUploadWorkProgress.getWorkSubDelayReasonId());
+							.findById(documentUploadWorkProgress.getWorkSubDelayReasonId()).orElse(null);
 					bean.setWorkSubDelayReason(subDelay.getSubDelayReason());
 				} else {
 					bean.setWorkSubDelayReason("-");
@@ -9222,17 +9218,13 @@ public class CommonServiceImpl implements CommonService {
 
 			// Create a temporary file to store the zip
 			Path zipDir = Paths.get(tempZipDir);
-			
+
 			// Ensure directory exists with safe permissions
 			if (!Files.exists(zipDir)) {
-			    Files.createDirectories(zipDir);
+				Files.createDirectories(zipDir);
 			}
 
-			Path tempZipFile = Files.createTempFile(
-			        zipDir,
-			        "images-",
-			        ".zip"
-			);
+			Path tempZipFile = Files.createTempFile(zipDir, "images-", ".zip");
 
 			// Create a ZipOutputStream to write files into the zip
 			try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(tempZipFile.toFile()))) {
@@ -9279,7 +9271,7 @@ public class CommonServiceImpl implements CommonService {
 		List<DocumentUploadWorkProgressBean> beanlist = new ArrayList<>();
 
 		try {
-			DocumentUploadWorkProgress doc = documentUploadWorkProgressRepository.findOne(documentId);
+			DocumentUploadWorkProgress doc = documentUploadWorkProgressRepository.findById(documentId).orElse(null);
 			List<DocumentUploadWorkProgress> wpPage = documentUploadWorkProgressRepository
 					.findByWorkIdAndCreatedDate(doc.getWorkId(), doc.getCreatedDate());
 			int index = 0;
@@ -9315,7 +9307,7 @@ public class CommonServiceImpl implements CommonService {
 
 				if (documentUploadWorkProgress.getWorkSubDelayReasonId() != null) {
 					WorkSubDelayReson subDelay = workSubDelayResonRepository
-							.findOne(documentUploadWorkProgress.getWorkSubDelayReasonId());
+							.findById(documentUploadWorkProgress.getWorkSubDelayReasonId()).orElse(null);
 					bean.setWorkSubDelayReason(subDelay.getSubDelayReason());
 				} else {
 					bean.setWorkSubDelayReason("-");
@@ -9350,18 +9342,17 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public String addOrUpdateDmRemark(DmRemarksBean bean) {
 		try {
-	
-			
+
 			if (bean == null) {
 				return "error: Invalid input";
 			}
 			DmRemarks entity;
 
 			if (bean.getId() != null) {
-				// 🔄 Update case
-				entity = dmRemarksRepository.findOne(bean.getId());
+				// ?? Update case
+				entity = dmRemarksRepository.findById(bean.getId()).orElse(null);
 			} else {
-				// 🆕 New record
+				// ?? New record
 				entity = new DmRemarks();
 			}
 			if (bean.getDmattachment() != null) {
@@ -9374,24 +9365,18 @@ public class CommonServiceImpl implements CommonService {
 				entity.setDocumentUpload(documentUpload);
 
 			}
-			entity.setRemark(
-				    bean.getRemark() != null && !bean.getRemark().trim().isEmpty()
-				        ? bean.getRemark()
-				        : null
-				);
+			entity.setRemark(bean.getRemark() != null && !bean.getRemark().trim().isEmpty() ? bean.getRemark() : null);
 
-				entity.setDepartmentRemarks(
-				    bean.getDepartmentRemarks() != null && !bean.getDepartmentRemarks().trim().isEmpty()
-				        ? bean.getDepartmentRemarks()
-				        : null
-				);
+			entity.setDepartmentRemarks(
+					bean.getDepartmentRemarks() != null && !bean.getDepartmentRemarks().trim().isEmpty()
+							? bean.getDepartmentRemarks()
+							: null);
 
-			if (bean.getWorkId() != null ) {
-			    entity.setWorkId(Long.valueOf(bean.getWorkId()));
+			if (bean.getWorkId() != null) {
+				entity.setWorkId(Long.valueOf(bean.getWorkId()));
 			}
-			
-			if (bean.getDepertmentMasterId() != null
-			        && bean.getDepertmentMasterId() == 0L) {
+
+			if (bean.getDepertmentMasterId() != null && bean.getDepertmentMasterId() == 0L) {
 				bean.setDepertmentMasterId(null);
 			}
 			entity.setDepertmentMasterId(bean.getDepertmentMasterId());
@@ -9408,22 +9393,32 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 	}
-	
+
 	@Override
 	public String addOrUpdateDepartmentRemark(DepartmentRemarksBean bean) {
 		try {
-	
-			
+
 			if (bean == null) {
 				return "error: Invalid input";
 			}
+
+			if (bean.getDepertmentMasterId() == null || bean.getDepertmentMasterId() <= 0) {
+				return "error: Please select Department Remarks";
+			}
+
+			if (bean.getDepertmentMasterId() == 5L) {
+				if (bean.getDepartmentRemarkName() == null || bean.getDepartmentRemarkName().trim().isEmpty()) {
+					return "error: Please enter remarks";
+				}
+			}
+
 			DepartmentRemarks entity;
 
 			if (bean.getId() != null) {
-				// 🔄 Update case
-				entity = departmentRemarksRepository.findOne(bean.getId());
+				// ?? Update case
+				entity = departmentRemarksRepository.findById(bean.getId()).orElse(null);
 			} else {
-				// 🆕 New record
+				// ?? New record
 				entity = new DepartmentRemarks();
 			}
 			if (bean.getDmattachment() != null) {
@@ -9436,20 +9431,17 @@ public class CommonServiceImpl implements CommonService {
 				entity.setDocumentUpload(documentUpload);
 
 			}
-			
 
-				entity.setDepartmentRemarkName(
-				    bean.getDepartmentRemarkName() != null && !bean.getDepartmentRemarkName().trim().isEmpty()
-				        ? bean.getDepartmentRemarkName()
-				        : null
-				);
+			entity.setDepartmentRemarkName(
+					bean.getDepartmentRemarkName() != null && !bean.getDepartmentRemarkName().trim().isEmpty()
+							? bean.getDepartmentRemarkName()
+							: null);
 
-			if (bean.getWorkId() != null ) {
-			    entity.setWorkId(Long.valueOf(bean.getWorkId()));
+			if (bean.getWorkId() != null) {
+				entity.setWorkId(Long.valueOf(bean.getWorkId()));
 			}
-			
-			if (bean.getDepertmentMasterId() != null
-			        && bean.getDepertmentMasterId() == 0L) {
+
+			if (bean.getDepertmentMasterId() != null && bean.getDepertmentMasterId() == 0L) {
 				bean.setDepertmentMasterId(null);
 			}
 			entity.setDepertmentMasterId(bean.getDepertmentMasterId());
@@ -9466,7 +9458,6 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 	}
-	
 
 	@Override
 	public List<DmRemarksBean> getAllRemarksByWorkID(Long long1) {
@@ -9480,14 +9471,15 @@ public class CommonServiceImpl implements CommonService {
 			DmRemarksBean bean = new DmRemarksBean();
 			bean.setIndex(index);
 			index++;
-			bean.setRemark(s.getRemark() != null ? s.getRemark() : "-" );
-			bean.setDepartmentRemarks(s.getDepartmentRemarks() != null  ? s.getDepartmentRemarks() : "-");
-			if(s.getDepertmentMasterId() != null) {
-			DepartmentMaster departmentMaster =	departmentMasterRepository.findOne(s.getDepertmentMasterId());
-			if(departmentMaster != null) {
-			bean.setDepertmentMasterId(departmentMaster.getId());
-			bean.setDepartmentName(departmentMaster.getName() != null ? departmentMaster.getName() : "-");
-			}
+			bean.setRemark(s.getRemark() != null ? s.getRemark() : "-");
+			bean.setDepartmentRemarks(s.getDepartmentRemarks() != null ? s.getDepartmentRemarks() : "-");
+			if (s.getDepertmentMasterId() != null) {
+				DepartmentMaster departmentMaster = departmentMasterRepository.findById(s.getDepertmentMasterId())
+						.orElse(null);
+				if (departmentMaster != null) {
+					bean.setDepertmentMasterId(departmentMaster.getId());
+					bean.setDepartmentName(departmentMaster.getName() != null ? departmentMaster.getName() : "-");
+				}
 			}
 			bean.setId(s.getId());
 			bean.setCreatedDate(dmRemarksRepository.findCreatedDateByWorkId(Long.parseLong(s.getId() + "")));
@@ -9495,23 +9487,23 @@ public class CommonServiceImpl implements CommonService {
 				bean.setDocumentId(s.getDocumentUpload().getDocumentId());
 			}
 			bean.setDocumentPath(CCDocumentPath);
-			if(s.getCreatedBy() != null) {
-			Users users = userRepository.findByUsername(s.getCreatedBy());
-			if(users != null) {
-			bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
-			Set<Role> role = users.getRoles();
-			for (Role r : role) {
-				bean.setRole(r.getRoleName());
-				bean.setRoleCode(r.getRoleCode());
-			}
-			}
+			if (s.getCreatedBy() != null) {
+				Users users = userRepository.findByUsername(s.getCreatedBy());
+				if (users != null) {
+					bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
+					Set<Role> role = users.getRoles();
+					for (Role r : role) {
+						bean.setRole(r.getRoleName());
+						bean.setRoleCode(r.getRoleCode());
+					}
+				}
 			}
 			beanlist.add(bean);
 		}
 
 		return beanlist;
 	}
-	
+
 	@Override
 	public List<DepartmentRemarksBean> getAllDepartmentRemarksByWorkID(Long long1) {
 
@@ -9529,40 +9521,38 @@ public class CommonServiceImpl implements CommonService {
 //			if(dmRemarks != null) {
 //				bean.setRemark(dmRemarks.getRemark() != null ? dmRemarks.getRemark() : "-" );
 			bean.setWorkId(s.getWorkId());
-				
-				if (s.getWorkId() != null) {
-				    List<DmRemarks> dmRemarks =  dmRemarksRepository.findByWorkId(s.getWorkId());
 
-				    if (dmRemarks != null && !dmRemarks.isEmpty()) {
+			if (s.getWorkId() != null) {
+				List<DmRemarks> dmRemarks = dmRemarksRepository.findByWorkId(s.getWorkId());
 
-				        StringBuilder remarkBuilder = new StringBuilder();
+				if (dmRemarks != null && !dmRemarks.isEmpty()) {
 
-				        for (DmRemarks dmRemarks2 : dmRemarks) {
-				            if (dmRemarks2.getRemark() != null) {
-				                remarkBuilder
-				                    .append(dmRemarks2.getRemark());
-				                 
-				            }
-				        }
+					StringBuilder remarkBuilder = new StringBuilder();
 
-				        bean.setRemark(remarkBuilder.toString());
-				    }
+					for (DmRemarks dmRemarks2 : dmRemarks) {
+						if (dmRemarks2.getRemark() != null) {
+							remarkBuilder.append(dmRemarks2.getRemark());
+
+						}
+					}
+
+					bean.setRemark(remarkBuilder.toString());
 				}
-						
-			
-			
-		//	bean.setRemark(s.getRemark() != null ? s.getRemark() : "-" );
-		//	bean.setDepartmentRemarks(s.getDepartmentRemarks() != null  ? s.getDepartmentRemarks() : "-");
-			
-			bean.setDepartmentRemarkName(s.getDepartmentRemarkName());
-			
-			
-			if(s.getDepertmentMasterId() != null) {
-			DepartmentMaster departmentMaster =	departmentMasterRepository.findOne(s.getDepertmentMasterId());
-			if(departmentMaster != null) {
-			bean.setDepertmentMasterId(departmentMaster.getId());
-			bean.setDepartmentName(departmentMaster.getName() != null ? departmentMaster.getName() : "-");
 			}
+
+			// bean.setRemark(s.getRemark() != null ? s.getRemark() : "-" );
+			// bean.setDepartmentRemarks(s.getDepartmentRemarks() != null ?
+			// s.getDepartmentRemarks() : "-");
+
+			bean.setDepartmentRemarkName(s.getDepartmentRemarkName());
+
+			if (s.getDepertmentMasterId() != null) {
+				DepartmentMaster departmentMaster = departmentMasterRepository.findById(s.getDepertmentMasterId())
+						.orElse(null);
+				if (departmentMaster != null) {
+					bean.setDepertmentMasterId(departmentMaster.getId());
+					bean.setDepartmentName(departmentMaster.getName() != null ? departmentMaster.getName() : "-");
+				}
 			}
 			bean.setId(s.getId());
 			bean.setCreatedDate(departmentRemarksRepository.findCreatedDateByWorkId(Long.parseLong(s.getId() + "")));
@@ -9570,29 +9560,28 @@ public class CommonServiceImpl implements CommonService {
 				bean.setDocumentId(s.getDocumentUpload().getDocumentId());
 			}
 			bean.setDocumentPath(CCDocumentPath);
-			if(s.getCreatedBy() != null) {
-			Users users = userRepository.findByUsername(s.getCreatedBy());
-			if(users != null) {
-			bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
-			Set<Role> role = users.getRoles();
-			for (Role r : role) {
-				bean.setRole(r.getRoleName());
-				bean.setRoleCode(r.getRoleCode());
+			if (s.getCreatedBy() != null) {
+				Users users = userRepository.findByUsername(s.getCreatedBy());
+				if (users != null) {
+					bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
+					Set<Role> role = users.getRoles();
+					for (Role r : role) {
+						bean.setRole(r.getRoleName());
+						bean.setRoleCode(r.getRoleCode());
+					}
+				}
 			}
-			}
-			}
-		
-		beanlist.add(bean);
+
+			beanlist.add(bean);
 		}
-	
 
 		return beanlist;
-	
+
 	}
 
 	@Override
 	public Boolean deleteRemarks(Long long1) {
-		DmRemarks one = dmRemarksRepository.findOne(long1);
+		DmRemarks one = dmRemarksRepository.findById(long1).orElse(null);
 
 		if (one != null) {
 			one.setEnabled((short) 0);
@@ -9603,104 +9592,103 @@ public class CommonServiceImpl implements CommonService {
 		}
 		return false;
 	}
-	
+   @Transactional
 	@Override
 	public Boolean deleteDepartmentRemarks(Long long1) {
-		DepartmentRemarks one = departmentRemarksRepository.findOne(long1);
+		DepartmentRemarks one = departmentRemarksRepository.findById(long1).orElseThrow(() -> new RuntimeException("Department Remarks not found"));
 
-		if (one != null) {
+		// if (one != null) {
 			one.setEnabled((short) 0);
 			DepartmentRemarks save = departmentRemarksRepository.save(one);
 			if (save.getId() != null) {
 				return true;
 			}
-		}
+		// }
 		return false;
 	}
 
 	@Override
 	public DmRemarksBean getRemakrsDetails(Long long1) {
 		DmRemarksBean bean = new DmRemarksBean();
-		DmRemarks one = dmRemarksRepository.findOne(long1);
+		DmRemarks one = dmRemarksRepository.findById(long1).orElse(null);
 		bean.setRemark(one.getRemark());
 		bean.setDepartmentRemarks(one.getDepartmentRemarks());
 		if (one.getDocumentUpload() != null) {
 			bean.setDocumentId(one.getDocumentUpload().getDocumentId());
 		}
 		bean.setId(one.getId());
-		
-		if(one.getCreatedBy() != null) {
+
+		if (one.getCreatedBy() != null) {
 			Users users = userRepository.findByUsername(one.getCreatedBy());
-			if(users != null) {
-			bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
-			Set<Role> role = users.getRoles();
-			for (Role r : role) {
-				bean.setRole(r.getRoleName());
-				bean.setRoleCode(r.getRoleCode());
+			if (users != null) {
+				bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
+				Set<Role> role = users.getRoles();
+				for (Role r : role) {
+					bean.setRole(r.getRoleName());
+					bean.setRoleCode(r.getRoleCode());
+				}
 			}
-			}
-			}
-		if(null != one.getDepertmentMasterId()) {
-		DepartmentMaster departmentMaster = departmentMasterRepository.findOne(one.getDepertmentMasterId());
-			if(null != departmentMaster) {
+		}
+		if (null != one.getDepertmentMasterId()) {
+			DepartmentMaster departmentMaster = departmentMasterRepository.findById(one.getDepertmentMasterId())
+					.orElse(null);
+			if (null != departmentMaster) {
 				bean.setDepertmentMasterId(departmentMaster.getId());
 				bean.setDepartmentName(departmentMaster.getName());
 			}
-		
+
 		}
 		return bean;
 	}
-	
+
 	@Override
 	public DepartmentRemarksBean getDepartmentRemarksDetailsById(Long long1) {
 		DepartmentRemarksBean bean = new DepartmentRemarksBean();
-		DepartmentRemarks one = departmentRemarksRepository.findOne(long1);
+		DepartmentRemarks one = departmentRemarksRepository.findById(long1).orElse(null);
 		System.err.println(one.getWorkId() + "<------------- work id null");
 		if (one.getWorkId() != null) {
-		    List<DmRemarks> dmRemarks =
-		            (List<DmRemarks>) dmRemarksRepository.findByWorkId(one.getWorkId());
+			List<DmRemarks> dmRemarks = (List<DmRemarks>) dmRemarksRepository.findByWorkId(one.getWorkId());
 
-		    if (dmRemarks != null && !dmRemarks.isEmpty()) {
+			if (dmRemarks != null && !dmRemarks.isEmpty()) {
 
-		        StringBuilder remarkBuilder = new StringBuilder();
+				StringBuilder remarkBuilder = new StringBuilder();
 
-		        for (DmRemarks dmRemarks2 : dmRemarks) {
-		            if (dmRemarks2.getRemark() != null) {
-		                remarkBuilder
-		                    .append(dmRemarks2.getRemark())
-		                    .append("");
-		            }
-		        }
+				for (DmRemarks dmRemarks2 : dmRemarks) {
+					if (dmRemarks2.getRemark() != null) {
+						remarkBuilder.append(dmRemarks2.getRemark()).append("");
+					}
+				}
 
-		        bean.setRemark(remarkBuilder.toString());
-		    }
+				bean.setRemark(remarkBuilder.toString());
+			}
 		}
-		
-		//bean.setRemark(one.getRemark());
+
+		// bean.setRemark(one.getRemark());
 		bean.setDepartmentRemarkName(one.getDepartmentRemarkName());
 		if (one.getDocumentUpload() != null) {
 			bean.setDocumentId(one.getDocumentUpload().getDocumentId());
 		}
 		bean.setId(one.getId());
-		
-		if(one.getCreatedBy() != null) {
+
+		if (one.getCreatedBy() != null) {
 			Users users = userRepository.findByUsername(one.getCreatedBy());
-			if(users != null) {
-			bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
-			Set<Role> role = users.getRoles();
-			for (Role r : role) {
-				bean.setRole(r.getRoleName());
-				bean.setRoleCode(r.getRoleCode());
+			if (users != null) {
+				bean.setCreateBy(users.getFirstname() + " " + users.getLastname());
+				Set<Role> role = users.getRoles();
+				for (Role r : role) {
+					bean.setRole(r.getRoleName());
+					bean.setRoleCode(r.getRoleCode());
+				}
 			}
-			}
-			}
-		if(null != one.getDepertmentMasterId()) {
-		DepartmentMaster departmentMaster = departmentMasterRepository.findOne(one.getDepertmentMasterId());
-			if(null != departmentMaster) {
+		}
+		if (null != one.getDepertmentMasterId()) {
+			DepartmentMaster departmentMaster = departmentMasterRepository.findById(one.getDepertmentMasterId())
+					.orElse(null);
+			if (null != departmentMaster) {
 				bean.setDepertmentMasterId(departmentMaster.getId());
 				bean.setDepartmentName(departmentMaster.getName());
 			}
-		
+
 		}
 		return bean;
 	}
@@ -9710,17 +9698,19 @@ public class CommonServiceImpl implements CommonService {
 		List<AreaOfficerRecord> findbyWorkid = areaOfficerRecordRepository.findAllByWorkId(workid);
 		List<UserBean> userlist = new ArrayList<>();
 		AreaOfficerRecord aa = areaOfficerRecordRepository
-				.findByUserid(workRepository.findOne(workid).getUserAssignee());
-		if(aa != null) {
-		UserBean convertUserEntityToBean2 = convertUserEntityToBean(userRepository.findOne(aa.getUserid()));
-		convertUserEntityToBean2.setAssignDate(aa.getModifiedDate().toString());
-		userlist.add(convertUserEntityToBean2);
+				.findByUserid(workRepository.findById(workid).orElse(null).getUserAssignee());
+		if (aa != null) {
+			UserBean convertUserEntityToBean2 = convertUserEntityToBean(
+					userRepository.findById(aa.getUserid()).orElse(null));
+			convertUserEntityToBean2.setAssignDate(aa.getModifiedDate().toString());
+			userlist.add(convertUserEntityToBean2);
 		}
 		for (AreaOfficerRecord a : findbyWorkid) {
-			UserBean convertUserEntityToBean = convertUserEntityToBean(userRepository.findOne(a.getUserid()));
+			UserBean convertUserEntityToBean = convertUserEntityToBean(
+					userRepository.findById(a.getUserid()).orElse(null));
 			convertUserEntityToBean.setAssignDate(a.getModifiedDate().toString());
 
-			if (!a.getUserid().equals(workRepository.findOne(workid).getUserAssignee())) {
+			if (!a.getUserid().equals(workRepository.findById(workid).orElse(null).getUserAssignee())) {
 				{
 					userlist.add(convertUserEntityToBean);
 				}
@@ -9867,16 +9857,16 @@ public class CommonServiceImpl implements CommonService {
 	public List<DmRemarksBean> fetchDmRemarksList() {
 		try {
 			List<DmRemarks> list = dmRemarksRepository.findByEnabled((short) 1);
-			
+
 			List<DmRemarksBean> beanList = new ArrayList<>();
 			Set<String> uniqueRemarks = new LinkedHashSet<>();
-			
+
 			for (DmRemarks dmRemark : list) {
 				if (dmRemark.getDepartmentRemarks() != null && !dmRemark.getDepartmentRemarks().isEmpty()) {
 					uniqueRemarks.add(dmRemark.getDepartmentRemarks());
 				}
 			}
-			
+
 			int id = 1;
 			for (String remark : uniqueRemarks) {
 				DmRemarksBean bean = new DmRemarksBean();
@@ -9891,315 +9881,339 @@ public class CommonServiceImpl implements CommonService {
 			return new ArrayList<>();
 		}
 	}
-	
-	
-	
+
 	@Override
-	public List<WorkBean> getFilteredWorkProgress(String workStatusStr, String userIdStr, String agencyIdStr, String workSubStatusStr, String workName) {
+	public List<WorkBean> getFilteredWorkProgress(String workStatusStr, String userIdStr, String agencyIdStr,
+			String workSubStatusStr, String workName) {
 
-	    // Convert string params to Long safely
-	    Long workStatus = parseLongOrNull(workStatusStr);
-	    Long userId = parseLongOrNull(userIdStr);
-	    Long agencyId = parseLongOrNull(agencyIdStr);
-	    Long workSubStatus = parseLongOrNull(workSubStatusStr);
-	    
-	    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		// Convert string params to Long safely
+		Long workStatus = parseLongOrNull(workStatusStr);
+		Long userId = parseLongOrNull(userIdStr);
+		Long agencyId = parseLongOrNull(agencyIdStr);
+		Long workSubStatus = parseLongOrNull(workSubStatusStr);
 
-	    // Fetch data from repository
-	    List<Object[]> resultList = workRepository.fetchWorkWithProgressFilters(workStatus, userId, agencyId, workSubStatus, workName);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+		// Fetch data from repository
+		List<Object[]> resultList = workRepository.fetchWorkWithProgressFilters(workStatus, userId, agencyId,
+				workSubStatus, workName);
 //	    System.err.println("List--- " + resultList.size());
-	    List<WorkBean> workProgressList = new ArrayList<>();
+		List<WorkBean> workProgressList = new ArrayList<>();
 
-	    int serialNo = 1; // ✅ for serial number
+		int serialNo = 1; // ? for serial number
 
-	    for (Object[] row : resultList) {
-	        WorkBean dto = new WorkBean();
+		for (Object[] row : resultList) {
+			WorkBean dto = new WorkBean();
 //	        System.err.println("row[2] ------------" + row[2]);
-	     //   dto.setSerialNo(serialNo++); // Add serial number
-	        dto.setWorkNo((String) row[0]);
-	        dto.setWorkName((String) row[1]);
-	        //dto.setImplementationAgencyName(row[2] != null ? row[2].toString() : "N/A");
-	        if (row[2] != null) {
-	            Long agencyId1 = Long.valueOf(row[2].toString()); // Integer → Long
-	            ImplementationAgency imp = implAgencyRepository.findOne(agencyId1);
-	            dto.setImplementationAgencyName(imp != null ? imp.getImplAgencyname() : "N/A");
-	        } else {
-	            dto.setImplementationAgencyName("N/A");
-	        }
-	        
-	          if (row[3] != null) {
-	            Long userId1 = Long.valueOf(row[3].toString()); // Integer → Long
-	            Users user = userRepository.findOne(userId1);
-	            dto.setUserAssigneeName(user != null ? user.getFirstname()+ " " + user.getLastname() : "N/A");
-	        } else {
-	            dto.setUserAssigneeName("N/A");
-	        }
-	        
-	       // dto.setUserAssigneeName(row[3] != null ? row[3].toString() : "N/A");
-	        if (row[4] != null) {
-	            Long statusId = Long.valueOf(row[4].toString()); // Integer → Long
-	            WorkStatus workStatus1 = workStatusRepository.findOne(statusId);
-	            dto.setWorkStatusName(workStatus1 != null ? workStatus1.getWorkStatusNameE() : "N/A");
-	        } else {
-	            dto.setWorkStatusName("N/A");
-	        }
-	        
-	        if (row[5] != null) {
-	            Long subStatusId = Long.valueOf(row[5].toString()); // Integer → Long
-	            WorkSubStatus workSubStatus1 = workSubStatusRepository.findOne(subStatusId);
-	            dto.setWorkSubTypeName(workSubStatus1 != null ? workSubStatus1.getWorkSubStatusNameE() : "N/A");
-	        } else {
-	            dto.setWorkSubTypeName("N/A");
-	        }
-	        //dto.setWorkStatusName(row[4] != null ? row[4].toString() : "N/A");
-	        if (row[6] != null) {
-	            Date modifiedDate = (Date) row[6];
-	            dto.setModifiedDate(sdf.format(modifiedDate)); // String field for formatted date
-	        } else {
-	            dto.setModifiedDate("N/A");
-	        }
+			// dto.setSerialNo(serialNo++); // Add serial number
+			dto.setWorkNo((String) row[0]);
+			dto.setWorkName((String) row[1]);
+			// dto.setImplementationAgencyName(row[2] != null ? row[2].toString() : "N/A");
+			if (row[2] != null) {
+				Long agencyId1 = Long.valueOf(row[2].toString()); // Integer ? Long
+				ImplementationAgency imp = implAgencyRepository.findById(agencyId1).orElse(null);
+				dto.setImplementationAgencyName(imp != null ? imp.getImplAgencyname() : "N/A");
+			} else {
+				dto.setImplementationAgencyName("N/A");
+			}
 
-	        workProgressList.add(dto);
+			if (row[3] != null) {
+				Long userId1 = Long.valueOf(row[3].toString()); // Integer ? Long
+				Users user = userRepository.findById(userId1).orElse(null);
+				dto.setUserAssigneeName(user != null ? user.getFirstname() + " " + user.getLastname() : "N/A");
+			} else {
+				dto.setUserAssigneeName("N/A");
+			}
+
+			// dto.setUserAssigneeName(row[3] != null ? row[3].toString() : "N/A");
+			if (row[4] != null) {
+				Long statusId = Long.valueOf(row[4].toString()); // Integer ? Long
+				WorkStatus workStatus1 = workStatusRepository.findById(statusId).orElse(null);
+				dto.setWorkStatusName(workStatus1 != null ? workStatus1.getWorkStatusNameE() : "N/A");
+			} else {
+				dto.setWorkStatusName("N/A");
+			}
+
+			if (row[5] != null) {
+				Long subStatusId = Long.valueOf(row[5].toString()); // Integer ? Long
+				WorkSubStatus workSubStatus1 = workSubStatusRepository.findById(subStatusId).orElse(null);
+				dto.setWorkSubTypeName(workSubStatus1 != null ? workSubStatus1.getWorkSubStatusNameE() : "N/A");
+			} else {
+				dto.setWorkSubTypeName("N/A");
+			}
+			// dto.setWorkStatusName(row[4] != null ? row[4].toString() : "N/A");
+			if (row[6] != null) {
+				Date modifiedDate = (Date) row[6];
+				dto.setModifiedDate(sdf.format(modifiedDate)); // String field for formatted date
+			} else {
+				dto.setModifiedDate("N/A");
+			}
+
+			workProgressList.add(dto);
 //	        System.err.println("dto------- " + dto);
-	    }
+		}
 
-	    return workProgressList;
+		return workProgressList;
 	}
 
-
-
-	
 	@Override
-	public List<WorkBean> getFilteredWorkWithLatestExpenses(String workStatusStr, String userIdStr, String agencyIdStr, String workName) {
+	public List<WorkBean> getFilteredWorkWithLatestExpenses(String workStatusStr, String userIdStr, String agencyIdStr,
+			String workName) {
 
-	    // Convert String parameters to Long safely
-	    Long workStatus = parseLongOrNull(workStatusStr);
-	    Long userId = parseLongOrNull(userIdStr);
-	    Long agencyId = parseLongOrNull(agencyIdStr);
-	    
-	    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		// Convert String parameters to Long safely
+		Long workStatus = parseLongOrNull(workStatusStr);
+		Long userId = parseLongOrNull(userIdStr);
+		Long agencyId = parseLongOrNull(agencyIdStr);
 
-	    // Fetch data using the repository query with filters and latest (year, month)
-	    List<Object[]> resultList = workRepository.fetchWorkWithLatestExpensesFilters(workStatus, userId, agencyId, workName);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-	    
-	    List<WorkBean> workList = new ArrayList<>();
+		// Fetch data using the repository query with filters and latest (year, month)
+		List<Object[]> resultList = workRepository.fetchWorkWithLatestExpensesFilters(workStatus, userId, agencyId,
+				workName);
 
-	    for (Object[] row : resultList) {
-	        WorkBean bean = new WorkBean();
+		List<WorkBean> workList = new ArrayList<>();
 
-	        // Work No
-	        bean.setWorkNo(row[0] != null ? row[0].toString() : "N/A");
+		for (Object[] row : resultList) {
+			WorkBean bean = new WorkBean();
 
-	        // Work Name
-	        bean.setWorkName(row[1] != null ? row[1].toString() : "N/A");
+			// Work No
+			bean.setWorkNo(row[0] != null ? row[0].toString() : "N/A");
 
-	        // Implementation Agency (id stored in DB)
-	        if (row[2] != null) {
-	            try {
-	                Long implId = Long.valueOf(row[2].toString());
-	                ImplementationAgency agency = implAgencyRepository.findOne(implId);
-	                bean.setImplementationAgencyName(agency != null ? agency.getImplAgencyname() : "N/A");
-	            } catch (Exception e) {
-	                bean.setImplementationAgencyName("N/A");
-	            }
-	        } else {
-	            bean.setImplementationAgencyName("N/A");
-	        }
+			// Work Name
+			bean.setWorkName(row[1] != null ? row[1].toString() : "N/A");
 
-	        // User / Assignee
-	        if (row[3] != null) {
-	            try {
-	                Long userIdVal = Long.valueOf(row[3].toString());
-	                Users user = userRepository.findOne(userIdVal);
-	                bean.setUserAssigneeName(user != null ? user.getFirstname() + " " + user.getLastname() : "N/A");
-	            } catch (Exception e) {
-	                bean.setUserAssigneeName("N/A");
-	            }
-	        } else {
-	            bean.setUserAssigneeName("N/A");
-	        }
+			// Implementation Agency (id stored in DB)
+			if (row[2] != null) {
+				try {
+					Long implId = Long.valueOf(row[2].toString());
+					ImplementationAgency agency = implAgencyRepository.findById(implId).orElse(null);
+					bean.setImplementationAgencyName(agency != null ? agency.getImplAgencyname() : "N/A");
+				} catch (Exception e) {
+					bean.setImplementationAgencyName("N/A");
+				}
+			} else {
+				bean.setImplementationAgencyName("N/A");
+			}
 
-	        // PAC (Tender amount)
-	        bean.setPac(row[4] != null ? new BigDecimal(row[4].toString()) : BigDecimal.ZERO);
+			// User / Assignee
+			if (row[3] != null) {
+				try {
+					Long userIdVal = Long.valueOf(row[3].toString());
+					Users user = userRepository.findById(userIdVal).orElse(null);
+					bean.setUserAssigneeName(user != null ? user.getFirstname() + " " + user.getLastname() : "N/A");
+				} catch (Exception e) {
+					bean.setUserAssigneeName("N/A");
+				}
+			} else {
+				bean.setUserAssigneeName("N/A");
+			}
 
-	        // Total Expenses (from Work Progress)
-	        bean.setTotalExpensess(row[5] != null ? new BigDecimal(row[5].toString()) : BigDecimal.ZERO);
+			// PAC (Tender amount)
+			bean.setPac(row[4] != null ? new BigDecimal(row[4].toString()) : BigDecimal.ZERO);
 
-	        // Total Expenses Upto March (latest year-month)
-	        bean.setLastExpenditure(row[6] != null ? new BigDecimal(row[6].toString()) : BigDecimal.ZERO);
+			// Total Expenses (from Work Progress)
+			bean.setTotalExpensess(row[5] != null ? new BigDecimal(row[5].toString()) : BigDecimal.ZERO);
 
-	        // Work Status
-	        if (row[7] != null) {
-	            Long statusId = Long.valueOf(row[7].toString()); // Integer → Long
-	            WorkStatus workStatus1 = workStatusRepository.findOne(statusId);
-	            bean.setWorkStatusName(workStatus1 != null ? workStatus1.getWorkStatusNameE() : "N/A");
-	        } else {
-	        	bean.setWorkStatusName("N/A");
-	        }
-	      //  bean.setWorkStatus(row[7] != null ? row[7].toString() : "N/A");
+			// Total Expenses Upto March (latest year-month)
+			bean.setLastExpenditure(row[6] != null ? new BigDecimal(row[6].toString()) : BigDecimal.ZERO);
 
-	        // Created Date (if needed)
-	        if (row.length > 8 && row[8] != null) {
-	        	if (row[8] != null) {
-	                Date modifiedDate = (Date) row[8];
-	                bean.setModifiedDate(sdf.format(modifiedDate)); // String field for formatted date
-	            } else {
-	            	bean.setModifiedDate("N/A");
-	            }
-	           // dto.setModifiedDate(row[5] != null ? (Date) row[5] : null);
-	        }
+			// Work Status
+			if (row[7] != null) {
+				Long statusId = Long.valueOf(row[7].toString()); // Integer ? Long
+				WorkStatus workStatus1 = workStatusRepository.findById(statusId).orElse(null);
+				bean.setWorkStatusName(workStatus1 != null ? workStatus1.getWorkStatusNameE() : "N/A");
+			} else {
+				bean.setWorkStatusName("N/A");
+			}
+			// bean.setWorkStatus(row[7] != null ? row[7].toString() : "N/A");
 
-	        workList.add(bean);
-	    }
+			// Created Date (if needed)
+			if (row.length > 8 && row[8] != null) {
+				if (row[8] != null) {
+					Date modifiedDate = (Date) row[8];
+					bean.setModifiedDate(sdf.format(modifiedDate)); // String field for formatted date
+				} else {
+					bean.setModifiedDate("N/A");
+				}
+				// dto.setModifiedDate(row[5] != null ? (Date) row[5] : null);
+			}
 
-	    return workList;
+			workList.add(bean);
+		}
+
+		return workList;
 	}
 
-	// Utility method to safely parse String → Long
+	// Utility method to safely parse String ? Long
 	private Long parseLongOrNull(String value) {
-	    try {
-	        return (value != null && !value.trim().isEmpty()) ? Long.parseLong(value.trim()) : null;
-	    } catch (NumberFormatException e) {
-	        return null;
-	    }
+		try {
+			return (value != null && !value.trim().isEmpty()) ? Long.parseLong(value.trim()) : null;
+		} catch (NumberFormatException e) {
+			return null;
+		}
 	}
 
 	@Override
 	public List<UserBean> fetchAssignedUsers() {
 
-	    List<Users> users = userRepository.findByDesignationIDAndStatus(1L, DMSConstants.STATUS_ACTIVE);
+		List<Users> users = userRepository.findByDesignationIDAndStatus(1L, DMSConstants.STATUS_ACTIVE);
 
-	    List<UserBean> userBeans = new ArrayList<>();
-	    
-	    if(users != null && !users.isEmpty()) {
-	    	for(Users user: users) {
-	    		UserBean bean = new UserBean();
-	            bean.setId(user.getId());
-	            bean.setFirstName(user.getFirstname() + " " + user.getLastname());
-	            userBeans.add(bean);
-	    	}
-	    }
+		List<UserBean> userBeans = new ArrayList<>();
 
-	    return userBeans;
+		if (users != null && !users.isEmpty()) {
+			for (Users user : users) {
+				UserBean bean = new UserBean();
+				bean.setId(user.getId());
+				bean.setFirstName(user.getFirstname() + " " + user.getLastname());
+				userBeans.add(bean);
+			}
+		}
+
+		return userBeans;
 	}
 
 	@Override
 	public List<UserBean> fetchAssignUser(Long implementationAgency) {
 
-	    List<Work> works = workRepository.findByImplementationAgency(implementationAgency);
-	    Set<Long> userIds = new HashSet<>();
+		List<Work> works = workRepository.findByImplementationAgency(implementationAgency);
+		Set<Long> userIds = new HashSet<>();
 
-	    // Step 1: Collect unique non-null user IDs
-	    for (Work work : works) {
-	        if (work.getUserAssignee() != null) {
-	            userIds.add(work.getUserAssignee());
-	        }
-	    }
+		// Step 1: Collect unique non-null user IDs
+		for (Work work : works) {
+			if (work.getUserAssignee() != null) {
+				userIds.add(work.getUserAssignee());
+			}
+		}
 
-	    List<UserBean> userBeans = new ArrayList<>();
+		List<UserBean> userBeans = new ArrayList<>();
 
-	    // Step 2: Fetch all unique users only once
-	    for (Long userId : userIds) {
-	        Users user = userRepository.findOne(userId);
-	        if (user != null) {
-	            UserBean bean = new UserBean();
-	            bean.setId(user.getId());
-	            bean.setFirstName(user.getFirstname() + " " + user.getLastname());
-	            userBeans.add(bean);
-	        }
-	    }
+		// Step 2: Fetch all unique users only once
+		for (Long userId : userIds) {
+			Users user = userRepository.findById(userId).orElse(null);
+			if (user != null) {
+				UserBean bean = new UserBean();
+				bean.setId(user.getId());
+				bean.setFirstName(user.getFirstname() + " " + user.getLastname());
+				userBeans.add(bean);
+			}
+		}
 
-	    return userBeans;
+		return userBeans;
 	}
 
 	@Override
 	public List<String> getWorkNoSuggestions(String keyword) {
-	    if (keyword == null || keyword.trim().isEmpty()) {
-	        return new ArrayList<>();
-	    }
-	    return workRepository.searchWorkNoSuggestions(keyword.trim());
+		if (keyword == null || keyword.trim().isEmpty()) {
+			return new ArrayList<>();
+		}
+		return workRepository.searchWorkNoSuggestions(keyword.trim());
 	}
 
-	
 	@Override
-	public List<FinancialAgencyBean> fetchFinancialAgencyByWorkId(Long workId){
+	public List<FinancialAgencyBean> fetchFinancialAgencyByWorkId(Long workId) {
 		List<WorkFinancialAgency> financialAgencyList = financialAgencyRepository.findByWorkId(workId);
-		
+
 		List<FinancialAgencyBean> bean = new ArrayList<FinancialAgencyBean>();
-		
+
 		for (WorkFinancialAgency financialAgency : financialAgencyList) {
 			FinancialAgencyBean financialAgencyBean = new FinancialAgencyBean();
 			financialAgencyBean.setId(financialAgency.getId());
 			financialAgencyBean.setCost(financialAgency.getCost());
 			financialAgencyBean.setExpenditure(financialAgency.getExpenditure());
-			if(financialAgency.getCost() != null && financialAgency.getExpenditure() != null) {
-			financialAgencyBean.setBalance(financialAgency.getCost() - financialAgency.getExpenditure());
+			if (financialAgency.getCost() != null && financialAgency.getExpenditure() != null) {
+				financialAgencyBean.setBalance(financialAgency.getCost() - financialAgency.getExpenditure());
 			}
-			//System.err.println("financialAgency.getId()==== " + financialAgency.getId());
-			if(financialAgency.getFinancialHeadId() != null) {
-			FinancialHead financialAgencyName = financialHeadRepository.findOne(financialAgency.getFinancialHeadId());
-			if(financialAgencyName != null) {
-			
-			financialAgencyBean.setFinancialAgencyName(financialAgencyName.getFinancialHeadName());
-			financialAgencyBean.setWorkId(financialAgency.getWorkId());
-			financialAgencyBean.setFinancialHeadId(financialAgencyName.getId());
-			}
+			// System.err.println("financialAgency.getId()==== " + financialAgency.getId());
+			if (financialAgency.getFinancialHeadId() != null) {
+				FinancialHead financialAgencyName = financialHeadRepository
+						.findById(financialAgency.getFinancialHeadId()).orElse(null);
+				if (financialAgencyName != null) {
+
+					financialAgencyBean.setFinancialAgencyName(financialAgencyName.getFinancialHeadName());
+					financialAgencyBean.setWorkId(financialAgency.getWorkId());
+					financialAgencyBean.setFinancialHeadId(financialAgencyName.getId());
+				}
 			}
 			bean.add(financialAgencyBean);
 		}
 		return bean;
 	}
-	
+
 	@Override
 	public String updateFinancialAgencyCost(Long id, Double expenditure, Long workId) {
 
-	    if (expenditure == null) {
-	        return "Invalid expenditure amount.";
-	    }
+		if (expenditure == null) {
+			return "Invalid expenditure amount.";
+		}
 
-	    WorkFinancialAgency entity = financialAgencyRepository.findOne(id);
+		WorkFinancialAgency entity = financialAgencyRepository.findById(id).orElse(null);
 
-	    if (entity == null) {
-	        return "Financial Agency record not found.";
-	    }
+		if (entity == null) {
+			return "Financial Agency record not found.";
+		}
 
-	    Double dbCost = entity.getCost();
-	    Double currentExpenditure = entity.getExpenditure() != null
-	            ? entity.getExpenditure()
-	            : 0.0;
+		Double dbCost = entity.getCost();
+		Double currentExpenditure = entity.getExpenditure() != null ? entity.getExpenditure() : 0.0;
 
-	    Double finalExpenditure = currentExpenditure + expenditure;
+		Double finalExpenditure = currentExpenditure + expenditure;
 
-	    // ✅ SOFT VALIDATION (NO ERROR)
-	    if (finalExpenditure > dbCost) {
-	        return "Expenditure cannot be greater than the cost. Remaining allowable amount is "
-	                + (dbCost - currentExpenditure) + ".";
-	    }
+		// ? SOFT VALIDATION (NO ERROR)
+		if (finalExpenditure > dbCost) {
+			return "Expenditure cannot be greater than the cost. Remaining allowable amount is "
+					+ (dbCost - currentExpenditure) + ".";
+		}
 
-	    entity.setExpenditure(finalExpenditure);
-	    financialAgencyRepository.save(entity);
+		entity.setExpenditure(finalExpenditure);
+		financialAgencyRepository.save(entity);
 
-	    return "SUCCESS";
+		syncWorkProgressExpenditureFromFinancialAgency(workId);
+
+		return "SUCCESS";
+	}
+
+	@Override
+	public Double sumFinancialAgencyExpenditureByWorkId(Long workId) {
+		if (workId == null) {
+			return 0.0;
+		}
+		Double total = financialAgencyRepository.sumExpenditureByWorkId(workId);
+		return total != null ? total : 0.0;
+	}
+
+	@Override
+	@Transactional
+	public void syncWorkProgressExpenditureFromFinancialAgency(Long workId) {
+		if (workId == null) {
+			return;
+		}
+		Double agencyTotal = sumFinancialAgencyExpenditureByWorkId(workId);
+		if (agencyTotal == null || agencyTotal <= 0) {
+			return;
+		}
+		WorkProgress workProgress = workProgressRepository.findByWorkId(workId);
+		if (workProgress != null) {
+			workProgress.setTotalExpensess(BigDecimal.valueOf(agencyTotal));
+			workProgressRepository.save(workProgress);
+		}
 	}
 
 	@Override
 	@Transactional
 	public String deleteByFinancailAgencyId(Long id) {
-	    if (id == null) {
-	        return "Given id not found";
-	    }
+		if (id == null) {
+			return "Given id not found";
+		}
 
-	    // Check if record exists
-	    boolean exists = financialAgencyRepository.existsById(id);
-	    if (!exists) {
-	        return "Record not found for id: " + id;
-	    }
+		// Check if record exists
+		boolean exists = financialAgencyRepository.existsById(id);
+		if (!exists) {
+			return "Record not found for id: " + id;
+		}
 
-	    // Delete from DB
-	    financialAgencyRepository.deleteById(id);
+		// Delete from DB
+		financialAgencyRepository.deleteById(id);
 
-	    return "Financial Agency Deleted Successfully...";
+		return "Financial Agency Deleted Successfully...";
 	}
 
 	@Override
@@ -10208,39 +10222,40 @@ public class CommonServiceImpl implements CommonService {
 		List<FinancialAgencyBean> beans = new ArrayList<FinancialAgencyBean>();
 		for (WorkFinancialAgency financialAgency : agencies) {
 			FinancialAgencyBean agencyBean = new FinancialAgencyBean();
-			if(financialAgency.getFinancialHeadId() != null) {
-			FinancialHead financialHead = financialHeadRepository.findOne(financialAgency.getFinancialHeadId());
-			if(financialHead != null) {
-				agencyBean.setFinancialAgencyName(financialHead.getFinancialHeadName());
-				agencyBean.setFinancialHeadId(financialHead.getId());
+			if (financialAgency.getFinancialHeadId() != null) {
+				FinancialHead financialHead = financialHeadRepository.findById(financialAgency.getFinancialHeadId())
+						.orElse(null);
+				if (financialHead != null) {
+					agencyBean.setFinancialAgencyName(financialHead.getFinancialHeadName());
+					agencyBean.setFinancialHeadId(financialHead.getId());
 				}
 			}
-			
+
 			agencyBean.setCost(financialAgency.getCost());
 			beans.add(agencyBean);
 		}
 		return beans;
 	}
-	
-	
+
 	@Override
 	public List<FinancialAgencyBean> getFinancialAgenciesExpenditureByWorkId(Long workId) {
 		List<WorkFinancialAgency> agencies = financialAgencyRepository.findByWorkId(workId);
 		List<FinancialAgencyBean> beans = new ArrayList<FinancialAgencyBean>();
 		for (WorkFinancialAgency financialAgency : agencies) {
 			FinancialAgencyBean agencyBean = new FinancialAgencyBean();
-			if(financialAgency.getFinancialHeadId() != null) {
-			FinancialHead financialHead = financialHeadRepository.findOne(financialAgency.getFinancialHeadId());
-			if(financialHead != null) {
-				agencyBean.setFinancialAgencyName(financialHead.getFinancialHeadName());
-				agencyBean.setFinancialHeadId(financialHead.getId());
+			if (financialAgency.getFinancialHeadId() != null) {
+				FinancialHead financialHead = financialHeadRepository.findById(financialAgency.getFinancialHeadId())
+						.orElse(null);
+				if (financialHead != null) {
+					agencyBean.setFinancialAgencyName(financialHead.getFinancialHeadName());
+					agencyBean.setFinancialHeadId(financialHead.getId());
 				}
 			}
-			
+
 			agencyBean.setCost(financialAgency.getCost());
-			if(financialAgency.getExpenditure() != null) {
-			agencyBean.setExpenditure(financialAgency.getExpenditure());
-			}else {
+			if (financialAgency.getExpenditure() != null) {
+				agencyBean.setExpenditure(financialAgency.getExpenditure());
+			} else {
 				agencyBean.setExpenditure(0.0);
 			}
 			beans.add(agencyBean);
@@ -10252,15 +10267,15 @@ public class CommonServiceImpl implements CommonService {
 	public List<DepartmentMasterBean> fetchDepartmentMaster() {
 		List<DepartmentMaster> departmentMastersList = departmentMasterRepository.findAll();
 		List<DepartmentMasterBean> departmentMasterBeans = new ArrayList<DepartmentMasterBean>();
-		
+
 		for (DepartmentMaster departmentMasters : departmentMastersList) {
-			DepartmentMasterBean bean =new DepartmentMasterBean();
+			DepartmentMasterBean bean = new DepartmentMasterBean();
 			bean.setId(departmentMasters.getId());
 			bean.setName(departmentMasters.getName());
-			bean.setEnabled(departmentMasters.getEnabled());	
+			bean.setEnabled(departmentMasters.getEnabled());
 			departmentMasterBeans.add(bean);
-			}
-	//	System.err.println("Service------- " + departmentMasterBeans.size());
+		}
+		// System.err.println("Service------- " + departmentMasterBeans.size());
 		return departmentMasterBeans;
 	}
 
@@ -10268,7 +10283,7 @@ public class CommonServiceImpl implements CommonService {
 	public List<DepartmentRemarksBean> fetchDepartmentRemarksList() {
 		List<DepartmentRemarks> departmentRemarksList = departmentRemarksRepository.findAll();
 		List<DepartmentRemarksBean> departmentRemarksBeans = new ArrayList<DepartmentRemarksBean>();
-		
+
 		for (DepartmentRemarks remark : departmentRemarksList) {
 			DepartmentRemarksBean bean = new DepartmentRemarksBean();
 			bean.setId(remark.getId());
@@ -10287,12 +10302,9 @@ public class CommonServiceImpl implements CommonService {
 			if (keyword == null || keyword.trim().isEmpty()) {
 				return new ArrayList<>();
 			}
-			Pageable pageable = new PageRequest(0, 100);
+			Pageable pageable = PageRequest.of(0, 100);
 			Page<Work> works = workRepository.findByWorkNameContainingIgnoreCase(pageable, keyword);
-			return works.getContent().stream()
-					.map(Work::getWorkName)
-					.distinct()
-					.collect(Collectors.toList());
+			return works.getContent().stream().map(Work::getWorkName).distinct().collect(Collectors.toList());
 		} catch (Exception e) {
 			logger.error("Error fetching work name suggestions", e);
 			return new ArrayList<>();
@@ -10305,7 +10317,7 @@ public class CommonServiceImpl implements CommonService {
 			if (districtId == null) {
 				return new ArrayList<>();
 			}
-			District district = districtRepository.findOne(districtId);
+			District district = districtRepository.findById(districtId).orElse(null);
 			if (district == null) {
 				return new ArrayList<>();
 			}
@@ -10324,50 +10336,50 @@ public class CommonServiceImpl implements CommonService {
 			return new ArrayList<>();
 		}
 	}
-	
+
 	@Override
 	public List<GeoTaggingBean> getGeoTaggingForWorkList(Long workId) {
 
-	    List<GeoTaggingBean> beanList = new ArrayList<>();
+		List<GeoTaggingBean> beanList = new ArrayList<>();
 
-	    try {
-	        List<WorkGeoLocation> geoList = geoLocationRepository.findByworkId(workId);
-	        List<LocationPoints> lp = pointsrepo.findAllByworkID(workId);
+		try {
+			List<WorkGeoLocation> geoList = geoLocationRepository.findByworkId(workId);
+			List<LocationPoints> lp = pointsrepo.findAllByworkID(workId);
 
-	        if (geoList != null && !geoList.isEmpty()) {
+			if (geoList != null && !geoList.isEmpty()) {
 
-	            for (WorkGeoLocation geo : geoList) {
+				for (WorkGeoLocation geo : geoList) {
 
-	                GeoTaggingBean bean = new GeoTaggingBean();
+					GeoTaggingBean bean = new GeoTaggingBean();
 
-	                bean.setAddress(geo.getAddress());
-	                bean.setAtProjectionLocation(geo.getAtProjectionLocation());
-	                bean.setCurrentLocation(geo.getCurrentPoint());
-	                bean.setWorkId(geo.getWorkId());
+					bean.setAddress(geo.getAddress());
+					bean.setAtProjectionLocation(geo.getAtProjectionLocation());
+					bean.setCurrentLocation(geo.getCurrentPoint());
+					bean.setWorkId(geo.getWorkId());
 
-	                // Points mapping
-	                if (lp != null && !lp.isEmpty()) {
-	                    List<GTPoint> points2 = new ArrayList<>();
+					// Points mapping
+					if (lp != null && !lp.isEmpty()) {
+						List<GTPoint> points2 = new ArrayList<>();
 
-	                    for (LocationPoints points : lp) {
-	                        GTPoint bean2 = new GTPoint();
-	                        bean2.setLattitude(points.getLattitude());
-	                        bean2.setLongitude(points.getLongitude());
-	                        points2.add(bean2);
-	                    }
+						for (LocationPoints points : lp) {
+							GTPoint bean2 = new GTPoint();
+							bean2.setLattitude(points.getLattitude());
+							bean2.setLongitude(points.getLongitude());
+							points2.add(bean2);
+						}
 
-	                    bean.setPoints(points2);
-	                }
+						bean.setPoints(points2);
+					}
 
-	                beanList.add(bean);
-	            }
-	        }
+					beanList.add(bean);
+				}
+			}
 
-	    } catch (Exception e) {
-	        logger.error("error getting Data", e);
-	    }
+		} catch (Exception e) {
+			logger.error("error getting Data", e);
+		}
 
-	    return beanList;
+		return beanList;
 	}
 
 	@Override
@@ -10381,7 +10393,8 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public List<DepartmentWiseReportRowBean> getDepartmentWiseReport(List<Long> agencyIds, List<Long> financialYearIds) {
+	public List<DepartmentWiseReportRowBean> getDepartmentWiseReport(List<Long> agencyIds,
+			List<Long> financialYearIds) {
 		List<DepartmentWiseReportRowBean> result = new ArrayList<>();
 		try {
 			List<Object[]> rows;

@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
+import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class DMSUtil {
 	public static String[] pdfOnly = { "application/pdf" };
 		
 	public static String getImageString(byte[] profileImage) {
-		return "data:image/jpg;base64," + Base64.encodeBase64String(profileImage);
+		return "data:image/jpg;base64," + Base64.getEncoder().encodeToString(profileImage);
 	}
 
 	@Autowired
@@ -942,7 +942,7 @@ public class DMSUtil {
 	public static String savebase64EncodedImage(String base, String documentsPath, String requestId, String encodedImg,
 			int count) throws DMSBusinessException {
 
-		byte[] decodedImg = Base64.decodeBase64(encodedImg.getBytes(StandardCharsets.UTF_8));
+		byte[] decodedImg = Base64.getDecoder().decode(encodedImg.getBytes(StandardCharsets.UTF_8));
 
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy_hh-mm-ss");

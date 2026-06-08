@@ -6,18 +6,36 @@
 <script type="text/javascript">
 	//<![CDATA[
 	function check_pass() {
-		if (document.getElementById('password').value
-				&& document.getElementById('confirmPassword').value) {
-			if (document.getElementById('password').value == document
-					.getElementById('confirmPassword').value) {
-				document.getElementById('submit').disabled = false;
-				document.getElementById('passwordError').style.display = 'none';
+		var password = document.getElementById('password');
+		var confirmPassword = document.getElementById('confirmPassword');
+		var submitBtn = document.getElementById('submit');
+		var errorDiv = document.getElementById('passwordError');
+		
+		if (password && confirmPassword && submitBtn && errorDiv) {
+			if (password.value && confirmPassword.value) {
+				if (password.value === confirmPassword.value) {
+					submitBtn.disabled = false;
+					errorDiv.style.display = 'none';
+				} else {
+					submitBtn.disabled = true;
+					errorDiv.style.display = 'block';
+				}
 			} else {
-				document.getElementById('submit').disabled = true;
-				document.getElementById('passwordError').style.display = 'block';
+				// If either field is empty, enable submit (Angular validation will handle it)
+				submitBtn.disabled = false;
+				errorDiv.style.display = 'none';
 			}
 		}
 	}
+	
+	// Ensure submit button is enabled on page load
+	document.addEventListener('DOMContentLoaded', function() {
+		var submitBtn = document.getElementById('submit');
+		if (submitBtn) {
+			submitBtn.disabled = false;
+			console.log('Submit button enabled on page load');
+		}
+	});
 	//]]>
 </script>
 
@@ -60,7 +78,7 @@
 								User</span>
 						</div>
 						<form data-ng-submit="addUser(userForm.$valid)" name="userForm"
-							novalidate="novalidate" data-ng-init="">
+							novalidate="novalidate" data-ng-init="userData.status='InActive';userData.role={};userData.role.roleCode='ROLE_AREA_OFFICER'">
 							<div class="card-body">
 								<div class="row">
 									<div class="col-md-12">
@@ -451,19 +469,9 @@
 									</div>
 								<div class="form-group col-sm-4" >
 										<label><span>Status</span><span class="aestrick">&#42;</span></label>
-										<select name="status" class="form-control" disabled="disabled"
-											data-ng-model="userData.status" >
-											
-											
-											<option value="" disabled="disabled" >InActive</option>
-										</select>
-										<div data-ng-show="userForm.$submitted">
-											<p class="help-block" style="color: red;"
-												data-ng-show="userForm.status.$error.required">
-												<span>Please select Status</span>
-											</p>
-										</div>	
-									</div>
+										<input type="hidden" name="status" data-ng-model="userData.status" value="InActive" />
+										<input type="text" class="form-control" value="InActive" disabled="disabled" />
+								</div>
 								</div>
 							</div>
 							<div class="card-footer text-right">

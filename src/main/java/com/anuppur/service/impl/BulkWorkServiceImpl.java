@@ -170,7 +170,7 @@ public class BulkWorkServiceImpl implements BulkWorkService {
             worksToSave.add(mapper.map(row, cache, username));
         }
         if (!worksToSave.isEmpty()) {
-            workRepository.save(worksToSave);
+            workRepository.saveAll(worksToSave);
         }
 
         // 8.4 Assemble result
@@ -254,7 +254,7 @@ public class BulkWorkServiceImpl implements BulkWorkService {
         }
 
         // Districts filtered by Division ID = 3 (mirrors fetchDistrictByDivision/3)
-        Division division = divisionRepository.findOne(DIVISION_ID);
+        Division division = divisionRepository.findById(DIVISION_ID).orElse(null);
         if (division != null) {
             for (District d : districtRepository.findByDivisionAndEnabled(division, (short) 1)) {
                 if (d.getDistrictName() != null) {

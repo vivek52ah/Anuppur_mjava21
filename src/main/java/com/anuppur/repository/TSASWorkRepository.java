@@ -16,7 +16,8 @@ import com.anuppur.entity.TSASWork;
 public interface TSASWorkRepository extends JpaRepository<TSASWork, Long>{
 	
 	
-	Page<TSASWork>  findByWorkStatusNotIn(Pageable pageable,String status);
+	@Query(value = "SELECT * FROM t_work_ts WHERE work_status != :status", nativeQuery = true)
+	Page<TSASWork>  findByWorkStatusNotIn(Pageable pageable, @Param("status") String status);
 	
 	
 	TSASWork  findByWorkId(Long id);

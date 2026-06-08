@@ -2,7 +2,6 @@ package com.anuppur.util;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,43 +13,24 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.anuppur.exception.DMSBusinessException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.google.gson.Gson;
-
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -124,7 +104,8 @@ public class HTTPClientUtil {
 			
 			
 			
-			URL requestUrl = new URL(spec);
+			URI requestUri = new URI(spec);
+			URL requestUrl = requestUri.toURL();
 			//System.out.println("URL: "+requestUrl);
 			
 			HttpsURLConnection connection = (HttpsURLConnection) requestUrl.openConnection();
@@ -151,9 +132,9 @@ public class HTTPClientUtil {
 				}
 			}
 			
-			if(body!=null && !StringUtils.isEmpty(body)) {
+			if(body!=null && !body.isEmpty()) {
 				OutputStream outStream = connection.getOutputStream();
-				OutputStreamWriter outStreamWriter = new OutputStreamWriter(outStream, "UTF-8");
+				OutputStreamWriter outStreamWriter = new OutputStreamWriter(outStream, StandardCharsets.UTF_8);
 				outStreamWriter.write(body);
 				outStreamWriter.flush();
 				outStreamWriter.close();
@@ -164,9 +145,9 @@ public class HTTPClientUtil {
 			int responseCode = connection.getResponseCode();
 			//System.out.println("GET Response Code :: " + responseCode);
 			if (responseCode == HttpsURLConnection.HTTP_OK) { // success
-				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(),"UTF-8"));
+				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 				String inputLine;
-				StringBuffer response = new StringBuffer();
+				StringBuilder response = new StringBuilder();
 
 				while ((inputLine = in.readLine()) != null) {
 					response.append(inputLine);
@@ -292,7 +273,8 @@ public class HTTPClientUtil {
 				spec = url + "?" + qString;
 			}
 			
-			URL requestUrl = new URL(spec);
+			URI requestUri = new URI(spec);
+			URL requestUrl = requestUri.toURL();
 			HttpsURLConnection connection = (HttpsURLConnection) requestUrl.openConnection();
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
@@ -313,9 +295,9 @@ public class HTTPClientUtil {
 				}
 			}
 			
-			if(body!=null && !StringUtils.isEmpty(body)) {
+			if(body!=null && !body.isEmpty()) {
 				OutputStream outStream = connection.getOutputStream();
-				OutputStreamWriter outStreamWriter = new OutputStreamWriter(outStream, "UTF-8");
+				OutputStreamWriter outStreamWriter = new OutputStreamWriter(outStream, StandardCharsets.UTF_8);
 				outStreamWriter.write(body);
 				outStreamWriter.flush();
 				outStreamWriter.close();
@@ -326,9 +308,9 @@ public class HTTPClientUtil {
 			int responseCode = connection.getResponseCode();
 			//System.out.println("GET Response Code :: " + responseCode);
 			if (responseCode == HttpsURLConnection.HTTP_OK) { // success
-				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
 				String inputLine;
-				StringBuffer response = new StringBuffer();
+				StringBuilder response = new StringBuilder();
 
 				while ((inputLine = in.readLine()) != null) {
 					response.append(inputLine);
@@ -428,7 +410,7 @@ public class HTTPClientUtil {
 		      }
 		      buffer.write(b);
 		    }
-		    return new String(buffer.toByteArray(), "UTF-8");
+		    return new String(buffer.toByteArray(), StandardCharsets.UTF_8);
 		  }
 
 	public static String fetchResponse(Map<String, String> requestParams, Map<String, String> headersMap, Object body, String url, HttpMethod httpMethod) throws Exception{
@@ -454,9 +436,9 @@ public class HTTPClientUtil {
 				int i=1;
 				for (Entry<String, String> entry : requestParams.entrySet()) {
 					if(i==size)
-						qString.append(entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), "UTF-8"));
+						qString.append(entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
 					else
-						qString.append(entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), "UTF-8") + "&");
+						qString.append(entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8) + "&");
 					
 					i++;
 				}

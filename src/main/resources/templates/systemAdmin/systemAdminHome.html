@@ -8,7 +8,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="Content-Security-Policy"
-	content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.canvasjs.com; frame-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; media-src 'none'; connect-src 'self'" />
+	content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.datatables.net https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.canvasjs.com; frame-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline' https://cdn.datatables.net https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self'; media-src 'none'" />
 <link rel="shortcut icon" th:href="@{/img/favicon.ico}"
 	type="image/x-icon" />
 <link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon" />
@@ -325,7 +325,6 @@
 		<div th:replace="fragments/footer :: footer" />
 		<script th:src="@{/angular/systemAdmin/SystemAdminRouting.js}"></script>
 		<script th:src="@{/angular/systemAdmin/SystemAdminController.js}"></script>
-		<script th:src="@{/angular/common/CommonRouting.js}"></script>
 		<script th:src="@{/angular/common/CommonController.js}"></script>
 		<script th:src="@{/angular/customdirective.js}"></script>
 	</div>

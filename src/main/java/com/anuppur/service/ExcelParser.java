@@ -75,7 +75,7 @@ public class ExcelParser {
 
     private String getCellStringValue(Cell cell) {
         if (cell == null) return "";
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case NUMERIC:
                 return new DataFormatter().formatCellValue(cell).trim();
             case STRING:

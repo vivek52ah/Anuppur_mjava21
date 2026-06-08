@@ -7,42 +7,41 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.anuppur.bean.ExpensesDataBean;
 import com.anuppur.entity.ExpensesData;
 
-public interface ExpensesDataRepository extends JpaRepository<ExpensesData, Long>{
+public interface ExpensesDataRepository extends JpaRepository<ExpensesData, Long> {
 
-	List<ExpensesData> findByStatus(Long status);
-	
-	@Query("SELECT sum(e.expensessCurrentFy) from ExpensesData e where e.workId IN:workId")
-	BigDecimal sumExpensesAmount(@Param("workId") Long workId);
+    List<ExpensesData> findByStatus(Long status);
 
-	List<ExpensesData> findByWorkId(Long workTypeId);
+    
+    // FIXED
+    @Query("SELECT SUM(e.expensessCurrentFy) FROM ExpensesData e WHERE e.workId IN :workIds")
+    BigDecimal sumExpensesAmount(@Param("workIds") List<Long> workIds);
 
-	List<ExpensesData> findByYearContainingAndWorkId(Long newYear, Long workTypeId);
+    
+    List<ExpensesData> findByWorkId(Long workTypeId);
 
-	List<ExpensesData> findByYearAndWorkIdIn(Long newYear, Long workId);
+    
+    // REMOVE Containing because Long field me Containing valid nahi hota
+    List<ExpensesData> findByYearAndWorkId(Long year, Long workTypeId);
 
-	List<ExpensesData> findByWorkIdAndStatusIn(Long workId, Long status);
+    
+    // FIXED
+    List<ExpensesData> findByYearAndWorkIdIn(Long year, List<Long> workIds);
 
-	 List<ExpensesData> findByWorkIdAndYearIn(Long workId, Long year);
+    
+    // statusIn => List required
+    List<ExpensesData> findByWorkIdAndStatusIn(Long workId, List<Long> statusList);
 
-	@Query("SELECT c From ExpensesData c ")
-	List<ExpensesData> getAllWork();
+    
+    // yearIn => List required
+    List<ExpensesData> findByWorkIdAndYearIn(Long workId, List<Long> years);
 
-	List<ExpensesData> getAllByWorkId(Long workTypeId);
+    
+    @Query("SELECT c FROM ExpensesData c")
+    List<ExpensesData> getAllWork();
 
-
-
-	//BigDecimal sumExpensesAmount(Long workId);
-	
-	
-	
-	/*
-	 * @Query("SELECT e.expId ,e.workId, e.year,e.expensessUptoMarch, e.expensessCurrentFy,e.totalExpensess,e.createdDate from ExpensesData e WHERE e.year IN :year AND e.workId IN :workId"
-	 * ) List<ExpensesData> findByYearContainingAndWorkId(@Param("year") Long year,
-	 * 
-	 * @Param("workId") Long workId);
-	 */
+    
+    List<ExpensesData> getAllByWorkId(Long workTypeId);
 
 }

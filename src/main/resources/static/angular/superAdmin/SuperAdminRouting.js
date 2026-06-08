@@ -1,7 +1,13 @@
-// Get the existing dms module (don't recreate it)
 var dms = angular.module('dms');
+dms.config(['KeepaliveProvider', 'IdleProvider', function(KeepaliveProvider, IdleProvider) {
+	  IdleProvider.idle(1800);
+	  IdleProvider.timeout(2);
+	  KeepaliveProvider.interval(2);
+	}]);
 
-// Add routes to the existing module
+dms.run(['Idle', function(Idle) {
+Idle.watch();
+}]);
 dms
 	.config( ['$routeProvider', function($routeProvider) {
 		$routeProvider

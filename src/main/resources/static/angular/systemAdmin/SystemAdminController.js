@@ -1,5 +1,169 @@
 var dms = angular.module('dms');
 
+(function(window, $) {
+	var currentSystemAdminTable = null;
+
+	jQuery.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings) {
+		return {
+			"iStart" : oSettings._iDisplayStart,
+			"iEnd" : oSettings.fnDisplayEnd(),
+			"iLength" : oSettings._iDisplayLength,
+			"iTotal" : oSettings.fnRecordsTotal(),
+			"iFilteredTotal" : oSettings.fnRecordsDisplay(),
+			"iPage" : oSettings._iDisplayLength === -1 ? 0 : Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+			"iTotalPages" : oSettings._iDisplayLength === -1 ? 0 : Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+		};
+	};
+
+	function attachTableButton(label, href) {
+		var buttonHtml = '<div class="dt-buttons btn-group ml-1"><a class="btn btn-secondary" href="' + href + '"> <span>' + label + '</span></a></div>';
+		$('.datatbl-top').append(buttonHtml);
+	}
+
+	window.fetchWorkSubType = function() {
+		currentSystemAdminTable = $("#dynamic-table").DataTable({
+			"processing": true,
+			"serverSide": true,
+			"sort": "position",
+			"bStateSave": false,
+			"iDisplayLength": 10,
+			"iDisplayStart": 0,
+			"pagingType": "full_numbers",
+			"aaSorting": [],
+			"dom": "<'row'<'col-12 datatbl-top'lB>><'row'<'col-md-6'r><'col-md-6'>><'row'<'col-md-12't>><'row'<'col-md-6'i><'col-md-6'p>>",
+			"buttons": [{
+				"extend": 'excelHtml5',
+				"title": 'Worktype_data',
+				"text": '<span class="fa fa-file-excel-o"></span> Excel Export',
+				"exportOptions": { "columns": [0, 1] }
+			}],
+			"lengthMenu": [[10, 25, 50, 100000], [10, 25, 50, "All"]],
+			"fnDrawCallback": function() {
+				var scope = angular.element('#StartOrFinishSpinnerId').scope();
+				if (scope && scope.startOrStopSpinner) {
+					scope.startOrStopSpinner(false);
+				}
+			},
+			"fnServerParams": function(aoData) {
+				aoData.push({ "name": "searchBoxVal", "value": $('#searchBox').val().trim() });
+			},
+			"fnCreatedRow": function(nRow, aData) {
+				$('td:eq(2)', nRow).html('<a class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="View/Edit" href="#editWorkType/' + encryptFunc(aData.workTypeId) + '"><i class="fa fa-pencil"></i></a>');
+				$('td:eq(2)', nRow).append('<a onclick="return deleteWorkSubType(' + aData.workTypeId + ');" href="" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash-o"></i></a> ');
+			},
+			"fnRowCallback": function(nRow, aData, iDataIndex, iDisplayIndexFull) {},
+			"language": { "searchPlaceholder": "Name" },
+			"sAjaxSource": "fetchWorkType",
+			"columns": [{ "data": "Index", "bSortable": false }, { "mData": "workTypeNameE", "bSortable": false, mRender: function(mData, type, row) { var dn = row.workTypeNameE; return dn == null ? "-" : dn; } }, { "mData": null, "bSortable": false }]
+		});
+		attachTableButton('Add Work Type', '#addWorkType');
+	};
+
+	window.fetchWorkSubTypes = function() {
+		currentSystemAdminTable = $("#dynamic-table").DataTable({
+			"processing": true,
+			"serverSide": true,
+			"sort": "position",
+			"bStateSave": false,
+			"iDisplayLength": 10,
+			"iDisplayStart": 0,
+			"pagingType": "full_numbers",
+			"aaSorting": [],
+			"dom": "<'row'<'col-12 datatbl-top'lB>><'row'<'col-md-6'r><'col-md-6'>><'row'<'col-md-12't>><'row'<'col-md-6'i><'col-md-6'p>>",
+			"buttons": [{
+				"extend": 'excelHtml5',
+				"title": 'WorkSubtype_data',
+				"text": '<span class="fa fa-file-excel-o"></span> Excel Export',
+				"exportOptions": { "columns": [0, 1] }
+			}],
+			"lengthMenu": [[10, 25, 50, 100000], [10, 25, 50, "All"]],
+			"fnDrawCallback": function() {
+				var scope = angular.element('#StartOrFinishSpinnerId').scope();
+				if (scope && scope.startOrStopSpinner) {
+					scope.startOrStopSpinner(false);
+				}
+			},
+			"fnServerParams": function(aoData) {
+				aoData.push({ "name": "searchBoxVal", "value": $('#searchBox').val().trim() });
+			},
+			"fnCreatedRow": function(nRow, aData) {
+				$('td:eq(2)', nRow).html('<a class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="View/Edit" href="#editWorkSubTypes/' + encryptFunc(aData.workSubTypeId) + '"><i class="fa fa-pencil"></i></a>');
+				$('td:eq(2)', nRow).append('<a onclick="return deleteWorkSubTypes(' + aData.workSubTypeId + ');" href="" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash-o"></i></a> ');
+			},
+			"fnRowCallback": function(nRow, aData, iDataIndex, iDisplayIndexFull) {},
+			"language": { "searchPlaceholder": "Name" },
+			"sAjaxSource": "fetchWorkSubTypes",
+			"columns": [{ "data": "index", "bSortable": false }, { "mData": "workSubTypeNameE", "bSortable": false, mRender: function(mData, type, row) { var dn = row.workSubTypeNameE; return dn == null ? "-" : dn; } }, { "mData": null, "bSortable": false }]
+		});
+		attachTableButton('Add Sub Work Type', '#addWorkSubTypes');
+	};
+
+	window.deleteWorkSubType = function(workTypeId) {
+		return angular.element('#page-div').scope().deleteWorkSubType(workTypeId);
+	};
+
+	window.deleteWorkSubTypes = function(workSubTypeId) {
+		return angular.element('#page-div').scope().deleteWorkSubTypes(workSubTypeId);
+	};
+
+	window.initDepartmentUserTable = function() {
+		if ($.fn.DataTable && $.fn.DataTable.isDataTable('#dynamic-table')) {
+			$('#dynamic-table').DataTable().destroy();
+			$('#dynamic-table tbody').remove();
+		}
+		currentSystemAdminTable = $("#dynamic-table").DataTable({
+			"processing": true,
+			"serverSide": true,
+			"sort": "position",
+			"bStateSave": false,
+			"iDisplayLength": 10,
+			"iDisplayStart": 0,
+			"pagingType": "full_numbers",
+			"aaSorting": [],
+			"dom": "<'row'<'col-12 datatbl-top'lB>><'row'<'col-md-6'r><'col-md-6'>><'row'<'col-md-12't>><'row'<'col-md-6'i><'col-md-6'p>>",
+			"buttons": [{
+				"extend": 'excelHtml5',
+				"title": 'Department_User_Data',
+				"text": '<span class="fa fa-file-excel-o"></span> Excel Export',
+				"exportOptions": { "columns": [0, 1, 2, 3, 4, 5, 6] }
+			}],
+			"lengthMenu": [[10, 25, 50, 100000], [10, 25, 50, "All"]],
+			"fnDrawCallback": function() {
+				var scope = angular.element('#StartOrFinishSpinnerId').scope()
+					|| angular.element('#page-div').scope();
+				if (scope) {
+					scope._userListLoading = false;
+					if (scope.startOrStopSpinner) {
+						scope.startOrStopSpinner(false);
+					}
+				}
+			},
+			"fnServerParams": function(aoData) {
+				aoData.push({ "name": "searchBoxVal", "value": $('#searchBox').val().trim() });
+				aoData.push({ "name": "status", "value": $('#status').val() });
+				aoData.push({ "name": "emailId", "value": $('#emailId').val().trim() });
+			},
+			"fnCreatedRow": function(nRow, aData) {
+				$('td:eq(7)', nRow).html('<a class="btn btn-xs btn-primary" data-toggle="tooltip" data-placement="top" title="View/Edit" href="#editDepartmentUser/' + encryptFunc(aData.id) + '"><i class="fa fa-pencil"></i></a>');
+				$('td:eq(7)', nRow).append('<a onclick="return deleteUser(' + aData.id + ');" href="" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash-o"></i></a> ');
+			},
+			"language": { "searchPlaceholder": "firstName" },
+			"sAjaxSource": "fetchUserList",
+			"columns": [{ "data": "index", "bSortable": false }, { "mData": "departmentName", "render": function(data, type, row) { return row.departmentName == null ? "--" : row.departmentName; }, "bSortable": false }, { "mData": null, "render": function(data, type, row) { return row.firstName + " " + row.lastName; }, "bSortable": false }, { "mData": "mobileNo", "bSortable": false }, { "mData": "emailId", "bSortable": false }, { "mData": "designationName", "bSortable": false }, { "mData": "status" }, { "mData": null, "bSortable": false }]
+		});
+	};
+
+	window.deleteUser = function(id) {
+		return angular.element('#page-div').scope().deleteUser(id);
+	};
+
+	window.reDraw = function() {
+		if (currentSystemAdminTable && typeof currentSystemAdminTable.draw === 'function') {
+			currentSystemAdminTable.draw(false);
+		}
+	};
+})(window, jQuery);
+
 /*dms.run(['$rootScope', function($rootScope) {
 	$rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 		$rootScope.title = current.$$route.title;        
@@ -533,9 +697,39 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 	};
 
 	$scope.loadUserList = function() {
-
+		if ($scope._userListLoading) {
+			return;
+		}
+		$scope._userListLoading = true;
 		$loading.start('sample-1');
-		fetchUserList();
+		var hash = $window.location.hash || '';
+		var initFn = null;
+		if (hash.indexOf('manageusers') !== -1 && typeof window.initManageUsersTable === 'function') {
+			initFn = window.initManageUsersTable;
+		} else if (hash.indexOf('manageDepartmentUser') !== -1 && typeof window.initDepartmentUserTable === 'function') {
+			initFn = window.initDepartmentUserTable;
+		} else if (typeof window.fetchUserList === 'function') {
+			initFn = window.fetchUserList;
+		}
+		try {
+			if (initFn) {
+				initFn();
+			} else {
+				console.error('No user table init function for route:', hash);
+				$scope._userListLoading = false;
+				$loading.finish('sample-1');
+			}
+		} catch (e) {
+			console.error('loadUserList failed:', e);
+			$scope._userListLoading = false;
+			$loading.finish('sample-1');
+		}
+		$timeout(function() {
+			if ($scope._userListLoading) {
+				$scope._userListLoading = false;
+				$loading.finish('sample-1');
+			}
+		}, 30000);
 	};
 
 	$scope.loadUserRoles = function() {
@@ -1552,6 +1746,8 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 
 			$scope.workSubTypes = {};
 			fetchWorkSubTypes();
+		} else {
+			$loading.finish('sample-1');
 		}
 	};
 

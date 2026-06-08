@@ -35,19 +35,19 @@ public  class ConverterServiceImpl implements ConverterService {
 			bean.setStatus(entity.getStatus());
 			bean.setTemplateIdEn(entity.getTemplateIdEn());
 			bean.setTemplateIdHi(entity.getTemplateIdHi());
-			bean.setTemplateId(locale.getLanguage().equals(new Locale(DMSConstants.LOCALE_HI).getLanguage())
+			bean.setTemplateId(locale.getLanguage().equals(Locale.of(DMSConstants.LOCALE_HI).getLanguage())
 					? entity.getTemplateIdHi()
 					: entity.getTemplateIdEn());
 
 			bean.setMessageTextEn(entity.getMessageTextEn());
 			bean.setMessageTextHi(entity.getMessageTextHi());
-			bean.setMessageText(locale.getLanguage().equals(new Locale(DMSConstants.LOCALE_HI).getLanguage())
+			bean.setMessageText(locale.getLanguage().equals(Locale.of(DMSConstants.LOCALE_HI).getLanguage())
 					? entity.getMessageTextHi()
 					: entity.getMessageTextEn());
 
 			bean.setSubjectEn(entity.getSubjectEn());
 			bean.setSubjectHi(entity.getSubjectHi());
-			bean.setSubject(locale.getLanguage().equals(new Locale(DMSConstants.LOCALE_HI).getLanguage())
+			bean.setSubject(locale.getLanguage().equals(Locale.of(DMSConstants.LOCALE_HI).getLanguage())
 					? entity.getSubjectHi()
 					: entity.getSubjectEn());
 

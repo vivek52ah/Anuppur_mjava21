@@ -3,17 +3,21 @@ package com.anuppur.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.resource.ContentVersionStrategy;
 import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
 import org.springframework.web.servlet.resource.VersionResourceResolver;
 
+/**
+ * ✅ UPDATED FOR SPRING BOOT 3.2.5 & JAVA 21
+ * Changed from WebMvcConfigurerAdapter (deprecated) to WebMvcConfigurer (interface)
+ * WebMvcConfigurerAdapter was deprecated in Spring 5.0 and removed in Spring 6.0
+ */
 @Configuration
-public class WebConfig extends WebMvcConfigurerAdapter {
+public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
@@ -43,7 +47,8 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		.setCachePeriod(60 * 60 * 24 * 365) /* one year */
 		.resourceChain(true)
 		.addResolver(versionResourceResolver);
-		 registry.addResourceHandler("/js/leaflet/images/**")
+		
+		registry.addResourceHandler("/js/leaflet/images/**")
          .addResourceLocations("classpath:/static/js/leaflet/images/")
          .setCachePeriod(60 * 60 * 24 * 365) // 1 year cache period
          .resourceChain(true)
@@ -54,14 +59,4 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	public ResourceUrlEncodingFilter resourceUrlEncodingFilter() {
 		return new ResourceUrlEncodingFilter();
 	}
-	
-	
-	 @Override
-	    public void configurePathMatch(PathMatchConfigurer configurer) {
-	        configurer.setUseSuffixPatternMatch(false);
-	    }
-	
-	
-
-	
 }

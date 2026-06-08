@@ -1036,10 +1036,11 @@
 				<!--/.row-->
 
 				<!-- add 2 row by sumit  -->
-				<div class="row">
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='3'">
+				<!-- Row: Tender Called Date (status 3 only) -->
+				<div class="row" data-ng-show="workDataTender.workStatusId=='3'">
+
+					<div class="form-group col-sm-4">
 						<label><span>Tender Called Date</span> <span
 							class="aestrick">&#42;</span> </label>
 						<div class="input-group date" id="datetimepicker16"
@@ -1068,10 +1069,7 @@
 						</div>
 					</div>
 
-
-
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='3'">
+					<div class="form-group col-sm-4">
 						<label><span>E-Tender No.</span></label> <input
 							class="form-control" id="eTenderNo"
 							disabled="disabled"
@@ -1085,13 +1083,12 @@
 						</div>
 					</div>
 
+				</div>
 
+				<!-- Row: Tender Received Date (status 4 only) -->
+				<div class="row" data-ng-show="workDataTender.workStatusId=='4'">
 
-
-
-
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='4'">
+					<div class="form-group col-sm-4">
 						<label><span>Tender Received Date</span><span
 							class="aestrick">&#42;</span></label>
 						<div class="input-group date" id="datetimepicker17"
@@ -1102,7 +1099,6 @@
 								disabled="disabled"
 								data-ng-model="workDataTender.tenderReceivedDate"
 								id="tenderReceivedDate" autocomplete="off" />
-
 
 							<div class="input-group-append input-group-addon"
 								data-target="#datetimepicker17" data-toggle="datetimepicker">
@@ -1119,16 +1115,14 @@
 								Received Date<span></span>
 							</p>
 						</div>
-
 					</div>
 
+				</div>
 
+				<!-- Row: Re-Tender Date (status 14 only) -->
+				<div class="row" data-ng-show="workDataTender.workStatusId=='14'">
 
-
-
-
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='14'">
+					<div class="form-group col-sm-4">
 						<label><span>Re-Tender Date</span></label>
 						<div class="input-group date" id="datetimepicker18"
 							data-target-input="nearest">
@@ -1138,7 +1132,6 @@
 								disabled="disabled"
 								data-ng-model="workDataTender.reTenderDate" id="reTenderDate"
 								autocomplete="off" />
-
 
 							<div class="input-group-append input-group-addon"
 								data-target="#datetimepicker18" data-toggle="datetimepicker">
@@ -1155,22 +1148,23 @@
 								<span></span>
 							</p>
 						</div>
-
 					</div>
 
+				</div>
 
-					<div class="form-group col-sm-4"
-						data-ng-show="workDataTender.workStatusId=='7'">
+				<!-- Row: LoA Issued Date (status 7 only) -->
+				<div class="row" data-ng-show="workDataTender.workStatusId=='7'">
+
+					<div class="form-group col-sm-4">
 						<label><span>LoA Issued Date</span><span class="aestrick">&#42;</span></label>
 						<div class="input-group date" id="datetimepicker21"
 							data-target-input="nearest">
-							<input type="text" class="form-control datepicker-input" 
+							<input type="text" class="form-control datepicker-input"
 								data-target="#datetimepicker21" name="loaIssuedDate"
 								placeholder="DD/MM/YYYY" required="required"
 								disabled="disabled"
 								data-ng-model="workDataTender.loaIssuedDate" id="loaIssuedDate"
 								autocomplete="off" />
-
 
 							<div class="input-group-append input-group-addon"
 								data-target="#datetimepicker21" data-toggle="datetimepicker">
@@ -1187,8 +1181,8 @@
 								Date<span></span>
 							</p>
 						</div>
-
 					</div>
+
 				</div>
 				<!-- end 5 row by Sumit -->
 

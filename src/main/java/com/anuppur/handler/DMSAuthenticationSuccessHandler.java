@@ -3,9 +3,9 @@ package com.anuppur.handler;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ AuthenticationSuccessHandler {
 		    }
 			  if(role.equals("ROLE_AREA_OFFICER")) {
 				 // logger.info("i am in role butwy ");
-			      // targetUrl = "/systemAdmin/home#/manageOngoingWorks"; // Example URL for AREA_OFFICER
+			      targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
 			       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
 			       return;
 			       }
@@ -112,3 +112,4 @@ AuthenticationSuccessHandler {
 		this.redirectStrategy = redirectStrategy;
 	}
 }
+

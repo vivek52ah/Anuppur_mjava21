@@ -171,11 +171,11 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 				
 				if(!StringUtils.isEmpty(searchParameter) && (!StringUtils.isEmpty(mobileNo)  && (!StringUtils.isEmpty(emailId)))) {
 					 
-					users = userRepository.findByStatusNotInAndFirstnameAndEmailIdAndMobileNoAndDesignationIDAndCreatedBy(pageable,  
+					users = userRepository.findByStatusNotAndFirstnameAndEmailIdAndMobileNoAndDesignationIDAndCreatedBy(pageable,  
 							DMSConstants.STATUS_DELETED, searchParameter,emailId,mobileNo,1L,be.getUsername());
 				}
 				else if(!StringUtils.isEmpty(mobileNo) ) {
-					users = userRepository.findByStatusNotInAndMobileNoAndDesignationIDAndCreatedBy(pageable,  
+					users = userRepository.findByStatusNotAndMobileNoAndDesignationIDAndCreatedBy(pageable,  
 							DMSConstants.STATUS_DELETED,mobileNo,1L,be.getUsername());
 				}
 				
@@ -258,7 +258,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 	public UserBean fetchUserDetails(Long id){
 		
 		try{
-			Users entity = userRepository.findOne(id);
+			Users entity = userRepository.findById(id).orElse(null);
 		
 			return convertUserEntityToBean(entity);
 		}
@@ -393,7 +393,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 			List<RoleBean> beanList = new LinkedList<>();
 			if (null != rolecods) {
 				
-				List<Role> list=roleRepository.findAll(rolecods);
+				List<Role> list=roleRepository.findAllById(rolecods);
 				if (null != list && !list.isEmpty()) {
 					for (Role role : list) {
 						beanList.add(convertRoleEntityToBean(role));
@@ -427,19 +427,19 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 					convertUserBeanToEntity(entity, bean);
 					
 					Set<Role> roles = new HashSet<>();
-				//	roles.add(roleRepository.findOne(bean.getRole().getRoleCode()));
+				//	roles.add(roleRepository.findById(bean.getRole().getRoleCode()).orElse(null));
 					if(bean.getDesignationId() == 1L) {
-						roles.add(roleRepository.findOne(new Role("ROLE_AREA_OFFICER").getRoleCode()));
+						roles.add(roleRepository.findById(new Role("ROLE_AREA_OFFICER").getRoleCode()).orElse(null));
 						
 							entity.setStatus(DMSConstants.STATUS_PENDING);
 						    entity.setDepartmentName( userRepository.findByUsernameAndStatus(DMSUtil.getUserDetail().getUsername(),"Active").getDepartmentName() );
 						
 					}
 					if(bean.getDesignationId() == 2L) {
-						roles.add(roleRepository.findOne(new Role("ROLE_DEPARTMENT").getRoleCode()));
+						roles.add(roleRepository.findById(new Role("ROLE_DEPARTMENT").getRoleCode()).orElse(null));
 					}
 					if(bean.getDesignationId() == 3L) {
-						roles.add(roleRepository.findOne(new Role("ROLE_DM").getRoleCode()));
+						roles.add(roleRepository.findById(new Role("ROLE_DM").getRoleCode()).orElse(null));
 						List<Users> DMUser=userRepository.findByDesignationIDAndStatus(3L, "Active");
 						 if(DMUser != null
 								 && !DMUser.isEmpty()) {
@@ -447,7 +447,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 						 }
 					}
 						 if(bean.getDesignationId() == 5L) {
-								roles.add(roleRepository.findOne(new Role("ROLE_CEO").getRoleCode()));
+								roles.add(roleRepository.findById(new Role("ROLE_CEO").getRoleCode()).orElse(null));
 								List<Users> DMUsers=userRepository.findByDesignationIDAndStatus(5L, "Active");
 								 if(DMUsers != null
 										 && !DMUsers.isEmpty()) {
@@ -507,7 +507,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 		
 		try{
 			logger.info("edit me i");
-			Users entity = userRepository.findOne(bean.getId());
+			Users entity = userRepository.findById(bean.getId()).orElse(null);
 			if(!entity.getEmailId().equals(bean.getEmailId())){//if EmailId has changed
 				//check whether already exist
 				Users user = userRepository.findByUsernameAndStatusNot(bean.getEmailId(), DMSConstants.STATUS_DELETED);
@@ -530,7 +530,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 			
 			Set<Role> roles = new HashSet<>();
 			if(bean.getDesignationId() == 1L) {
-				roles.add(roleRepository.findOne(new Role("ROLE_AREA_OFFICER").getRoleCode()));
+				roles.add(roleRepository.findById(new Role("ROLE_AREA_OFFICER").getRoleCode()).orElse(null));
 				if(!bean.getStatus().isEmpty()) {
 					entity.setStatus(bean.getStatus());
 				}else {
@@ -538,10 +538,10 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 				}
 			}
 			if(bean.getDesignationId() == 2L) {
-				roles.add(roleRepository.findOne(new Role("ROLE_DEPARTMENT").getRoleCode()));
+				roles.add(roleRepository.findById(new Role("ROLE_DEPARTMENT").getRoleCode()).orElse(null));
 			}
 			if(bean.getDesignationId() == 3L) {
-				roles.add(roleRepository.findOne(new Role("ROLE_DM").getRoleCode()));
+				roles.add(roleRepository.findById(new Role("ROLE_DM").getRoleCode()).orElse(null));
 			}
 			entity.setRoles(roles);
 			
@@ -569,7 +569,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 	public String deleteUser(Long id){
 		
 		try{
-			Users entity = userRepository.findOne(id);
+			Users entity = userRepository.findById(id).orElse(null);
 			if(entity!=null){
 				entity.setStatus(DMSConstants.STATUS_DELETED);
 				userRepository.save(entity);
@@ -637,7 +637,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 				bean.setDepartmentName("Collectorate");
 				
 			}
-			Designation designation = designationRepository.findOne(user.getDesignationID());
+			Designation designation = designationRepository.findById(user.getDesignationID()).orElse(null);
 			if(designation != null) {
 			bean.setDesignationName(designation.getDesignationNameEnglish());
 			}
@@ -843,11 +843,11 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 		try {
 			
 			if(bean.getRolee().equals("ROLE_DEPARTMENT")) {
-			return  Arrays.asList(designationRepository.findOne(1L));
+			return  Arrays.asList(designationRepository.findById(1L).orElse(null));
 		    }
 		    if(bean.getRolee().equals("ROLE_SYSTEM_ADMIN")) {
-		    	logger.info( designationRepository.findOne(2L).getDesignationNameEnglish()+" "+designationRepository.findOne(3L) .getDesignationNameEnglish());
-			return  Arrays.asList(designationRepository.findOne(2L),designationRepository.findOne(3L), designationRepository.findOne(5L));
+		    	logger.info( designationRepository.findById(2L).orElse(null).getDesignationNameEnglish()+" "+designationRepository.findById(3L).orElse(null).getDesignationNameEnglish());
+			return  Arrays.asList(designationRepository.findById(2L).orElse(null),designationRepository.findById(3L).orElse(null), designationRepository.findById(5L).orElse(null));
 		
 		    }
 			return null;

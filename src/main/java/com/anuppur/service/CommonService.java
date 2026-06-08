@@ -442,6 +442,10 @@ public interface CommonService {
 
 	String updateFinancialAgencyCost(Long id, Double expenditure, Long workId);
 
+	Double sumFinancialAgencyExpenditureByWorkId(Long workId);
+
+	void syncWorkProgressExpenditureFromFinancialAgency(Long workId);
+
 	String deleteByFinancailAgencyId(Long id);
 
 	List<String> getWorkNoSuggestions(String keyword);

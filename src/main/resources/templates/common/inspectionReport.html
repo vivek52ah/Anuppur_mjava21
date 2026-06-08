@@ -710,7 +710,7 @@ table.dataTable {
             paging: true,
             aaSorting: [],
             
-            lengthMenu: [[10, 25, 50, 100000], [10, 25, 50, "All"]],
+            lengthMenu: [ [10, 25, 50, 100000], [10, 25, 50, "All"] ],
             
 
             columns: [ 
@@ -847,7 +847,7 @@ table.dataTable {
      
      function downloadFileWSDocumnt(documentId, workSubStatusNameE) {
     	    // Build the image URL
-    	    let url = getBaseUrl() + '/downloadDocumentWSPro/' + documentId;
+    	    let url = getBaseUrl() + '/systemAdmin/downloadDocumentWSPro/' + documentId;
 
     	    // Set the image URL in the modal
     	    document.querySelector('#exampleModal img').src = url;
@@ -1011,7 +1011,9 @@ window.openProgressImages = function (rowIndex) {
         return;
     }
 
-    window.currentImageList = data.docs.filter(doc => doc.workStatusId === 10);
+    window.currentImageList = data.docs.filter(function (doc) {
+        return doc && doc.documentId != null;
+    });
     window.currentImageIndex = 0;
 
     // AngularJS scope update
@@ -1040,7 +1042,7 @@ window.openProgressImages = function (rowIndex) {
 window.showImageAt = function (index) {
     if (index >= 0 && index < window.currentImageList.length) {
         const doc = window.currentImageList[index];
-        const url = getBaseUrl() + '/downloadDocumentWSPro/' + doc.documentId;
+        const url = getBaseUrl() + '/systemAdmin/downloadDocumentWSPro/' + doc.documentId;
         document.getElementById('modalImage').src = url;
         
         

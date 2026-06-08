@@ -250,7 +250,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public WorkCategoryBean fetchWorkCatById(long id) {
 		try {
-			WorkCategory entity = workCategoryRepository.findOne(id);
+			WorkCategory entity = workCategoryRepository.findById(id).orElse(null);
 
 			return convertWorkCategoryEntityToBean(entity);
 		} catch (Exception e) {
@@ -262,7 +262,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public String deleteWorkCatById(Long id) {
 		try {
-			WorkCategory entity = workCategoryRepository.findOne(id);
+			WorkCategory entity = workCategoryRepository.findById(id).orElse(null);
 			if (entity != null) {
 				entity.setEnabled((short) 0);
 				workCategoryRepository.save(entity);
@@ -410,7 +410,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	public WorkCategoryBean fetchWorkFacilityById(Long id) {
 
 		try {
-			WorkCategory entity = workCategoryRepository.findOne(id);
+			WorkCategory entity = workCategoryRepository.findById(id).orElse(null);
 			return convertWorkCategoryEntityToBean(entity);
 		} catch (Exception e) {
 			logger.error("An exception occurred.", e);
@@ -424,7 +424,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	public String deleteWorkFacility(Long id) {
 
 		try {
-			WorkCategory entity = workCategoryRepository.findOne(id);
+			WorkCategory entity = workCategoryRepository.findById(id).orElse(null);
 			if (entity != null) {
 				entity.setEnabled((short) 0);
 				workCategoryRepository.save(entity);
@@ -440,7 +440,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public WorkTypeBean fetchWorkTypeById(Long id) {
 		try {
-			WorkType entity = workTypeRepository.findOne(id);
+			WorkType entity = workTypeRepository.findById(id).orElse(null);
 			return convertWorkTypeEntityToBean(entity);
 		} catch (Exception e) {
 			logger.error("An exception occurred.", e);
@@ -462,7 +462,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	public String deleteWorkSubType(Long id) {
 
 		try {
-			WorkType entity = workTypeRepository.findOne(id);
+			WorkType entity = workTypeRepository.findById(id).orElse(null);
 			if (entity != null) {
 				entity.setEnabled((short) 0);
 				workTypeRepository.save(entity);
@@ -485,7 +485,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 
 			if (bean.getWorkTypeId() != null) {
 
-				entity = workTypeRepository.findOne(bean.getWorkTypeId());
+				entity = workTypeRepository.findById(bean.getWorkTypeId()).orElse(null);
 
 			}
 
@@ -643,7 +643,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public String deleteImplAgencyy(Long id) {
 		try {
-			ImplementationAgency entity = implAgecyRepository.findOne(id);
+			ImplementationAgency entity = implAgecyRepository.findById(id).orElse(null);
 			if (entity != null) {
 				entity.setEnabled((short) 0);
 				implAgecyRepository.save(entity);
@@ -659,7 +659,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public ImplAgencyBean fetchImplAgencyy(Long id) {
 		try {
-			ImplementationAgency entity = implAgecyRepository.findOne(id);
+			ImplementationAgency entity = implAgecyRepository.findById(id).orElse(null);
 			return convertImplAgencyEntityToBean(entity);
 		} catch (Exception e) {
 			logger.error("An exception occurred.", e);
@@ -724,7 +724,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public DistrictBean fetchDistrictDetails(Long long1) {
 		try {
-			return convertDistrictEntityToBean(districtRepository.findOne(long1));
+			return convertDistrictEntityToBean(districtRepository.findById(long1).orElse(null));
 		} catch (Exception e) {
 			// TODO: handle exception
 
@@ -756,7 +756,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public BlockBean fetchBlockDetails(Long long1) {
 		try {
-			return convertBlockEntityToBean(blockRepository.findOne(long1));
+			return convertBlockEntityToBean(blockRepository.findById(long1).orElse(null));
 		} catch (Exception e) {
 			// TODO: handle exception
 
@@ -770,7 +770,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 
 			if (bean.getDistrictId() != null) {
 
-				District entity = convertDistrictBEanToEntity(districtRepository.findOne(bean.getDistrictId()), bean);
+				District entity = convertDistrictBEanToEntity(districtRepository.findById(bean.getDistrictId()).orElse(null), bean);
 				System.out.print(bean.getDistrictCode() + "   adhued   " + bean.getDistrictName());
 				District savedEntity = districtRepository.save(entity);
 
@@ -823,7 +823,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 			district.setDistrictNameH(bean.getDistrictNameH());
 			district.setEnabled(DMSConstants.ENABLED);
 			logger.info(bean.getDivisionId() + "this is not for the f");
-			district.setDivision(divisionRepository.findOne(bean.getDivisionId()));
+			district.setDivision(divisionRepository.findById(bean.getDivisionId()).orElse(null));
 
 		} catch (Exception e) {
 
@@ -836,7 +836,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public String deleteDistrict(Long id) {
 		try {
-			District entity = districtRepository.findOne(id);
+			District entity = districtRepository.findById(id).orElse(null);
 			if (entity != null) {
 				entity.setEnabled((short) 0);
 				districtRepository.save(entity);
@@ -874,7 +874,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 				if (searchParameter != null && !searchParameter.isEmpty()) {
 
 					gp = gramPanchayatRepository.findByGramPanchayatNameAndDistrictCodeAndBlockCodeAndEnabled(pageable,
-							searchParameter, districtRepository.findOne(Long.parseLong(districtid)).getDistrictCode(),
+							searchParameter, districtRepository.findById(Long.parseLong(districtid)).orElse(null).getDistrictCode(),
 							blockId, (short) 1);
 
 				}
@@ -892,7 +892,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 
 				else {
 					gp = gramPanchayatRepository.findByDistrictCodeAndBlockCodeAndEnabled(pageable,
-							districtRepository.findOne(Long.parseLong(districtid)).getDistrictCode(), blockId,
+							districtRepository.findById(Long.parseLong(districtid)).orElse(null).getDistrictCode(), blockId,
 							(short) 1);
 				}
 
@@ -903,12 +903,12 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 				if (searchParameter != null && !searchParameter.isEmpty()) {
 
 					gp = gramPanchayatRepository.findByGramPanchayatNameContainingAndDistrictCodeAndEnabled(pageable,
-							districtRepository.findOne(Long.parseLong(districtid)).getDistrictCode(), searchParameter,
+							districtRepository.findById(Long.parseLong(districtid)).orElse(null).getDistrictCode(), searchParameter,
 							DMSConstants.ENABLED);
 				} else {
 					logger.info("i am inside new block 55");
 					gp = gramPanchayatRepository.findByDistrictCodeAndEnabled(pageable,
-							districtRepository.findOne(Long.parseLong(districtid)).getDistrictCode(), (short) 1);
+							districtRepository.findById(Long.parseLong(districtid)).orElse(null).getDistrictCode(), (short) 1);
 				}
 			} else {
 
@@ -960,7 +960,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public String deleteBlock(Long id) {
 		try {
-			Block entity = blockRepository.findOne(id);
+			Block entity = blockRepository.findById(id).orElse(null);
 			if (entity != null) {
 				entity.setEnabled((short) 0);
 				blockRepository.save(entity);
@@ -975,7 +975,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public String deleteGP(Long id) {
 		try {
-			GramPanchayat entity = gramPanchayatRepository.findOne(id);
+			GramPanchayat entity = gramPanchayatRepository.findById(id).orElse(null);
 			if (entity != null) {
 				entity.setEnabled((short) 0);
 				gramPanchayatRepository.save(entity);
@@ -990,7 +990,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public GramPanchayatBean fetchGPDetails(Long long1) {
 		try {
-			return convertGramPanchayatEntityToBean(gramPanchayatRepository.findOne(long1));
+			return convertGramPanchayatEntityToBean(gramPanchayatRepository.findById(long1).orElse(null));
 		} catch (Exception e) {
 			// TODO: handle exception
 
@@ -1004,7 +1004,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 
 			if (bean.getBlockId() != null) {
 
-				Block entity = convertBlockBEanToEntity(blockRepository.findOne(bean.getBlockId()), bean);
+				Block entity = convertBlockBEanToEntity(blockRepository.findById(bean.getBlockId()).orElse(null), bean);
 
 				Block savedEntity = blockRepository.save(entity);
 
@@ -1065,7 +1065,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 			if (bean.getGramPanchayatId() != null) {
 
 				GramPanchayat entity = convertBlockBEanToEntity(
-						gramPanchayatRepository.findOne(bean.getGramPanchayatId()), bean);
+						gramPanchayatRepository.findById(bean.getGramPanchayatId()).orElse(null), bean);
 
 				GramPanchayat savedEntity = gramPanchayatRepository.save(entity);
 
@@ -1124,7 +1124,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 					(short) 1);
 			if (bean.getFinancialYearId() != null) {
 
-				entity = financialYearRepository.findOne(bean.getFinancialYearId());
+				entity = financialYearRepository.findById(bean.getFinancialYearId()).orElse(null);
 
 				entity.setEnabled(bean.getEnabled());
 				entity.setFinancialYear(bean.getFinancialYearName());
@@ -1162,7 +1162,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	public FinancialYearBean fetchFinancialYearData(Long id) {
 		try {
 
-			FinancialYear entity = financialYearRepository.findOne(id);
+			FinancialYear entity = financialYearRepository.findById(id).orElse(null);
 			FinancialYearBean bean = new FinancialYearBean();
 			bean.setEnabled(entity.getEnabled());
 			bean.setFinancialYearId(entity.getId());
@@ -1223,7 +1223,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 
 			if (bean.getWorkSubTypeId() != null) {
 
-				entity = workSubTypeRepository.findOne(bean.getWorkSubTypeId());
+				entity = workSubTypeRepository.findById(bean.getWorkSubTypeId()).orElse(null);
 
 			}
 
@@ -1252,7 +1252,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	@Override
 	public WorkSubTypeBean fetchWorkSubTypeById(long id) {
 		try {
-			WorkSubType entity = workSubTypeRepository.findOne(id);
+			WorkSubType entity = workSubTypeRepository.findById(id).orElse(null);
 			return convertWorkSubTypeEntityToBean(entity);
 		} catch (Exception e) {
 			logger.error("An exception occurred.", e);
@@ -1265,7 +1265,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 		public String deleteWorkSubTypes(Long id) {
 
 			try {
-				WorkSubType entity = workSubTypeRepository.findOne(id);
+				WorkSubType entity = workSubTypeRepository.findById(id).orElse(null);
 				if (entity != null) {
 					entity.setEnabled((short) 0);
 					workSubTypeRepository.save(entity);

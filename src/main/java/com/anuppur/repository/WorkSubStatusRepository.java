@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.anuppur.entity.WorkStatus;
@@ -13,7 +14,8 @@ import com.anuppur.entity.WorkSubStatus;
 public interface WorkSubStatusRepository extends JpaRepository<WorkSubStatus, Long> {
 	
 	
-	List<WorkSubStatus> findByWorkSubStatusId(String enabled);
+	@Query(value = "SELECT * FROM mst_work_sub_status WHERE work_sub_status_id = :enabled", nativeQuery = true)
+	List<WorkSubStatus> findByWorkSubStatusId(@Param("enabled") String enabled);
 	
 	List<WorkSubStatus> findByEnabled(Short enabled);
 	

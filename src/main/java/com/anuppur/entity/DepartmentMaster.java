@@ -2,58 +2,54 @@ package com.anuppur.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "mst_department")
-public class DepartmentMaster implements Serializable{
-	
-	
-	
-		
-		private static final long serialVersionUID = 1L;
-		@Id
-		@Basic(optional = false)
-		@GeneratedValue(strategy = GenerationType.IDENTITY)
-		@Column(name = "id")
-		private Long Id;
-		
-		@Column(name = "name")
-		private String name;
-		
-		@Column(name = "enabled")
-		private Short enabled;
+public class DepartmentMaster implements Serializable {
 
-		public final Long getId() {
-			return Id;
-		}
+	private static final long serialVersionUID = 1L;
 
-		public final void setId(Long id) {
-			Id = id;
-		}
+	@Id
+	@Basic(optional = false)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long Id;
 
-		public final String getName() {
-			return name;
-		}
+	@Column(name = "name")
+	private String name;
 
-		public final void setName(String name) {
-			this.name = name;
-		}
+	@Column(name = "enabled")
+	private Short enabled;
 
-		public final Short getEnabled() {
-			return enabled;
-		}
+	public Long getId() {
+		return Id;
+	}
 
-		public final void setEnabled(Short enabled) {
-			this.enabled = enabled;
-		}
-		
-		
+	public void setId(Long id) {
+		Id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Short getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Short enabled) {
+		this.enabled = enabled;
+	}
 
 }

@@ -83,10 +83,16 @@ dms.controller('SuperAdminController', function($scope, $loading, $rootScope, $w
 		};
 
 	$scope.loadUserList = function() {
-
-		 $loading.start('sample-1');
-		 fetchUserList();
-	 };
+		$loading.start('sample-1');
+		if (typeof window.initManageUsersTable === 'function') {
+			window.initManageUsersTable();
+		} else if (typeof fetchUserList === 'function') {
+			fetchUserList();
+		} else {
+			console.error('initManageUsersTable is not defined yet');
+			$loading.finish('sample-1');
+		}
+	};
 
 	 $scope.loadUserRoles = function() {
 

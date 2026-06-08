@@ -8,8 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.anuppur.entity.Block;
 import com.anuppur.entity.District;
-import com.anuppur.entity.Division;
-import com.anuppur.entity.WorkCategory;
 
 public interface BlockRepository  extends JpaRepository<Block, Long> {
 

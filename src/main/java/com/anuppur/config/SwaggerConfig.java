@@ -1,42 +1,29 @@
 package com.anuppur.config;
 
-import java.util.Collections;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.anuppur.controller.MobileApiController;
-import com.anuppur.controller.MobileController;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.service.BasicAuth;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
+/**
+ * ✅ UPDATED FOR SPRING BOOT 3.2.5 & JAVA 21
+ * Migrated from Springfox (Swagger 2.0) to Springdoc OpenAPI (OpenAPI 3.0)
+ * 
+ * Springfox is deprecated and not compatible with Spring Boot 3.x
+ * Springdoc OpenAPI is the recommended replacement for Spring Boot 3.x
+ */
 @Configuration
-@EnableSwagger2
 public class SwaggerConfig {
+    
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(requestHandler -> 
-                    requestHandler.declaringClass() != null &&(
-                    requestHandler.declaringClass().equals(MobileApiController.class) ||  requestHandler.declaringClass().equals(MobileController.class) )
-                )
-                .paths(PathSelectors.any())
-                .build()
-                .securitySchemes(Collections.singletonList(new BasicAuth("basicAuth")))
-                .securityContexts(Collections.singletonList(securityContext()));
-    }
-
-    private SecurityContext securityContext() {
-        return SecurityContext.builder()
-                .securityReferences(
-                        Collections.singletonList(new springfox.documentation.service.SecurityReference(
-                                "basicAuth", new springfox.documentation.service.AuthorizationScope[0])))
-                .build();
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Anuppur Work Management System API")
+                        .version("1.0.0")
+                        .description("API documentation for Anuppur Work Management System"));
     }
 }

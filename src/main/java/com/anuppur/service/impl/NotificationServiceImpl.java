@@ -220,7 +220,7 @@ public class NotificationServiceImpl implements NotificationService {
 						if (templateEntity != null)
 							templateBean = converterService.convertTemplateEToB(templateEntity, locale);
 
-						msgText = locale.getLanguage().equals(new Locale(DMSConstants.LOCALE_HI).getLanguage())
+						msgText = locale.getLanguage().equals(Locale.of(DMSConstants.LOCALE_HI).getLanguage())
 								? templateBean.getMessageTextHi()
 								: templateBean.getMessageTextEn();
 

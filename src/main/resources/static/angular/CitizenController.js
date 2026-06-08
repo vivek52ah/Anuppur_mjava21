@@ -1,4 +1,4 @@
-var dms = angular.module('dms', ['ngRoute','darthwade.dwLoading','ngIdle','ui.bootstrap']);
+var dms = angular.module('dms');
 dms.directive('fileModel', ['$parse', function ($parse) {
     return {
         restrict: 'A',

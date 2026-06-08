@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,12 +66,12 @@ public class SuperAdminController extends BaseController {
 		String language = request.getParameter("lang");
 
 		if (null == locale) {
-			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("en"));
+			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, Locale.of("en"));
 		} else if (!StringUtils.isEmpty(language) && language.equals(DMSConstants.LOCALE_HI)) {
 
-			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("hi"));
+			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, Locale.of("hi"));
 		} else if (!StringUtils.isEmpty(language) && language.equals(DMSConstants.LOCALE_EN)) {
-			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("en"));
+			request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, Locale.of("en"));
 		}
 
 		Locale updatedLocale = (Locale) request.getSession()
@@ -172,11 +172,11 @@ public class SuperAdminController extends BaseController {
 	 * .valueOf(request.getParameter("iDisplayStart")) / pageDisplayLength); }
 	 * 
 	 * Sort sort = null; if(sColName!=null){ if(StringUtils.equals("asc",
-	 * sSortDir)){ sort = new Sort(new Sort.Order(Direction.ASC, sColName)); }else{
-	 * sort = new Sort(new Sort.Order(Direction.DESC, sColName)); } }else{ sort =
-	 * new Sort(new Sort.Order(Direction.DESC, "id"));//default sorting }
+	 * sSortDir)){ sort = Sort.by(Direction.ASC, sColName); }else{
+	 * sort = Sort.by(Direction.DESC, sColName); } }else{ sort =
+	 * Sort.by(Direction.DESC, "id");//default sorting }
 	 * 
-	 * Pageable pageable = new PageRequest(pageNumber, pageDisplayLength, sort);
+	 * Pageable pageable = PageRequest.of(pageNumber, pageDisplayLength, sort);
 	 * 
 	 * UserJson userJson = superAdminService.getAllUsers(pageable, searchBoxVal,
 	 * status,username,emailId);

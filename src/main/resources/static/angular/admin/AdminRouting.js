@@ -1,5 +1,5 @@
 //Created By Yousra
-var dms = angular.module('dms', ['ngRoute','darthwade.dwLoading','ngIdle','ui.bootstrap']);
+var dms = angular.module('dms');
 dms.config(['KeepaliveProvider', 'IdleProvider', function(KeepaliveProvider, IdleProvider) {
 	  IdleProvider.idle(1800);
 	  IdleProvider.timeout(2);

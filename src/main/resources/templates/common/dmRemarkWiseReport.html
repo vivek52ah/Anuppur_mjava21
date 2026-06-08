@@ -2,40 +2,63 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org">
 <head>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css"/>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-<script th:src="@{/js/bootstrap-select.min.js}"></script>
-<script th:src="@{/js/bootstrap-select.js}"></script>
-
-<script>
-$(document).ready(function() {
-	$('#issueTypeFilter').selectpicker({
-		actionsBox: true,
-		liveSearch: true,
-		noneSelectedText: '--Select Issue Type--'
-	});
-	$('#deptNameFilter').selectpicker({
-		actionsBox: true,
-		liveSearch: true,
-		noneSelectedText: '--Select Department--'
-	});
-});
+<script th:src="@{/js/language.js}"></script>
+<script type="text/javascript" th:inline="none">
+/*<![CDATA[*/
+function initDmRemarkReportSelectpickers() {
+	if (!window.jQuery || !$.fn.selectpicker) {
+		return;
+	}
+	var $issue = $('#issueTypeFilter');
+	var $dept = $('#deptNameFilter');
+	if ($issue.length && !$issue.data('selectpicker')) {
+		$issue.selectpicker({
+			actionsBox: true,
+			liveSearch: true,
+			noneSelectedText: '--Select Issue Type--'
+		});
+	}
+	if ($dept.length && !$dept.data('selectpicker')) {
+		$dept.selectpicker({
+			actionsBox: true,
+			liveSearch: true,
+			noneSelectedText: '--Select Department--'
+		});
+	}
+}
+window.initDmRemarkReportSelectpickers = initDmRemarkReportSelectpickers;
+/*]]>*/
 </script>
-
 <style>
-thead th { color: #076659; background-color: #D0EAEB; }
-.table th, .table td { text-align: center; vertical-align: middle; }
-.card { margin-bottom: 1.5rem; box-shadow: 0 0 7px rgb(0 0 0 / 70%); border-radius: 7px; }
-select#issueTypeFilter + button, select#deptNameFilter + button { background: #fff; border: 1px solid #ccc; }
-.dropdown-menu.show { width: 100% !important; }
-a.count-link { font-weight: bold; }
+.report-page-root thead th { color: #076659; background-color: #D0EAEB; }
+.report-page-root .table th,
+.report-page-root .table td { text-align: center; vertical-align: middle; }
+.report-page-root .card {
+	margin-bottom: 1.5rem;
+	box-shadow: 0 0 7px rgb(0 0 0 / 70%);
+	border-radius: 7px;
+}
+.report-page-root .card-body { overflow: visible; }
+.report-page-root select#issueTypeFilter + button,
+.report-page-root select#deptNameFilter + button {
+	background: #fff;
+	border: 1px solid #ccc;
+}
+.report-page-root .dropdown-menu.show { width: 100% !important; }
+.report-page-root a.count-link { font-weight: bold; }
+.report-page-root .report-table-wrap {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	overflow-x: auto;
+	overflow-y: visible;
+	-webkit-overflow-scrolling: touch;
+	clear: both;
+}
 </style>
 </head>
 
-<div id="page-div">
+<div id="page-div" class="report-page-root">
 	<ol class="breadcrumb">
 		<li class="breadcrumb-item"><a><span th:text="#{home}">Home</span></a></li>
 		<li class="breadcrumb-item active"><span>DM Remark-wise Report</span></li>
@@ -47,90 +70,82 @@ a.count-link { font-weight: bold; }
 	</ol>
 
 	<div class="container-fluid">
-		<div class="animated fadeIn">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="card">
-						<div class="card-header">
-							<i class="fa fa-bar-chart"></i>
-							<span> DM Remark-wise Report </span>
-						</div>
-						<div class="card-body" data-ng-init="loadIssueTypeOptions(); loadDeptNameOptions(); fetchDmRemarkWiseReportData();">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header">
+						<i class="fa fa-bar-chart"></i>
+						<span> Issue-wise Report </span>
+					</div>
+					<div class="card-body" data-ng-init="loadIssueTypeOptions(); loadDeptNameOptions(); fetchDmRemarkWiseReportData();">
 
-							<!-- Filters -->
-							<div class="pr">
-								<form name="dmRemarkWiseReportForm" novalidate="novalidate">
-									<fieldset class="legend-border">
-										<legend class="legend-border">Filters</legend>
-										<div class="row">
-
-											<!-- Issue Type Filter -->
-											<div class="form-group col-sm-6">
-												<label>Issue Type</label>
-												<select multiple="multiple" class="form-control selectpicker"
-													id="issueTypeFilter"
-													name="issueTypeFilter"
-													data-live-search="true"
-													data-actions-box="true"
-													title="--Select Issue Type--">
-													<option data-ng-repeat="opt in issueTypeOptions"
-														value="{{opt.id}}">{{opt.name}}</option>
-												</select>
-											</div>
-
-											<!-- Department Name Filter -->
-											<div class="form-group col-sm-6">
-												<label>Department Name</label>
-												<select multiple="multiple" class="form-control selectpicker"
-													id="deptNameFilter"
-													name="deptNameFilter"
-													data-live-search="true"
-													data-actions-box="true"
-													title="--Select Department--">
-													<option data-ng-repeat="opt in deptNameOptions"
-														value="{{opt.implementationAgencyId}}">{{opt.implementationAgencyNameE}}</option>
-												</select>
-											</div>
-
+						<div class="pr">
+							<form name="dmRemarkWiseReportForm" novalidate="novalidate">
+								<fieldset class="legend-border">
+									<legend class="legend-border">Filters</legend>
+									<div class="row">
+										<div class="form-group col-sm-6">
+											<label>Issue Type</label>
+											<select multiple="multiple" class="form-control selectpicker"
+												id="issueTypeFilter"
+												name="issueTypeFilter"
+												data-live-search="true"
+												data-actions-box="true"
+												title="--Select Issue Type--">
+												<option data-ng-repeat="opt in issueTypeOptions"
+													value="{{opt.id}}">{{opt.name}}</option>
+											</select>
 										</div>
-									</fieldset>
-								</form>
-							</div>
+										<div class="form-group col-sm-6">
+											<label>Department Name</label>
+											<select multiple="multiple" class="form-control selectpicker"
+												id="deptNameFilter"
+												name="deptNameFilter"
+												data-live-search="true"
+												data-actions-box="true"
+												title="--Select Department--">
+												<option data-ng-repeat="opt in deptNameOptions"
+													value="{{opt.implementationAgencyId}}">{{opt.implementationAgencyNameE}}</option>
+											</select>
+										</div>
+									</div>
+								</fieldset>
+							</form>
+						</div>
 
-							<!-- Action Buttons -->
-							<div class="form-group col-sm-12 text-right mt-2">
+						<div class="row">
+							<div class="col-12 text-right mb-3">
 								<button type="button" class="btn btn-primary"
 									data-ng-click="fetchDmRemarkWiseReportData();">Search</button>
 								<button type="button" class="btn btn-secondary"
 									data-ng-click="resetDmRemarkFilters();">Reset</button>
 							</div>
-
-							<!-- Summary Table -->
-							<div class="table-responsive">
-								<table class="table table-bordered table-striped" style="width:100%">
-									<thead>
-										<tr>
-											<th>S.No.</th>
-											<th>Issue Type</th>
-											<th>Department Name</th>
-											<th>Total Works</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr data-ng-if="!dmRemarkWiseReportRows || dmRemarkWiseReportRows.length === 0">
-											<td colspan="4">No data available</td>
-										</tr>
-										<tr data-ng-repeat="row in dmRemarkWiseReportRows track by $index">
-											<td>{{$index + 1}}</td>
-											<td>{{row.issueType}}</td>
-											<td>{{row.departmentNames}}</td>
-											<td><a class="count-link" style="cursor:pointer;" data-ng-click="goToDmRemarkDetail(row)">{{row.totalWorks}}</a></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-
 						</div>
+
+						<div class="report-table-wrap table-responsive responsive-md">
+							<table class="table table-bordered table-striped w-100">
+								<thead>
+									<tr>
+										<th>S.No.</th>
+										<th>Issue Type</th>
+										<th>Department Name</th>
+										<th>Total Works</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr data-ng-if="!dmRemarkWiseReportRows || dmRemarkWiseReportRows.length === 0">
+										<td colspan="4">No data available</td>
+									</tr>
+									<tr data-ng-repeat="row in dmRemarkWiseReportRows track by $index">
+										<td>{{$index + 1}}</td>
+										<td>{{row.issueType}}</td>
+										<td>{{row.departmentNames}}</td>
+										<td><a class="count-link" style="cursor:pointer;" data-ng-click="goToDmRemarkDetail(row)">{{row.totalWorks}}</a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
 					</div>
 				</div>
 			</div>

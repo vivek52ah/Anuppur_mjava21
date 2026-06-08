@@ -6,13 +6,13 @@
 
 
 		<div class="container" align="center"
-			data-ng-hide="workDataTender.workStatusId=='8' ||workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'">
+			data-ng-hide="workDataTender.tenderUpdated=='8' || workDataTender.tenderUpdated=='9' || workDataTender.tenderUpdated=='10' || workDataTender.tenderUpdated=='11' || workDataTender.tenderUpdated=='12' || workDataTender.tenderUpdated=='13'">
 
 		</div>
 
 		<div class="card"
 			data-ng-hide="workDataTender.workStatus=='notTenderIssued'"
-			data-ng-show="workDataTender.workStatusId=='8' ||workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13'">
+			data-ng-show="workDataTender.tenderUpdated=='8' || workDataTender.tenderUpdated=='9' || workDataTender.tenderUpdated=='10' || workDataTender.tenderUpdated=='11' || workDataTender.tenderUpdated=='12' || workDataTender.tenderUpdated=='13'">
 			<div class="card-header">
 				<span>Contractor’s Details</span>
 			</div>
@@ -404,7 +404,7 @@
 
 		<!-- <div class="tab-footer text-right" 
 			data-ng-hide="workDataTender.workStatus=='notTenderIssued'|| workDataProgress.workStatusId=='12'||workDataProgress.workStatusId=='13'||workDataProgress.workStatusId=='9'||workDataProgress.workStatusId=='10'||workDataProgress.workStatusId=='11' "
-			data-ng-show="workDataTender.workStatusId=='8' ||workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13' ">
+			data-ng-show="workDataTender.tenderUpdated=='8' || workDataTender.tenderUpdated=='9' || workDataTender.tenderUpdated=='10' || workDataTender.tenderUpdated=='11' || workDataTender.tenderUpdated=='12' || workDataTender.tenderUpdated=='13' ">
 			<button type="submit" class="btn  btn-success  next-button"
 				id="draftCobtn"
 				data-ng-click="finalSubmit=false;saveCoDraft=true;saveCoNext=false;">
@@ -419,15 +419,15 @@
 
 
 		<div class="tab-footer text-right"
-			data-ng-hide="workDataTender.workStatus == 'notTenderIssued' || workDataProgress.workStatusId == '12' || workDataProgress.workStatusId == '13' || workDataProgress.workStatusId == '9' || workDataProgress.workStatusId == '10' || workDataProgress.workStatusId == '11'"
-			data-ng-show="workDataTender.workStatusId == '8' || workDataTender.workStatusId == '9' || workDataTender.workStatusId == '10' || workDataTender.workStatusId == '11' || workDataTender.workStatusId == '12' || workDataTender.workStatusId == '13'">
+			data-ng-hide="workDataTender.workStatus == 'notTenderIssued'"
+			data-ng-show="workDataTender.tenderUpdated == '8' || workDataTender.tenderUpdated == '9' || workDataTender.tenderUpdated == '10' || workDataTender.tenderUpdated == '11' || workDataTender.tenderUpdated == '12' || workDataTender.tenderUpdated == '13'">
 
-			<!-- <button type="submit" class="btn btn-success next-button"
+			<button type="submit" class="btn btn-success next-button"
 				id="draftCobtn"
 				data-ng-click="finalSubmit = false; saveCoDraft = true; saveCoNext = false;"
 				data-ng-disabled="(workData.role == 'ROLE_DEPARTMENT' || workData.role == 'ROLE_DEPT_DISTRICT' || workData.role == 'ROLE_SYSTEM_ADMIN' || workData.role == 'ROLE_SU') &amp;&amp; workData.isRecommendedAgency == 0">
-				<i class="las la-file-alt"></i> Save As Draft
-			</button> -->
+				<i class="las la-file-alt"></i> Save
+			</button>
 
 			<button type="submit" class="btn btn-primary next-button nexxt"
 				id="finalCotbtn"

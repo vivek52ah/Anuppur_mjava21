@@ -3,8 +3,8 @@ package com.anuppur.controller;
 import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -161,8 +161,8 @@ public class RegistrationController {
 
 		commonService.saveOrUpdateOtp(mobileNo, otp);
 		String fullName = firstName + " " + lastName;
-		District district = districtRepository.findOne(districtId);
-		LegislativeConstituency lc = legislativeConsRepository.findOne(lcId);
+		District district = districtRepository.findById(districtId).orElse(null);
+		LegislativeConstituency lc = legislativeConsRepository.findById(lcId).orElse(null);
 
 		/*
 		 * notificationService.sendOtpNotificationMobileNo(mobileNo, otp, fullName,

@@ -2,14 +2,14 @@ package com.anuppur.filter;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletResponse;
 
 @WebFilter("/**/*")
 public class AddResponseHeaderFilter implements Filter {
@@ -26,9 +26,8 @@ public class AddResponseHeaderFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 		httpServletResponse.setHeader("Set‐Cookie", "SameSite=strict");
-		//httpServletResponse.setHeader("Content‐Security‐Policy", "script‐src 'self'");
-		httpServletResponse.setHeader("Content-Security-Policy", "script-src 'self'; style-src 'self'; font-src 'self'; form-action 'self'; object-src 'none'; connect-src 'self'; img-src 'self';");
-
+		// Temporarily disable CSP to test if it's causing the issue
+		// httpServletResponse.setHeader("Content-Security-Policy", ...);
 
 		chain.doFilter(request, response);
 	}

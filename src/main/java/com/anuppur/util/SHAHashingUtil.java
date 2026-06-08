@@ -8,7 +8,7 @@ import com.anuppur.exception.DMSBusinessException;
 
 public class SHAHashingUtil {
 
-	public static StringBuffer encryptPassword(String password) throws DMSBusinessException {
+	public static StringBuilder encryptPassword(String password) throws DMSBusinessException {
 
 		try {
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -18,7 +18,7 @@ public class SHAHashingUtil {
 			byte byteData[] = md.digest();
 
 			// convert the byte to hex format method 2
-			StringBuffer hexString = new StringBuffer();
+			StringBuilder hexString = new StringBuilder();
 			for (int i = 0; i < byteData.length; i++) {
 				String hex = Integer.toHexString(0xff & byteData[i]);
 				if (hex.length() == 1)

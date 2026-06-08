@@ -1,11 +1,12 @@
 package com.anuppur.bean;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 
 public class ForgotPasswordBean {
 
-	@NotEmpty
-	// @Email
+	@NotBlank(message = "Email ID cannot be empty")
+	@Email(message = "Email ID should be valid")
 	private String emailId;
 	
 	private String mobileNo;

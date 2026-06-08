@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.anuppur.entity.WorkHead;
 
@@ -15,7 +17,8 @@ public interface WorkHeadRepository extends JpaRepository<WorkHead, Long> {
 	List<WorkHead> findByEnabledAndPriorityType(Short isEnabled, Integer priorityType);
 	
 
-	WorkHead findByHeadName(Long headName);
+	@Query(value = "SELECT * FROM mst_work_head WHERE head_name = :headName LIMIT 1", nativeQuery = true)
+	WorkHead findByHeadName(@Param("headName") Long headName);
 
 	Page<WorkHead> findByHeadNameContainingAndEnabled(Pageable pageable, String searchParameter, short s);
 

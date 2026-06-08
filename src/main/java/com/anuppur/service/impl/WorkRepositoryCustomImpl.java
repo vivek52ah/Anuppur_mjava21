@@ -4,14 +4,14 @@ package com.anuppur.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -635,7 +635,7 @@ public class WorkRepositoryCustomImpl {
 		    }
 		    // Add division filter for ROLE_DEPARTMENT
 		    if (divisionId != null) {
-		        predicates.add(cb.equal(work.get("divisionId"), divisionId));
+		        predicates.add(cb.equal(work.get("divisionCode"), divisionId));
 		    }
 
 		    // Filter: blockId (multiple values)
@@ -685,7 +685,7 @@ public class WorkRepositoryCustomImpl {
 		    if (vsList != null && !vsList.isEmpty()) countPredicates.add(countRoot.get("vidhanSabhaId").in(vsList));
 		    // Add division filter for ROLE_DEPARTMENT
 		    if (divisionId != null) {
-		        countPredicates.add(cb.equal(countRoot.get("divisionId"), divisionId));
+		        countPredicates.add(cb.equal(countRoot.get("divisionCode"), divisionId));
 		    }
 
 		    // Filter: blockId for count

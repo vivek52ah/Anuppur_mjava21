@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +22,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.crypto.Cipher;
@@ -41,21 +39,17 @@ import javax.net.ssl.TrustManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.anuppur.bean.EmailBean;
 import com.anuppur.bean.SMSBean;
-import com.anuppur.entity.Notification;
 import com.anuppur.exception.DMSBusinessException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,9 +230,11 @@ public class SMSUtil {
 			SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
 			sslContext.init(null, trustManagers, null);
 
-			LayeredConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
+			SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
 			CloseableHttpClient httpClient = HttpClients.custom()
-			        .setSSLSocketFactory(socketFactory)
+			        .setConnectionManager(org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder.create()
+			                .setSSLSocketFactory(socketFactory)
+			                .build())
 			        .build();
 			
 			             HttpPost post=new HttpPost(urlCdac);
@@ -271,7 +267,7 @@ public class SMSUtil {
                          nameValuePairs.add(new BasicNameValuePair("templateid", templateid));
 			             post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			             
-			             HttpResponse response=httpClient.execute(post);
+			             ClassicHttpResponse response = httpClient.execute(post);
 			             BufferedReader bf=new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 			             String line="";
 			             while((line=bf.readLine())!=null){
@@ -300,11 +296,6 @@ public class SMSUtil {
 							timetaken = (double)(endtime - starttime)/1000;	
 							logger.error("SMS Delivery:transaction logs||"+smsBean.getMobileNumber()+"||"+ sdf.format(date) + "||"+ timetaken + "||"+urlCdac.toString()+"?||"+e );
 							throw new DMSBusinessException("SMS_DELIVERY_FAILURE_UnsupportedEncodingException");
-			         } catch (ClientProtocolException e) {
-			                endtime = System.currentTimeMillis();
-							timetaken = (double)(endtime - starttime)/1000;	
-							logger.error("SMS Delivery:transaction logs||"+smsBean.getMobileNumber()+"||"+ sdf.format(date) + "||"+ timetaken + "||"+urlCdac.toString()+"?||"+e );
-							throw new DMSBusinessException("SMS_DELIVERY_FAILURE_ClientProtocolException");
 			         } catch (IOException e) {
 			                endtime = System.currentTimeMillis();
 							timetaken = (double)(endtime - starttime)/1000;	

@@ -1,14 +1,14 @@
 package com.anuppur.entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "department_remarks")
@@ -43,51 +43,51 @@ public class DepartmentRemarks extends Auditable {
 	@Column(name = "created_time")
 	private String createdTime;
 
-	public final Long getId() {
+	public  Long getId() {
 		return id;
 	}
 
-	public final void setId(Long id) {
+	public  void setId(Long id) {
 		this.id = id;
 	}
 
-	public final String getDepartmentRemarkName() {
+	public  String getDepartmentRemarkName() {
 		return departmentRemarkName;
 	}
 
-	public final void setDepartmentRemarkName(String departmentRemarkName) {
+	public  void setDepartmentRemarkName(String departmentRemarkName) {
 		this.departmentRemarkName = departmentRemarkName;
 	}
 
-	public final Long getDepertmentMasterId() {
+	public  Long getDepertmentMasterId() {
 		return depertmentMasterId;
 	}
 
-	public final void setDepertmentMasterId(Long depertmentMasterId) {
+	public  void setDepertmentMasterId(Long depertmentMasterId) {
 		this.depertmentMasterId = depertmentMasterId;
 	}
 
-	public final Long getWorkId() {
+	public  Long getWorkId() {
 		return workId;
 	}
 
-	public final void setWorkId(Long workId) {
+	public  void setWorkId(Long workId) {
 		this.workId = workId;
 	}
 
-	public final DocumentUpload getDocumentUpload() {
+	public  DocumentUpload getDocumentUpload() {
 		return DocumentUpload;
 	}
 
-	public final void setDocumentUpload(DocumentUpload documentUpload) {
+	public  void setDocumentUpload(DocumentUpload documentUpload) {
 		DocumentUpload = documentUpload;
 	}
 
-	public final Short getEnabled() {
+	public  Short getEnabled() {
 		return enabled;
 	}
 
-	public final void setEnabled(Short enabled) {
+	public  void setEnabled(Short enabled) {
 		this.enabled = enabled;
 	}
 

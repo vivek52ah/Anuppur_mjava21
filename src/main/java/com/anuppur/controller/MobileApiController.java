@@ -8,8 +8,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ import com.anuppur.util.JwtUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import groovyjarjarcommonscli.ParseException;
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/mobile")
@@ -512,7 +512,7 @@ public class MobileApiController extends BaseController {
 
 		Sort sort = null;
 
-		Pageable pageable = new PageRequest(pageNumber, 2, sort);
+		Pageable pageable = PageRequest.of(pageNumber, 2, sort);
 
 		WorkProgressImagesJson workProgressImagesJson = commonService.fetchProgressImagesList(pageable,
 				!StringUtils.isEmpty(workStatusName) ? workStatusName : null,

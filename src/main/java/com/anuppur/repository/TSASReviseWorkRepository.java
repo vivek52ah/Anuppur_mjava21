@@ -18,7 +18,8 @@ import com.anuppur.entity.WorkProgress;
 public interface TSASReviseWorkRepository extends JpaRepository<TSASReviseWork, Long>{
 	
 	
-	Page<TSASReviseWork>  findByWorkStatusNotIn(Pageable pageable,String status);
+	@Query(value = "SELECT * FROM t_work_ts_revised WHERE work_status != :status", nativeQuery = true)
+	Page<TSASReviseWork>  findByWorkStatusNotIn(Pageable pageable, @Param("status") String status);
 	
 	//TSASReviseWork  findByWorkId(Long id);
 	TSASReviseWork  findByTsAsId(Long id);
@@ -39,7 +40,8 @@ public interface TSASReviseWorkRepository extends JpaRepository<TSASReviseWork, 
 
 	Page<TSASReviseWork> findByWorkId(Pageable pageable, Long workTypeId);
 
-	long countByStatusNotIn(String statusDeleted);
+	@Query(value = "SELECT count(*) FROM t_work_ts_revised WHERE status != :statusDeleted", nativeQuery = true)
+	long countByStatusNotIn(@Param("statusDeleted") String statusDeleted);
 	
 	@Query("SELECT w FROM TSASReviseWork w WHERE w.work = :workId")
     List<TSASReviseWork> findAllByWorkId(@Param("workId") Long workId);
