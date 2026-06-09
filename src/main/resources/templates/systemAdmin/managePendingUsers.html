@@ -49,6 +49,10 @@
 		try {
 			if ($.fn.DataTable.isDataTable('#dynamic-table')) {
 				$('#dynamic-table').DataTable().destroy();
+				$('#dynamic-table tbody').remove();
+			}
+			if ($('#dynamic-table tbody').length === 0) {
+				$('#dynamic-table').append('<tbody></tbody>');
 			}
 			t = $('#dynamic-table').DataTable({
 				processing: true,
@@ -56,7 +60,10 @@
 				pagingType: 'full_numbers',
 				pageLength: 10,
 				lengthMenu: [ [10, 25, 50, 100000], [10, 25, 50, 'All'] ],
-				dom: "<'row'<'col-12 datatbl-top'lfrtip>>",
+				dom: "<'row'<'col-12 datatbl-top'l>>" +
+					"<'row'<'col-md-6'r><'col-md-6'>>" +
+					"<'row'<'col-md-12't>>" +
+					"<'row'<'col-md-6'i><'col-md-6'p>>",
 				order: [[0, 'asc']],
 				language: { searchPlaceholder: 'firstName' },
 				ajax: function(data, callback) {
@@ -192,6 +199,26 @@ select.form-control.form-control-sm {
  box-shadow: 0px 0px 12px rgb(0 0 0 / 8%);
 }
 
+#managePendingUsersRoot .filter-box {
+	position: relative;
+	left: auto;
+	transform: none;
+	z-index: 5;
+}
+
+#managePendingUsersRoot .table-responsive {
+	margin-top: 0.5rem;
+}
+
+#managePendingUsersRoot #dynamic-table {
+	min-width: 1450px;
+}
+
+#managePendingUsersRoot #dynamic-table th,
+#managePendingUsersRoot #dynamic-table td {
+	white-space: nowrap;
+	vertical-align: middle;
+}
 
 </style>
 
@@ -358,6 +385,7 @@ select.form-control.form-control-sm {
 											<th nowrap="nowrap" class="text-center"><span th:text="#{action}">Action</span></th>
 										</tr>
 									</thead>
+									<tbody></tbody>
 								</table>
 							</div>
 						</div>

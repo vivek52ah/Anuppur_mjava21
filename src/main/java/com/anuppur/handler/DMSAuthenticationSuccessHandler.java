@@ -16,8 +16,6 @@ import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.anuppur.constants.DMSConstants;
-
 @Component
 public class DMSAuthenticationSuccessHandler implements
 AuthenticationSuccessHandler {
@@ -54,40 +52,16 @@ AuthenticationSuccessHandler {
 		        // You can return or handle the null case based on your logic
 		        return;  // or return some appropriate response here
 		    }
-			  if(role.equals("ROLE_AREA_OFFICER")) {
-				 // logger.info("i am in role butwy ");
-			      targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
-			       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
-			       return;
-			       }
-			       if(role.equals("ROLE_DEPARTMENT")) {
-			    	   //logger.info("i am in role butwy ");
-				       targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
-				       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
-				       return;
-				       }
-			       if(role.equals("ROLE_DM")) {
-			    	   //logger.info("i am in role butwy ");
-				       targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
-				       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
-				       return;
-				       }
-			       
-			       if(role.equals("ROLE_CEO")) {
-			    	   //logger.info("i am in role butwy ");
-				       targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
-				       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
-				       return;
-				       }
-			       
-			       if(role.equals("ROLE_SYSTEM_ADMIN")) {
-			    	   targetUrl = "/systemAdmin/home#/changepassword"; // Example URL for AREA_OFFICER
-				       redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
-				       return;
-			       }
-		
-		    if( DMSConstants.ROLE_SYSTEM_ADMIN.equals(role) || DMSConstants.ROLE_ADMIN.equals(role) || DMSConstants.ROLE_DEPARTMENT.equals(role)|| DMSConstants.ROLE_DEPT_DISTRICT.equals(role) || DMSConstants.ROLE_AGENCY_ADMIN.equals(role) || DMSConstants.ROLE_DM.equals(role) || DMSConstants.ROLE_CEO.equals(role) ) {
-				targetUrl = "/systemAdmin/home#/changepassword";
+
+		    if ("ROLE_SYSTEM_ADMIN".equals(role)
+		    		|| "ROLE_ADMIN".equals(role)
+		    		|| "ROLE_DEPARTMENT".equals(role)
+		    		|| "ROLE_DEPT_DISTRICT".equals(role)
+		    		|| "ROLE_AGENCY_ADMIN".equals(role)
+		    		|| "ROLE_DM".equals(role)
+		    		|| "ROLE_CEO".equals(role)
+		    		|| "ROLE_AREA_OFFICER".equals(role)) {
+				targetUrl = "/systemAdmin/home#/manageOngoingWorks";
 				break;
 			} 
 		     

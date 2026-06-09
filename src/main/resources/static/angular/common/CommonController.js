@@ -269,6 +269,10 @@ dms.factory('Excel', function($window, $document) {
 })
 
 dms.controller('CommonController', function($scope, $loading, $rootScope, $window, $routeParams, $http, $timeout, $sce, commonService, Excel, $parse, $route, $q, $location) {
+	if ($location.path() === '/changepassword' && $window.loggedInRoleName === 'ROLE_SYSTEM_ADMIN') {
+		$location.path('/manageOngoingWorks');
+		return;
+	}
 	
 	// ✅ ADD AT TOP
     $scope.workData = {};
