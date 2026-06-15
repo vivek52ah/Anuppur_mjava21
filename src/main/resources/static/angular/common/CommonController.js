@@ -333,6 +333,38 @@ dms.controller('CommonController', function($scope, $loading, $rootScope, $windo
             $nextTabLi = $nextTabLi.next();
         }
     };
+
+	$scope.moveToNextTenderStatusField = function(savedStatusId) {
+		var nextStatusByCurrentStatus = {
+			'3': '4',
+			'4': '7',
+			'7': '8',
+			'14': '4'
+		};
+		var nextStatusId = nextStatusByCurrentStatus[String(savedStatusId)];
+		if (nextStatusId) {
+			$scope.workDataTender.tenderUpdated = String(savedStatusId);
+			$scope.workDataTender.workStatusId = nextStatusId;
+			$scope.workTenderForm.$submitted = false;
+		}
+	};
+
+	$scope.canEditContractorDetails = function() {
+		var savedTenderStatus = String(($scope.workDataTender && $scope.workDataTender.tenderUpdated) || '');
+		return ['8', '9', '10', '11', '12', '13'].indexOf(savedTenderStatus) >= 0;
+	};
+
+	$scope.isTenderWork = function() {
+		return $scope.workData && ($scope.workData.isTenders == 1 || $scope.workData.isTenders === true || $scope.workData.isTenders === '1');
+	};
+
+	$scope.isWorkOrderIssuedStatus = function() {
+		return $scope.workDataTender && String($scope.workDataTender.workStatusId) === '8';
+	};
+
+	$scope.isWorkOrderIssuedRequired = function() {
+		return $scope.isTenderWork() && $scope.isWorkOrderIssuedStatus();
+	};
     
 	$scope.started = false;
 
@@ -2111,10 +2143,42 @@ $scope.changePasswordFunction = function(isValid) {
 	$scope.createTenderAgreementData = function(workTenderForm, isValid, ldTdfFile, dTTTFile, ldTULFile, ldUAFile) {
 
 
-		if (($scope.workData.isTenders == 1 || $scope.workData.isTenders == true)
-				&& String($scope.workDataTender.workStatusId) === '8') {
+		if ($scope.isWorkOrderIssuedRequired()) {
 			if (!isValid) {
 				alert("All fields are required.");
+				return false;
+			}
+
+			var missingWorkOrderFields = [];
+			var hasValue = function(value) {
+				return value !== undefined && value !== null && value !== '' && value !== 'undefined' && value !== 'null';
+			};
+
+			if (!hasValue($scope.workDataTender.workOrderDate)) missingWorkOrderFields.push("Work Order Date");
+			if (!hasValue($scope.workDataTender.tenderCalledDate)) missingWorkOrderFields.push("Tender Called Date");
+			if (!hasValue($scope.workDataTender.eTenderNo)) missingWorkOrderFields.push("E-Tender No");
+			if (!hasValue($scope.workDataTender.tenderReceivedDate)) missingWorkOrderFields.push("Tender Received Date");
+			if (!hasValue($scope.workDataTender.loaIssuedDate)) missingWorkOrderFields.push("LoA Issued Date");
+			if (!hasValue($scope.workDataTender.agreementNo)) missingWorkOrderFields.push("Agreement No");
+			if (!hasValue($scope.workDataTender.agreementDate)) missingWorkOrderFields.push("Agreement Date");
+			if (!hasValue($scope.workDataTender.sorYear)) missingWorkOrderFields.push("SOR Year");
+			if (!hasValue($scope.workDataTender.pacAmount)) missingWorkOrderFields.push("PAC Amount");
+			if (!hasValue($scope.workDataTender.contractTenure)) missingWorkOrderFields.push("Contract Period");
+			if (!hasValue($scope.workDataTender.workCompletionDate)) missingWorkOrderFields.push("Work Completion Date");
+
+			if ($scope.workData.isTender == '1' || $scope.workData.isTender == 1 || $scope.workData.isTender === true) {
+				if (!hasValue($scope.workDataTender.tenderPercentage)) missingWorkOrderFields.push("Tender Percentage");
+				if (!hasValue($scope.workDataTender.rateStatus)) missingWorkOrderFields.push("Above/Below");
+				if (!hasValue($scope.workDataTender.contractAmount)) missingWorkOrderFields.push("Contract Amount");
+			}
+
+			if (!ldTdfFile && !$scope.workDataTender.tenderFileId) missingWorkOrderFields.push("Work Order File");
+			if (!dTTTFile && !$scope.workData.drawingId) missingWorkOrderFields.push("Drawing File");
+			if (!ldTULFile && !$scope.workDataTender.uLoiId) missingWorkOrderFields.push("LOA File");
+			if (!ldUAFile && !$scope.workDataTender.uAId) missingWorkOrderFields.push("Agreement File");
+
+			if (missingWorkOrderFields.length > 0) {
+				alert("Please fill required fields: " + missingWorkOrderFields.join(", "));
 				return false;
 			}
 		}
@@ -2611,6 +2675,7 @@ $scope.changePasswordFunction = function(isValid) {
 			});
 
 			responsePromise.success(function(data, status, headers, config) {
+				var savedStatusId = String($scope.workDataTender.workStatusId);
 				$scope.reloadJqueryDatatablestatus();
 				$rootScope.responseObject = data;
 				$scope.workDataContractor = {};
@@ -2628,9 +2693,7 @@ $scope.changePasswordFunction = function(isValid) {
 					$scope.loadContractorDetails();
 					$scope.loadWorkProgress();
 
-					if ($scope.saveTNext) {
-						$scope.goToNextWizardTab();
-					}
+					$scope.moveToNextTenderStatusField(savedStatusId);
 
 
 
@@ -2696,6 +2759,11 @@ $scope.changePasswordFunction = function(isValid) {
 
 	//
 	$scope.createContractorDetails = function(isValid) {
+
+		if (!$scope.canEditContractorDetails()) {
+			alert("Please save Work Order Issued in Sanction Details before entering Contractor's Details.");
+			return false;
+		}
 
 		if (!$scope.workDataContractor.workId && $routeParams.id) {
 			$scope.workDataContractor.workId = $routeParams.id;

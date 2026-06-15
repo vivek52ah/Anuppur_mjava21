@@ -346,6 +346,7 @@
 <script>
 /*<![CDATA[*/
     var validationReportBase64 = null;
+    var bulkUploadInProgress = false;
 
     function handleLogout() {
         // Logout handler - form submission is already triggered
@@ -374,6 +375,10 @@
     }
 
     function submitUpload() {
+        if (bulkUploadInProgress) {
+            return;
+        }
+
         var fileInput = document.getElementById('bulkFile');
         var errorEl = document.getElementById('fileTypeError');
 
@@ -391,6 +396,7 @@
         var formData = new FormData();
         formData.append('file', fileInput.files[0]);
 
+        bulkUploadInProgress = true;
         document.getElementById('uploadBtn').disabled = true;
         document.getElementById('uploadSpinner').style.display = 'block';
         document.getElementById('resultSection').style.display = 'none';
@@ -410,6 +416,7 @@
                 showErrorMessage(msg);
             },
             complete: function() {
+                bulkUploadInProgress = false;
                 document.getElementById('uploadBtn').disabled = false;
                 document.getElementById('uploadSpinner').style.display = 'none';
             }

@@ -96,7 +96,7 @@ public class SpringSecurityConfig {
         http
             .csrf(csrf -> csrf
                 .requireCsrfProtectionMatcher(csrfRequestMatcher)
-                .ignoringRequestMatchers("/mobilelogin", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs"))
+                .ignoringRequestMatchers("/logout", "/mobilelogin", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs"))
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/", "/login", "/error", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs").permitAll()
                 .requestMatchers(

@@ -17,6 +17,7 @@
 				<span>Contractor’s Details</span>
 			</div>
 			<div class="card-body">
+				<fieldset data-ng-disabled="!canEditContractorDetails()">
 				<div class="row">
 
 					<!-- <input type="text" value="workDataContractor.workIdCount" data-ng-model="workDataContractor.workIdCount"/> -->
@@ -391,8 +392,8 @@
 					</div> -->
 
 
-
 				</div>
+				</fieldset>
 			</div>
 
 
@@ -425,7 +426,7 @@
 			<button type="submit" class="btn btn-success next-button"
 				id="draftCobtn"
 				data-ng-click="finalSubmit = false; saveCoDraft = true; saveCoNext = false;"
-				data-ng-disabled="(workData.role == 'ROLE_DEPARTMENT' || workData.role == 'ROLE_DEPT_DISTRICT' || workData.role == 'ROLE_SYSTEM_ADMIN' || workData.role == 'ROLE_SU') &amp;&amp; workData.isRecommendedAgency == 0">
+				data-ng-disabled="!canEditContractorDetails() || ((workData.role == 'ROLE_DEPARTMENT' || workData.role == 'ROLE_DEPT_DISTRICT' || workData.role == 'ROLE_SYSTEM_ADMIN' || workData.role == 'ROLE_SU') &amp;&amp; workData.isRecommendedAgency == 0)">
 				<i class="las la-file-alt"></i> Save
 			</button>
 

@@ -50,8 +50,12 @@ import com.anuppur.service.WorkMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
@@ -61,6 +65,7 @@ public class BulkWorkServiceImpl implements BulkWorkService {
 
     private static final long MAX_FILE_SIZE = 5L * 1024 * 1024;
     private static final int MAX_ROWS = 500;
+    private static final Set<String> UPLOADS_IN_PROGRESS = ConcurrentHashMap.newKeySet();
 
     @Autowired
     private FinancialYearRepository financialYearRepository;
@@ -127,85 +132,117 @@ public class BulkWorkServiceImpl implements BulkWorkService {
             return errorResult("File size must not exceed 5 MB");
         }
 
-        // Guard 2 + parse
-        List<BulkWorkRowBean> rows;
+        byte[] uploadBytes;
+        String uploadKey;
         try {
-            rows = new ExcelParser().parse(file.getInputStream());
+            uploadBytes = file.getBytes();
+            uploadKey = username + ":" + sha256(uploadBytes);
         } catch (Exception e) {
-            logger.warn("Failed to parse uploaded file: {}", e.getMessage());
-            return errorResult("The uploaded file is not a valid Excel (.xlsx) file");
+            logger.warn("Failed to read uploaded file: {}", e.getMessage());
+            return errorResult("The uploaded file could not be read");
         }
 
-        // Guard 3: no data rows
-        if (rows.isEmpty()) {
-            return errorResult("The uploaded file contains no data rows");
+        if (!UPLOADS_IN_PROGRESS.add(uploadKey)) {
+            return errorResult("This Excel file is already being processed. Please wait for the current upload to finish.");
         }
 
-        // Guard 4: too many rows
-        if (rows.size() > MAX_ROWS) {
-            return errorResult("A maximum of 500 rows are allowed per upload");
-        }
-
-        // 8.1 Load MasterDataCache
-        MasterDataCache cache = buildCache();
-
-        // 8.2 Validate each row
-        RowValidator validator = new RowValidator();
-        List<RowErrorBean> allErrors = new ArrayList<>();
-        List<BulkWorkRowBean> validRows = new ArrayList<>();
-
-        for (BulkWorkRowBean row : rows) {
-            List<RowErrorBean> rowErrors = validator.validate(row, cache);
-            if (rowErrors.isEmpty()) {
-                validRows.add(row);
-            } else {
-                allErrors.addAll(rowErrors);
-            }
-        }
-
-        // 8.3 Map and persist valid rows
-        WorkMapper mapper = new WorkMapper();
-        List<Work> worksToSave = new ArrayList<>();
-        for (BulkWorkRowBean row : validRows) {
-            worksToSave.add(mapper.map(row, cache, username));
-        }
-        if (!worksToSave.isEmpty()) {
-            workRepository.saveAll(worksToSave);
-        }
-
-        // 8.4 Assemble result
-        int total = rows.size();
-        int successCount = worksToSave.size();
-        int failureCount = total - successCount;
-
-        BulkUploadResultBean result = new BulkUploadResultBean();
-        result.setTotalRows(total);
-        result.setSuccessCount(successCount);
-        result.setFailureCount(failureCount);
-        result.setErrors(allErrors);
-
-        if (failureCount == 0) {
-            result.setMessage("All " + successCount + " work records created successfully");
-        } else if (successCount == 0) {
-            result.setMessage("No records were created. Please review the validation report");
-        } else {
-            result.setMessage(successCount + " work records created successfully. " + failureCount + " rows had errors.");
-        }
-
-        // 8.4 Generate validation report if any errors
-        if (!allErrors.isEmpty()) {
+        try {
+            // Guard 2 + parse
+            List<BulkWorkRowBean> rows;
             try {
-                result.setValidationReportBase64(new ValidationReportGenerator().generateBase64Report(allErrors));
+                rows = new ExcelParser().parse(new ByteArrayInputStream(uploadBytes));
             } catch (Exception e) {
-                logger.error("Failed to generate validation report", e);
+                logger.warn("Failed to parse uploaded file: {}", e.getMessage());
+                return errorResult("The uploaded file is not a valid Excel (.xlsx) file");
             }
+
+            // Guard 3: no data rows
+            if (rows.isEmpty()) {
+                return errorResult("The uploaded file contains no data rows");
+            }
+
+            // Guard 4: too many rows
+            if (rows.size() > MAX_ROWS) {
+                return errorResult("A maximum of 500 rows are allowed per upload");
+            }
+
+            // 8.1 Load MasterDataCache
+            MasterDataCache cache = buildCache();
+
+            // 8.2 Validate each row
+            RowValidator validator = new RowValidator();
+            List<RowErrorBean> allErrors = new ArrayList<>();
+            List<BulkWorkRowBean> validRows = new ArrayList<>();
+
+            for (BulkWorkRowBean row : rows) {
+                List<RowErrorBean> rowErrors = validator.validate(row, cache);
+                if (rowErrors.isEmpty()) {
+                    validRows.add(row);
+                } else {
+                    allErrors.addAll(rowErrors);
+                }
+            }
+
+            // 8.3 Map and persist valid rows
+            WorkMapper mapper = new WorkMapper();
+            List<Work> worksToSave = new ArrayList<>();
+            for (BulkWorkRowBean row : validRows) {
+                worksToSave.add(mapper.map(row, cache, username));
+            }
+            if (!worksToSave.isEmpty()) {
+                workRepository.saveAll(worksToSave);
+            }
+
+            // 8.4 Assemble result
+            int total = rows.size();
+            int successCount = worksToSave.size();
+            int failureCount = total - successCount;
+
+            BulkUploadResultBean result = new BulkUploadResultBean();
+            result.setTotalRows(total);
+            result.setSuccessCount(successCount);
+            result.setFailureCount(failureCount);
+            result.setErrors(allErrors);
+
+            if (failureCount == 0) {
+                result.setMessage("All " + successCount + " work records created successfully");
+            } else if (successCount == 0) {
+                result.setMessage("No records were created. Please review the validation report");
+            } else {
+                result.setMessage(successCount + " work records created successfully. " + failureCount + " rows had errors.");
+            }
+
+            // 8.4 Generate validation report if any errors
+            if (!allErrors.isEmpty()) {
+                try {
+                    result.setValidationReportBase64(new ValidationReportGenerator().generateBase64Report(allErrors));
+                } catch (Exception e) {
+                    logger.error("Failed to generate validation report", e);
+                }
+            }
+
+            // 8.5 Log
+            logger.info("Bulk upload by user={}, timestamp={}, totalRows={}, successCount={}, failureCount={}",
+                    username, java.time.LocalDateTime.now(), total, successCount, failureCount);
+
+            return result;
+        } finally {
+            UPLOADS_IN_PROGRESS.remove(uploadKey);
         }
+    }
 
-        // 8.5 Log
-        logger.info("Bulk upload by user={}, timestamp={}, totalRows={}, successCount={}, failureCount={}",
-                username, java.time.LocalDateTime.now(), total, successCount, failureCount);
-
-        return result;
+    private String sha256(byte[] bytes) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(bytes);
+            StringBuilder hex = new StringBuilder(hash.length * 2);
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+            return hex.toString();
+        } catch (Exception e) {
+            throw new IllegalStateException("SHA-256 algorithm is not available", e);
+        }
     }
 
     private MasterDataCache buildCache() {
