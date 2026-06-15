@@ -53,7 +53,20 @@ public class BulkWorkController extends BaseController {
 
     @GetMapping("/uploadPage")
     public ModelAndView uploadPage(HttpServletRequest request) {
-        return new ModelAndView("systemAdmin/bulkWorkUpload");
+        ModelAndView mav = new ModelAndView("systemAdmin/bulkWorkUpload");
+        try {
+            com.anuppur.util.DMSUtil.getUserDetail();
+            org.springframework.security.core.userdetails.User user = com.anuppur.util.DMSUtil.getUserDetail();
+            if (user != null) {
+                com.anuppur.bean.UserBean userBean = fetchLoggedInUserDetails(request);
+                mav.addObject("loggedInUserName", user.getUsername());
+                mav.addObject("roleName", userBean.getLoggedInUserRole());
+                mav.addObject("Role", userBean.getLoggedInUserRole());
+            }
+        } catch (Exception e) {
+            logger.error("Error loading user details for uploadPage", e);
+        }
+        return mav;
     }
 
     @GetMapping("/downloadTemplate")

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -76,14 +78,12 @@ public class SpringSecurityConfig {
     @Order(1)
     public SecurityFilterChain staticResourcesFilterChain(HttpSecurity http) throws Exception {
         http
-            .securityMatcher(
-                "/new-assets/**", "/assets/**", "/css/**", "/js/**",
-                "/img/**", "/fonts/**", "/angular/**", "/images/**",
-                "/Buttons-1.5.1/**", "/DataTables-1.10.16/**",
-                "/JSZip-2.5.0/**", "/dhs/**", "/webjars/**"
-            )
+            .securityMatcher(PathRequest.toStaticResources().atCommonLocations())
             .authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
-            .csrf(AbstractHttpConfigurer::disable);
+            .csrf(AbstractHttpConfigurer::disable)
+            .requestCache(AbstractHttpConfigurer::disable)
+            .securityContext(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 
@@ -98,8 +98,14 @@ public class SpringSecurityConfig {
                 .requireCsrfProtectionMatcher(csrfRequestMatcher)
                 .ignoringRequestMatchers("/mobilelogin", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs"))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/", "/login", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs").permitAll()
-                .requestMatchers(  "/awms_production.apk","/css/**", "/js/**", "/img/**", "/fonts/**", "/assets/**", "/webjars/**", "/angular/**", "/new-assets/**").permitAll()
+                .requestMatchers("/", "/login", "/error", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs").permitAll()
+                .requestMatchers(
+                    "/awms.apk", "/awms_production.apk",
+                    "/new-assets/**", "/assets/**", "/css/**", "/js/**",
+                    "/img/**", "/fonts/**", "/angular/**", "/images/**",
+                    "/Buttons-1.5.1/**", "/DataTables-1.10.16/**",
+                    "/JSZip-2.5.0/**", "/dhs/**", "/webjars/**"
+                ).permitAll()
                 .requestMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .requestMatchers("/systemAdmin/**", "/superAdmin/**", "/ceo/**").authenticated()
                 .requestMatchers("/mobile/**").authenticated()

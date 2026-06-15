@@ -275,14 +275,14 @@ public class SystemAdminController extends BaseController {
 		return new ModelAndView("systemAdmin/manageWorkCategory");
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DEPARTMENT','ROLE_DEPT_DISTRICT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DEPARTMENT','ROLE_DEPT_DISTRICT','ROLE_DM','ROLE_CEO','ROLE_AREA_OFFICER')")
 	@RequestMapping(value = "/dashboard", method = RequestMethod.GET)
 	public ModelAndView dashBoardView(HttpServletRequest request) {
 		user = DMSUtil.getUserDetail();
-		logger.info("User - {}, Role - {} - Displaying Manage WorkCategory page", user.getUsername(),
+		logger.info("User - {}, Role - {} - Displaying Dashboard page", user.getUsername(),
 				user.getAuthorities());
 
-		return new ModelAndView("superAdmin/dashboard");
+		return new ModelAndView("systemAdmin/dashboard");
 	}
 
 	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")

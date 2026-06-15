@@ -54,6 +54,7 @@
 			fnCreatedRow: function(nRow, aData) {
 				$('td:eq(7)', nRow).html('');
 				if (aData.imagepath && aData.imagepath !== '') {
+					var progressLabel = aData.workSubStatusNameE || aData.reasonDelay || '';
 					if (aData.workStatusId == 10) {
 						$('td:eq(7)', nRow).html(
 							'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileWS('
@@ -62,7 +63,7 @@
 					}
 					$('td:eq(7)', nRow).append(
 						'<button class="btn btn-xs btn-warning" type="button" title="Download File" onclick="return downloadFileWSDocumnt('
-							+ aData.documentId + ',\'' + (aData.workSubStatusNameE || '').replace(/'/g, "\\'") + '\')"> <i class="fa fa-eye"></i></button>'
+							+ aData.documentId + ',\'' + progressLabel.replace(/'/g, "\\'") + '\')"> <i class="fa fa-eye"></i></button>'
 					);
 				}
 				if (aData.workStatusId == 9) {

@@ -1132,15 +1132,15 @@
 				<button type="submit" class="btn  btn-success  next-button"
 					data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13' || workDataTender.workStatusId=='14' || workDataTender.workStatusId=='3' || workDataTender.workStatusId=='4' || workDataTender.workStatusId=='7' || workDataTender.workStatusId==null"
 					id="drafTtbtn"
-					data-ng-click="finalSubmit=false;saveTDraft=true;saveTNext=false;uploadedDrawingFiles">
+					data-ng-click="finalSubmit=false;saveTDraft=true;saveTNext=true;uploadedDrawingFiles">
 					<i class="las la-file-alt"></i>Save
 				</button>
-				<button type="submit" class="btn btn-primary next-button nexxt"
+				<!-- <button type="submit" class="btn btn-primary next-button nexxt"
 					data-ng-hide="workDataTender.workStatusId=='3' || workDataTender.workStatusId=='4' || workDataTender.workStatusId=='14'|| workDataTender.workStatusId=='7' ||workDataTender.workStatusId==null"
 					data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12'|| workDataTender.workStatusId=='13' "
 					id="finalTtbtn" data-ng-click="finalSubmit=false;saveTDraft=true;saveTNext=true;">
 					Save &amp; Next <span class="fa fa-arrow-circle-right"></span>
-				</button>
+				</button> -->
 			</div>
 			<div class="alert alert-success alert-dismissible" role="alert" id="myAlert"
 				data-ng-if="successResponseTender=='success'">

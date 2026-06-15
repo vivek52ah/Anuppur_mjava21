@@ -7,15 +7,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.resource.ContentVersionStrategy;
-import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
-import org.springframework.web.servlet.resource.VersionResourceResolver;
 
-/**
- * ✅ UPDATED FOR SPRING BOOT 3.2.5 & JAVA 21
- * Changed from WebMvcConfigurerAdapter (deprecated) to WebMvcConfigurer (interface)
- * WebMvcConfigurerAdapter was deprecated in Spring 5.0 and removed in Spring 6.0
- */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -24,39 +16,42 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addViewController("/").setViewName("login");
 		registry.addViewController("/login").setViewName("login");
 	}
-	
+
 	@Bean
 	public LocaleChangeInterceptor localeChangeInterceptor() {
-	    LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-	    lci.setParamName("lang");
-	    return lci;
+		LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+		lci.setParamName("lang");
+		return lci;
 	}
-	
+
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-	    registry.addInterceptor(localeChangeInterceptor());
+		registry.addInterceptor(localeChangeInterceptor());
 	}
-	
+
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		VersionResourceResolver versionResourceResolver = new VersionResourceResolver()
-				.addVersionStrategy(new ContentVersionStrategy(), "/**");
+		addStaticHandler(registry, "/assets/**", "classpath:/static/assets/");
+		addStaticHandler(registry, "/css/**", "classpath:/static/css/");
+		addStaticHandler(registry, "/js/**", "classpath:/static/js/");
+		addStaticHandler(registry, "/img/**", "classpath:/static/img/");
+		addStaticHandler(registry, "/angular/**", "classpath:/static/angular/");
+		addStaticHandler(registry, "/fonts/**", "classpath:/static/fonts/");
+		addStaticHandler(registry, "/Buttons-1.5.1/**", "classpath:/static/Buttons-1.5.1/");
+		addStaticHandler(registry, "/DataTables-1.10.16/**", "classpath:/static/DataTables-1.10.16/");
+		addStaticHandler(registry, "/JSZip-2.5.0/**", "classpath:/static/JSZip-2.5.0/");
+		addStaticHandler(registry, "/dhs/**", "classpath:/static/dhs/");
+		addStaticHandler(registry, "/new-assets/**", "classpath:/static/new-assets/");
+		addStaticHandler(registry, "/leaflet/**", "classpath:/static/leaflet/");
 
-		registry.addResourceHandler("/**/assets/**", "/**/css/**", "/**/js/**", "/**/img/**", "/**/angular/**", "/**/fonts/**", "/**/Buttons-1.5.1/**", "/**/DataTables-1.10.16/**", "/**/JSZip-2.5.0/**", "/**/dhs/**")
-		.addResourceLocations("classpath:/static/")
-		.setCachePeriod(60 * 60 * 24 * 365) /* one year */
-		.resourceChain(true)
-		.addResolver(versionResourceResolver);
-		
 		registry.addResourceHandler("/js/leaflet/images/**")
-         .addResourceLocations("classpath:/static/js/leaflet/images/")
-         .setCachePeriod(60 * 60 * 24 * 365) // 1 year cache period
-         .resourceChain(true)
-         .addResolver(versionResourceResolver);
+				.addResourceLocations("classpath:/static/js/leaflet/images/")
+				.setCachePeriod(0);
 	}
 
-	@Bean
-	public ResourceUrlEncodingFilter resourceUrlEncodingFilter() {
-		return new ResourceUrlEncodingFilter();
+	private void addStaticHandler(ResourceHandlerRegistry registry, String pattern, String location) {
+		registry.addResourceHandler(pattern)
+				.addResourceLocations(location)
+				.setCachePeriod(0);
 	}
 }

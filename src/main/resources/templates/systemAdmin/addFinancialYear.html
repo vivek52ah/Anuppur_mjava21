@@ -55,9 +55,9 @@
 	                                 <div class="form-group col-sm-3">
 	                                  	  <label><span> Add Financial Year</span><span
 											class="aestrick">&#42;</span></label> 
-	                                  	  <select class="form-control" id="financialYear"
+	                                  	  <select class="form-control" id="newFinancialYear"
 							 
-							                name="financialYear"  data-ng-model="financialYear.financialYearName" data-ng-change="">
+							                name="newFinancialYear"  data-ng-model="financialYear.financialYearName" required="required">
 							                <option value="" disabled="disabled">--Select--</option>
 							                <option 
 							             	value="{{financialYearjson.financialYearName}}">{{financialYearjson.financialYearName}}</option>
@@ -70,9 +70,9 @@
 								<div class="form-group col-sm-4"
 						data-ng-init="loadFinancialYears()">
 						<label><span> Available Financial Years</span></label>
-						<select class="form-control" id="financialYear"
+						<select class="form-control" id="availableFinancialYear"
 							 
-							name="financialYear"  data-ng-model="fd" data-ng-change="">
+							name="availableFinancialYear"  data-ng-model="fd">
 							<option value="" disabled="disabled">--Select--</option>
 							<option data-ng-repeat="fy in financialYears "
 								value="{{fy.financialYearId}}">{{fy.financialYearName}}</option>

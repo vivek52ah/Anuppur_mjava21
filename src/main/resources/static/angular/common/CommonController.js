@@ -1925,9 +1925,20 @@ $scope.changePasswordFunction = function(isValid) {
 	$scope.downloadDocumentIdWSPro = function(documentId, workSubStatusNameE) {
 		//console.log(" downloadDocument =" + documentId + "@@@@" + workSubStatus);
 		// $scope.loadWorkProgressDocumetnId(documentId);
-		$scope.workDataProgress.workSubStatusNameE = String(workSubStatusNameE);
+		$scope.workDataCC = $scope.workDataCC || {};
+		$scope.workDataProgress = $scope.workDataProgress || {};
+		$scope.workDataCC.workNo = ($scope.workData && $scope.workData.workNo)
+			|| $scope.workDataCC.workNo
+			|| '';
+		$scope.workDataProgress.workSubStatusNameE = (workSubStatusNameE && workSubStatusNameE !== 'null')
+			? String(workSubStatusNameE)
+			: ($scope.workDataProgress.workSubStatusNameE || '');
 		$scope.imageurl = 'downloadDocumentWSPro/' + documentId;
-		$('#exampleModal').modal('show');
+
+		$scope.$applyAsync(function() {
+			$('#exampleModal').modal('show');
+		});
+		return false;
 		//	$window.open('downloadDocumentWSPro/' + documentId, '_blank');
 	};
 
@@ -2617,6 +2628,10 @@ $scope.changePasswordFunction = function(isValid) {
 					$scope.loadContractorDetails();
 					$scope.loadWorkProgress();
 
+					if ($scope.saveTNext) {
+						$scope.goToNextWizardTab();
+					}
+
 
 
 
@@ -3177,7 +3192,7 @@ $scope.changePasswordFunction = function(isValid) {
 						$scope.loadTenderDetails();
 						$scope.loadTSASDetails();
 						$scope.loadWorkDetails('sec');
-						$scope.loadWorkProgress();
+						$scope.refreshWorkProgressAfterSave();
 
 					} else {
 						
@@ -3266,6 +3281,7 @@ $scope.changePasswordFunction = function(isValid) {
 				}, 5000);
 
 				$scope.createWorkProExpensesData();
+				$scope.refreshWorkProgressAfterSave();
 				//	$scope.workDataCC.workId = $rootScope.responseObject.id;
 				//$scope.finalCall = 'yes';
 				//$scope.loadCCDetails();
@@ -4663,6 +4679,11 @@ $scope.changePasswordFunction = function(isValid) {
 			$scope.loadExpensesList(step5WorkId);
 			$scope.loadWorkFinancialAgencyList(step5WorkId);
 		}, 350);
+	};
+
+	$scope.refreshWorkProgressAfterSave = function() {
+		$scope.successRespondeWS = 'success';
+		$scope.loadWorkProgress();
 	};
 
 	$scope.loadWorkProgressImagesList = function(workId) {
@@ -8442,8 +8463,14 @@ $scope.deleteDepartmentRemark = function(id) {
 		if (typeof fetchUserList === 'function') {
 			fetchUserList();
 		} else {
-			console.error('fetchUserList is not defined yet');
-			$loading.finish('sample-1');
+			$timeout(function() {
+				if (typeof fetchUserList === 'function') {
+					fetchUserList();
+				} else {
+					console.error('fetchUserList is not defined yet');
+					$loading.finish('sample-1');
+				}
+			}, 200);
 		}
 	};
 
@@ -9475,15 +9502,17 @@ $scope.loadFinancialHeadforAddAS = function(isEdit) {
             $scope.financialHeadsOriginal = angular.copy(response.data);
             
             
-            if (isEdit && $scope.workDataRows.length > 0) {
+            if ($scope.workDataRows && $scope.workDataRows.length > 0) {
             angular.forEach($scope.workDataRows, function(row) {
                 row.availableFinancialHeads = angular.copy($scope.financialHeadsOriginal);
             });
+            $scope.updateAllAvailableFinancialHeads();
         }
 
             // पहली row add करो
-            $scope.workDataRows = [];
-            $scope.addRow();
+            if (!$scope.workDataRows || $scope.workDataRows.length === 0) {
+                $scope.addRow();
+            }
 
             $loading.finish('sample-1');
         });
@@ -9941,3 +9970,4 @@ $scope.checkCurrentPassword = function () {
 	$scope.goToDmRemarkDetail = function(row) {
 		window.location.href = '#/manageOngoingWorks?departmentRemark=' + row.departmentMasterId;
 	};});
+

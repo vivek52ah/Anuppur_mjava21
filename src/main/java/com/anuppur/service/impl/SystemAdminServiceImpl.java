@@ -1118,6 +1118,10 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	public String addFinanicalYear(FinancialYearBean bean) {
 
 		try {
+			if (bean == null || StringUtils.isEmpty(bean.getFinancialYearName())) {
+				return "Please select financial year.";
+			}
+			bean.setFinancialYearName(bean.getFinancialYearName().trim());
 
 			FinancialYear entity = new FinancialYear();
 			FinancialYear e = financialYearRepository.findByFinancialYearAndEnabled(bean.getFinancialYearName(),

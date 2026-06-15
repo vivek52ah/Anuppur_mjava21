@@ -364,18 +364,33 @@
 
 	<style>
 		/* Optional: layout nicely if multiple images */
+		#imageModal .modal-content {
+			max-height: calc(100vh - 60px);
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+		}
+
+		#imageModal .modal-header {
+			flex-shrink: 0;
+		}
+
 		#imageModal .modal-body {
 			display: flex;
 			flex-wrap: wrap;
 			gap: 12px;
 			justify-content: center;
+			flex: 1 1 auto;
+			min-height: 0;
+			overflow: auto;
+			padding: 14px;
 		}
 
 		/* Force the same size for all images */
 		#imageModal .modal-body img {
 			width: 600px !important;
 			/* fixed */
-			height: 350px !important;
+			height: 250px !important;
 			/* fixed */
 			max-width: none !important;
 			max-height: none !important;
@@ -383,6 +398,19 @@
 			/* no distortion; letterboxed if needed */
 			/* optional: neutral background behind letterboxing */
 			display: block;
+		}
+
+		#imageModal .modal-footer {
+			display: flex !important;
+			flex-shrink: 0;
+			position: sticky;
+			bottom: 0;
+			z-index: 5;
+			padding: 14px !important;
+		}
+
+		#imageModal button[onclick="openZoomOverlay()"] {
+			z-index: 6;
 		}
 		
 		
@@ -624,7 +652,7 @@
 function openZoomOverlay() {
     var src = document.getElementById('modalImage').src;
     document.getElementById('zoomImage').src = src;
-    var total = window.currentImageList ? window.currentImageList.length : 1;
+    var total = window.currentImageList && window.currentImageList.length ? window.currentImageList.length : 1;
     var idx = window.currentImageIndex !== undefined ? window.currentImageIndex : 0;
     document.getElementById('zoomCounter').innerText = (idx + 1) + ' / ' + total;
     var overlay = document.getElementById('zoomOverlay');
@@ -2588,6 +2616,26 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 		window.currentImageIndex = 0;
 		window.currentImageList = [];
 
+		window.getImageNotUploadedUrl = function () {
+			return getBaseUrl() + '/img/image-not-uploaded.svg';
+		};
+
+		window.setModalImageSource = function (url, isPlaceholder) {
+			const image = document.getElementById('modalImage');
+			image.onerror = isPlaceholder ? null : function () {
+				image.onerror = null;
+				image.src = window.getImageNotUploadedUrl();
+				var total = window.currentImageList && window.currentImageList.length ? window.currentImageList.length : 1;
+				document.getElementById('imageCounter').innerText = (window.currentImageIndex + 1) + '/' + total;
+
+				const scope = angular.element(document.getElementById('imageModal')).scope();
+				scope.$apply(function () {
+					scope.noImageMessage = true;
+				});
+			};
+			image.src = url;
+		};
+
 window.openProgressImages = function (rowIndex) {
     const data = window.progressDocsStore[rowIndex];
 
@@ -2613,10 +2661,13 @@ window.openProgressImages = function (rowIndex) {
         scope.modalWorkNo = data.workNo;
         scope.levelOfCompletion = data.levelOfCompletion;
         scope.workName = data.workName;
+        scope.noImageMessage = window.currentImageList.length === 0;
 
         // latest date (since DESC, first element is latest)
         if (window.currentImageList.length > 0) {
             scope.date = window.currentImageList[0].createdDate;
+        } else {
+            scope.date = "";
         }
     });
 
@@ -2624,7 +2675,14 @@ window.openProgressImages = function (rowIndex) {
         window.showImageAt(window.currentImageIndex);
         $('#imageModal').modal('show');
     } else {
-        alert("No image found.");
+        window.currentImageList = [{
+            placeholder: true,
+            createdDate: ""
+        }];
+        window.currentImageIndex = 0;
+        window.setModalImageSource(window.getImageNotUploadedUrl(), true);
+        document.getElementById('imageCounter').innerText = "1/1";
+        $('#imageModal').modal('show');
     }
 };
 
@@ -2632,14 +2690,16 @@ window.openProgressImages = function (rowIndex) {
 		window.showImageAt = function (index) {
 			if (index >= 0 && index < window.currentImageList.length) {
 				const doc = window.currentImageList[index];
-				const url = 'downloadDocumentWSPro/' + doc.documentId;
-				document.getElementById('modalImage').src = url;
+				const isPlaceholder = doc.placeholder === true || doc.documentId == null;
+				const url = isPlaceholder ? window.getImageNotUploadedUrl() : 'downloadDocumentWSPro/' + doc.documentId;
+				window.setModalImageSource(url, isPlaceholder);
 
 
 				// AngularJS scope update for createdDate
 				const scope = angular.element(document.getElementById('imageModal')).scope();
 				scope.$apply(function () {
 					scope.date = doc.createdDate; // yaha set hoga har image ke hisab se
+					scope.noImageMessage = isPlaceholder;
 				});
 
 				// Optional: show counter (like 2/10)

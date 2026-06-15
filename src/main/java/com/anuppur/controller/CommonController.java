@@ -141,6 +141,7 @@ import com.anuppur.service.SuperAdminService;
 import com.anuppur.service.UserService;
 import com.anuppur.service.impl.CommonServiceImpl;
 import com.anuppur.util.DMSUtil;
+import com.anuppur.util.SHAHashingUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -287,10 +288,11 @@ public class CommonController extends BaseController {
 	    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	    // Validate current password
+	    String currentPasswordHash = !StringUtils.isEmpty(changePassword.getCurrentPassword())
+	            ? SHAHashingUtil.encryptPassword(changePassword.getCurrentPassword()).toString()
+	            : null;
 	    if (!StringUtils.isEmpty(changePassword.getCurrentPassword())
-	            && !passwordEncoder.matches(
-	                    changePassword.getCurrentPassword(),
-	                    userEntity.getPassword())) {
+	            && !passwordEncoder.matches(currentPasswordHash, userEntity.getPassword())) {
 
 	        response.setErrorMessage("Current password is not valid.");
 
@@ -319,7 +321,7 @@ public class CommonController extends BaseController {
 
 	    // Encode password
 	    changePassword.setPassword(
-	            passwordEncoder.encode(changePassword.getPassword()));
+	            passwordEncoder.encode(SHAHashingUtil.encryptPassword(changePassword.getPassword()).toString()));
 
 	    // Save password
 	    userService.changePassword(changePassword, user.getUsername());
@@ -5680,7 +5682,7 @@ public class CommonController extends BaseController {
 		 	}
 		
 			@RequestMapping(value = "/validateCurrentPassword", method = RequestMethod.POST)
-			public ResponseObject validateCurrentPassword(@RequestBody ChangePasswordBean currentpassword) {
+			public ResponseObject validateCurrentPassword(@RequestBody ChangePasswordBean currentpassword) throws Exception {
 
 			    ResponseObject response = new ResponseObject();
 
@@ -5690,7 +5692,12 @@ public class CommonController extends BaseController {
 			    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 			    // Wrong current password
-			    if (!passwordEncoder.matches(currentpassword.getCurrentPassword(), userEntity.getPassword())) {
+			    String currentPasswordHash = !StringUtils.isEmpty(currentpassword.getCurrentPassword())
+			            ? SHAHashingUtil.encryptPassword(currentpassword.getCurrentPassword()).toString()
+			            : null;
+
+			    if (StringUtils.isEmpty(currentpassword.getCurrentPassword())
+			            || !passwordEncoder.matches(currentPasswordHash, userEntity.getPassword())) {
 			        response.setErrorMessage("INVALID_CURRENT_PASSWORD");
 			        return response;
 			    }

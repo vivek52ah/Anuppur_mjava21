@@ -39,6 +39,7 @@ public class DataInitializer implements CommandLineRunner {
             if (existingUser == null) {
                 // Try to get SYSTEM_ADMIN role by ID (assuming it exists)
                 Optional<Role> adminRoleOpt = roleRepository.findById("ROLE_SYSTEM_ADMIN");
+                System.out.println("Role Found : " + adminRoleOpt.isPresent());
                 Role adminRole;
                 
                 if (adminRoleOpt.isPresent()) {

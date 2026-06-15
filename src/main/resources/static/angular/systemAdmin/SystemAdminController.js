@@ -1642,16 +1642,22 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		}
 	};
 
-	$scope.financialYearjson = {}
+	$scope.financialYear = {};
+	$scope.financialYearjson = {};
 
 	$scope.loadFinancialYears = function() {
 
 		$loading.start('sample-1');
 		var response = $http.get('fetchFinancialYear');
 		response.success(function(data, status, headers, config) {
-			$scope.financialYears = data;
+			$scope.financialYears = data || [];
+			if (!$scope.financialYears.length) {
+				$scope.financialYearjson = {};
+				$loading.finish('sample-1');
+				return;
+			}
 
-			$scope.financialYearjson = angular.copy(data[0]);
+			$scope.financialYearjson = angular.copy($scope.financialYears[0]);
 
 			var i = $scope.financialYearjson.financialYearName.charAt(2) + $scope.financialYearjson.financialYearName.charAt(3) + "";
 
@@ -1701,20 +1707,28 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		if (!isValid) {
 			return false;
 		}
+		if (!$scope.financialYear || !$scope.financialYear.financialYearName) {
+			$rootScope.responseObject = {
+				errorMessage: 'Please select financial year.'
+			};
+			$timeout(function() {
+				$rootScope.responseObject.errorMessage = null;
+			}, 5000);
+			return false;
+		}
 		if (confirm("Are you sure you want to save the data?")) {
 
-
-			var responsePromise = $http.post('addfinancialYear', $scope.financialYear);
+			$loading.start('sample-1');
+			var responsePromise = $http.post('addfinancialYear', angular.copy($scope.financialYear));
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
-				//alert($rootScope.responseObject.successMessage);
-				reDraw();
 				if ($rootScope.responseObject.successMessage != null) {
 					$timeout(function() {
 						$rootScope.responseObject.successMessage = null;
 					}, 5000);
 
 					$window.location.href = '#addFinancialYear';
+					$scope.financialYear = {};
 					$scope.loadFinancialYears();
 
 				}
@@ -1724,7 +1738,15 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 					}, 5000);
 					$loading.finish('sample-1');
 				}
-			})
+			}).error(function() {
+				$rootScope.responseObject = {
+					errorMessage: 'Error occurred while saving data.'
+				};
+				$timeout(function() {
+					$rootScope.responseObject.errorMessage = null;
+				}, 5000);
+				$loading.finish('sample-1');
+			});
 		}
 
 	};

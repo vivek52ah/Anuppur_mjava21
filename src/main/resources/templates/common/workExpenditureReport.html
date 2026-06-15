@@ -449,8 +449,8 @@ table.dataTable {
 							
 											<!-- Implementation Agency -->
 											<div class="form-group col-sm-4" data-ng-init="loadAgencies()">
-												<input type="text" class="form-control search-input" ng-model="implAgency" placeholder="Search..."
-													ng-change="updateFilter()" />
+												<!-- <input type="text" class="form-control search-input" ng-model="implAgency" placeholder="Search..."
+													ng-change="updateFilter()" /> -->
 												<select class="form-control" data-ng-model="workData.implementationAgency"
 													name="implementationAgency" id="implementationAgency">
 													<option value="" disabled="disabled">--Select
@@ -463,8 +463,8 @@ table.dataTable {
 											
 												<!-- Assign Users -->
 											<div class="form-group col-sm-4" data-ng-init="loadAssignedUsers();workData.userId = ''">
-												<input type="text" class="form-control search-input" ng-model="assignUserText" placeholder="Search..."
-													ng-change="updateFilter()" />
+												<!-- <input type="text" class="form-control search-input" ng-model="assignUserText" placeholder="Search..."
+													ng-change="updateFilter()" /> -->
 												<select class="form-control" id="userId" data-ng-model="workData.userId"
 													 name="userId">
 													<option value="" ng-selected="!workData.userId" disabled="disabled">By Area
@@ -476,8 +476,8 @@ table.dataTable {
 							
 											<!-- Work Status -->
 											<div class="form-group col-sm-4">
-												<input type="text" class="form-control search-input" ng-model="worksStatu" placeholder="Search..."
-													ng-change="updateFilter()" />
+												<!-- <input type="text" class="form-control search-input" ng-model="worksStatu" placeholder="Search..."
+													ng-change="updateFilter()" /> -->
 												<select class="form-control" id="workStatusId" data-ng-model="workData.workStatusId"
 													data-ng-init="loadWorkStatus1();" name="workStatusId">
 													<option value="" disabled="disabled">--Select Work
