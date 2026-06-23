@@ -1,7 +1,7 @@
 /**
  *
  * A JQUERY GOOGLE MAPS LATITUDE AND LONGITUDE LOCATION PICKER
- * version 1.2
+ 
  *
  * Supports multiple maps. Works on touchscreen. Easy to customize markup and CSS.
  *

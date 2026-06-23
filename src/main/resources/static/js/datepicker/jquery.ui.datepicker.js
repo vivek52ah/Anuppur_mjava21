@@ -1,5 +1,5 @@
 /*!
- * jQuery UI Datepicker 1.10.4
+ * 
  * http://jqueryui.com
  *
  * Copyright 2014 jQuery Foundation and other contributors

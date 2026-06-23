@@ -1,6 +1,6 @@
 /********************************************
  * REVOLUTION 5.0 EXTENSION - CAROUSEL
- * @version: 1.0.2 (01.10.2015)
+ * 
  * @requires jquery.themepunch.revolution.js
  * @author ThemePunch
 *********************************************/
