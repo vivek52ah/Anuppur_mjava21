@@ -643,6 +643,28 @@
       }
     }
   })();
+  (function() {
+    var hash = window.location.hash || '';
+    if (hash.indexOf('manageOngoingWorks') === -1) return;
+    var qIdx = hash.indexOf('?');
+    if (qIdx !== -1) {
+      var hashParams = new URLSearchParams(hash.substring(qIdx + 1));
+      window.urlDepartmentId = hashParams.get('departmentId') || null;
+      window.urlFinancialYearId = hashParams.get('financialYearId') || null;
+      window.urlWorkStatus = hashParams.get('workStatus') || null;
+      window.urlImplementationAgency = hashParams.get('implementationAgency') || null;
+      window.urlDepartmentRemark = hashParams.get('departmentRemark') || null;
+      window.urlWorkStatusIds = hashParams.get('workStatusId') || '';
+    } else {
+      window.urlDepartmentId = null;
+      window.urlFinancialYearId = null;
+      window.urlWorkStatus = null;
+      window.urlImplementationAgency = null;
+      window.urlDepartmentRemark = null;
+      window.urlWorkStatusIds = '';
+    }
+    localStorage.removeItem('work_filters');
+  })();
   /*]]>*/
 </script>
 

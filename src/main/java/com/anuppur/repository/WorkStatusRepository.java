@@ -31,4 +31,6 @@ public interface WorkStatusRepository  extends JpaRepository<WorkStatus, Long> {
 	WorkStatus findByWorkStatusNameEAndSchemes(String workStatus, Schemes findBySchemeNameAndEnabled);
 	
 	WorkStatus findByWorkStatusNameE(String statusName);
+
+	List<WorkStatus> findByWorkStatusNameEOrderByIdAsc(String statusName);
 }

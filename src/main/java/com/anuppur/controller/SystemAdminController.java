@@ -1,9 +1,11 @@
 package com.anuppur.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -32,23 +34,28 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.thymeleaf.util.StringUtils;
 
 import com.anuppur.bean.BlockBean;
+import com.anuppur.bean.DashBoardDataBean;
 import com.anuppur.bean.DistrictBean;
 import com.anuppur.bean.FinancialYearBean;
 import com.anuppur.bean.GramPanchayatBean;
 import com.anuppur.bean.ImplAgencyBean;
 import com.anuppur.bean.OfficeTypeBean;
 import com.anuppur.bean.OtherDocListBean;
+import com.anuppur.bean.PhotoUpdateReportRowBean;
 import com.anuppur.bean.RoleBean;
 import com.anuppur.bean.SchemeBean;
 import com.anuppur.bean.UserBean;
 import com.anuppur.bean.UserTypeBean;
 import com.anuppur.bean.WorkCategoryBean;
+import com.anuppur.bean.WorkBean;
 import com.anuppur.bean.WorkSubTypeBean;
 import com.anuppur.bean.WorkTypeBean;
+import com.anuppur.bean.WorkTypeFinancialOverviewBean;
 import com.anuppur.constants.DMSConstants;
 import com.anuppur.entity.Designation;
 import com.anuppur.entity.Role;
 import com.anuppur.entity.Users;
+import com.anuppur.entity.WorkStatus;
 import com.anuppur.json.DistrictJson;
 import com.anuppur.json.GramPanchayatJson;
 import com.anuppur.json.ImplAgencyJson;
@@ -59,6 +66,8 @@ import com.anuppur.json.WorkCategoryJson;
 import com.anuppur.json.WorkSubtypeJson;
 import com.anuppur.json.workTypeJson;
 import com.anuppur.repository.DesignationRepository;
+import com.anuppur.repository.WorkRepository;
+import com.anuppur.repository.WorkStatusRepository;
 import com.anuppur.response.ResponseObject;
 import com.anuppur.service.CommonService;
 import com.anuppur.service.NotificationService;
@@ -89,6 +98,12 @@ public class SystemAdminController extends BaseController {
 
 	@Autowired
 	private SystemAdminService systemAdminService;
+
+	@Autowired
+	private WorkRepository workRepository;
+
+	@Autowired
+	private WorkStatusRepository workStatusRepository;
 
 	@Value("${applicationDeploymentServerName}")
 	private String applicationDeploymentServerName;
@@ -283,6 +298,178 @@ public class SystemAdminController extends BaseController {
 				user.getAuthorities());
 
 		return new ModelAndView("systemAdmin/dashboard");
+	}
+
+	@RequestMapping(value = "/fetchDashboardData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public DashBoardDataBean fetchDashboardData(HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		logger.info("User - {}, Role - {} - Fetching dashboard data", user.getUsername(), user.getAuthorities());
+
+		DashBoardDataBean dashboardData = new DashBoardDataBean();
+		dashboardData.setWorkCount(fetchDashboardCount("Total works", () -> workRepository.countWork()));
+		dashboardData.setAsIsuuesCount(fetchDashboardCountByStatusIds("AS issued", 2L));
+		dashboardData.setTenderCalledCount(fetchDashboardCountByStatusIds("Tender called", 3L));
+		dashboardData.setTenderRcvCount(fetchDashboardCountByStatusIds("Tender received", 4L));
+		dashboardData.setTenderApprovalInprocessCount(fetchDashboardCountByStatusIds("Tender approval", 5L));
+		dashboardData.setReTenderCount(fetchDashboardCountByStatusIds("Re-tender", 14L));
+		dashboardData.setLoaIssuesCount(fetchDashboardCountByStatusIds("LOA issued", 7L));
+		dashboardData.setWoIssuedCount(fetchDashboardCountByStatusIds("Work order", 8L));
+		dashboardData.setNotStartedCount(fetchDashboardCountByStatusIds("Not started", 9L));
+		dashboardData.setInProgressCount(fetchDashboardCountByStatusIds("In progress", 10L));
+		dashboardData.setCompletedCount(fetchDashboardCountByStatusIds("Completed", 11L));
+		dashboardData.setCcCount(fetchDashboardCountByStatusIds("CC uploaded", 13L));
+		dashboardData.setHandOverCount(fetchDashboardCountByStatusIds("Hand over", 12L));
+		populatePhotoUploadDashboardCounts(dashboardData);
+		return dashboardData;
+	}
+
+	@RequestMapping(value = "/fetchDashboardWorkTypeFinancialOverview", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<WorkTypeFinancialOverviewBean> fetchDashboardWorkTypeFinancialOverview(HttpServletRequest request) {
+		user = DMSUtil.getUserDetail();
+		logger.info("User - {}, Role - {} - Fetching dashboard work type financial overview", user.getUsername(),
+				user.getAuthorities());
+		return fetchWorkTypeFinancialOverview();
+	}
+
+	private void populatePhotoUploadDashboardCounts(DashBoardDataBean dashboardData) {
+		try {
+			List<PhotoUpdateReportRowBean> photoRows = commonService.getPhotoUpdateReport(null);
+			if (photoRows == null) {
+				photoRows = new ArrayList<PhotoUpdateReportRowBean>();
+			}
+			BigDecimal uploadedWorks = BigDecimal.ZERO;
+			for (PhotoUpdateReportRowBean row : photoRows) {
+				if (row != null) {
+					uploadedWorks = uploadedWorks.add(BigDecimal.valueOf(row.getTotalWorks()));
+				}
+			}
+			BigDecimal totalWorks = dashboardData.getWorkCount() == null ? BigDecimal.ZERO : dashboardData.getWorkCount();
+			BigDecimal pendingWorks = totalWorks.subtract(uploadedWorks);
+			if (pendingWorks.compareTo(BigDecimal.ZERO) < 0) {
+				pendingWorks = BigDecimal.ZERO;
+			}
+			dashboardData.setPhotoUploadWorkCount(uploadedWorks);
+			dashboardData.setPhotoUploadDepartmentCount(BigDecimal.valueOf(photoRows.size()));
+			dashboardData.setPhotoUploadPendingCount(pendingWorks);
+		} catch (Exception ex) {
+			logger.error("Dashboard photo upload counts failed", ex);
+			dashboardData.setPhotoUploadWorkCount(BigDecimal.ZERO);
+			dashboardData.setPhotoUploadDepartmentCount(BigDecimal.ZERO);
+			dashboardData.setPhotoUploadPendingCount(BigDecimal.ZERO);
+		}
+	}
+
+	private void populateExpenditureDashboardCounts(DashBoardDataBean dashboardData) {
+		try {
+			List<WorkBean> expenditureRows = commonService.getFilteredWorkWithLatestExpenses(null, null, null, null);
+			if (expenditureRows == null) {
+				expenditureRows = new ArrayList<WorkBean>();
+			}
+
+			BigDecimal pacTotal = BigDecimal.ZERO;
+			BigDecimal totalExpenditure = BigDecimal.ZERO;
+			BigDecimal lastExpenditure = BigDecimal.ZERO;
+			for (WorkBean row : expenditureRows) {
+				if (row != null) {
+					pacTotal = pacTotal.add(row.getPac() == null ? BigDecimal.ZERO : row.getPac());
+					totalExpenditure = totalExpenditure
+							.add(row.getTotalExpensess() == null ? BigDecimal.ZERO : row.getTotalExpensess());
+					lastExpenditure = lastExpenditure
+							.add(row.getLastExpenditure() == null ? BigDecimal.ZERO : row.getLastExpenditure());
+				}
+			}
+
+			dashboardData.setExpenditureReportWorkCount(BigDecimal.valueOf(expenditureRows.size()));
+			dashboardData.setExpenditurePacTotal(pacTotal);
+			dashboardData.setExpenditureTotal(totalExpenditure);
+			dashboardData.setExpenditureLastTotal(lastExpenditure);
+		} catch (Exception ex) {
+			logger.error("Dashboard expenditure counts failed", ex);
+			dashboardData.setExpenditureReportWorkCount(BigDecimal.ZERO);
+			dashboardData.setExpenditurePacTotal(BigDecimal.ZERO);
+			dashboardData.setExpenditureTotal(BigDecimal.ZERO);
+			dashboardData.setExpenditureLastTotal(BigDecimal.ZERO);
+		}
+	}
+
+	private void populateWorkTypeFinancialOverview(DashBoardDataBean dashboardData) {
+		dashboardData.setWorkTypeFinancialOverview(fetchWorkTypeFinancialOverview());
+	}
+
+	private List<WorkTypeFinancialOverviewBean> fetchWorkTypeFinancialOverview() {
+		List<WorkTypeFinancialOverviewBean> overview = new ArrayList<WorkTypeFinancialOverviewBean>();
+		try {
+			List<Object[]> rows = workRepository.fetchWorkTypeFinancialOverview();
+			if (rows != null) {
+				for (Object[] row : rows) {
+					WorkTypeFinancialOverviewBean bean = new WorkTypeFinancialOverviewBean();
+					bean.setWorkTypeName(row[0] != null ? row[0].toString() : "N/A");
+					bean.setContractAmount(toBigDecimal(row[1]));
+					bean.setExpenditureAmount(toBigDecimal(row[2]));
+					overview.add(bean);
+				}
+			}
+		} catch (Exception ex) {
+			logger.error("Dashboard work type financial overview failed", ex);
+		}
+		return overview;
+	}
+
+	private BigDecimal toBigDecimal(Object value) {
+		if (value == null) {
+			return BigDecimal.ZERO;
+		}
+		if (value instanceof BigDecimal) {
+			return (BigDecimal) value;
+		}
+		if (value instanceof Number) {
+			return BigDecimal.valueOf(((Number) value).doubleValue());
+		}
+		try {
+			return new BigDecimal(value.toString());
+		} catch (Exception ex) {
+			return BigDecimal.ZERO;
+		}
+	}
+
+	private BigDecimal fetchDashboardCountByStatusIds(String label, Long... statusIds) {
+		List<Long> ids = new ArrayList<Long>();
+		for (Long statusId : statusIds) {
+			if (statusId != null && !ids.contains(statusId)) {
+				ids.add(statusId);
+			}
+		}
+		return fetchDashboardCount(label, () -> workRepository.getDashboardCountByStatusIds(ids));
+	}
+
+	private BigDecimal fetchDashboardCountByStatusNames(String label, String... statusNames) {
+		List<Long> statusIds = new ArrayList<Long>();
+		for (String statusName : statusNames) {
+			if (StringUtils.isEmpty(statusName)) {
+				continue;
+			}
+			List<WorkStatus> workStatuses = workStatusRepository.findByWorkStatusNameEOrderByIdAsc(statusName);
+			for (WorkStatus workStatus : workStatuses) {
+				if (workStatus != null && workStatus.getId() != null && !statusIds.contains(workStatus.getId())) {
+					statusIds.add(workStatus.getId());
+				}
+			}
+		}
+		if (statusIds.isEmpty()) {
+			logger.warn("Dashboard status ids not found for {}", label);
+			return BigDecimal.ZERO;
+		}
+		return fetchDashboardCount(label, () -> workRepository.getDashboardCountByStatusIds(statusIds));
+	}
+
+	private BigDecimal fetchDashboardCount(String label, Supplier<BigDecimal> countSupplier) {
+		try {
+			BigDecimal count = countSupplier.get();
+			return count == null ? BigDecimal.ZERO : count;
+		} catch (Exception ex) {
+			logger.error("Dashboard count failed for {}", label, ex);
+			return BigDecimal.ZERO;
+		}
 	}
 
 	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")

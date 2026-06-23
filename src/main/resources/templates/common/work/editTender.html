@@ -1586,11 +1586,11 @@
 	</div>
 
 
-	<div class="card-header">
+	<div class="card-header" data-ng-show="showAssignAreaOfficerSection()">
 		Assign Area Officer
 	</div>
-	<div class="card-body" ng-show="workDataTender.workStatusId=='8'" >
-		<div class="row">
+	<div class="card-body" data-ng-show="showAssignAreaOfficerSection()">
+		<div class="row" data-ng-show="workDataTender.workStatusId=='8'">
 			<div class="col-sm-2">
 				<button type="button" class="btn btn-success"
 					ng-click="openModal(workData.workId || null, workData.userAssignee || null)"
@@ -1611,8 +1611,7 @@
 			<br />
 			<br />
 		</div>
-		<div class="row"
-			data-ng-show="workDataTender.workStatusId=='8' || workDataTender.workStatusId=='9' || workDataTender.workStatusId=='10' || workDataTender.workStatusId=='11' || workDataTender.workStatusId=='12' || workDataTender.workStatusId=='13'">
+		<div class="row" data-ng-show="showAssignAreaOfficerSection()">
 			<div class="table-responsive responsive-md" data-ng-init="loadareaUserList()">
 				<table id="dynamic-table25" class="table table-striped table-bordered table-hover table-outline">
 					<thead class="thead-default">

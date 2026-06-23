@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -31,11 +32,13 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.anuppur.filter.CaptchaAuthenticationFilter;
 import com.anuppur.handler.DMSAuthenticationSuccessHandler;
+import com.anuppur.security.DMSPasswordEncoder;
 import com.anuppur.service.impl.UserDetailsServiceImpl;
 import com.anuppur.util.JwtFilter;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -63,13 +66,27 @@ public class SpringSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public PasswordEncoder dmsPasswordEncoder() {
+        return new DMSPasswordEncoder();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(dmsPasswordEncoder());
+        return provider;
+    }
+
     private final RequestMatcher csrfRequestMatcher = request -> {
         List<AntPathRequestMatcher> requestMatchers = List.of(
             new AntPathRequestMatcher("/forgotpassword/**"),
             new AntPathRequestMatcher("/api/**"),
             new AntPathRequestMatcher("/resetpassword/**"),
             new AntPathRequestMatcher("/registrationForm/**"),
-            new AntPathRequestMatcher("/doSignUp/**")
+            new AntPathRequestMatcher("/doSignUp/**"),
+            new AntPathRequestMatcher("/mobilelogin/**")
         );
         return requestMatchers.stream().anyMatch(matcher -> matcher.matches(request));
     };
@@ -94,11 +111,13 @@ public class SpringSecurityConfig {
         http.cors(cors -> cors.disable());
         
         http
-            .csrf(csrf -> csrf
+            .authenticationProvider(daoAuthenticationProvider())
+                .csrf(csrf -> csrf
                 .requireCsrfProtectionMatcher(csrfRequestMatcher)
-                .ignoringRequestMatchers("/logout", "/mobilelogin", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs"))
+                .ignoringRequestMatchers("/logout", "/mobilelogin", "/mobilelogin/**", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs"))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/", "/login", "/error", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs").permitAll()
+                .requestMatchers("/", "/login", "/error", "/captcha", "/forgotpassword", "/resetpassword", "/aboutUs", "/guidelines", "/contactUs",
+                    "/mobilelogin", "/mobilelogin/**").permitAll()
                 .requestMatchers(
                     "/awms.apk", "/awms_production.apk",
                     "/new-assets/**", "/assets/**", "/css/**", "/js/**",
@@ -156,6 +175,9 @@ public class SpringSecurityConfig {
         if (uri != null && uri.contains("/mobile/")) {
             return true;
         }
+        if (uri != null && uri.contains("/mobilelogin")) {
+            return true;
+        }
         if ("XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"))) {
             return true;
         }
@@ -166,8 +188,9 @@ public class SpringSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
+            .authenticationProvider(daoAuthenticationProvider())
             .userDetailsService(userDetailsService)
-            .passwordEncoder(bCryptPasswordEncoder())
+            .passwordEncoder(dmsPasswordEncoder())
             .and()
             .build();
     }

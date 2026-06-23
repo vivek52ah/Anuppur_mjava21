@@ -312,12 +312,13 @@
                                     </div>
 
                                     <div id="errorTableDiv" style="display:none;">
-                                        <h6>Row-Level Errors:</h6>
+                                        <h6>Validation Errors:</h6>
                                         <div class="table-responsive">
                                             <table class="table table-sm table-striped table-bordered error-table">
                                                 <thead class="thead-default">
                                                     <tr>
-                                                        <th>Row #</th>
+                                                        <th>Error #</th>
+                                                        <th>Excel Row #</th>
                                                         <th>Column</th>
                                                         <th>Error</th>
                                                     </tr>
@@ -449,9 +450,9 @@
         if (data.errors && data.errors.length > 0) {
             var tbody = document.getElementById('errorTableBody');
             tbody.innerHTML = '';
-            data.errors.forEach(function(err) {
+            data.errors.forEach(function(err, index) {
                 var tr = document.createElement('tr');
-                tr.innerHTML = '<td>' + err.rowNumber + '</td><td>' + escHtml(err.columnName) + '</td><td>' + escHtml(err.errorMessage) + '</td>';
+                tr.innerHTML = '<td>' + (index + 1) + '</td><td>' + err.rowNumber + '</td><td>' + escHtml(err.columnName) + '</td><td>' + escHtml(err.errorMessage) + '</td>';
                 tbody.appendChild(tr);
             });
             document.getElementById('errorTableDiv').style.display = 'block';

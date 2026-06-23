@@ -43,7 +43,7 @@
 						<input type="hidden" data-ng-model="workDataProgress.size"></input>
 						<select class="form-control" id="workStatus" required="required"
 							data-ng-model="workDataProgress.workStatusId"
-							data-ng-change="workDataProgress.workStatusId!=null;workDataProgress.workSubStatusId=null;loadWorkSubStatusByWorkStatus(workData.workSubTypeId, workDataProgress.workStatusId);workDataProgress.remarks = null;"
+							data-ng-change="onWorkProgressStatusChange();"
 							name="workStatus">
 							<!-- setBgColor(workDataProgress.workStatusId); -->
 							<option value="" disabled="disabled">--Select--</option>
@@ -577,7 +577,7 @@
 				<span>Financial Progress Details</span>
 			</div>
 			<div class="card-body"
-			data-ng-show="workDataProgress.progressUpdated=='9' || workDataProgress.progressUpdated=='10' || workDataProgress.progressUpdated=='11' || workDataProgress.progressUpdated=='12' || workDataProgress.progressUpdated=='13'">
+			data-ng-show="workDataContractor.workStatus!='notContractorIssued' && (workDataProgress.workId || workData.workId || workData.id || workDataProgress.workStatusId || successRespondeWS=='success')">
 
 
 				<div class="row" data-ng-hide="workDataProgress.workStatusId=='9' "
@@ -730,7 +730,7 @@
 
 
 				<div id="page-fa-div"
-					data-ng-show="workDataProgress.progressUpdated=='9' || workDataProgress.progressUpdated=='10' || workDataProgress.progressUpdated=='11' || workDataProgress.progressUpdated=='12' || workDataProgress.progressUpdated=='13'">
+					data-ng-show="workDataProgress.workId || workData.workId || workData.id || workDataProgress.workStatusId || successRespondeWS=='success'">
 					<div class="container-fluid" style="margin-top: 10px">
 
 						<div class="animated fadeIn">

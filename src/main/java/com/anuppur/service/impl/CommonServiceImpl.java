@@ -563,7 +563,7 @@ public class CommonServiceImpl implements CommonService {
 
 			List<String> schemes = new ArrayList<String>();
 
-			// Convert blockId comma-separated string to List<Long>
+			// Convert blockId comma-separated strideng to List<Long>
 			List<Long> blockIdList = new ArrayList<>();
 			if (blockId != null && !blockId.isEmpty()) {
 				String[] blockIds = blockId.split(",");
@@ -1435,14 +1435,22 @@ public class CommonServiceImpl implements CommonService {
 						if (documentUploadWorkProgress.getWorkSubStatusId() != null) {
 							WorkSubStatus workSubStatus = workSubStatusRepository
 									.findByWorkSubStatusId(documentUploadWorkProgress.getWorkSubStatusId());
-							bean.setWorkSubStatusId(workSubStatus.getWorkSubStatusId());
-							if ("In-Progress".equals(documentUploadWorkProgress.getWorkStatusNameE())) {
-								bean.setWorkSubStatusNameE(workSubStatus.getWorkSubStatusNameE());
-								bean.setReasonDelay("-");
+							if (workSubStatus != null) {
+								bean.setWorkSubStatusId(workSubStatus.getWorkSubStatusId());
+								if ("In-Progress".equals(documentUploadWorkProgress.getWorkStatusNameE())) {
+									bean.setWorkSubStatusNameE(workSubStatus.getWorkSubStatusNameE());
+									bean.setReasonDelay("-");
+								} else {
+									bean.setReasonDelay(workSubStatus.getWorkSubStatusNameE());
+									bean.setWorkSubStatusNameE("-");
+								}
 							} else {
-								bean.setReasonDelay(workSubStatus.getWorkSubStatusNameE());
 								bean.setWorkSubStatusNameE("-");
+								bean.setReasonDelay("-");
 							}
+						} else {
+							bean.setWorkSubStatusNameE("-");
+							bean.setReasonDelay("-");
 
 						}
 						if (documentUploadWorkProgress.getWorkStatusId() != null) {
@@ -3107,6 +3115,9 @@ public class CommonServiceImpl implements CommonService {
 						cc.setWorkStatusId(workStatus.getId());
 						// cc.setWorkStatus(workStatus.getWorkStatusNameE());
 					}
+					if (workProgressBean.getWorkStatusId() == 11) {
+						saveCompletedWorkProgressListRow(workProgressBean, workStatus);
+					}
 					responseObject.setId(entity.getWork().getId());
 
 				}
@@ -3117,6 +3128,18 @@ public class CommonServiceImpl implements CommonService {
 			logger.error("An exception occurred.", e);
 			throw new Exception(DMSConstants.ERROR_SAVING_DATA);
 		}
+	}
+
+	private void saveCompletedWorkProgressListRow(WorkProgressBean workProgressBean, WorkStatus workStatus) {
+		DocumentUploadWorkProgress completedRow = new DocumentUploadWorkProgress();
+		completedRow.setWorkId(workProgressBean.getWorkId());
+		completedRow.setWorkStatusId(workStatus.getId());
+		completedRow.setWorkStatusNameE(workStatus.getWorkStatusNameE());
+		completedRow.setRemarks(workProgressBean.getRemarks());
+		completedRow.setPerc(workProgressBean.getPerc() != null ? workProgressBean.getPerc() : 100);
+		completedRow.setEnabled((short) 1);
+		completedRow.setCreatedDate(new Date());
+		documentUploadWorkProgressRepository.save(completedRow);
 	}
 
 	@Override
@@ -9032,6 +9055,22 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 			if (uplDocumentUploadWorkProgressBean != null) {
+				if (uplDocumentUploadWorkProgressBean.getWorkId() == null) {
+					throw new Exception("Work id is required");
+				}
+				if (uplDocumentUploadWorkProgressBean.getWorkStatusId() == null) {
+					throw new Exception("Work status is required");
+				}
+				Work work = workRepository.findById(uplDocumentUploadWorkProgressBean.getWorkId()).orElse(null);
+				if (work == null) {
+					throw new Exception("Work not found");
+				}
+				WorkStatus workStatus = workStatusRepository
+						.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId()).orElse(null);
+				if (workStatus == null) {
+					throw new Exception("Work status not found");
+				}
+
 				WorkProgress progressentity = workProgressRepository
 						.findByWorkId(uplDocumentUploadWorkProgressBean.getWorkId());
 
@@ -9039,41 +9078,45 @@ public class CommonServiceImpl implements CommonService {
 					progressentity = new WorkProgress();
 				}
 
-				if (uplDocumentUploadWorkProgressBean != null) {
-
-					progressentity.setWork(
-							workRepository.findById(uplDocumentUploadWorkProgressBean.getWorkId()).orElse(null));
-					if (uplDocumentUploadWorkProgressBean.getWorkRemakrsM() != null) {
-						progressentity.setWorkremarksM(uplDocumentUploadWorkProgressBean.getWorkRemakrsM());
-					}
+				progressentity.setWork(work);
+				progressentity.setWorkStatusId(workStatus.getId());
+				if (uplDocumentUploadWorkProgressBean.getWorkSubStatusId() != null) {
+					progressentity.setWorkSubStatusId(uplDocumentUploadWorkProgressBean.getWorkSubStatusId().intValue());
+				}
+				if (uplDocumentUploadWorkProgressBean.getPerc() != null) {
+					progressentity.setPerc(uplDocumentUploadWorkProgressBean.getPerc());
+				}
+				if (uplDocumentUploadWorkProgressBean.getWorkRemakrsM() != null) {
+					progressentity.setWorkremarksM(uplDocumentUploadWorkProgressBean.getWorkRemakrsM());
 				}
 
 				workProgressRepository.save(progressentity);
 
 				if (uplDocumentUploadWorkProgressBean != null) {
-					DocumentUploadWorkProgress entity = null;
-					entity = new DocumentUploadWorkProgress();
-
 					responseObject = new ResponseObject();
-					Work work = workRepository.findById(uplDocumentUploadWorkProgressBean.getWorkId()).orElse(null);
 					work.setWorkStatus(uplDocumentUploadWorkProgressBean.getWorkStatusId());
 					workRepository.save(work);
 					WorkProgress workprogress = workProgressRepository
 							.findByWorkId(uplDocumentUploadWorkProgressBean.getWorkId());
 					if (workprogress == null) {
 						workprogress = new WorkProgress();
+						workprogress.setWork(work);
 					}
-					workprogress.setWorkSubStatusId(
-							Integer.parseInt(uplDocumentUploadWorkProgressBean.getWorkSubStatusId() + ""));
+					if (uplDocumentUploadWorkProgressBean.getWorkSubStatusId() != null) {
+						workprogress.setWorkSubStatusId(uplDocumentUploadWorkProgressBean.getWorkSubStatusId().intValue());
+					}
 					workprogress.setWorkStatusId(uplDocumentUploadWorkProgressBean.getWorkStatusId());
 					workProgressRepository.save(workprogress);
-					String workNo = null;
 					Integer remarkscount = -1;
+					boolean hasSavedDocument = false;
 					// Iterate over the list of files (List<MultipartFile>)
 					if (uplDocumentUploadWorkProgressBean.getUploadFile() != null
 							&& !uplDocumentUploadWorkProgressBean.getUploadFile().isEmpty()) {
 						// Iterate through each file in the list
 						for (MultipartFile file : uplDocumentUploadWorkProgressBean.getUploadFile()) {
+							if (file == null || file.isEmpty()) {
+								continue;
+							}
 							logger.info("Processing file: " + file.getOriginalFilename());
 							remarkscount += 1;
 							// Upload document (Assuming DMSUtil.uploadWorkProgressDocument method)
@@ -9082,13 +9125,16 @@ public class CommonServiceImpl implements CommonService {
 									uplDocumentUploadWorkProgressBean.getWorkId(), file, null, "blank",
 									uplDocumentUploadWorkProgressBean.getWorkSubStatusId(),
 									uplDocumentUploadWorkProgressBean.getWorkStatusId());
+							if (documentUpload == null) {
+								throw new Exception("Unable to upload progress document");
+							}
 
 							// Set work status
-							WorkStatus workStatus = workStatusRepository
-									.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId()).orElse(null);
 							documentUpload.setWorkStatusId(workStatus.getId());
 							documentUpload.setWorkStatusNameE(workStatus.getWorkStatusNameE());
-							if (uplDocumentUploadWorkProgressBean.getRemarks().get(remarkscount) != null) {
+							if (uplDocumentUploadWorkProgressBean.getRemarks() != null
+									&& uplDocumentUploadWorkProgressBean.getRemarks().size() > remarkscount
+									&& uplDocumentUploadWorkProgressBean.getRemarks().get(remarkscount) != null) {
 								documentUpload
 										.setRemarks(uplDocumentUploadWorkProgressBean.getRemarks().get(remarkscount));
 							}
@@ -9098,30 +9144,40 @@ public class CommonServiceImpl implements CommonService {
 							documentUpload.setAddress(uplDocumentUploadWorkProgressBean.getAddress());
 							documentUpload.setLattitude(uplDocumentUploadWorkProgressBean.getLattitude());
 							documentUpload.setLongitude(uplDocumentUploadWorkProgressBean.getLongitude());
+							documentUpload.setEnabled((short) 1);
+							if (documentUpload.getCreatedDate() == null) {
+								documentUpload.setCreatedDate(new Date());
+							}
 							// Save the document
 
 							documentUploadWorkProgressRepository.save(documentUpload);
+							hasSavedDocument = true;
 							// workRepository.findById(uplDocumentUploadWorkProgressBean.getWorkId()).orElse(null);
 						}
 
 						// Set the response ID
 						responseObject.setId(uplDocumentUploadWorkProgressBean.getWorkId());
-					} else if (uplDocumentUploadWorkProgressBean.getWorkStatusId() == 9) {
-						// If no file is uploaded and WorkStatusId is 9, save another record
+					}
+					if (!hasSavedDocument) {
+						// If no valid file is uploaded, keep a progress history row for the saved mobile form.
 						DocumentUploadWorkProgress documentUpload1 = new DocumentUploadWorkProgress();
 						documentUpload1.setWorkId(uplDocumentUploadWorkProgressBean.getWorkId());
 						documentUpload1.setEnabled((short) 1);
 						documentUpload1.setCreatedDate(new Date());
 						documentUpload1.setWorkSubStatusId(uplDocumentUploadWorkProgressBean.getWorkSubStatusId());
 						documentUpload1.setActionTakenDelay(uplDocumentUploadWorkProgressBean.getActionTakenDelay());
-						WorkStatus workStatus = workStatusRepository
-								.findById(uplDocumentUploadWorkProgressBean.getWorkStatusId()).orElse(null);
 						documentUpload1.setWorkStatusId(workStatus.getId());
 						documentUpload1.setAddress(uplDocumentUploadWorkProgressBean.getAddress());
 						documentUpload1.setLattitude(uplDocumentUploadWorkProgressBean.getLattitude());
 						documentUpload1.setLongitude(uplDocumentUploadWorkProgressBean.getLongitude());
 						documentUpload1.setWorkStatusNameE(workStatus.getWorkStatusNameE());
-						// documentUpload1.setRemarks(uplDocumentUploadWorkProgressBean.getRemarks());
+						if (uplDocumentUploadWorkProgressBean.getRemarks() != null
+								&& !uplDocumentUploadWorkProgressBean.getRemarks().isEmpty()) {
+							documentUpload1.setRemarks(uplDocumentUploadWorkProgressBean.getRemarks().get(0));
+						} else if (uplDocumentUploadWorkProgressBean.getWorkremarks() != null) {
+							documentUpload1.setRemarks(uplDocumentUploadWorkProgressBean.getWorkremarks());
+						}
+						documentUpload1.setPerc(uplDocumentUploadWorkProgressBean.getPerc());
 						documentUpload1
 								.setWorkSubDelayReasonId(uplDocumentUploadWorkProgressBean.getWorkSubDelayReasonId());
 						documentUploadWorkProgressRepository.save(documentUpload1);

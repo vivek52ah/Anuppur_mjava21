@@ -794,8 +794,6 @@
 		<script th:src="@{/dhs/js/custom.js}"></script>
 
 	</div>
-	<script th:src="@{/js/sha256.js}"></script>
-
 	<script type="text/javascript" th:inline="javascript">
 		/*<![CDATA[*/
 		$('#btnlogin').click(function () {
@@ -817,33 +815,6 @@
 						$('#loginbox').show();
 					}
 
-					$('#btn-login')
-						.click(
-							function () {
-								if ($.trim($('#username').val()
-									.trim()) == ''
-									|| $
-										.trim($(
-											'#password')
-											.val()
-											.trim()) == ''
-									|| $.trim($(
-										'#captchaText')
-										.val().trim()) == '') {
-									//alert("Please enter User Name and Password");
-								} else {
-									var hashObj = new jsSHA(
-										"SHA-256", "TEXT",
-										"1");
-									hashObj.update($(
-										'#password').val()
-										.trim());
-									$("#password")
-										.val(
-											hashObj
-												.getHash("HEX"));
-								}
-							});
 				});
 	</script>
 </body>

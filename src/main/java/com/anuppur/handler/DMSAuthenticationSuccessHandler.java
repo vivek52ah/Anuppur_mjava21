@@ -61,7 +61,7 @@ AuthenticationSuccessHandler {
 		    		|| "ROLE_DM".equals(role)
 		    		|| "ROLE_CEO".equals(role)
 		    		|| "ROLE_AREA_OFFICER".equals(role)) {
-				targetUrl = "/systemAdmin/home#/manageOngoingWorks";
+				targetUrl = "/systemAdmin/home#/dashboard";
 				break;
 			} 
 		     

@@ -415,12 +415,10 @@ public class MobileApiController extends BaseController {
 	public ResponseObject addWorkProgressMobileData(WorkProgressBean workProgressBean, HttpServletRequest request)
 			throws Exception {
 
-		// user = DMSUtil.getUserDetail();
-		// logger.info("User - {}, Role - {} - Adding Work data", user.getUsername(),
-		// user.getAuthorities());
 		ResponseObject response = null;
 
 		try {
+			user = DMSUtil.getUserDetail();
 
 			String remoteIpAddr = request.getHeader("X-Forwarded-For");
 
@@ -428,19 +426,21 @@ public class MobileApiController extends BaseController {
 			response = commonService.addWorkProgress(workProgressBean);
 			if (response != null) {
 				response.setSuccessMessage("WorkProgress saved successfully!");
-				logger.info("User - {}, Role - {} - WorkProgress saved successfully!", user.getUsername(),
-						user.getAuthorities());
+				if (user != null) {
+					logger.info("User - {}, Role - {} - WorkProgress saved successfully!", user.getUsername(),
+							user.getAuthorities());
+				}
 			} else {
 				response = new ResponseObject();
 				String errorMsg = DMSConstants.ERROR_SAVING_DATA;
 				response.setErrorMessage(errorMsg);
-				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
+				logger.error("Mobile WorkProgress save failed - {}", errorMsg);
 			}
 		} catch (Exception e) {
 			String errorMsg = e.getMessage();
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
-			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
+			logger.error("Mobile WorkProgress save failed", e);
 		}
 		return response;
 	}
@@ -451,11 +451,14 @@ public class MobileApiController extends BaseController {
 	public ResponseObject addWorkProgressMoibleData(WorkProgressDataMoibleBean uploadWorkProgressBean,
 			HttpServletRequest request) throws Exception {
 
-		user = DMSUtil.getUserDetail();
-		logger.info("User - {}, Role - {} - Adding Work data", user.getUsername(), user.getAuthorities());
 		ResponseObject response = null;
 
 		try {
+			user = DMSUtil.getUserDetail();
+			if (user != null) {
+				logger.info("User - {}, Role - {} - Adding mobile work progress data", user.getUsername(),
+						user.getAuthorities());
+			}
 
 			String remoteIpAddr = request.getHeader("X-Forwarded-For");
 
@@ -464,19 +467,21 @@ public class MobileApiController extends BaseController {
 			response = commonService.addWorkProgressDataMobile(uploadWorkProgressBean);
 			if (response != null) {
 				response.setSuccessMessage("Work saved successfully!");
-				logger.info("User - {}, Role - {} - Work saved successfully!", user.getUsername(),
-						user.getAuthorities());
+				if (user != null) {
+					logger.info("User - {}, Role - {} - Work saved successfully!", user.getUsername(),
+							user.getAuthorities());
+				}
 			} else {
 				response = new ResponseObject();
 				String errorMsg = DMSConstants.ERROR_SAVING_DATA;
 				response.setErrorMessage(errorMsg);
-				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
+				logger.error("Mobile work progress upload failed - {}", errorMsg);
 			}
 		} catch (Exception e) {
 			String errorMsg = e.getMessage();
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
-			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
+			logger.error("Mobile work progress upload failed", e);
 		}
 		return response;
 	}

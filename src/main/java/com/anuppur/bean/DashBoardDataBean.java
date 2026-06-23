@@ -1,6 +1,7 @@
 package com.anuppur.bean;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class DashBoardDataBean {
 	
@@ -20,6 +21,14 @@ public class DashBoardDataBean {
 	private BigDecimal completedCount;
 	private BigDecimal ccCount;
 	private BigDecimal handOverCount;
+	private BigDecimal photoUploadWorkCount;
+	private BigDecimal photoUploadDepartmentCount;
+	private BigDecimal photoUploadPendingCount;
+	private BigDecimal expenditureReportWorkCount;
+	private BigDecimal expenditurePacTotal;
+	private BigDecimal expenditureTotal;
+	private BigDecimal expenditureLastTotal;
+	private List<WorkTypeFinancialOverviewBean> workTypeFinancialOverview;
 	public int getWorkId() {
 		return workId;
 	}
@@ -110,6 +119,54 @@ public class DashBoardDataBean {
 	public void setHandOverCount(BigDecimal handOverCount) {
 		this.handOverCount = handOverCount;
 	}
+	public BigDecimal getPhotoUploadWorkCount() {
+		return photoUploadWorkCount;
+	}
+	public void setPhotoUploadWorkCount(BigDecimal photoUploadWorkCount) {
+		this.photoUploadWorkCount = photoUploadWorkCount;
+	}
+	public BigDecimal getPhotoUploadDepartmentCount() {
+		return photoUploadDepartmentCount;
+	}
+	public void setPhotoUploadDepartmentCount(BigDecimal photoUploadDepartmentCount) {
+		this.photoUploadDepartmentCount = photoUploadDepartmentCount;
+	}
+	public BigDecimal getPhotoUploadPendingCount() {
+		return photoUploadPendingCount;
+	}
+	public void setPhotoUploadPendingCount(BigDecimal photoUploadPendingCount) {
+		this.photoUploadPendingCount = photoUploadPendingCount;
+	}
+	public BigDecimal getExpenditureReportWorkCount() {
+		return expenditureReportWorkCount;
+	}
+	public void setExpenditureReportWorkCount(BigDecimal expenditureReportWorkCount) {
+		this.expenditureReportWorkCount = expenditureReportWorkCount;
+	}
+	public BigDecimal getExpenditurePacTotal() {
+		return expenditurePacTotal;
+	}
+	public void setExpenditurePacTotal(BigDecimal expenditurePacTotal) {
+		this.expenditurePacTotal = expenditurePacTotal;
+	}
+	public BigDecimal getExpenditureTotal() {
+		return expenditureTotal;
+	}
+	public void setExpenditureTotal(BigDecimal expenditureTotal) {
+		this.expenditureTotal = expenditureTotal;
+	}
+	public BigDecimal getExpenditureLastTotal() {
+		return expenditureLastTotal;
+	}
+	public void setExpenditureLastTotal(BigDecimal expenditureLastTotal) {
+		this.expenditureLastTotal = expenditureLastTotal;
+	}
+	public List<WorkTypeFinancialOverviewBean> getWorkTypeFinancialOverview() {
+		return workTypeFinancialOverview;
+	}
+	public void setWorkTypeFinancialOverview(List<WorkTypeFinancialOverviewBean> workTypeFinancialOverview) {
+		this.workTypeFinancialOverview = workTypeFinancialOverview;
+	}
 	
 	
 	public BigDecimal getWorkCreate() {
@@ -126,6 +183,11 @@ public class DashBoardDataBean {
 				+ ", loaIssuesCount=" + loaIssuesCount + ", woIssuedCount=" + woIssuedCount + ", contractorCount="
 				+ contractorCount + ", notStartedCount=" + notStartedCount + ", inProgressCount=" + inProgressCount
 				+ ", completedCount=" + completedCount + ", ccCount=" + ccCount + ", handOverCount=" + handOverCount
+				+ ", photoUploadWorkCount=" + photoUploadWorkCount + ", photoUploadDepartmentCount="
+				+ photoUploadDepartmentCount + ", photoUploadPendingCount=" + photoUploadPendingCount
+				+ ", expenditureReportWorkCount=" + expenditureReportWorkCount + ", expenditurePacTotal="
+				+ expenditurePacTotal + ", expenditureTotal=" + expenditureTotal + ", expenditureLastTotal="
+				+ expenditureLastTotal + ", workTypeFinancialOverview=" + workTypeFinancialOverview
 				+ "]";
 	}
 	

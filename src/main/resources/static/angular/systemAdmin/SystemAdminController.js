@@ -184,8 +184,221 @@ dms.directive('hcChart', function () {
 	};
 })*/
 
-dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $window, $routeParams, $http, $timeout) {
+dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $window, $routeParams, $http, $timeout, $location) {
+
+	if ($location.path() === '/dashboard') {
+		$timeout(function() {
+			$http.get('verifyUserPasswordExpiry').then(function(response) {
+				if (response.status === 200 && response.data && response.data.successMessage) {
+					if (response.data.successMessage.indexOf('Your password has expired') !== -1) {
+						alert('Your password has expired. Please Update your Password');
+						var sideNav = document.getElementById('sideNav');
+						if (sideNav) {
+							sideNav.style.display = 'none';
+						}
+						$window.location.href = '#/changepassword';
+					} else if (response.data.successMessage.indexOf('Your password will expire') !== -1) {
+						if ($window.confirm(response.data.successMessage)) {
+							$window.location.href = '#/changepassword';
+						}
+					}
+				}
+			});
+		}, 0);
+	}
 	$scope.started = false;
+
+	function dashboardNumber(value) {
+		var parsed = parseFloat(value);
+		return isNaN(parsed) ? 0 : parsed;
+	}
+
+	function chartPoint(label, value, color) {
+		return {
+			label: label,
+			y: dashboardNumber(value),
+			color: color
+		};
+	}
+
+	$scope.dashboardBarWidth = function(value) {
+		var data = $scope.dashboardData || {};
+		var maxValue = Math.max(
+			dashboardNumber(data.asIsuuesCount),
+			dashboardNumber(data.tenderCalledCount),
+			dashboardNumber(data.tenderRcvCount),
+			dashboardNumber(data.loaIssuesCount),
+			dashboardNumber(data.woIssuedCount),
+			dashboardNumber(data.completedCount),
+			1
+		);
+		return Math.max(3, Math.round((dashboardNumber(value) / maxValue) * 100)) + '%';
+	};
+
+	$scope.dashboardExpenditureBarWidth = function(value) {
+		var data = $scope.dashboardData || {};
+		var maxValue = Math.max(
+			dashboardNumber(data.expenditurePacTotal),
+			dashboardNumber(data.expenditureTotal),
+			dashboardNumber(data.expenditureLastTotal),
+			dashboardNumber(data.expenditureReportWorkCount),
+			1
+		);
+		return Math.max(3, Math.round((dashboardNumber(value) / maxValue) * 100)) + '%';
+	};
+
+	$scope.dashboardAmount = function(value) {
+		var number = dashboardNumber(value);
+		return number.toLocaleString('en-IN', {
+			maximumFractionDigits: 2
+		});
+	};
+
+	$scope.dashboardShortAmount = function(value) {
+		var number = dashboardNumber(value);
+		var absoluteNumber = Math.abs(number);
+		function trimAmount(amount) {
+			return amount.toLocaleString('en-IN', {
+				maximumFractionDigits: 2
+			}).replace(/\.00$/, '');
+		}
+		if (absoluteNumber >= 10000000) {
+			return trimAmount(number / 10000000) + ' Cr';
+		}
+		if (absoluteNumber >= 100000) {
+			return trimAmount(number / 100000) + ' L';
+		}
+		return trimAmount(number);
+	};
+
+	$scope.workTypeFinancialMaxValue = function() {
+		var rows = ($scope.dashboardData && $scope.dashboardData.workTypeFinancialOverview) || [];
+		var maxValue = 1;
+		angular.forEach(rows, function(row) {
+			maxValue = Math.max(
+				maxValue,
+				dashboardNumber(row.contractAmount),
+				dashboardNumber(row.expenditureAmount)
+			);
+		});
+		return maxValue;
+	};
+
+	$scope.workTypeFinancialBarHeight = function(value) {
+		return Math.max(4, Math.round((dashboardNumber(value) / $scope.workTypeFinancialMaxValue()) * 100)) + '%';
+	};
+
+	$scope.dashboardProgressTotalValue = function() {
+		var data = $scope.dashboardData || {};
+		return dashboardNumber(data.notStartedCount)
+			+ dashboardNumber(data.inProgressCount)
+			+ dashboardNumber(data.completedCount)
+			+ dashboardNumber(data.ccCount)
+			+ dashboardNumber(data.handOverCount);
+	};
+
+	$scope.dashboardProgressBackground = function() {
+		var data = $scope.dashboardData || {};
+		var items = [
+			{ value: dashboardNumber(data.notStartedCount), color: '#f9a825' },
+			{ value: dashboardNumber(data.inProgressCount), color: '#00897b' },
+			{ value: dashboardNumber(data.completedCount), color: '#43a047' },
+			{ value: dashboardNumber(data.ccCount), color: '#1976d2' },
+			{ value: dashboardNumber(data.handOverCount), color: '#e53935' }
+		];
+		var total = $scope.dashboardProgressTotalValue();
+		var cursor = 0;
+		var segments = [];
+		angular.forEach(items, function(item) {
+			if (item.value > 0 && total > 0) {
+				var next = cursor + (item.value / total) * 100;
+				segments.push(item.color + ' ' + cursor.toFixed(2) + '% ' + next.toFixed(2) + '%');
+				cursor = next;
+			}
+		});
+		return segments.length ? 'conic-gradient(' + segments.join(', ') + ')' : 'conic-gradient(#edf0f5 0% 100%)';
+	};
+
+	$scope.dashboardPhotoUploadTotalValue = function() {
+		var data = $scope.dashboardData || {};
+		return dashboardNumber(data.photoUploadWorkCount);
+	};
+
+	$scope.dashboardPhotoUploadBackground = function() {
+		var data = $scope.dashboardData || {};
+		var uploaded = dashboardNumber(data.photoUploadWorkCount);
+		var total = Math.max(uploaded, 1);
+		var cursor = 0;
+		var segments = [];
+		if (uploaded > 0) {
+			var next = cursor + (uploaded / total) * 100;
+			segments.push('#1976d2 ' + cursor.toFixed(2) + '% ' + next.toFixed(2) + '%');
+		}
+		return segments.length ? 'conic-gradient(' + segments.join(', ') + ')' : 'conic-gradient(#edf0f5 0% 100%)';
+	};
+
+	var dashboardStatusAliases = {
+		AS_ISSUED: ['AA Issued', 'AS Issued', 'Approved and Not Paid'],
+		TENDER_CALLED: ['Tender Called', 'Tender Called date'],
+		TENDER_RECEIVED: ['Tender Received'],
+		TENDER_APPROVAL: ['Tender Approval in Process', 'Approval Pending'],
+		RE_TENDER: ['Re-Tender'],
+		LOA_ISSUED: ['LoA Issued'],
+		WORK_ORDER: ['Work Order Issued'],
+		NOT_STARTED: ['Not Started', 'Approved and Paid but Not Started'],
+		IN_PROGRESS: ['In-Progress', 'Started/ In Progress', 'Started but Stopped'],
+		COMPLETED: ['Completed', 'Completed CC Pending', 'CC Issued', 'Completed and Transferred'],
+		CC_UPLOADED: ['CC Uploaded', 'CC Issued'],
+		HAND_OVER: ['Handed Over', 'Completed and Transferred']
+	};
+
+	function normalizeStatusName(value) {
+		return (value || '').toString().trim().toLowerCase();
+	}
+
+	function loadDashboardStatusMap() {
+		return $http.get('getWorkStatus').then(function(response) {
+			var data = response.data;
+			if (typeof data === 'string') {
+				try {
+					data = JSON.parse(data);
+				} catch (e) {
+					data = [];
+				}
+			}
+			$scope.dashboardStatusIds = {};
+			angular.forEach(data || [], function(status) {
+				var key = normalizeStatusName(status.workStatusNameE);
+				if (!$scope.dashboardStatusIds[key]) {
+					$scope.dashboardStatusIds[key] = [];
+				}
+				$scope.dashboardStatusIds[key].push(status.workStatusId);
+			});
+		}).catch(function() {
+			$scope.dashboardStatusIds = {};
+		});
+	}
+
+	$scope.dashboardFilterUrl = function(statusKey) {
+		if (!statusKey) {
+			return '#manageOngoingWorks';
+		}
+		var ids = [];
+		angular.forEach(dashboardStatusAliases[statusKey] || [], function(statusName) {
+			angular.forEach(($scope.dashboardStatusIds && $scope.dashboardStatusIds[normalizeStatusName(statusName)]) || [], function(id) {
+				if (id && ids.indexOf(String(id)) === -1) {
+					ids.push(String(id));
+				}
+			});
+		});
+		if (ids.length > 0) {
+			return '#manageOngoingWorks?workStatusId=' + encodeURIComponent(ids.join(','));
+		}
+		return '#manageOngoingWorks';
+	};
+
+	$scope.dashboardData = {};
+	$scope.dashboardGraphLoading = false;
 
 
 
@@ -256,16 +469,28 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 
 	$scope.loadDashBoardData = function() {
 
-		$loading.start('sample-1');
-		var response = $http.get('fetchDashboardData');
-		response.success(function(data, status, headers, config) {
-			$scope.dashboardData = data;
+		$scope.dashboardData = {};
+		$scope.loadDashboardWorkTypeFinancialOverview();
+		$http.get('fetchDashboardData').then(function(response) {
+			var financialOverview = $scope.dashboardData.workTypeFinancialOverview || [];
+			$scope.dashboardData = response.data || {};
+			$scope.dashboardData.workTypeFinancialOverview = financialOverview;
+		}).catch(function() {
+			$scope.dashboardData = {
+				workTypeFinancialOverview: $scope.dashboardData.workTypeFinancialOverview || []
+			};
+		});
+	};
 
-			updateChart($scope.dashboardData.workCount, $scope.dashboardData.handOverCount, $scope.dashboardData.ccCount, $scope.dashboardData.completedCount
-				, $scope.dashboardData.inProgressCount, $scope.dashboardData.notStartedCount, $scope.dashboardData.woIssuedCount, $scope.dashboardData.loaIssuesCount
-				, $scope.dashboardData.reTenderCount, $scope.dashboardData.tenderApprovalInprocessCount, $scope.dashboardData.tenderRcvCount, $scope.dashboardData.tenderCalledCount
-				, $scope.dashboardData.asIsuuesCount);
-			$loading.finish('sample-1');
+	$scope.loadDashboardWorkTypeFinancialOverview = function() {
+		$scope.dashboardGraphLoading = true;
+		$scope.dashboardData.workTypeFinancialOverview = [];
+		$http.get('fetchDashboardWorkTypeFinancialOverview').then(function(response) {
+			$scope.dashboardData.workTypeFinancialOverview = response.data || [];
+		}).catch(function() {
+			$scope.dashboardData.workTypeFinancialOverview = [];
+		}).finally(function() {
+			$scope.dashboardGraphLoading = false;
 		});
 	};
 

@@ -39,7 +39,7 @@ public class ExcelParser {
                 if (allBlank) continue;
 
                 BulkWorkRowBean bean = new BulkWorkRowBean();
-                bean.setRowNumber(rowIndex);
+                bean.setRowNumber(rowIndex + 1);
                 bean.setWorkName(v[0]);
                 bean.setWorkTypeName(v[1]);
                 bean.setFinancialYearName(v[2]);

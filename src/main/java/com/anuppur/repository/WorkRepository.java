@@ -202,7 +202,7 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 	Page<Work> findByStatusNotInAndWorkStatusIn(Pageable pageable, @Param("statusDeleted") String statusDeleted, @Param("workStatusHandover") Long workStatusHandover);
      
 	
-	@Query(value="SELECT count(*) from t_work where status in ('Active') and (scheme is not null) and (financial_year is not null) and (work_head is not null)", nativeQuery=true)
+	@Query(value="SELECT count(*) from t_work where status in ('Active')", nativeQuery=true)
 	BigDecimal countWork();
 	
 	
@@ -1340,8 +1340,11 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 									@Query("SELECT w From Work w WHERE w.status = 'Active' ")
 									List<Work> getAllWork();
 									
-									@Query(value = "select count(*) FROM t_work w where w.work_status = :workStatus and status = 'Active' and (scheme is not null) and (financial_year is not null) and (work_head is not null)"  , nativeQuery = true)
-									BigDecimal getDashboardCountByStatus(@Param("workStatus") String workStatus);
+	@Query(value = "select count(*) FROM t_work w where w.work_status = :workStatus and status = 'Active'"  , nativeQuery = true)
+	BigDecimal getDashboardCountByStatus(@Param("workStatus") String workStatus);
+
+	@Query(value = "select count(*) FROM t_work w where w.work_status in (:workStatusIds) and status = 'Active'", nativeQuery = true)
+	BigDecimal getDashboardCountByStatusIds(@Param("workStatusIds") List<Long> workStatusIds);
 									@Query(value="select work_name, implementation_agency, financial_year,work_status  from t_work",nativeQuery = true)													
 									List<Work> findByYear(String year);
                                     
@@ -1460,6 +1463,27 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 								        @Param("userId") Long userId,
 								        @Param("agencyId") Long agencyId,
 								        @Param("workName") String workName);
+
+								@Query(value = "SELECT " +
+										"COALESCE(mwt.work_type_name_e, 'N/A') AS workTypeName, " +
+										"COALESCE(SUM(COALESCE(wt.contract_amount, 0)), 0) AS contractAmount, " +
+										"COALESCE(SUM(COALESCE(wp.total_expensess, 0)), 0) AS expenditureAmount " +
+										"FROM t_work w " +
+										"LEFT JOIN mst_work_type mwt ON mwt.work_type_id = COALESCE(w.work_type, w.work_type_id) " +
+										"LEFT JOIN ( " +
+										"  SELECT work_id, MAX(COALESCE(contract_amount, pac_amount, 0)) AS contract_amount " +
+										"  FROM t_work_tender GROUP BY work_id " +
+										") wt ON wt.work_id = w.id " +
+										"LEFT JOIN ( " +
+										"  SELECT work_id, MAX(COALESCE(total_expensess, 0)) AS total_expensess " +
+										"  FROM t_work_progress GROUP BY work_id " +
+										") wp ON wp.work_id = w.id " +
+										"WHERE w.status = 'Active' " +
+										"GROUP BY COALESCE(mwt.work_type_name_e, 'N/A') " +
+										"ORDER BY contractAmount DESC " +
+										"LIMIT 5",
+										nativeQuery = true)
+								List<Object[]> fetchWorkTypeFinancialOverview();
 
 
 

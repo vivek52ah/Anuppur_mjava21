@@ -609,39 +609,6 @@ Code End  Here
 
 
 
-		<script th:src="@{js/sha256.js}"></script>
-	<script>
-
-		$(document).ready(function () {
-
-			$('#btn-login').click(function () {
-				if ($.trim($('#username').val()
-					.trim()) == ''
-					|| $
-						.trim($(
-							'#password')
-							.val()
-							.trim()) == '')
-					/*|| $.trim($(
-						'#captchaText')
-						.val().trim()) == '')*/ {
-					//alert("Please enter User Name and Password");
-				} else {
-					var hashObj = new jsSHA(
-						"SHA-256", "TEXT",
-						"1");
-					hashObj.update($(
-						'#password').val()
-						.trim());
-					$("#password")
-						.val(
-							hashObj
-								.getHash("HEX"));
-				}
-			});
-		});
-	</script>
-	
 	<script>
 	$("#stmn,#stmn2").click(function() {
 	    $('html, body').animate({

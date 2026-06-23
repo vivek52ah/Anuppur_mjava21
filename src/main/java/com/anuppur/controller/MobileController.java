@@ -109,8 +109,12 @@ public class MobileController extends BaseController {
             	 PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
  		        StringBuilder encodedPassword = com.anuppur.util.SHAHashingUtil.encryptPassword(loginRequest.getPassword());
  		        if (passwordEncoder.matches(encodedPassword, user.getPassword())) {
+ 		        	authresponse.setStatusCode(200L);
+ 		        	authresponse.setStatusDesc("Success");
  		        	//authresponse.setId(user.getId());
+ 		        	authresponse.setId(user.getId());
  		        	authresponse.setUserId(user.getId().toString());
+ 		        	authresponse.setUserIdInt(user.getId().intValue());
  		        	authresponse.setLoggedInUserRole(user.getRolee());
  		        	authresponse.setName(user.getFirstName()+" "+user.getLastName());
  		        	authresponse.setEmailAddress(user.getEmailId());
@@ -118,16 +122,29 @@ public class MobileController extends BaseController {
  		        	authresponse.setMobileNo(user.getMobileNo());}
  		        	authresponse.setDepartmentNAme(user.getDepartmentName());
  		        	if(user.getDesignationId()!= null) {
- 		        	authresponse.setDesignation(designationRepository.findById(user.getDesignationId()).orElse(null).getDesignationNameEnglish());}
+ 		        		var designation = designationRepository.findById(user.getDesignationId()).orElse(null);
+ 		        		if (designation != null) {
+ 		        			authresponse.setDesignation(designation.getDesignationNameEnglish());
+ 		        		}
+ 		        	}
  		        	
+ 		        } else {
+ 		        	authresponse.setStatusCode(302L);
+ 		        	authresponse.setStatusDesc("Invalid Password");
  		        }
             	
-            	
+            } else {
+            	authresponse.setStatusCode(301L);
+            	authresponse.setStatusDesc("Invalid User Id");
             }
             return ResponseEntity.ok(authresponse );
         } catch (AuthenticationException e) {
             // Handle invalid credentials
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponseBean());
+            AuthResponseBean authresponse = new AuthResponseBean();
+            authresponse.setUserId(loginRequest.getUserName());
+            authresponse.setStatusCode(302L);
+            authresponse.setStatusDesc("Invalid User Id or Password");
+            return ResponseEntity.ok(authresponse);
         }
     }
     
@@ -152,8 +169,7 @@ public class MobileController extends BaseController {
 
 		        	responseBean.setStatusCode(200L);
 					responseBean.setStatusDesc("Success");
-					responseBean.setLoggedInUserRole(bean.getUserName());
-					Users userEntity = userService.findByUserName(bean.getUserName());
+					responseBean.setLoggedInUserRole(user.getRolee());
 					if (null != user.getId()) {
 						responseBean.setUserIdInt(user.getId().intValue());
 					}

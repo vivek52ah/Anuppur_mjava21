@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
  */
 @Configuration
 public class SwaggerConfig {
+    private static final String BEARER_AUTH = "bearerAuth";
     
     @Bean
     public OpenAPI customOpenAPI() {
@@ -24,6 +26,13 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("Anuppur Work Management System API")
                         .version("1.0.0")
-                        .description("API documentation for Anuppur Work Management System"));
+                        .description("API documentation for Anuppur Work Management System"))
+                .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH))
+                .components(new Components()
+                        .addSecuritySchemes(BEARER_AUTH, new SecurityScheme()
+                                .name(BEARER_AUTH)
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")));
     }
 }

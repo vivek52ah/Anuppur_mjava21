@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -35,7 +36,7 @@ public class ForgotPasswordController {
 	@Autowired
 	ForgotPasswordValidator forgotPasswordValidator;
 
-	@RequestMapping(value = "forgotpassword", method = RequestMethod.GET)
+	@RequestMapping(value = "/forgotpassword", method = RequestMethod.GET)
 	public String viewForgotPassword(HttpServletRequest request, Model model) {
 
 		logger.info("Displaying Forgot password page");
@@ -114,14 +115,21 @@ public class ForgotPasswordController {
 	 * //return "redirect:/login?resetPassword"; return "redirect:/verifyotp"; }
 	 */
 	
-	@RequestMapping(value = "resetpassword", method = RequestMethod.POST)
-	public String resetPassword(@Valid ForgotPasswordBean forgotPasswordBean, BindingResult bindingResult, Model model,
+	@RequestMapping(value = "/resetpassword", method = RequestMethod.POST)
+	public String resetPassword(@Valid @ModelAttribute("forgotPasswordBean")  ForgotPasswordBean forgotPasswordBean, BindingResult bindingResult, Model model,
 			HttpServletRequest request) throws DMSBusinessException {
 
 		logger.info("Resetting password");
 		
-		Users userEntity = userRepository.findByMobileNoAndStatusNot(forgotPasswordBean.getMobileNo(), DMSConstants.STATUS_DELETED);
+		
 
+		   // Custom validation
+//	    forgotPasswordValidator.validate(forgotPasswordBean, bindingResult);
+
+	    if (bindingResult.hasErrors()) {
+	        model.addAttribute("forgotPasswordBean", forgotPasswordBean);
+	        return "forgotpassword";
+	    }
 		
 		String captchaText = request.getParameter("captchaText");
 		
@@ -129,10 +137,13 @@ public class ForgotPasswordController {
 
 		//String captcha = (String) session.getAttribute(DMSConstants.CAPTCHA_RESET);
 		String captcha = "123456";
+		
+		Users userEntity = userRepository.findByMobileNoAndStatusNot(forgotPasswordBean.getMobileNo(), DMSConstants.STATUS_DELETED);
 		if(userEntity == null)
 		{
 			
 			model.addAttribute("error", "Please Enter Registered Mobile No!");
+			model.addAttribute("forgotPasswordBean", forgotPasswordBean);
 			return "forgotpassword";
 			
 		}

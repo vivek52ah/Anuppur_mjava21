@@ -71,6 +71,9 @@ public class LoginController {
 		Exception exception = (Exception) request.getSession().getAttribute(key);
 
 		String error = "";
+		if (exception == null) {
+			return "Invalid user name or password!";
+		}
 
 		if (exception instanceof AuthenticationServiceException) {
 			error = exception.getMessage();

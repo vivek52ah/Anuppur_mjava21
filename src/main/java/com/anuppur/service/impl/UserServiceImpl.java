@@ -68,6 +68,9 @@ public class UserServiceImpl implements UserService {
 	public UserBean fetchUserDetailsByUserName(String userName) {
 		try {
 			Users entity = userRepository.findByUsernameAndStatus(userName, DMSConstants.STATUS_ACTIVE);
+			if (entity == null) {
+				entity = userRepository.findByEmailIdAndStatus(userName, DMSConstants.STATUS_ACTIVE);
+			}
 			UserBean bean = convertUserEntityToBean(entity);
 			DistrictBean districtBean = new DistrictBean();
 
@@ -382,7 +385,11 @@ public class UserServiceImpl implements UserService {
 	}
 	@Override
 	public Users findByUserName(String userName) {
-		return userRepository.findByUsernameAndStatus(userName, DMSConstants.STATUS_ACTIVE);
+		Users user = userRepository.findByUsernameAndStatus(userName, DMSConstants.STATUS_ACTIVE);
+		if (user == null) {
+			user = userRepository.findByEmailIdAndStatus(userName, DMSConstants.STATUS_ACTIVE);
+		}
+		return user;
 	}
 
 	@Override

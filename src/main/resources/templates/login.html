@@ -834,21 +834,6 @@ Code End  Here
 	</script>
 
 
-	<script th:src="@{/js/sha256.js}"></script>
-	<script>
-		$(document).ready(function() {
-							$('#loginform').on('submit', function() {
-								var pwd = $.trim($('#password').val());
-								if (pwd !== '') {
-									var hashObj = new jsSHA("SHA-256", "TEXT", "1");
-									hashObj.update(pwd);
-									$("#password").val(hashObj.getHash("HEX"));
-								}
-								return true;
-							});
-						});
-	</script>
-
 	<script>
 		$("#stmn,#stmn2").click(function() {
 			$('html, body').animate({

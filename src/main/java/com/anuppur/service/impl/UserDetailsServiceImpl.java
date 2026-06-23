@@ -40,6 +40,9 @@ public class UserDetailsServiceImpl implements UserDetailsService{
         //Users user = userRepository.findByUsernameAndStatus(username, DMFConstants.STATUS_ACTIVE);//Only active users allowed
         
         Users user = userRepository.findByUsernameAndStatusNot(username, DMSConstants.STATUS_DELETED);
+        if (user == null) {
+        	user = userRepository.findByEmailIdAndStatusNot(username, DMSConstants.STATUS_DELETED);
+        }
         //Users user=userRepository.findByUsernameAndStatusNotContainingIgnoreCase(username, DMSConstants.STATUS_DELETED);
         
         if (user == null) {
@@ -48,7 +51,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
         }else if(!DMSConstants.STATUS_ACTIVE.equals(user.getStatus())){
         	throw new AuthenticationServiceException("User is not activated. Please contact admin!");
         }else if(user != null) {
-        	if (!username.equals(user.getUsername())) {
+        	if (!username.equals(user.getUsername()) && !username.equals(user.getEmailId())) {
         	
         		throw new UsernameNotFoundException("Invalid user details!");
         	}

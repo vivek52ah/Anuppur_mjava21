@@ -912,6 +912,10 @@ public class CommonController extends BaseController {
 		// Use session-stored URL params (set by manageOngoingWorks when navigating from dept-wise report)
 		// Session takes priority over localStorage-restored workStatusId on every call
 		Object sessionWorkStatus = request.getSession().getAttribute("urlWorkStatus");
+		if (!StringUtils.isEmpty(workStatusId)) {
+			request.getSession().removeAttribute("urlWorkStatus");
+			sessionWorkStatus = null;
+		}
 		if (sessionWorkStatus != null) {
 			workStatus = sessionWorkStatus.toString();
 			workStatusId = null;

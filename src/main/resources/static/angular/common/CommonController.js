@@ -269,10 +269,6 @@ dms.factory('Excel', function($window, $document) {
 })
 
 dms.controller('CommonController', function($scope, $loading, $rootScope, $window, $routeParams, $http, $timeout, $sce, commonService, Excel, $parse, $route, $q, $location) {
-	if ($location.path() === '/changepassword' && $window.loggedInRoleName === 'ROLE_SYSTEM_ADMIN') {
-		$location.path('/manageOngoingWorks');
-		return;
-	}
 	
 	// ✅ ADD AT TOP
     $scope.workData = {};
@@ -640,6 +636,14 @@ $scope.showAssignOfficer = false;
 				alert('Error opening modal: ' + error.message);
 			}
 		}, 100);
+	};
+
+	$scope.showAssignAreaOfficerSection = function() {
+		var statusId = $scope.workDataTender && $scope.workDataTender.workStatusId;
+		var hasAssignedOfficer = $scope.workData
+			&& ($scope.workData.userAssignee || $scope.workData.userAssigneeName);
+		var hasAssignmentHistory = $scope.useralist && $scope.useralist.length > 0;
+		return String(statusId) === '8' || !!hasAssignedOfficer || !!hasAssignmentHistory;
 	};
 
 	$scope.startOrStopSpinner = function(isStart) {
@@ -4738,6 +4742,7 @@ $scope.changePasswordFunction = function(isValid) {
 	$scope.reloadStep5Tables = function() {
 		var step5WorkId = ($scope.workDataProgress && $scope.workDataProgress.workId)
 			|| ($scope.workData && $scope.workData.workId)
+			|| ($scope.workData && $scope.workData.id)
 			|| $routeParams.id;
 		if (!step5WorkId) {
 			return;
@@ -4747,6 +4752,22 @@ $scope.changePasswordFunction = function(isValid) {
 			$scope.loadExpensesList(step5WorkId);
 			$scope.loadWorkFinancialAgencyList(step5WorkId);
 		}, 350);
+	};
+
+	$scope.onWorkProgressStatusChange = function() {
+		var step5WorkId = ($scope.workDataProgress && $scope.workDataProgress.workId)
+			|| ($scope.workData && $scope.workData.workId)
+			|| ($scope.workData && $scope.workData.id)
+			|| $routeParams.id;
+		if ($scope.workDataProgress) {
+			$scope.workDataProgress.workId = step5WorkId;
+			$scope.workDataProgress.workSubStatusId = null;
+			$scope.workDataProgress.remarks = null;
+		}
+		$scope.loadWorkSubStatusByWorkStatus($scope.workData.workSubTypeId, $scope.workDataProgress.workStatusId);
+		$timeout(function() {
+			$scope.reloadStep5Tables();
+		}, 0);
 	};
 
 	$scope.refreshWorkProgressAfterSave = function() {
@@ -8418,31 +8439,21 @@ $scope.deleteDepartmentRemark = function(id) {
 		var qIdx = hash.indexOf('?');
 		if (qIdx !== -1) {
 			var hashParams = new URLSearchParams(hash.substring(qIdx + 1));
-			if (!window.urlDepartmentId && hashParams.get('departmentId')) {
-				window.urlDepartmentId = hashParams.get('departmentId');
-			}
-			if (!window.urlFinancialYearId && hashParams.get('financialYearId')) {
-				window.urlFinancialYearId = hashParams.get('financialYearId');
-			}
-			if (!window.urlWorkStatus && hashParams.get('workStatus')) {
-				window.urlWorkStatus = hashParams.get('workStatus');
-			}
-			if (hashParams.get('implementationAgency')) {
-				window.urlImplementationAgency = hashParams.get('implementationAgency');
-			}
-			if (hashParams.get('departmentRemark')) {
-				window.urlDepartmentRemark = hashParams.get('departmentRemark');
-			}
-			if (hashParams.get('workStatusId')) {
-				window.urlWorkStatusIds = hashParams.get('workStatusId');
-			} else if (hashParams.get('departmentId') || hashParams.get('financialYearId') || hashParams.get('implementationAgency')) {
-				window.urlWorkStatusIds = '';
-				try {
-					var wf = JSON.parse(localStorage.getItem('work_filters') || '{}');
-					wf.workStatusId = '';
-					localStorage.setItem('work_filters', JSON.stringify(wf));
-				} catch (e) { /* ignore */ }
-			}
+			window.urlDepartmentId = hashParams.get('departmentId') || null;
+			window.urlFinancialYearId = hashParams.get('financialYearId') || null;
+			window.urlWorkStatus = hashParams.get('workStatus') || null;
+			window.urlImplementationAgency = hashParams.get('implementationAgency') || null;
+			window.urlDepartmentRemark = hashParams.get('departmentRemark') || null;
+			window.urlWorkStatusIds = hashParams.get('workStatusId') || '';
+			localStorage.removeItem('work_filters');
+		} else if (hash.indexOf('manageOngoingWorks') !== -1) {
+			window.urlDepartmentId = null;
+			window.urlFinancialYearId = null;
+			window.urlWorkStatus = null;
+			window.urlImplementationAgency = null;
+			window.urlDepartmentRemark = null;
+			window.urlWorkStatusIds = '';
+			localStorage.removeItem('work_filters');
 		}
 		$timeout(function() {
 			if (window.initManageOngoingWorksSelectpickers) {
@@ -9773,8 +9784,8 @@ $scope.getTotalCost = function () {
 							else if (response.data.successMessage.includes("Your password will expire")) {
 								//alert('bbbbb');
 								// Show confirmation dialog for the user to update the password
-								if (!$window.confirm(response.data.successMessage)) {
-									  window.location.href = targetUrl; // Redirect to dashboard if dismissed
+								if ($window.confirm(response.data.successMessage)) {
+									  window.location.href = '#/changepassword';
 								}
 							}
 							// Password is still valid
@@ -9782,7 +9793,6 @@ $scope.getTotalCost = function () {
 								//alert('ccccccc');
 								// Password is still valid, show the sidebar
 								document.getElementById("sideNav").style.display = "block"; // Show sidebar
-								  window.location.href = targetUrl;
 							}
 							else {
 								alert(response.data.successMessage);
@@ -9792,6 +9802,12 @@ $scope.getTotalCost = function () {
 						$loading.finish('sample-1');
 					});
 			};
+
+			if ($location.path() === '/manageOngoingWorks') {
+				$timeout(function() {
+					$scope.verifyUserPasswordExpiry();
+				}, 0);
+			}
 
 
 function getContextPath() {
