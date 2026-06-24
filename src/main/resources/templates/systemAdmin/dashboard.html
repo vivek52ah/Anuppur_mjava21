@@ -599,8 +599,8 @@
 					<div class="card-body">
 						<div id="workStatusChart" class="work-type-chart">
 							<div class="work-type-legend">
-								<span><i class="legend-square" style="background:#124a80"></i> Sum of Contract Amt (IN Lac)</span>
-								<span><i class="legend-square" style="background:#2d8df0"></i> Sum of Expenditure (IN Lac)</span>
+								<span><i class="legend-square" style="background:#124a80"></i> Sum of Contract Amt </span>
+								<span><i class="legend-square" style="background:#2d8df0"></i> Sum of Expenditure </span>
 							</div>
 							<div class="work-type-loading" data-ng-if="dashboardGraphLoading">
 								<i class="fa fa-spinner fa-spin"></i> Loading graph...
@@ -736,11 +736,11 @@
 							<span class="status-name">Tender Received</span>
 							<span class="status-count">{{dashboardData.tenderRcvCount || 0}}</span>
 						</div>
-						<div class="status-row">
+						<!-- <div class="status-row">
 							<span class="status-dot bg-amber"></span>
 							<span class="status-name">Approval In Process</span>
 							<span class="status-count">{{dashboardData.tenderApprovalInprocessCount || 0}}</span>
-						</div>
+						</div> -->
 						<div class="status-row">
 							<span class="status-dot bg-violet"></span>
 							<span class="status-name">Re-Tender</span>
@@ -750,6 +750,11 @@
 							<span class="status-dot bg-green"></span>
 							<span class="status-name">LOA Issued</span>
 							<span class="status-count">{{dashboardData.loaIssuesCount || 0}}</span>
+						</div>
+						<div class="status-row">
+							<span class="status-dot bg-green"></span>
+							<span class="status-name">Work Order Issued</span>
+							<span class="status-count">{{dashboardData.woIssuedCount || 0}}</span>
 						</div>
 					</div>
 				</div>
@@ -765,10 +770,10 @@
 					</div>
 					<div class="card-body">
 						<div class="quick-link-grid">
-							<a class="quick-link" href="#inspectionReport"><i class="fa fa-folder-open"></i> Inspection</a>
-							<a class="quick-link" href="#departmentWiseWorksReport"><i class="fa fa-building"></i> Department Report</a>
-							<a class="quick-link" href="#photoUpdateReport"><i class="fa fa-image"></i> Photo Report</a>
-							<a class="quick-link" href="#dmRemarkWiseReport"><i class="fa fa-comments"></i> Remarks Report</a>
+							<a class="quick-link" href="#inspectionReport"><i class="fa fa-folder-open"></i> Inspection Report</a>
+							<a class="quick-link" href="#departmentWiseWorksReport"><i class="fa fa-building"></i> Department-Wise Work Report</a>
+							<a class="quick-link" href="#photoUpdateReport"><i class="fa fa-image"></i> Photo Update Report</a>
+							<a class="quick-link" href="#dmRemarkWiseReport"><i class="fa fa-comments"></i> Issue-Wise Report</a>
 						</div>
 					</div>
 				</div>

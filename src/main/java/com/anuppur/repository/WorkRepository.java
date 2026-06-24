@@ -1469,7 +1469,7 @@ public interface WorkRepository extends JpaRepository<Work, Long>{
 										"COALESCE(SUM(COALESCE(wt.contract_amount, 0)), 0) AS contractAmount, " +
 										"COALESCE(SUM(COALESCE(wp.total_expensess, 0)), 0) AS expenditureAmount " +
 										"FROM t_work w " +
-										"LEFT JOIN mst_work_type mwt ON mwt.work_type_id = COALESCE(w.work_type, w.work_type_id) " +
+										"LEFT JOIN mst_work_type mwt ON mwt.work_type_id = COALESCE(w.work_type, w.work_type_id) AND mwt.enabled = 1 " +
 										"LEFT JOIN ( " +
 										"  SELECT work_id, MAX(COALESCE(contract_amount, pac_amount, 0)) AS contract_amount " +
 										"  FROM t_work_tender GROUP BY work_id " +
