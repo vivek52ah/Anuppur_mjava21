@@ -2,19 +2,33 @@ package com.anuppur.util;
 
 import java.util.Date;
 
-import org.springframework.stereotype.Component;
 
+
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+
 import javax.crypto.SecretKey;
 
 @Component
 @SuppressWarnings("all")
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "MySecretKeyForJwtSigningWithMinimum32Characters1234567890"; // 256+ bits for HS256
-    private static final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        private final Key key;
+
+    public JwtUtil(@Value("${jwt.secret}") String jwtSecret) {
+        // byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        // this.key = Keys.hmacShaKeyFor(keyBytes);
+        //  this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+            this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
+
 
     public String generateToken(String username) {
         return Jwts.builder()

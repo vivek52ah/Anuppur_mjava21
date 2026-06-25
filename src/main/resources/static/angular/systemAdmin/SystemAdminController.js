@@ -405,8 +405,52 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 
 
 
-	$scope.doTheBack = function() {
-		window.history.back();
+	$scope.doTheBack = function($event) {
+		if ($event && typeof $event.preventDefault === 'function') {
+			$event.preventDefault();
+		}
+
+		var path = $location.path() || '';
+		var fallbackPath = '/dashboard';
+
+		if (path === '' || path === '/') {
+			$location.path('/dashboard').search({ _r: Date.now() });
+			return;
+		}
+
+		if (path.indexOf('/editWork') === 0 || path.indexOf('/viewWork') === 0 || path.indexOf('/addNewWork') === 0) {
+			fallbackPath = '/manageOngoingWorks';
+		} else if (path.indexOf('/addWorkType') === 0) {
+			fallbackPath = '/manageWorkType';
+		} else if (path.indexOf('/addWorkSubTypes') === 0 || path.indexOf('/editWorkSubTypes') === 0) {
+			fallbackPath = '/manageWorkSubTypes';
+		} else if (path.indexOf('/addWorkSub') === 0 || path.indexOf('/editWorkSub') === 0) {
+			fallbackPath = '/manageWorkSubtype';
+		} else if (path.indexOf('/addWorkFacility') === 0 || path.indexOf('/editWorkFacility') === 0) {
+			fallbackPath = '/manageWorkFacility';
+		} else if (path.indexOf('/addImplAgency') === 0 || path.indexOf('/editImplAgency') === 0) {
+			fallbackPath = '/manageImplAgencyy';
+		} else if (path.indexOf('/addDepartmentUser') === 0) {
+			fallbackPath = '/manageDepartmentUser';
+		} else if (path.indexOf('/addBlock') === 0) {
+			fallbackPath = '/manageBlock';
+		} else if (path.indexOf('/addDistrict') === 0) {
+			fallbackPath = '/manageDistricts';
+		} else if (path.indexOf('/addGrampanchayat') === 0) {
+			fallbackPath = '/manageGrampanchayat';
+		}
+
+		if (fallbackPath !== '/dashboard') {
+			$location.path(fallbackPath).search({ _r: Date.now() });
+			return;
+		}
+
+		if (window.history.length > 1) {
+			window.history.back();
+			return;
+		}
+
+		$location.path(fallbackPath).search({ _r: Date.now() });
 	};
 
 	function closeModals() {

@@ -346,7 +346,10 @@ dms
 				templateUrl: function(params){ return 'editWorkSubTypes/' + params.id; }, 
 				controller : 'SystemAdminController'
 			})
+			.when('/', {
+				redirectTo: '/dashboard'
+			})
 			.otherwise({
-				redirectTo: '/'
+				redirectTo: '/dashboard'
 			});
 	}]);

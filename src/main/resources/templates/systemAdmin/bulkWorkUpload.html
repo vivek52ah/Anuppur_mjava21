@@ -429,11 +429,11 @@
 
         var msgEl = document.getElementById('resultMessage');
         if (data.failureCount === 0 && data.successCount > 0) {
-            msgEl.innerHTML = '<div class="alert alert-success"><i class="fa fa-check-circle"></i> ' + escHtml(data.message) + '</div>';
+            setResultMessage(msgEl, 'alert-success', 'fa-check-circle', data.message);
         } else if (data.successCount === 0) {
-            msgEl.innerHTML = '<div class="alert alert-danger"><i class="fa fa-times-circle"></i> ' + escHtml(data.message) + '</div>';
+            setResultMessage(msgEl, 'alert-danger', 'fa-times-circle', data.message);
         } else {
-            msgEl.innerHTML = '<div class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> ' + escHtml(data.message) + '</div>';
+            setResultMessage(msgEl, 'alert-warning', 'fa-exclamation-triangle', data.message);
         }
 
         if (data.totalRows > 0) {
@@ -449,10 +449,13 @@
 
         if (data.errors && data.errors.length > 0) {
             var tbody = document.getElementById('errorTableBody');
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             data.errors.forEach(function(err, index) {
                 var tr = document.createElement('tr');
-                tr.innerHTML = '<td>' + (index + 1) + '</td><td>' + err.rowNumber + '</td><td>' + escHtml(err.columnName) + '</td><td>' + escHtml(err.errorMessage) + '</td>';
+                appendTableCell(tr, index + 1);
+                appendTableCell(tr, err.rowNumber);
+                appendTableCell(tr, err.columnName);
+                appendTableCell(tr, err.errorMessage);
                 tbody.appendChild(tr);
             });
             document.getElementById('errorTableDiv').style.display = 'block';
@@ -462,9 +465,28 @@
     }
 
     function showErrorMessage(msg) {
-        document.getElementById('resultMessage').innerHTML =
-            '<div class="alert alert-danger"><i class="fa fa-times-circle"></i> ' + escHtml(msg) + '</div>';
+        setResultMessage(document.getElementById('resultMessage'), 'alert-danger', 'fa-times-circle', msg);
         document.getElementById('resultSection').style.display = 'block';
+    }
+
+    function setResultMessage(container, alertClass, iconClass, message) {
+        container.textContent = '';
+
+        var alertEl = document.createElement('div');
+        alertEl.className = 'alert ' + alertClass;
+
+        var iconEl = document.createElement('i');
+        iconEl.className = 'fa ' + iconClass;
+        alertEl.appendChild(iconEl);
+        alertEl.appendChild(document.createTextNode(' ' + safeText(message)));
+
+        container.appendChild(alertEl);
+    }
+
+    function appendTableCell(row, value) {
+        var cell = document.createElement('td');
+        cell.textContent = safeText(value);
+        row.appendChild(cell);
     }
 
     function downloadValidationReport() {
@@ -542,13 +564,9 @@
         alert('Copied: ' + text);
     }
 
-    function escHtml(str) {
-        if (!str) return '';
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+    function safeText(value) {
+        if (value === null || value === undefined) return '';
+        return String(value);
     }
     
     /*]]>*/

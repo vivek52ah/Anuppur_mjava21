@@ -531,17 +531,23 @@ $scope.showAssignOfficer = false;
 
 
 
-	$scope.doTheBack = function() {
+	$scope.doTheBack = function($event) {
+		if ($event && typeof $event.preventDefault === 'function') {
+			$event.preventDefault();
+		}
+
 		var path = $location.path() || '';
+		if (path === '' || path === '/') {
+			$location.path('/manageOngoingWorks').search({ _r: Date.now() });
+			return;
+		}
+
 		if (path.indexOf('/editWork') === 0 || path.indexOf('/viewWork') === 0 || path.indexOf('/addNewWork') === 0) {
 			$location.path('/manageOngoingWorks').search({ _r: Date.now() });
 			return;
 		}
-		if (window.history.length > 1) {
-			window.history.back();
-		} else {
-			$location.path('/manageOngoingWorks');
-		}
+
+		$location.path('/manageOngoingWorks').search({ _r: Date.now() });
 	};
 
 	function closeModals() {

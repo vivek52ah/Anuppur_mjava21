@@ -7,22 +7,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.HttpURLConnection;
+
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -30,13 +29,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import javax.crypto.spec.IvParameterSpec;
-import javax.net.ssl.HostnameVerifier;
+
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.anuppur.bean.SMSBean;
@@ -49,7 +43,6 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -224,19 +217,9 @@ public class SMSUtil {
 		}else {
 		
 		try {
-			HostnameVerifier hostnameVerifier = (host, sslSession) -> true;
-			TrustManager[] trustManagers = new TrustManager[]{UnsafeX509ExtendedTrustManager.getInstance()};
-
-			SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-			sslContext.init(null, trustManagers, null);
-
-			SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
-			CloseableHttpClient httpClient = HttpClients.custom()
-			        .setConnectionManager(org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder.create()
-			                .setSSLSocketFactory(socketFactory)
-			                .build())
-			        .build();
 			
+	CloseableHttpClient httpClient = HttpClients.createDefault();
+
 			             HttpPost post=new HttpPost(urlCdac);
 			             encryptedPassword  = MD5(passwordForSMS);
 			             String genratedhashKey = hashGenerator(userNameCdac, senderIdCdac, finalmessage, secureKeyCdac);
@@ -286,11 +269,7 @@ public class SMSUtil {
 							timetaken = (double)(endtime - starttime)/1000;	
 							logger.error("SMS Delivery:transaction logs||"+smsBean.getMobileNumber()+"||"+ sdf.format(date) + "||"+ timetaken + "||"+urlCdac.toString()+"?||"+e );
 							throw new DMSBusinessException("SMS_DELIVERY_FAILURE_NoSuchAlgorithmException");
-			         } catch (KeyManagementException e) {
-			                endtime = System.currentTimeMillis();
-							timetaken = (double)(endtime - starttime)/1000;	
-							logger.error("SMS Delivery:transaction logs||"+smsBean.getMobileNumber()+"||"+ sdf.format(date) + "||"+ timetaken + "||"+urlCdac.toString()+"?||"+e );
-							throw new DMSBusinessException("SMS_DELIVERY_FAILURE_KeyManagementException");
+
 			         } catch (UnsupportedEncodingException e) {
 			                endtime = System.currentTimeMillis();
 							timetaken = (double)(endtime - starttime)/1000;	

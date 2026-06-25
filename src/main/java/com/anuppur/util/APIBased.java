@@ -5,20 +5,8 @@ import java.io.*;
 
 import java.net.*;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Base64;
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,43 +14,6 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("all")
 public class APIBased {
 	public static final Logger logger1 = LoggerFactory.getLogger(APIBased.class);
-	public static class DummyTrustManager implements X509TrustManager {
-
-		public static final Logger logger = LoggerFactory.getLogger(DummyTrustManager.class);
-		
-	       public DummyTrustManager() {
-	       }
-
-	       public boolean isClientTrusted(X509Certificate cert[]) {
-	               return true;
-	       }
-
-	       public boolean isServerTrusted(X509Certificate cert[]) {
-	               return true;
-	       }
-
-	       public X509Certificate[] getAcceptedIssuers() {
-	               return new X509Certificate[0];
-	       }
-
-	       public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
-	       }
-
-	       public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-
-	       }
-	   }
-	public static class DummyHostnameVerifier implements HostnameVerifier {
-
-	    public boolean verify( String urlHostname, String certHostname ) {
-	            return true;
-	    }
-
-	    public boolean verify(String arg0, SSLSession arg1) {
-	            return true;
-	    }
-	}
 	
 	public StringBuilder base64_to_binary(String base64_str) {
 		// String base64_str = "MDQw";
@@ -86,22 +37,6 @@ public class APIBased {
  
  	
  	
- 	 SSLContext sslcontext = null;
-      try {
-              sslcontext = SSLContext.getInstance("SSL");
-              
-              sslcontext.init(new KeyManager[0],
-                              new TrustManager[] { new DummyTrustManager() },
-                              new SecureRandom());
-      } catch (NoSuchAlgorithmException e) {
-              e.printStackTrace(System.err);
-             
-      } catch (KeyManagementException e) {
-              e.printStackTrace(System.err);
-      }
-				
-      SSLSocketFactory factory = sslcontext.getSocketFactory();
-      
       //String data="V0000501^AOVPP2323N";
       String data="V0265801^AOVPP2323N";
       data="V0136601^AAIPM3854E";
@@ -176,9 +111,6 @@ public class APIBased {
       connection.setDoInput(true);
       connection.setDoOutput(true);
      
-		 connection.setSSLSocketFactory(factory);
-      connection.setHostnameVerifier(new DummyHostnameVerifier());
-      
 
      
      

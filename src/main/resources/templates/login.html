@@ -38,6 +38,19 @@
 
 <!--=============== New style integration================ -->
 <script th:src="@{/new-assets/js/jquery.min.js}"></script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const currentYear = new Date().getFullYear();
+
+		document.querySelectorAll(".dynamic-year").forEach(function (el) {
+			el.textContent = currentYear;
+		});
+
+		document.querySelectorAll(".dynamic-calendar-text").forEach(function (el) {
+			el.textContent = "Diary / calendar " + currentYear;
+		});
+	});
+</script>
 <style>
 .col-sm-12.controls.text-center {
 	position: relative;
@@ -743,15 +756,15 @@ Footer Area
 
 	<div id="calendar-diary">
 		<span class="titles_cls"><i class="fa fa-calendar"
-			aria-hidden="true"></i> <span class="">Diary / calendar 2026</span></span> <a
+			aria-hidden="true"></i> <span class="dynamic-calendar-text">Diary / calendar 2026</span></span> <a
 			href="http://diary.mp.gov.in/" target="_blank"
 			title="Diary/Calendar 2026"
 			style="display: inline-block; text-align: left; vertical-align: top; margin-left: -5px;">
 			<img th:src="@{/new-assets/img/dairy-img.jpg}" alt="dairy-img" /> <label
-			class="year-title">2026</label> <span
+			class="year-title dynamic-year ">2026</label> <span
 			style="display: block; text-align: center; margin-top: -40px;"></span>
 			<span style="font-size: 12px; margin-left: 12px;"
-			class="btn btn-primar">Diary / calendar 2026</span>
+			class="btn btn-primar dynamic-calendar-text">Diary / calendar 2026</span>
 		</a>
 	</div>
 

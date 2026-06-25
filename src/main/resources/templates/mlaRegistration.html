@@ -121,7 +121,10 @@
 								</div>
 
 
-								<form data-ng-submit="addRegistration(regForm.$valid)"
+								<form method="post"
+      autocomplete="off"
+      novalidate="novalidate"
+								data-ng-submit="addRegistration(regForm.$valid)"
 									name="regForm">
 									<div class="card-body">
 										
@@ -307,7 +310,7 @@
 													class="form-control" type="password"
 													data-ng-model="regData.password" name="password"
 													maxlength="20" id="password" onkeyup="check_pass();"
-													placeholder="Password" AUTOCOMPLETE="off" />
+													placeholder="Password" autocomplete="new-password" />
 												<div data-ng-show="regForm.$submitted">
 													<p class="help-block" style="color: red;"
 														data-ng-show="regForm.password.$error.required">
@@ -323,7 +326,7 @@
 													data-ng-model="regData.confirmPassword"
 													name="confirmPassword" maxlength="20" id="confirmPassword"
 													onkeyup="check_pass();" placeholder="Confirm Password"
-													AUTOCOMPLETE="off" />
+													autocomplete="new-password" />
 												<div data-ng-show="regForm.$submitted">
 													<p class="help-block" style="color: red;"
 														data-ng-show="regForm.confirmPassword.$error.required">

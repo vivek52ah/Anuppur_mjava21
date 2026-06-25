@@ -650,7 +650,10 @@ dms
 				controller: 'CommonController'
 			})
 
+			.when('/', {
+				redirectTo: '/manageOngoingWorks'
+			})
 			.otherwise({
-				redirectTo: '/'
+				redirectTo: '/manageOngoingWorks'
 			});
 	}]);
