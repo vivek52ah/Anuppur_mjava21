@@ -1,36 +1,21 @@
 package com.anuppur.util;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
-import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
-import javax.crypto.spec.IvParameterSpec;
-
-import javax.net.ssl.HttpsURLConnection;
 import org.springframework.stereotype.Service;
 
 import com.anuppur.bean.SMSBean;
@@ -87,14 +72,12 @@ public class SMSUtil {
 
 	// Method to send SMS
 	public String sendSMS(SMSBean smsBean) {
-		StringBuilder queryString = new StringBuilder("");
 		long starttime = System.currentTimeMillis();
 		long endtime = 0;
 		double timetaken = 0.0;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 		String responseMessage = "";
-		String responseTxt = "";
 		String smsServiceType = "unicodemsg";
 		String templateId = (smsBean.getTemplateId() != null && smsBean.getTemplateId().equals("")) ? smsBean.getTemplateId()
 				: "1004187509346541932";
@@ -107,77 +90,51 @@ public class SMSUtil {
 		
 		try {
 			logger.info("Sending SMS....");
-			queryString.append("username=" + URLEncoder.encode(userName, "UTF-8") + "&");
-			queryString.append("password=" + URLEncoder.encode(password, "UTF-8") + "&");
-			queryString.append("smsservicetype=" + URLEncoder.encode(smsServiceType, "UTF-8") + "&");
-			queryString.append("content=" + URLEncoder.encode(smsBean.getSmsText(), "UTF-8") + "&");
-			queryString.append("mobileno=" + URLEncoder.encode(smsBean.getMobileNumber(), "UTF-8") + "&");
-			queryString.append("senderid=" + URLEncoder.encode(senderId, "UTF-8") + "&");
-			queryString.append("templateid=" + URLEncoder.encode(templateId, "UTF-8"));
+			HttpPost post = new HttpPost(url);
+			post.setHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; DigExt)");
 
-			logger.info("queryString====");
-			URL smsUrl = new URL(url + "?" + queryString);
-			logger.info("SMS URL====");
-			HttpsURLConnection connection = (HttpsURLConnection) smsUrl.openConnection();
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
-			connection.setRequestMethod("POST");
-			HttpsURLConnection.setFollowRedirects(true);
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-			connection.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; DigExt)");
+			List<NameValuePair> formParams = new ArrayList<>();
+			formParams.add(new BasicNameValuePair("username", userName));
+			formParams.add(new BasicNameValuePair("password", password));
+			formParams.add(new BasicNameValuePair("smsservicetype", smsServiceType));
+			formParams.add(new BasicNameValuePair("content", smsBean.getSmsText()));
+			formParams.add(new BasicNameValuePair("mobileno", smsBean.getMobileNumber()));
+			formParams.add(new BasicNameValuePair("senderid", senderId));
+			formParams.add(new BasicNameValuePair("templateid", templateId));
+			post.setEntity(new UrlEncodedFormEntity(formParams, StandardCharsets.UTF_8));
 
-			// get ready to read the response from the cgi script
-			DataInputStream input = new DataInputStream(connection.getInputStream());
-			// read in each character until end-of-stream is detected
-			for (int c = input.read(); c != -1; c = input.read()) {
-				responseTxt += (char) c;
-			}
-			logger.info("responseTxt====" + responseTxt);
-			input.close();
-			logger.info(smsBean.getSmsText());
-			if (connection.getResponseCode() == 200) {
+			try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+				ClassicHttpResponse response = httpClient.execute(post);
+				responseMessage = response.getReasonPhrase();
+				if (response.getEntity() != null) {
+					try (BufferedReader input = new BufferedReader(
+							new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8))) {
+						while (input.readLine() != null) {
+							// Drain response so the connection can be released without logging provider data.
+						}
+					}
+				}
+
+			logger.info("SMS provider response received");
+			if (response.getCode() == 200) {
 				logger.info("SMS send successfully.....");
 			} else {
 				logger.info("SMS not send successfully.....");
 			}
-			responseMessage = connection.getResponseMessage();
 			endtime = System.currentTimeMillis();
 			timetaken = (double) (endtime - starttime) / 1000;
-			String logText = "SMS Delivery:transaction logs||" + smsBean.getMobileNumber() + "||" + sdf.format(date)
-					+ "||" + timetaken + "||" + connection.getResponseCode() + "||" + url.toString() + "?" + queryString
-					+ "||" + connection.getResponseMessage() + ":" + responseTxt;
-			logger.info("logText");
+			logger.info("SMS Delivery:transaction logs||{}||{}||{}||{}||{}||{}",
+					smsBean.getMobileNumber(), sdf.format(date), timetaken, response.getCode(),
+					url, responseMessage);
+			}
 		} catch (Exception ex) {
 			endtime = System.currentTimeMillis();
 			timetaken = (double) (endtime - starttime) / 1000;
 			
 			logger.error("error sending sms",ex);
-			// logger.error("SMS Delivery:transaction
-			// logs||"+smsBean.getMobileNumber()+"||"+ sdf.format(date) + "||"+ timetaken +
-			// "||"+url.toString()+"?"+queryString+"||"+ex );
 		}
 		return responseMessage;
 	}
-	
-	public void fetchSamagraData() throws
-	  DMSBusinessException {
-		
-			/*
-			 * String timeStamp = new SimpleDateFormat("ddMMyyyyHHmmss").format(new Date());
-			 * 
-			 * String key = "26092022";
-			 * 
-			 * String result;
-			 * 
-			 * result = CalculateMD5Hash(timeStamp+key,timeStamp);
-			 * System.out.println("HashValue....."+result+"timesStamp...."+timeStamp);
-			 */
-			  
-		String value= getDecryptData("yWpiR7fmO8F4sIugJMOoWmbQ57zY3HJ8XlA+h/J/bcCWErYUKnkd9CUvZdmbQVKUIhbXtFRfHuHpnuxkDs0qMWQc9ZbGCHYJzwTJinTmyIzDc6IIXd13YjZ/erx9AjxTkAe0DbqpWBBQyt3Itg/BJalDi1J0biyavT5jKOWq8VArXEBgWY7Eq2ToYLccCZQIEabe1ew/pFOMvlPoqoFXh4wK9lzQNEgwKquSB5gGRH7Gh1D85sVdg536aTYaZlz+YSXwJiz141y20YymhfrJbulspP5R186oK2+b17QTxLbQ0MdHZUPFyPm94OhPI0vMQTqqTBb2R32w8Dcda5F6OqOSXIDgudzo8C4EtBwnqFUmsfQqR81r3ftujvWd3RgxPkSUgPFw+mFsfKGLfs+Z3TPyDAaBTBcxHwrYqhjVihf/NB5N2ADU5IDyo4vsu/fa4uEX0yURwb4qLC6jH80ur2s5kHpb0ineb2s/+3yvM34b32hpXZHluqnt01SnCbtzZnFIo5VJA4lKQzhMzDjNE42Cqz4/lojmshkb0U2P83cduwwP6qSVv1a3504rNlY1jz7173rDcdNMpGKEJKZXPQeTG7lABK8f8PUu4F9eCyTziM8HMumiN/oknuOJ+eX61GG0njtQrPjVUw0WGDoECVLAKqRjCRftY/TSjvd5lX+xfrw3pG9b5PkG8tIcS4kD1/q2u609BVb9wuTweMFMG9SNcZGYxQODte56n2rpEG14jfiBwod/y7oamDeeBiIvmsPmtNVscnB25OPA7oA3pGGGQ79/TMSRnAgtH4sMtmGVVbUjBAV9R+ik5Jb1OydBKVWjMS0rVm8ZdUNXCUM4vFxYafUqBi4NPeWJedjlCFH9UcsXpI/nmP87l8kyA6J/ctRvZ59sRw6m9pEPEnFv8aNuh07Zwp1oSmMIOmIU3SHxtt7ahQ+B/tUFuSDbrSEtwsheymIYdmMz1woHit73v14Epk0sJga3L1+0aXvuc+d6ZNdI1Cpb55sV9wmpm/HjQSZOVpF44f0KIbnmFcscrsZst4zY14iD5t4vOapVw3M6/rgI0CVTAYdcHGeFcBJ7YznuMFfnmrU8CdK7yLhySHPzsfTw1kcdAjAdBVmPYE+YEXppyslOjfuZSPYIyQ2chV8EZ/JXN9MWUz8k4jrnLZPwZgQvRiG4vkNTZ3HfIgRiBRG1PUPDUMCoRaSgItTgf6csCq3UAtiE6+FRoKAeKm217e9QIq4NUqXOjlKnvyLU+SqBlPnzeCyDEMq9Q9IFvW2RnJXM8eF5y2ZzTZNS+Oww8JlFrgxe+6ik7HUUqQvf2bz3aVtJ0A5gvVDeOBqKGFeKNOz0g5/0rbC36g/1giz9T+H207x3cOwzXJJ50Ltd3qKgAln+F7QfXNYG/jRPYN71sIrKWDPj2/SbLymicwnYCmvWN6yjjLhQtC0QlZrvmkJUDyWzJnso3CUdQlZA3ysXl/v9ViA05WD/otGbSLmvGzIQNYznjuk5GFUODZTVsHCJLIVAfgaXAzJ9d/aQddsOCpQQaWB1LGulo6LENkPCW4y8AEsdXSGHDopPLJ1aM0OBNFcoFrAGTvlh5kM1YUNMf0UaqSxaLUEV8THOAA==" ); logger.info("Data..."+value);
-				 
-	 
-	}
-
 	
 	public String sendSingleUnicodeSMSCDAC(SMSBean smsBean) throws
 	  DMSBusinessException {
@@ -221,25 +178,11 @@ public class SMSUtil {
 	CloseableHttpClient httpClient = HttpClients.createDefault();
 
 			             HttpPost post=new HttpPost(urlCdac);
-			             encryptedPassword  = MD5(passwordForSMS);
+			             encryptedPassword  = sha256Hex(passwordForSMS);
 			             String genratedhashKey = hashGenerator(userNameCdac, senderIdCdac, finalmessage, secureKeyCdac);
 			             
 			             List<NameValuePair> nameValuePairs=new ArrayList<NameValuePair>(1);
 			             
-			             @SuppressWarnings("java:S2068")
-			             String query = MessageFormat.format(
-			            		    "username={0}&pwd={1}&smsservicetype={2}&content={3}&mobileno={4}&senderid={5}&key={6}&templateid={7}",
-			            		    URLEncoder.encode(userNameCdac, StandardCharsets.UTF_8.toString()),
-			            		    URLEncoder.encode(passwordForSMS, StandardCharsets.UTF_8.toString()),
-			            		    URLEncoder.encode(serviceType, StandardCharsets.UTF_8.toString()),
-			            		    URLEncoder.encode(finalmessage, StandardCharsets.UTF_8.toString()),
-			            		    URLEncoder.encode(smsBean.getMobileNumber(), StandardCharsets.UTF_8.toString()),
-			            		    URLEncoder.encode(senderIdCdac, StandardCharsets.UTF_8.toString()),
-			            		    URLEncoder.encode(genratedhashKey, StandardCharsets.UTF_8.toString()),
-			            		    URLEncoder.encode(templateid, StandardCharsets.UTF_8.toString())
-			            		);
-
-						 int queryLength = query.length();
 			             nameValuePairs.add(new BasicNameValuePair("mobileno", smsBean.getMobileNumber()));
 			             nameValuePairs.add(new BasicNameValuePair("senderid", senderIdCdac));
 			             nameValuePairs.add(new BasicNameValuePair("content", finalmessage));
@@ -259,8 +202,8 @@ public class SMSUtil {
 			             //System.out.println(responseString);
 			                  endtime = System.currentTimeMillis();
 							timetaken = (double)(endtime - starttime)/1000;
-						    String logText = "SMS Delivery:transaction logs||"+smsBean.getMobileNumber()+"||"+ sdf.format(date) + "||"+ timetaken + "||"+responseString+"||"+smsBean.getSmsText()+"||"+urlCdac.toString()+"?"+query+"||"+responseString ;	
-						 //   System.out.println(logText);
+						    logger.info("SMS Delivery:transaction logs||{}||{}||{}||{}||{}",
+						            smsBean.getMobileNumber(), sdf.format(date), timetaken, responseString, urlCdac);
 						    if(!responseString.contains("402,MsgID")) {
 						    	throw new DMSBusinessException("SMS_DELIVERY_FAILURE_IOException");
 						    }
@@ -311,12 +254,11 @@ public class SMSUtil {
 	   }
 
 
-	public String CalculateMD5Hash(String input,String time) { 
+	public String calculateSha256Hash(String input,String time) {
 		
 		
 		try {
 			 
-            // Static getInstance method is called with hashing MD5
             MessageDigest md = MessageDigest.getInstance("SHA-256");
  
             // digest() method is called to calculate message digest
@@ -341,54 +283,13 @@ public class SMSUtil {
 	}
 	
 	
-	public String getDecryptData(String stringToDecrypt) {
-		String _key="20220926";
-		stringToDecrypt = stringToDecrypt.replace(" ", "+");
-        byte[] rgbIV = new byte[]{
-                (byte) 10,
-                (byte) 20,
-                (byte) 30,
-                (byte) 40,
-                (byte) 50,
-                (byte) 60,
-                (byte) 70,
-                (byte) 80
-        };
-
-        try {
-            byte[] bytes = Arrays.copyOf(_key.getBytes(StandardCharsets.UTF_8), 8);
-            DESKeySpec desKeySpec = new DESKeySpec(bytes);
-            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-            SecretKey secretKey = keyFactory.generateSecret(desKeySpec);
-            Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(rgbIV));
-            byte[] buffer = Base64.getDecoder().decode(stringToDecrypt);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, cipher);
-            cipherOutputStream.write(buffer);
-            cipherOutputStream.close();
-            String decryptedString = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
-            logger.info("Descypted...."+decryptedString);
-            return decryptedString.toString();
-        } catch (Exception ex) {
-        	logger.info("Error: " + ex.getMessage());
-        }
-        
-        return null;
-    }
-	
-
-	
-	
-	
-	private static String MD5(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	private static String sha256Hex(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		MessageDigest md;
-		//md = MessageDigest.getInstance("SHA-1");
-		md = MessageDigest.getInstance("HmacSHA256");
-		byte[] md5 = new byte[64];
+		md = MessageDigest.getInstance("SHA-256");
+		byte[] digest = new byte[32];
 		md.update(text.getBytes("iso-8859-1"), 0, text.length());
-		md5 = md.digest();
-		return convertedToHex(md5);
+		digest = md.digest();
+		return convertedToHex(digest);
 	}
 
 	private static String convertedToHex(byte[] data) {

@@ -154,17 +154,8 @@ $(document).on('keypress','.alpha-numeric-with-dot', function(e) {
 });
 
 function encryptFunc(param){
-	
-	var iv = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
-    var salt = CryptoJS.lib.WordArray.random(128/8).toString(CryptoJS.enc.Hex);
-    
-    var aesUtil = new AesUtil(128, 1000);
-    var ciphertext = aesUtil.encrypt(salt, iv, /* $('#key').text() */"1234567891234567", param+"");
-
-    var aesString = (iv + "::" + salt + "::" + ciphertext);
-    var encryptedString = btoa(aesString);
-    
-	return encryptedString;
+	var encoded = btoa(unescape(encodeURIComponent(param + "")));
+	return encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 

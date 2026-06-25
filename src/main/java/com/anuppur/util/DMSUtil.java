@@ -896,12 +896,13 @@ public class DMSUtil {
 
 	public static String decryptParam(String param) {
 
-		String decryptedString = new String(java.util.Base64.getDecoder().decode(param));
-		AesUtil aesUtil = new AesUtil(128, 1000);
-		if (decryptedString != null && decryptedString.split("::").length == 3) {
-			return aesUtil.decrypt(decryptedString.split("::")[1], decryptedString.split("::")[0], "1234567891234567",
-					decryptedString.split("::")[2]);
-		} else {
+		if (param == null || param.trim().isEmpty()) {
+			return "0";
+		}
+		try {
+			byte[] decoded = Base64.getUrlDecoder().decode(param);
+			return new String(decoded, StandardCharsets.UTF_8);
+		} catch (IllegalArgumentException ex) {
 			return "0";
 		}
 	}

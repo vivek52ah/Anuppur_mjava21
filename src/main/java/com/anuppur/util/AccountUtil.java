@@ -7,12 +7,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.security.Key;
 import java.security.SecureRandom;
-import java.security.spec.KeySpec;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -33,12 +30,6 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64;
@@ -220,56 +211,6 @@ public class AccountUtil {
 		
 	}
 
-	/*
-	 * public static String decryptParam(String param) throws
-	 * GeneralSecurityException { String decryptedString = new
-	 * String(java.util.Base64.getDecoder().decode(param)); AesUtil aesUtil = new
-	 * AesUtil(); if (decryptedString != null && decryptedString.split("::").length
-	 * == 3) { return aesUtil.decrypt(decryptedString.split("::")[1],
-	 * decryptedString.split("::")[0], "1234567891234567",
-	 * decryptedString.split("::")[2]); } else{ return "0"; } }
-	 * 
-	 * public static String encryptLcncParam(String param) throws
-	 * GeneralSecurityException, UnsupportedEncodingException { AesUtil aesUtil =
-	 * new AesUtil(); return aesUtil.encrypt(AesUtil.random(128/8),
-	 * AesUtil.random(128/8), "sampada@lcnc", param); }
-	 * 
-	 * 
-	 * 
-	 * public static String decryptLcncParam(String param) throws
-	 * GeneralSecurityException { String decryptedString = new
-	 * String(java.util.Base64.getDecoder().decode(param)); AesUtil aesUtil = new
-	 * AesUtil(); if (decryptedString != null && decryptedString.split("::").length
-	 * == 3) { return aesUtil.decrypt(decryptedString.split("::")[1],
-	 * decryptedString.split("::")[0], "sampada@lcnc",
-	 * decryptedString.split("::")[2]); } else{ return "0"; } }
-	 * 
-	 * public static String encryptParam(String param) throws
-	 * GeneralSecurityException, UnsupportedEncodingException { AesUtil aesUtil =
-	 * new AesUtil(); return aesUtil.encrypt(AesUtil.random(128/8),
-	 * AesUtil.random(128/8), "1234567891234567", param); }
-	 * 
-	 * 
-	 * 
-	 * public static String decryptAngularCryptoAES(String cipherText) { try {
-	 * String secret = "123456"; byte[] cipherData =
-	 * java.util.Base64.getDecoder().decode(cipherText); byte[] saltData =
-	 * Arrays.copyOfRange(cipherData, 8, 16);
-	 * 
-	 * MessageDigest md5 = MessageDigest.getInstance("MD5"); final byte[][] keyAndIV
-	 * = AesUtil.GenerateKeyAndIV(32, 16, 1, saltData,
-	 * secret.getBytes(StandardCharsets.UTF_8), md5); SecretKeySpec key = new
-	 * SecretKeySpec(keyAndIV[0], "AES"); IvParameterSpec iv = new
-	 * IvParameterSpec(keyAndIV[1]);
-	 * 
-	 * byte[] encrypted = Arrays.copyOfRange(cipherData, 16, cipherData.length);
-	 * Cipher aesCBC = Cipher.getInstance("AES/CBC/PKCS5Padding");
-	 * aesCBC.init(Cipher.DECRYPT_MODE, key, iv); byte[] decryptedData =
-	 * aesCBC.doFinal(encrypted); return new String(decryptedData,
-	 * StandardCharsets.UTF_8); } catch (Exception e) { e.printStackTrace(); return
-	 * null; } }
-	 */
-	
 	public static <T> Stream<List<T>> batches(List<T> source, int length) {
         if (length <= 0)
             throw new IllegalArgumentException("length = " + length);
@@ -592,63 +533,6 @@ public class AccountUtil {
 	        return m.matches();
 	}
 
-	private static char[] password = "EF737CC29DAE7C80644A5B01544CBA61".toCharArray();
-	private static String salt = "0123456789";
-    private static byte iv[];
-    static {
-        try {             
-            iv = getBytes("79994A6EF73DA76C");
-        } catch (Exception e) {
-           logger.error("error",e);
-            
-        }
-    }
-    
-    public static String encryptAndEncode(String raw)
-    {
-        try
-        {
-            Cipher c = getCipher(1,salt);
-            byte[] encryptedVal = c.doFinal(getBytes(raw));
-            return new String(java.util.Base64.getEncoder().encodeToString(encryptedVal));
-           // return new String(encryptedVal);
-        }
-        catch (Throwable t)
-        {
-            throw new RuntimeException(t);
-        }
-    }
-  
-    public static String decodeAndDecrypt(String encrypted) throws Exception
-    {
-        byte[] decodedValue = java.util.Base64.getDecoder().decode(encrypted);
-        Cipher c = getCipher(2,salt);
-        byte[] decValue = c.doFinal(decodedValue);
-        return new String(decValue);
-    }
-  
-    private static byte[] getBytes(String str) throws UnsupportedEncodingException
-    {
-        return str.getBytes("UTF-8");
-    }
-    
-    private static Cipher getCipher(int mode,String salt)throws Exception
-    {
-        Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        c.init(mode, generateKey(salt), new IvParameterSpec(iv));
-        return c;
-    }
-  
-  
-    private static Key generateKey(String salt) throws Exception
-    {
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        byte[] saltb = getBytes(salt);
-    
-        KeySpec spec = new PBEKeySpec(password, saltb, 65536, 256);
-        SecretKey tmp = factory.generateSecret(spec);
-        return new SecretKeySpec(tmp.getEncoded(), "AES");
-    }
     public static String encodeBase64(String salt) 
     {
     	String BasicBase64format= java.util.Base64.getEncoder().encodeToString(salt.getBytes());

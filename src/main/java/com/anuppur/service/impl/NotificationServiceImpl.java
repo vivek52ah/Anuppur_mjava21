@@ -303,8 +303,7 @@ public class NotificationServiceImpl implements NotificationService {
 		emailBean.setSubject("Notification "
 			);
 		emailBean.setHTML(true);
-		 logger.info( emailBean.getBody());
-		// System.out.println(emailBean.getBody()+231231);
+		 logger.info("Sending account creation notification email to {}", emailId);
    try {
 	  
 	   getEmailService().sendEmailmessage(emailBean);
@@ -335,8 +334,7 @@ public class NotificationServiceImpl implements NotificationService {
 		emailBean.setSubject("Notification "
 			);
 		emailBean.setHTML(true);
-		 logger.info( emailBean.getBody());
-		// System.out.println(emailBean.getBody()+231231);
+		 logger.info("Sending password reset notification email to {}", emailId);
    try {
 	  
 	   getEmailService().sendEmailmessage(emailBean);

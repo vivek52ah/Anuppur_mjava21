@@ -433,7 +433,7 @@ $scope.loadStateIdOfMP = function() {
 										<input required="required" class="form-control"
 											type="password" data-ng-model="userData.password"
 											name="password" maxlength="20" id="password"
-											onkeyup="check_pass();" autocomplete="off" />
+											onkeyup="check_pass();" autocomplete="new-password" />
 										<div data-ng-show="userForm.$submitted">
 											<p class="help-block" style="color: red;"
 												data-ng-show="userForm.password.$error.required">
@@ -447,7 +447,7 @@ $scope.loadStateIdOfMP = function() {
 											class="form-control" type="password"
 											data-ng-model="userData.confirmPassword"
 											name="confirmPassword" maxlength="20" id="confirmPassword"
-											onkeyup="check_pass();" autocomplete="off" />
+											onkeyup="check_pass();" autocomplete="new-password" />
 										<div data-ng-show="userForm.$submitted">
 											<p class="help-block" style="color: red;"
 												data-ng-show="userForm.confirmPassword.$error.required">

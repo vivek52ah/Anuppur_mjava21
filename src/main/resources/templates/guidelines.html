@@ -194,42 +194,35 @@
 
 							//color = [1, 10, 20, 30, 40, 50];
 
-							div.innerHTML += 'Legends: <br><b>Completed Works</b>'
-								+ '<br>';
-							div.innerHTML += '<i style="background:'
-								+ getColor(0) + '"></i> ' + '0' + '<br>';
-							div.innerHTML += '<i style="background:'
-								+ getColor(1) + '"></i> ' + '1-75' + '<br>';
-
-							div.innerHTML += '<i style="background:'
-								+ getColor(77) + '"></i> ' + '76-150'
-								+ '<br>';
-
-							div.innerHTML += '<i style="background:'
-								+ getColor(152) + '"></i> ' + '151-225'
-								+ '<br>';
-
-							div.innerHTML += '<i style="background:'
-								+ getColor(227) + '"></i> ' + '226-300'
-								+ '<br>';
-
-							div.innerHTML += '<i style="background:'
-								+ getColor(302) + '"></i> ' + '301-375'
-								+ '<br>';
-							div.innerHTML += '<i style="background:'
-								+ getColor(376) + '"></i> ' + '375+'
-								+ '<br>';
-
-							div.innerHTML += '<i style="background:' + 'grey' + '"></i> '
-								+ 'Not applicable';
-
-							/*for (var i = 1; i < color.length; i++) {
-								div.innerHTML +=
-									'<i style="background:' + getColor(color[i]+1) + '"></i> ' +
-									color[i] + (color[i + 1] ? '&ndash;' + color[i + 1] + '<br>' : '+');
-							}*/
+							appendTextLine(div, 'Legends: ');
+							var title = document.createElement('b');
+							title.textContent = 'Completed Works';
+							div.appendChild(title);
+							div.appendChild(document.createElement('br'));
+							appendLegendItem(div, getColor(0), '0');
+							appendLegendItem(div, getColor(1), '1-75');
+							appendLegendItem(div, getColor(77), '76-150');
+							appendLegendItem(div, getColor(152), '151-225');
+							appendLegendItem(div, getColor(227), '226-300');
+							appendLegendItem(div, getColor(302), '301-375');
+							appendLegendItem(div, getColor(376), '375+');
+							appendLegendItem(div, 'grey', 'Not applicable', false);
 
 							return div;
+						}
+
+						function appendTextLine(container, text) {
+							container.appendChild(document.createTextNode(text));
+						}
+
+						function appendLegendItem(container, color, label, includeBreak) {
+							var swatch = document.createElement('i');
+							swatch.style.background = color;
+							container.appendChild(swatch);
+							container.appendChild(document.createTextNode(' ' + label));
+							if (includeBreak !== false) {
+								container.appendChild(document.createElement('br'));
+							}
 						}
 
 						function highlightFeature(e) {
@@ -376,19 +369,34 @@
 						// method that we will use to update the control based on feature properties passed
 						info.update = function (props) {
 
-							this._div.innerHTML = (props ? '<b>'
-								+ 'District Name :' + props.District_Name
-								+ '</b><br />' + 'Completed Works: '
-								+ props.Completed + '</b><br />'
-								+ 'In Progress Works :' + props.In_Progress
-								+ '</b><br />' + 'On Hold Works: '
-								+ props.On_Hold + '</b><br />'
-								+ 'Cancelled Works: ' + props.Cancelled
-								+ '</b><br />' + 'Not Started Works: '
-								+ props.Not_Started + '</b><br />'
-								: 'Hover over District');
+							this._div.textContent = '';
+							if (!props) {
+								this._div.textContent = 'Hover over District';
+								return;
+							}
+
+							var district = document.createElement('b');
+							district.textContent = 'District Name :' + safeText(props.District_Name);
+							this._div.appendChild(district);
+							appendInfoLine(this._div, 'Completed Works: ', props.Completed);
+							appendInfoLine(this._div, 'In Progress Works :', props.In_Progress);
+							appendInfoLine(this._div, 'On Hold Works: ', props.On_Hold);
+							appendInfoLine(this._div, 'Cancelled Works: ', props.Cancelled);
+							appendInfoLine(this._div, 'Not Started Works: ', props.Not_Started);
 
 						};
+
+						function appendInfoLine(container, label, value) {
+							container.appendChild(document.createElement('br'));
+							container.appendChild(document.createTextNode(label + safeText(value)));
+						}
+
+						function safeText(value) {
+							if (value === null || value === undefined) {
+								return '';
+							}
+							return String(value);
+						}
 
 						info.addTo(map);
 
