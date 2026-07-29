@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -21,18 +20,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import com.anuppur.filter.CaptchaAuthenticationFilter;
 import com.anuppur.handler.DMSAuthenticationSuccessHandler;
+import com.anuppur.security.CsrfCookieFilter;
 import com.anuppur.security.DMSPasswordEncoder;
+import com.anuppur.security.SpaCsrfTokenRequestHandler;
 import com.anuppur.service.impl.UserDetailsServiceImpl;
 import com.anuppur.util.JwtFilter;
 
@@ -48,9 +50,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity(prePostEnabled = true)
 @SuppressWarnings("all")
 public class SpringSecurityConfig {
-
-    @Value("${security.enable-csrf}")
-    private boolean csrfEnabled;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -79,18 +78,6 @@ public class SpringSecurityConfig {
         return provider;
     }
 
-    private final RequestMatcher csrfRequestMatcher = request -> {
-        List<AntPathRequestMatcher> requestMatchers = List.of(
-            new AntPathRequestMatcher("/forgotpassword/**"),
-            new AntPathRequestMatcher("/api/**"),
-            new AntPathRequestMatcher("/resetpassword/**"),
-            new AntPathRequestMatcher("/registrationForm/**"),
-            new AntPathRequestMatcher("/doSignUp/**"),
-            new AntPathRequestMatcher("/mobilelogin/**")
-        );
-        return requestMatchers.stream().anyMatch(matcher -> matcher.matches(request));
-    };
-
     @Bean
     @Order(1)
     public SecurityFilterChain staticResourcesFilterChain(HttpSecurity http) throws Exception {
@@ -107,14 +94,22 @@ public class SpringSecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        csrfTokenRepository.setCookieCustomizer(cookie -> cookie
+                .path("/")
+                .secure(true)
+                .sameSite("Lax"));
+
         // Disable CORS for login page - it's a same-origin request
         http.cors(cors -> cors.disable());
         
         http
             .authenticationProvider(daoAuthenticationProvider())
-                .csrf(csrf -> csrf
-                .requireCsrfProtectionMatcher(csrfRequestMatcher)
-                .ignoringRequestMatchers("/logout", "/mobilelogin", "/mobilelogin/**", "/captcha", "/forgotpassword", "/aboutUs", "/guidelines", "/contactUs"))
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(csrfTokenRepository)
+                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                // Bearer-token mobile calls do not use browser session cookies.
+                .ignoringRequestMatchers("/mobile/**", "/mobilelogin", "/mobilelogin/**"))
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/", "/login", "/error", "/captcha", "/forgotpassword", "/resetpassword", "/aboutUs", "/guidelines", "/contactUs",
                     "/mobilelogin", "/mobilelogin/**").permitAll()
@@ -132,7 +127,13 @@ public class SpringSecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login")
                 .successHandler(authenticationSuccessHandler))
-            .logout(logout -> logout.permitAll())
+            .logout(logout -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID", "XSRF-TOKEN")
+                .logoutSuccessUrl("/login?logout")
+                .permitAll())
             .exceptionHandling(exception -> exception
                 .accessDeniedPage("/403")
                 .authenticationEntryPoint((request, response, authException) -> {
@@ -146,6 +147,7 @@ public class SpringSecurityConfig {
                 }))
             .sessionManagement(session -> session
                 .sessionFixation(fixation -> fixation.migrateSession())
+                .invalidSessionUrl("/login?timeout")
                 .maximumSessions(2)
                 .expiredUrl("/login?timeout"))
             .headers(headers -> headers
@@ -161,10 +163,7 @@ public class SpringSecurityConfig {
         http.addFilterBefore(new CaptchaAuthenticationFilter("/login", "/login?error"),
                 UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        if (!csrfEnabled) {
-            http.csrf(csrf -> csrf.disable());
-        }
+        http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
         return http.build();
     }
@@ -215,7 +214,8 @@ public class SpringSecurityConfig {
                 "http://localhost:8080",
                 "http://localhost:8085",
                 "http://127.0.0.1:8085",
-                "http://raman-coe.mapit.gov.in:8080"
+                "http://raman-coe.mapit.gov.in:8080",
+                "https://raman-coe.mp.gov.in"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

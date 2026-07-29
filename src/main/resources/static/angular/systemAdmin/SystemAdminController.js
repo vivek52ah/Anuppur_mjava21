@@ -835,7 +835,7 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 	$scope.deleteWorkCat = function(workCatId) {
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
-			var responsePromise = $http.get('deleteWorkCatById/' + workCatId);
+			var responsePromise = $http.post('deleteWorkCatById/' + workCatId);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
 				if ($rootScope.responseObject.successMessage != null) {
@@ -1133,12 +1133,9 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 					$timeout(function() {
 						$rootScope.responseObject.successMessage = null;
 					}, 5000);
-					if ($scope.userData.designationId == 2) {
-						$window.location.href = '#manageDepartmentUser';
-					}
-
-					else {
-
+					if ($scope.userData.designationId == 1) {
+						$window.location.href = '#manageusers';
+					} else {
 						$window.location.href = '#manageDepartmentUser';
 					}
 				}
@@ -1194,7 +1191,7 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteUser/' + userId);
+			var responsePromise = $http.post('deleteUser/' + userId);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
 				if ($rootScope.responseObject.successMessage != null) {
@@ -1419,7 +1416,7 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteWorkFacility/' + id);
+			var responsePromise = $http.post('deleteWorkFacility/' + id);
 
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
@@ -1489,7 +1486,7 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteWorkSubType/' + id);
+			var responsePromise = $http.post('deleteWorkSubType/' + id);
 
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
@@ -1573,7 +1570,7 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteImplAgencyy/' + id);
+			var responsePromise = $http.post('deleteImplAgencyy/' + id);
 
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
@@ -1793,7 +1790,7 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteDistrict/' + id);
+			var responsePromise = $http.post('deleteDistrict/' + id);
 
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
@@ -1822,7 +1819,7 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteBlock/' + id);
+			var responsePromise = $http.post('deleteBlock/' + id);
 
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
@@ -1849,7 +1846,7 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteGP/' + id);
+			var responsePromise = $http.post('deleteGP/' + id);
 
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
@@ -2090,7 +2087,7 @@ dms.controller('SystemAdminController', function($scope, $loading, $rootScope, $
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteWorkSubTypes/' + id);
+			var responsePromise = $http.post('deleteWorkSubTypes/' + id);
 
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;

@@ -64,6 +64,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -2644,6 +2645,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canEditWork(#p0)")
 	synchronized public ResponseObject addWork(WorkBean bean) throws Exception {
 		String ni = "";
 		ResponseObject responseObject = null;
@@ -4332,6 +4334,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteWork(Long id) {
 
 		try {
@@ -5213,6 +5216,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addImplAgency(ImplAgencyBean bean, String userName, String dateString) {
 
 		try {
@@ -5238,6 +5242,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addHead(WorkHeadBean bean, String userName, String dateString) {
 
 		try {
@@ -5261,6 +5266,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addScheme(SchemeBean bean, String userName, String dateString) {
 
 		try {
@@ -5285,6 +5291,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addSor(SorYearBean bean, String userName, String dateString) {
 
 		try {
@@ -5309,6 +5316,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String editImplAgency(ImplAgencyBean bean, String date) {
 
 		try {
@@ -5336,6 +5344,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String editHead(WorkHeadBean bean, String date) {
 
 		try {
@@ -5362,6 +5371,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String editScheme(SchemeBean bean, String date) {
 
 		try {
@@ -5388,6 +5398,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String editSor(SorYearBean bean, String date) {
 
 		try {
@@ -5414,6 +5425,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteImplAgency(Long id) {
 
 		try {
@@ -5430,6 +5442,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteHead(Long id) {
 
 		try {
@@ -5454,6 +5467,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteScheme(Long id) {
 
 		try {
@@ -5479,6 +5493,7 @@ public class CommonServiceImpl implements CommonService {
 
 //working
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteSor(Long id) {
 
 		try {
@@ -6788,6 +6803,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addSdr(WorkSubDelayResonBean bean, String userName, String dateString) {
 
 		try {
@@ -6879,6 +6895,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteSdr(Long id) {
 
 		try {
@@ -6940,6 +6957,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String editSdr(WorkSubDelayResonBean bean, String date) {
 
 		try {
@@ -7840,6 +7858,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 // @Transactional
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
 	synchronized public ResponseObject addTSASWorkDataCancelStatus(TSASWorkBean tsasWorkbean) throws Exception {
 
 		ResponseObject responseObject = null;
@@ -7901,6 +7920,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 // @Transactional
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
 	synchronized public ResponseObject addTSReviseWorkDataStatus(TSASReviseWorkBean tsasReviseWorkBean)
 			throws Exception {
 
@@ -7939,6 +7959,7 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 // @Transactional
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
 	synchronized public ResponseObject addASReviseWorkDataStatus(TSASReviseWorkBean tsasReviseWorkBean)
 			throws Exception {
 
@@ -8742,6 +8763,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') and @workAuthorization.canAssignUserToWork(#p0, #p1)")
 	public String assignUserToWork(Long userid, Long workid) {
 
 		try {
@@ -9396,6 +9418,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
 	public String addOrUpdateDmRemark(DmRemarksBean bean) {
 		try {
 
@@ -9451,6 +9474,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	public String addOrUpdateDepartmentRemark(DepartmentRemarksBean bean) {
 		try {
 
@@ -9636,6 +9660,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canDeleteDmRemark(#p0)")
 	public Boolean deleteRemarks(Long long1) {
 		DmRemarks one = dmRemarksRepository.findById(long1).orElse(null);
 
@@ -9650,6 +9675,7 @@ public class CommonServiceImpl implements CommonService {
 	}
    @Transactional
 	@Override
+	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canDeleteDepartmentRemark(#p0)")
 	public Boolean deleteDepartmentRemarks(Long long1) {
 		DepartmentRemarks one = departmentRemarksRepository.findById(long1).orElseThrow(() -> new RuntimeException("Department Remarks not found"));
 

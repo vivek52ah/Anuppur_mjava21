@@ -29,6 +29,27 @@ public interface UserRepository  extends JpaRepository<Users, Long> {
 	Page<Users> findByUsernameContainingAndStatusNotInAndDistrict(Pageable pageable, String username, String[] status, District district);
 	
 	Page<Users> findByStatusNotInAndDistrict(Pageable pageable, String[] status, District district);
+
+	@Query("SELECT DISTINCT u FROM Users u JOIN u.role r WHERE "
+			+ "r.roleCode = 'ROLE_AREA_OFFICER' "
+			+ "AND u.status NOT IN :excludedStatuses "
+			+ "AND u.departmentName = :departmentName "
+			+ "AND (:district IS NULL OR u.district = :district) "
+			+ "AND (:status IS NULL OR u.status = :status) "
+			+ "AND (:username IS NULL OR u.username LIKE CONCAT('%', :username, '%')) "
+			+ "AND (:emailId IS NULL OR u.emailId = :emailId) "
+			+ "AND (:mobileNo IS NULL OR u.mobileNo = :mobileNo) "
+			+ "AND (:searchParameter IS NULL OR LOWER(u.firstname) LIKE LOWER(CONCAT('%', :searchParameter, '%'))) ")
+	Page<Users> findDepartmentAreaOfficers(
+			Pageable pageable,
+			@Param("excludedStatuses") String[] excludedStatuses,
+			@Param("departmentName") String departmentName,
+			@Param("district") District district,
+			@Param("status") String status,
+			@Param("username") String username,
+			@Param("emailId") String emailId,
+			@Param("mobileNo") String mobileNo,
+			@Param("searchParameter") String searchParameter);
 	
 	long countByStatusNotInAndDistrict(String[] status,District district);
 	

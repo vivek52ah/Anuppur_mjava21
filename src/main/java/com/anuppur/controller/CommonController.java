@@ -173,7 +173,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 @RestController
 @RequestMapping(value = { "/", "/admin/*", "/dpo/*", "/district/*", "/systemAdmin/*", "/hq/*", "division/*",
 		"/agencyAdmin/*", "/ceo/*" })
-//@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT','ROLE_DEPT_DISTRICT','ROLE_DISTRICT','ROLE_SAU' , 'ROLE_AGENCY_ADMIN')")
+@PreAuthorize("isAuthenticated()")
 public class CommonController extends BaseController {
 
 	public static final Logger logger = LoggerFactory.getLogger(CommonController.class);
@@ -1477,6 +1477,7 @@ public class CommonController extends BaseController {
 
 	// Method to add work data and handle the response for successful or failed
 	// save.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canEditWork(#p0)")
 	@RequestMapping(value = "/addWorkData", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
 	public ResponseObject addWorkData(WorkBean workBean, HttpServletRequest request) throws Exception {
@@ -1919,6 +1920,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to display the form for editing ongoing work based on the provided ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessEncryptedWork(#p0)")
 	@RequestMapping(value = "/editWork/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditWorkForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -1977,6 +1979,7 @@ public class CommonController extends BaseController {
 
 	// Method to fetch work details based on the given work ID and adjust access
 	// permissions based on user role.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "fetchWorkDetails/{id}", method = RequestMethod.GET)
 	public WorkBean fetchWorkDetails(@PathVariable Long id, HttpServletRequest request) {
 
@@ -2095,7 +2098,8 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to delete a work entry by its ID.
-	@RequestMapping(value = "/deleteWork/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteWork/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteWork(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -2149,6 +2153,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/manageImplAgency", method = RequestMethod.GET)
 	public ModelAndView manageImplAgencyView(HttpServletRequest request) {
 
@@ -2162,7 +2167,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/manageHead", method = RequestMethod.GET)
 	public ModelAndView manageHeadView(HttpServletRequest request) {
 
@@ -2176,7 +2181,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/manageScheme", method = RequestMethod.GET)
 	public ModelAndView manageSchemeView(HttpServletRequest request) {
 
@@ -2189,7 +2194,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/manageSor", method = RequestMethod.GET)
 	public ModelAndView manageSorView(HttpServletRequest request) {
 
@@ -2204,6 +2209,7 @@ public class CommonController extends BaseController {
 
 	// Method to fetch the list of implementation agencies with search and
 	// pagination.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/fetchImplAgencyList", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchImplAgencyList(HttpServletRequest request) {
 
@@ -2252,6 +2258,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch the list of heads with search and pagination functionality.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/fetchHeadList", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchHeadList(HttpServletRequest request) {
 
@@ -2300,6 +2307,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch the list of schemes with sorting and pagination.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/fetchSchemeList", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchSchemeList(HttpServletRequest request) {
 
@@ -2342,6 +2350,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch the list of SORs with sorting and pagination.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/fetchSorList", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchSorList(HttpServletRequest request) {
 
@@ -2383,6 +2392,7 @@ public class CommonController extends BaseController {
 		return json;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addImplAgencyForm", method = RequestMethod.GET)
 	public ModelAndView viewAddImplAgencyForm(HttpServletRequest request) {
 
@@ -2400,6 +2410,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addHeadForm", method = RequestMethod.GET)
 	public ModelAndView viewAddHeadForm(HttpServletRequest request) {
 
@@ -2417,6 +2428,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addSchemeForm", method = RequestMethod.GET)
 	public ModelAndView viewAddSchemeForm(HttpServletRequest request) {
 
@@ -2435,6 +2447,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add a new work head (segment) to the system.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addHead", method = RequestMethod.POST)
 	public ResponseObject addHead(@RequestBody WorkHeadBean bean, HttpServletRequest request) throws Exception {
 
@@ -2457,6 +2470,7 @@ public class CommonController extends BaseController {
 		return response;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addSorForm", method = RequestMethod.GET)
 	public ModelAndView viewAddSorForm(HttpServletRequest request) {
 
@@ -2475,6 +2489,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add a new scheme with user details and current date.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addScheme", method = RequestMethod.POST)
 	public ResponseObject addScheme(@RequestBody SchemeBean bean, HttpServletRequest request) throws Exception {
 
@@ -2497,6 +2512,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add a new Scheme of Rates (SOR) data.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addSor", method = RequestMethod.POST)
 	public ResponseObject addSor(@RequestBody SorYearBean bean, HttpServletRequest request) throws Exception {
 
@@ -2519,6 +2535,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add implementation agency data.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addImplAgency", method = RequestMethod.POST)
 	public ResponseObject addImplAgency(@RequestBody ImplAgencyBean bean, HttpServletRequest request) throws Exception {
 
@@ -2541,6 +2558,7 @@ public class CommonController extends BaseController {
 		return response;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editImplAgencyForm/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditImplAgencyForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -2555,6 +2573,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editHeadForm/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditHeadForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -2571,6 +2590,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editSchemeForm/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditSchemeForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -2587,6 +2607,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editSorForm/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditSorForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -2604,6 +2625,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch implementation agency details based on the provided ID.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchImplAgencyDetails/{id}", method = RequestMethod.GET)
 	public ImplAgencyBean fetchImplAgencyDetails(@PathVariable String id, HttpServletRequest request) {
 
@@ -2613,6 +2635,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch head details based on the provided ID.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchHeadDetails/{id}", method = RequestMethod.GET)
 	public WorkHeadBean fetchHeadDetails(@PathVariable String id, HttpServletRequest request) {
 
@@ -2622,6 +2645,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch scheme details based on the provided scheme ID.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchSchemeDetails/{id}", method = RequestMethod.GET)
 	public SchemeBean fetchSchemeDetails(@PathVariable String id, HttpServletRequest request) {
 
@@ -2631,6 +2655,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch SOR details based on the given ID.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchSorDetails/{id}", method = RequestMethod.GET)
 	public SorYearBean fetchSorDetails(@PathVariable String id, HttpServletRequest request) {
 
@@ -2640,6 +2665,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to update the implementation agency data.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editImplAgency", method = RequestMethod.POST)
 	public ResponseObject editImplAgency(@RequestBody ImplAgencyBean userBean, HttpServletRequest request)
 			throws Exception {
@@ -2663,6 +2689,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to update the head data for implementation agency.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editHead", method = RequestMethod.POST)
 	public ResponseObject editHead(@RequestBody WorkHeadBean workHeadBean, HttpServletRequest request)
 			throws Exception {
@@ -2685,6 +2712,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to edit and update scheme data.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editScheme", method = RequestMethod.POST)
 	public ResponseObject editScheme(@RequestBody SchemeBean schemeBean, HttpServletRequest request) throws Exception {
 
@@ -2707,6 +2735,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to edit and update the Scheme data (SOR).
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editSor", method = RequestMethod.POST)
 	public ResponseObject editSor(@RequestBody SorYearBean schemeBean, HttpServletRequest request) throws Exception {
 
@@ -2729,7 +2758,8 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to delete an implementation agency by its ID.
-	@RequestMapping(value = "/deleteImplAgency/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteImplAgency/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteImplAgency(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -2750,7 +2780,8 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to delete a head based on the provided ID.
-	@RequestMapping(value = "/deleteHead/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteHead/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteHead(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -2770,7 +2801,8 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to delete a scheme by its ID and return a response message.
-	@RequestMapping(value = "/deleteScheme/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteScheme/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteScheme(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -2791,7 +2823,8 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to delete an SOR by its ID.
-	@RequestMapping(value = "/deleteSor/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteSor/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteSor(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -2919,7 +2952,8 @@ public class CommonController extends BaseController {
 	}
 
 	// delete File
-	@RequestMapping(value = "/deleteFile/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT')")
+	@RequestMapping(value = "/deleteFile/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteFile(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -3847,7 +3881,7 @@ public class CommonController extends BaseController {
 	 * return subHeaders; }
 	 */
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/manageSdr", method = RequestMethod.GET)
 	public ModelAndView manageSdrView(HttpServletRequest request) {
 
@@ -3861,6 +3895,7 @@ public class CommonController extends BaseController {
 		return modelAndView;
 	}
 
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addSdrForm", method = RequestMethod.GET)
 	public ModelAndView viewAddSdrForm(HttpServletRequest request) {
 
@@ -3878,6 +3913,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add sub delayed reason data for a scheme.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addSdr", method = RequestMethod.POST)
 	public ResponseObject addSdr(@RequestBody WorkSubDelayResonBean bean, HttpServletRequest request) throws Exception {
 
@@ -3901,6 +3937,7 @@ public class CommonController extends BaseController {
 
 	// Method to fetch the list of SDRs (Sub Delay Reasons) with filters and
 	// pagination.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/fetchSdrList", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchSdrList(HttpServletRequest request) {
 
@@ -3943,7 +3980,8 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to delete an SDR (Sub Delay Reasons) by its ID.
-	@RequestMapping(value = "/deleteSdr/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteSdr/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteSdr(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -3963,6 +4001,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to display the edit SDR form with user and date details.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editSdrForm/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditSdrForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -3980,6 +4019,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch sub-delay reason details based on the provided ID.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchSdrDetails/{id}", method = RequestMethod.GET)
 	public WorkSubDelayResonBean fetchSdrDetails(@PathVariable String id, HttpServletRequest request) {
 
@@ -3989,6 +4029,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to update sub delay reason data for a work scheme.
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editSdr", method = RequestMethod.POST)
 	public ResponseObject editSdr(@RequestBody WorkSubDelayResonBean workSubDelayResonBean, HttpServletRequest request)
 			throws Exception {
@@ -4359,6 +4400,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add or update TSAS work data status, including cancellation.
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addTSASWorkDataStatus", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
 	public ResponseObject addTSASWorkDataStatus(TSASWorkBean tsasWorkBean, HttpServletRequest request)
@@ -4397,6 +4439,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add revised work data status for a TSAS work entry.
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addTSReviseWorkDataStatus", method = RequestMethod.POST, consumes = {
 			"multipart/form-data" })
 	@ResponseBody
@@ -4434,6 +4477,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add AS revise work data status with error handling and logging.
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addASReviseWorkDataStatus", method = RequestMethod.POST, consumes = {
 			"multipart/form-data" })
 	@ResponseBody
@@ -4644,6 +4688,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to assign a user to a work based on userId and workId.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') and @workAuthorization.canAssignUserToWork(T(Long).valueOf(#p0), T(Long).valueOf(#p1))")
 	@RequestMapping(value = "assignUserToWork/{userId}/{workId}", method = RequestMethod.POST)
 	public ResponseObject assignUserToWork(@PathVariable("userId") String userId, @PathVariable("workId") String workId,
 			HttpServletRequest request) {
@@ -5312,6 +5357,7 @@ public class CommonController extends BaseController {
 	}
 
 	
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
 	@PostMapping( value="saveOrUpdate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	//@ResponseBody
 	public ResponseObject saveOrUpdateDmRemarks( DmRemarksBean bean) {
@@ -5332,6 +5378,7 @@ public class CommonController extends BaseController {
 	}
 	
 	
+	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	@PostMapping( value="saveOrUpdateDepartment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	//@ResponseBody
 	public ResponseObject saveOrUpdateDepartmentRemarks( DepartmentRemarksBean bean) {
@@ -5366,12 +5413,14 @@ public class CommonController extends BaseController {
 	}
 	
 	
-	@GetMapping(value = "deleteRemarks/{id}")
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canDeleteDmRemark(T(Long).valueOf(#p0))")
+	@PostMapping(value = "deleteRemarks/{id}")
 	public Boolean deleteRemarks(@PathVariable("id") String id,HttpServletRequest request) {
 		return commonService.deleteRemarks(Long.parseLong(id));
 	}
 	
-	@GetMapping(value = "deleteDepartmentRemarks/{id}")
+	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canDeleteDepartmentRemark(T(Long).valueOf(#p0))")
+	@PostMapping(value = "deleteDepartmentRemarks/{id}")
 	public Boolean deleteDepartmentRemarks(@PathVariable("id") String id,HttpServletRequest request) {
 		return commonService.deleteDepartmentRemarks(Long.parseLong(id));
 	}

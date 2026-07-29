@@ -1,9 +1,16 @@
 package com.anuppur.config;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.anuppur.constants.DMSConstants;
 import com.anuppur.entity.Role;
@@ -11,14 +18,12 @@ import com.anuppur.entity.Users;
 import com.anuppur.repository.RoleRepository;
 import com.anuppur.repository.UserRepository;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
 /**
- * Initialize database with default test users on application startup
+ * Optionally initializes a development-only user. It is disabled unless
+ * explicitly enabled so deployments never receive known default credentials.
  */
 @Component
+@ConditionalOnProperty(name = "app.data.initialize-test-user", havingValue = "true")
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
@@ -30,48 +35,49 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    @Override
-    public void run(String... args) throws Exception {
-        try {
-            // Check if test user already exists
-            Users existingUser = userRepository.findByUsernameAndStatusNot("admin@gmail.com", DMSConstants.STATUS_DELETED);
-            
-            if (existingUser == null) {
-                // Try to get SYSTEM_ADMIN role by ID (assuming it exists)
-                Optional<Role> adminRoleOpt = roleRepository.findById("ROLE_SYSTEM_ADMIN");
-                System.out.println("Role Found : " + adminRoleOpt.isPresent());
-                Role adminRole;
-                
-                if (adminRoleOpt.isPresent()) {
-                    adminRole = adminRoleOpt.get();
-                } else {
-                    // Create SYSTEM_ADMIN role if it doesn't exist
-                    adminRole = new Role();
-                    adminRole.setRoleCode("ROLE_SYSTEM_ADMIN");
-                    adminRole.setRoleName("System Administrator");
-                    adminRole = roleRepository.save(adminRole);
-                }
+    @Value("${app.data.test-user.username}")
+    private String testUsername;
 
-                // Create test admin user
-                Users adminUser = new Users();
-                adminUser.setUsername("admin@gmail.com");
-                adminUser.setPassword(passwordEncoder.encode("admin123")); // Password: admin123
-                adminUser.setStatus(DMSConstants.STATUS_ACTIVE);
-                adminUser.setFirstname("Admin");
-                adminUser.setLastname("User");
-                
-                Set<Role> roles = new HashSet<>();
-                roles.add(adminRole);
-                adminUser.setRoles(roles);
-                
-                userRepository.save(adminUser);
-                System.out.println("✅ Test user created: admin@gmail.com / admin123");
-            } else {
-                System.out.println("✅ Test user already exists");
+    @Value("${app.data.test-user.password}")
+    private String testPassword;
+
+    @Override
+    @Transactional
+    public void run(String... args) {
+        try {
+            Users existingUser = userRepository.findByUsernameAndStatusNot(
+                    testUsername, DMSConstants.STATUS_DELETED);
+
+            if (existingUser != null) {
+                System.out.println("Test user already exists");
+                return;
             }
-        } catch (Exception e) {
-            System.out.println("⚠️ Could not initialize test user: " + e.getMessage());
-            // Don't fail startup if initialization fails
+
+            Optional<Role> adminRoleOptional = roleRepository.findById("ROLE_SYSTEM_ADMIN");
+            Role adminRole = adminRoleOptional.orElseGet(() -> {
+                Role role = new Role();
+                role.setRoleCode("ROLE_SYSTEM_ADMIN");
+                role.setRoleName("System Administrator");
+                return roleRepository.save(role);
+            });
+
+            Users adminUser = new Users();
+            adminUser.setUsername(testUsername);
+            adminUser.setEmailId(testUsername);
+            adminUser.setPassword(passwordEncoder.encode(testPassword));
+            adminUser.setStatus(DMSConstants.STATUS_ACTIVE);
+            adminUser.setFirstname("Admin");
+            adminUser.setLastname("User");
+
+            Set<Role> roles = new HashSet<>();
+            roles.add(adminRole);
+            adminUser.setRoles(roles);
+
+            userRepository.save(adminUser);
+            System.out.println("Test user created: " + testUsername);
+        } catch (Exception exception) {
+            System.out.println("Could not initialize test user: " + exception.getMessage());
+            // Do not fail application startup when optional development data fails.
         }
     }
 }

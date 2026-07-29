@@ -80,7 +80,7 @@ import com.google.gson.GsonBuilder;
 
 @RestController
 @RequestMapping(value = { "/systemAdmin", "/agencyAdmin" })
-@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DEPARTMENT','ROLE_DM','ROLE_AREA_OFFICER','ROLE_SU','ROLE_DEPT_DISTRICT','ROLE_DISTRICT','ROLE_SAU','ROLE_AGENCY_ADMIN','ROLE_CEO')")
+@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 public class SystemAdminController extends BaseController {
 
 	public static final Logger logger = LoggerFactory.getLogger(SystemAdminController.class);
@@ -108,6 +108,7 @@ public class SystemAdminController extends BaseController {
 	@Value("${applicationDeploymentServerName}")
 	private String applicationDeploymentServerName;
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DEPARTMENT','ROLE_DM','ROLE_AREA_OFFICER','ROLE_SU','ROLE_DEPT_DISTRICT','ROLE_DISTRICT','ROLE_SAU','ROLE_AGENCY_ADMIN','ROLE_CEO')")
 	@RequestMapping(value = "/home", method = RequestMethod.GET)
 	public ModelAndView viewHome(HttpServletRequest request, Model model) {
 
@@ -174,7 +175,7 @@ public class SystemAdminController extends BaseController {
 		this.applicationDeploymentServerName = applicationDeploymentServerName;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchRolesForManage", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchRolesForManage(HttpServletRequest request) {
 		// return systemAdminService.fetchRoles();
@@ -224,7 +225,7 @@ public class SystemAdminController extends BaseController {
 
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchSchemesForManage", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchSchemesForManage(HttpServletRequest request) {
 
@@ -271,7 +272,7 @@ public class SystemAdminController extends BaseController {
 
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/manageSchemes", method = RequestMethod.GET)
 	public ModelAndView manageSchemesView(HttpServletRequest request) {
 		user = DMSUtil.getUserDetail();
@@ -280,7 +281,7 @@ public class SystemAdminController extends BaseController {
 		return new ModelAndView("common/manageSchemes");
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/manageWorkCategory", method = RequestMethod.GET)
 	public ModelAndView manageWorkCategoryView(HttpServletRequest request) {
 		user = DMSUtil.getUserDetail();
@@ -300,6 +301,7 @@ public class SystemAdminController extends BaseController {
 		return new ModelAndView("systemAdmin/dashboard");
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DEPARTMENT','ROLE_DEPT_DISTRICT','ROLE_DM','ROLE_CEO','ROLE_AREA_OFFICER')")
 	@RequestMapping(value = "/fetchDashboardData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public DashBoardDataBean fetchDashboardData(HttpServletRequest request) {
 		user = DMSUtil.getUserDetail();
@@ -323,6 +325,7 @@ public class SystemAdminController extends BaseController {
 		return dashboardData;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DEPARTMENT','ROLE_DEPT_DISTRICT','ROLE_DM','ROLE_CEO','ROLE_AREA_OFFICER')")
 	@RequestMapping(value = "/fetchDashboardWorkTypeFinancialOverview", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<WorkTypeFinancialOverviewBean> fetchDashboardWorkTypeFinancialOverview(HttpServletRequest request) {
 		user = DMSUtil.getUserDetail();
@@ -472,7 +475,7 @@ public class SystemAdminController extends BaseController {
 		}
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/manageWorkStages", method = RequestMethod.GET)
 	public ModelAndView addWorkStages(HttpServletRequest request) {
 		user = DMSUtil.getUserDetail();
@@ -481,7 +484,7 @@ public class SystemAdminController extends BaseController {
 		return new ModelAndView("systemAdmin/manageWorkStages");
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/fetchWorkCatListByDst", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchWorkCatListByDst(HttpServletRequest request) {
 
@@ -529,7 +532,7 @@ public class SystemAdminController extends BaseController {
 		return json;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/addWorkCatForm", method = RequestMethod.GET)
 	public ModelAndView addWorkCatForm(HttpServletRequest request) {
 
@@ -539,7 +542,7 @@ public class SystemAdminController extends BaseController {
 
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "/editWorkCatForm/{id}", method = RequestMethod.GET)
 	public ModelAndView editWorkCatForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -551,7 +554,7 @@ public class SystemAdminController extends BaseController {
 		return modelAndView;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@ResponseBody
 	@RequestMapping(value = "/addWorkCat", method = RequestMethod.POST)
 	public ResponseObject addWorkCat(@RequestBody WorkCategoryBean workCategoryBean, HttpServletRequest request)
@@ -573,7 +576,7 @@ public class SystemAdminController extends BaseController {
 		return response;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchWorkCatById/{id}", method = RequestMethod.GET)
 	public WorkCategoryBean fetchWorkCatById(@PathVariable String id, HttpServletRequest request) {
 
@@ -583,8 +586,8 @@ public class SystemAdminController extends BaseController {
 		return systemAdminService.fetchWorkCatById(Long.parseLong(DMSUtil.decryptParam(id)));
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
-	@RequestMapping(value = "/deleteWorkCatById/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteWorkCatById/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteWorkCatById(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -609,13 +612,13 @@ public class SystemAdminController extends BaseController {
 	 * List<WorkTypeBean> fetchWorkTypes(HttpServletRequest request) { return
 	 * commonService.fetchWorkTypes(); }
 	 */
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchSchemesForSyatemAdmin", method = RequestMethod.GET)
 	public List<SchemeBean> fetchSchemesForSyatemAdmin(HttpServletRequest request) {
 		return commonService.fetchSchemes();
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	@RequestMapping(value = "fetchDefaultDocList", method = RequestMethod.GET)
 	public List<OtherDocListBean> fetchDefaultDocList(HttpServletRequest request) {
 		return commonService.fetchDefaultDocList();
@@ -623,7 +626,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Getting Manage User Page
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_SAU','ROLE_DEPARTMENT','ROLE_CEO')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT')")
 	@RequestMapping(value = "/manageusers", method = RequestMethod.GET)
 	public ModelAndView manageUsersView(HttpServletRequest request) {
 
@@ -637,7 +640,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Getting User List
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_AGENCY_ADMIN', 'ROLE_SAU','ROLE_DEPARTMENT','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT')")
 	@RequestMapping(value = "/fetchUserList", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchUserList(HttpServletRequest request) {
 
@@ -691,7 +694,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Getting add User Form Page
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_AGENCY_ADMIN', 'ROLE_SAU','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT')")
 	@RequestMapping(value = "/addUserForm", method = RequestMethod.GET)
 	public ModelAndView viewAddUserForm(HttpServletRequest request) {
 
@@ -702,7 +705,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Getting Add UserAgency Form
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_AGENCY_ADMIN' , 'ROLE_SAU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/addUserAgencyFrom", method = RequestMethod.GET)
 	public ModelAndView viewAddUserAgencyFrom(HttpServletRequest request) {
 
@@ -712,33 +715,32 @@ public class SystemAdminController extends BaseController {
 		return modelAndView;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchRoles", method = RequestMethod.GET)
 	public List<RoleBean> fetchRoles(HttpServletRequest request) {
 		return superAdminService.fetchRoles();
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_AGENCY_ADMIN', 'ROLE_SAU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchUserType", method = RequestMethod.GET)
 	public List<UserTypeBean> fetchUserType(HttpServletRequest request) {
 		return superAdminService.fetchUserType();
 	}
 
-	// @PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_AGENCY_ADMIN',
-	// 'ROLE_SAU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT')")
 	@RequestMapping(value = "fetchDesignation", method = RequestMethod.GET)
 	public List<Designation> fetchDesignation(HttpServletRequest request) {
 
 		return superAdminService.fetchDesignation(fetchLoggedInUserDetails(request));
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchOfficeType", method = RequestMethod.GET)
 	public List<OfficeTypeBean> fetchOfficeType(HttpServletRequest request) {
 		return superAdminService.fetchOfficeType();
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_AGENCY_ADMIN' , 'ROLE_SAU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchOfficeTypesByUserType/{userTypeId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OfficeTypeBean> fetchOfficeTypesByUserType(HttpServletRequest request,
@@ -746,7 +748,7 @@ public class SystemAdminController extends BaseController {
 		return superAdminService.fetchOfficeTypesByUserType(Long.parseLong(userTypeId));
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU' , 'ROLE_AGENCY_ADMIN', 'ROLE_SAU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchRoleTypesByUserOfficeType/{userTypeId}/{officeTypeId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<RoleBean> fetchRoleTypesByUserOfficeType(HttpServletRequest request, @PathVariable String userTypeId,
@@ -756,7 +758,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Getting Add User
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_AGENCY_ADMIN', 'ROLE_SAU','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') or (hasRole('ROLE_DEPARTMENT') and @userAuthorization.isAreaOfficerRequest(#p0))")
 	@RequestMapping(value = "/addUser", method = RequestMethod.POST)
 	public ResponseObject addUser(@RequestBody UserBean userBean, HttpServletRequest request) throws Exception {
 
@@ -789,7 +791,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Getting Edit User Form Page
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/editUserForm/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditUserForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -803,7 +805,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// MEthod For Getting USer Details
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchUserDetails/{id}", method = RequestMethod.GET)
 	public UserBean fetchUserDetails(@PathVariable String id, HttpServletRequest request) {
 
@@ -813,7 +815,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Editing User
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/editUser", method = RequestMethod.POST)
 	public ResponseObject editUser(@RequestBody UserBean userBean, HttpServletRequest request) throws Exception {
 
@@ -842,8 +844,8 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Deleteing User
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT')")
-	@RequestMapping(value = "/deleteUser/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
+	@RequestMapping(value = "/deleteUser/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteUser(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -862,7 +864,7 @@ public class SystemAdminController extends BaseController {
 		return response;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_AGENCY_ADMIN' , 'ROLE_SAU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchConstructionAgency", method = RequestMethod.GET)
 	public List<ImplAgencyBean> fetchConstructionAgency(HttpServletRequest request) {
 		return superAdminService.fetchConstructionAgency();
@@ -871,7 +873,7 @@ public class SystemAdminController extends BaseController {
 	@Autowired
 	private SuperAdminService superAdminService;
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_AGENCY_ADMIN' , 'ROLE_SAU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/manageAgencyUsers", method = RequestMethod.GET)
 	public ModelAndView manageAgencyUsersView(HttpServletRequest request) {
 
@@ -884,6 +886,7 @@ public class SystemAdminController extends BaseController {
 		return modelAndView;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchRole", method = RequestMethod.GET)
 	public List<Role> fetchRole(HttpServletRequest request) {
 		List list = systemAdminService.fetchRole();
@@ -980,7 +983,8 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// delete
-	@RequestMapping(value = "/deleteWorkFacility/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteWorkFacility/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteWorkFacility(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -1086,7 +1090,8 @@ public class SystemAdminController extends BaseController {
 		return json;
 	}
 
-	@RequestMapping(value = "/deleteWorkSubType/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteWorkSubType/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteWorkSubType(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -1177,7 +1182,8 @@ public class SystemAdminController extends BaseController {
 
 	// deleteImplAgency
 
-	@RequestMapping(value = "/deleteImplAgencyy/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteImplAgencyy/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteImplAgencyy(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -1402,7 +1408,8 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Deleteing District
-	@RequestMapping(value = "/deleteDistrict/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteDistrict/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteDistrict(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -1421,7 +1428,8 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Deleteing Grampanchayat
-	@RequestMapping(value = "/deleteGP/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteGP/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteGP(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -1440,7 +1448,8 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Mehtod for Deleteing Block
-	@RequestMapping(value = "/deleteBlock/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@RequestMapping(value = "/deleteBlock/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteBlock(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -1537,7 +1546,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Mehtod for Getting Page of Pending User Page
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_SAU','ROLE_DEPARTMENT','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/managePendingUsers", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
 	public ModelAndView viewmanagePendingUsers(HttpServletRequest request) {
 
@@ -1551,7 +1560,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method for Getting List of User For Approval
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU', 'ROLE_AGENCY_ADMIN', 'ROLE_SAU','ROLE_DEPARTMENT','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/fetchUserListForApproval", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchUserListForApproval(HttpServletRequest request) {
 
@@ -1605,6 +1614,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method for Rendering Approve User
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/ApproveUser/{id}", method = RequestMethod.GET)
 	public ModelAndView ApproveUser(@PathVariable String id, HttpServletRequest request) {
 		// System.out.println("i am inside gta 6");
@@ -1739,7 +1749,8 @@ public class SystemAdminController extends BaseController {
 		}
 		
 		// Delete WorkSubTypes
-		@RequestMapping(value = "/deleteWorkSubTypes/{id}", method = RequestMethod.GET)
+		@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+		@RequestMapping(value = "/deleteWorkSubTypes/{id}", method = RequestMethod.POST)
 		public ResponseObject deleteWorkSubTypes(@PathVariable Long id, HttpServletRequest request) {
 
 			user = DMSUtil.getUserDetail();

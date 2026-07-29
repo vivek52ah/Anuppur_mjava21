@@ -2755,7 +2755,7 @@ window.openProgressImages = function (rowIndex) {
 			if (confirm("Are you sure to delete this entry?")) {
 				$.ajax({
 					url: getBaseUrl() + '/systemAdmin/deleteWork/' + workId,
-					type: 'GET',
+					type: 'POST',
 					data: {workId: workId},
 					success: function (res) {
 						console.log("Work deleted", res);

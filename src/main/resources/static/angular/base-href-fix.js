@@ -9,6 +9,28 @@
 (function() {
     'use strict';
 
+    function readCookie(name) {
+        var prefix = name + '=';
+        var cookies = document.cookie ? document.cookie.split(';') : [];
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.indexOf(prefix) === 0) {
+                return decodeURIComponent(cookie.substring(prefix.length));
+            }
+        }
+        return null;
+    }
+
+    function isSafeMethod(method) {
+        return /^(GET|HEAD|OPTIONS|TRACE)$/i.test(method || 'GET');
+    }
+
+    function isSameOrigin(url) {
+        var anchor = document.createElement('a');
+        anchor.href = url || window.location.href;
+        return anchor.protocol === window.location.protocol && anchor.host === window.location.host;
+    }
+
     // Get the controller base path from current page URL
     // e.g., /anuppur/systemAdmin/home -> /anuppur/systemAdmin/
     var pagePath = window.location.pathname;
@@ -51,8 +73,33 @@
                 var base = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
                 options.url = base + options.url;
             }
+
+            if (!isSafeMethod(options.type) && isSameOrigin(options.url)) {
+                var csrfToken = readCookie('XSRF-TOKEN');
+                if (csrfToken) {
+                    options.headers = options.headers || {};
+                    options.headers['X-XSRF-TOKEN'] = csrfToken;
+                }
+            }
         });
     }
+
+    // Protect dynamically-created same-origin POST forms (for example exports).
+    document.addEventListener('submit', function(event) {
+        var form = event.target;
+        if (!form || form.nodeName !== 'FORM' || isSafeMethod(form.method)) return;
+        if (!isSameOrigin(form.action)) return;
+        if (form.querySelector('input[name="_csrf"]')) return;
+
+        var csrfToken = readCookie('XSRF-TOKEN');
+        if (csrfToken) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = '_csrf';
+            input.value = csrfToken;
+            form.appendChild(input);
+        }
+    }, true);
 
     // === FIX 3: AngularJS $http relative URL fix ===
     // Angular loads after this script, so we set up a config block

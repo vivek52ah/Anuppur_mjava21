@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
@@ -213,6 +214,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addWorkCategory(WorkCategoryBean workCategoryBean) {
 
 		try {
@@ -260,6 +262,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteWorkCatById(Long id) {
 		try {
 			WorkCategory entity = workCategoryRepository.findById(id).orElse(null);
@@ -380,6 +383,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	// add
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addWorkFacility(WorkCategoryBean bean) {
 		if (bean == null) {
 			return "Invalid data provided";
@@ -421,6 +425,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 
 //delete
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteWorkFacility(Long id) {
 
 		try {
@@ -459,6 +464,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 
 	// delete
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteWorkSubType(Long id) {
 
 		try {
@@ -476,6 +482,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addWorkSubType(WorkTypeBean bean) {
 		if (bean == null) {
 			return "Invalid data provided";
@@ -564,6 +571,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addImplAgencyy(ImplAgencyBean bean) {
 		if (bean == null) {
 			return "Invalid data provided";
@@ -641,6 +649,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteImplAgencyy(Long id) {
 		try {
 			ImplementationAgency entity = implAgecyRepository.findById(id).orElse(null);
@@ -765,6 +774,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addDistrict(DistrictBean bean) {
 		try {
 
@@ -834,6 +844,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteDistrict(Long id) {
 		try {
 			District entity = districtRepository.findById(id).orElse(null);
@@ -958,6 +969,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteBlock(Long id) {
 		try {
 			Block entity = blockRepository.findById(id).orElse(null);
@@ -973,6 +985,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String deleteGP(Long id) {
 		try {
 			GramPanchayat entity = gramPanchayatRepository.findById(id).orElse(null);
@@ -999,6 +1012,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addblock(BlockBean bean) {
 		try {
 
@@ -1055,6 +1069,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addGP(GramPanchayatBean bean) {
 		try {
 
@@ -1115,6 +1130,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addFinanicalYear(FinancialYearBean bean) {
 
 		try {
@@ -1218,6 +1234,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	}
 	
 	
+	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 	public String addWorkSubTypes(WorkSubTypeBean bean) {
 		if (bean == null) {
 			return "Invalid data provided";
@@ -1266,6 +1283,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 	
 	// delete workSubTypes
 		@Override
+		@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 		public String deleteWorkSubTypes(Long id) {
 
 			try {

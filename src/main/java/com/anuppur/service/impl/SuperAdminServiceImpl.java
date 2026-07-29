@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -167,36 +168,18 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 			
 			
 			if(be.getRolee().equals("ROLE_DEPARTMENT")) {
-				
-				
-				if(!StringUtils.isEmpty(searchParameter) && (!StringUtils.isEmpty(mobileNo)  && (!StringUtils.isEmpty(emailId)))) {
-					 
-					users = userRepository.findByStatusNotAndFirstnameAndEmailIdAndMobileNoAndDesignationIDAndCreatedBy(pageable,  
-							DMSConstants.STATUS_DELETED, searchParameter,emailId,mobileNo,1L,be.getUsername());
-				}
-				else if(!StringUtils.isEmpty(mobileNo) ) {
-					users = userRepository.findByStatusNotAndMobileNoAndDesignationIDAndCreatedBy(pageable,  
-							DMSConstants.STATUS_DELETED,mobileNo,1L,be.getUsername());
-				}
-				
-				
-			else if(!StringUtils.isEmpty(searchParameter) && (!StringUtils.isEmpty(status) || !StringUtils.isEmpty(username) || !StringUtils.isEmpty(emailId)))
-					users = userRepository.findByStatusAndUsernameAndEmailIdAndDesignationIDAndCreatedBy(pageable,  
-							status, username, emailId,1L,be.getUsername());
-				else if(!StringUtils.isEmpty(searchParameter))
-					users = userRepository.findByFirstnameContainingAndStatusNotInAndDesignationIDAndCreatedBy(pageable, searchParameter, statusDeletedPendingVerification,1L,be.getUsername());
-					//users = userRepository.findByUsernameContainingAndStatusNotIn(pageable, searchParameter, statusDeletedPendingVerification);
-				else if(!StringUtils.isEmpty(status) || !StringUtils.isEmpty(username) || !StringUtils.isEmpty(emailId)) {
-					if(status==null) {
-						users = userRepository.findByEmailIdAndStatusNotInAndDesignationIDAndCreatedBy(pageable, emailId, statusDeletedPendingVerification,1L,be.getUsername());
-					}else
-						users = userRepository.findByStatusAndUsernameAndEmailIdAndDesignationIDAndCreatedBy(pageable,  status, username, emailId,1L,be.getUsername());
-				}
-				
-				else
-					users = userRepository.findByStatusNotInAndDesignationIDInAndCreatedBy(pageable, statusDeletedPendingVerification,designationIds,be.getUsername());
-				
-				
+				// A Department user can only see Area Officers in its own department/district.
+				// Do not rely only on createdBy: an Area Officer may have been created by an admin.
+				users = userRepository.findDepartmentAreaOfficers(
+						pageable,
+						statusDeletedPendingVerification,
+						userEntity.getDepartmentName(),
+						district,
+						status,
+						username,
+						emailId,
+						mobileNo,
+						searchParameter);
 			}
 			
 			
@@ -408,6 +391,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 	}
 	
 	@Override
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') or (hasRole('ROLE_DEPARTMENT') and @userAuthorization.isAreaOfficerRequest(#p0))")
 	public String addUser(UserBean bean){
 		
 		try{
@@ -425,6 +409,17 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 			 }else {
 				    entity = new Users();
 					convertUserBeanToEntity(entity, bean);
+
+					Users loggedInUser = userRepository.findByUsernameAndStatus(
+							DMSUtil.getUserDetail().getUsername(), DMSConstants.STATUS_ACTIVE);
+					boolean departmentCreator = DMSUtil.getUserDetail().getAuthorities().stream()
+							.anyMatch(authority -> "ROLE_DEPARTMENT".equals(authority.getAuthority()));
+					if (departmentCreator) {
+						// Never trust department/district values submitted by the browser.
+						entity.setDepartmentName(loggedInUser.getDepartmentName());
+						entity.setDistrict(loggedInUser.getDistrict());
+						entity.setDivision(loggedInUser.getDivision());
+					}
 					
 					Set<Role> roles = new HashSet<>();
 				//	roles.add(roleRepository.findById(bean.getRole().getRoleCode()).orElse(null));
@@ -432,7 +427,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 						roles.add(roleRepository.findById(new Role("ROLE_AREA_OFFICER").getRoleCode()).orElse(null));
 						
 							entity.setStatus(DMSConstants.STATUS_PENDING);
-						    entity.setDepartmentName( userRepository.findByUsernameAndStatus(DMSUtil.getUserDetail().getUsername(),"Active").getDepartmentName() );
+						    entity.setDepartmentName(loggedInUser.getDepartmentName());
 						
 					}
 					if(bean.getDesignationId() == 2L) {
@@ -503,6 +498,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 	}
 	
 	@Override
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	public String editUser(UserBean bean, String websiteURL){
 		
 		try{
@@ -566,6 +562,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 	}
 	
 	@Override
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	public String deleteUser(Long id){
 		
 		try{

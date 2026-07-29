@@ -5083,7 +5083,7 @@ $scope.changePasswordFunction = function(isValid) {
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteWork/' + id);
+			var responsePromise = $http.post('deleteWork/' + id);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
 				if ($rootScope.responseObject.successMessage != null) {
@@ -5113,7 +5113,7 @@ $scope.changePasswordFunction = function(isValid) {
 		if (confirm("Are you sure to delete this File?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteFile/' + id);
+			var responsePromise = $http.post('deleteFile/' + id);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
 				if ($rootScope.responseObject.successMessage != null) {
@@ -6383,7 +6383,7 @@ $scope.changePasswordFunction = function(isValid) {
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteImplAgency/' + implAgencyId);
+			var responsePromise = $http.post('deleteImplAgency/' + implAgencyId);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
 				if ($rootScope.responseObject.successMessage != null) {
@@ -6409,7 +6409,7 @@ $scope.changePasswordFunction = function(isValid) {
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteHead/' + workHeadId);
+			var responsePromise = $http.post('deleteHead/' + workHeadId);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
 				if ($rootScope.responseObject.successMessage != null) {
@@ -6435,7 +6435,7 @@ $scope.changePasswordFunction = function(isValid) {
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteRemarks/' + id);
+			var responsePromise = $http.post('deleteRemarks/' + id);
 			responsePromise.then(function(response) {
 				var data = response.data;
 				$rootScope.responseObject = data;
@@ -6458,7 +6458,7 @@ $scope.deleteDepartmentRemark = function(id) {
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteDepartmentRemarks/' + id);
+			var responsePromise = $http.post('deleteDepartmentRemarks/' + id);
 			responsePromise.then(function(response) {
 				var data = response.data;
 				$rootScope.responseObject = data;
@@ -6481,7 +6481,7 @@ $scope.deleteDepartmentRemark = function(id) {
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteScheme/' + workHeadId);
+			var responsePromise = $http.post('deleteScheme/' + workHeadId);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
 				if ($rootScope.responseObject.successMessage != null) {
@@ -6508,7 +6508,7 @@ $scope.deleteDepartmentRemark = function(id) {
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteSor/' + Id);
+			var responsePromise = $http.post('deleteSor/' + Id);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
 				if ($rootScope.responseObject.successMessage != null) {
@@ -7677,7 +7677,7 @@ $scope.deleteDepartmentRemark = function(id) {
 		if (confirm("Are you sure to delete this entry?")) {
 			$loading.start('sample-1');
 
-			var responsePromise = $http.get('deleteSdr/' + Id);
+			var responsePromise = $http.post('deleteSdr/' + Id);
 			responsePromise.success(function(data, status, headers, config) {
 				$rootScope.responseObject = data;
 				if ($rootScope.responseObject.successMessage != null) {

@@ -188,7 +188,7 @@ dms.controller('SuperAdminController', function($scope, $loading, $rootScope, $w
 		 if (confirm("Are you sure to delete this entry?")) {
 			 $loading.start('sample-1');
 
-			 var responsePromise = $http.get('deleteUser/'+ userId);
+			 var responsePromise = $http.post('deleteUser/'+ userId);
 			 responsePromise.success(function(data, status, headers, config) {
 				 $rootScope.responseObject = data;
 				 if ($rootScope.responseObject.successMessage != null) {

@@ -42,7 +42,7 @@ import com.google.gson.GsonBuilder;
 
 @RestController
 @RequestMapping("/superAdmin")
-@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_SU','ROLE_DEPARTMENT')")
+@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
 public class SuperAdminController extends BaseController {
 
 	public static final Logger logger = LoggerFactory.getLogger(SuperAdminController.class);
@@ -118,7 +118,7 @@ public class SuperAdminController extends BaseController {
 	
 	
 	
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/manageusers", method = RequestMethod.GET)
 	public ModelAndView manageUsersView(HttpServletRequest request) {
 
@@ -186,7 +186,7 @@ public class SuperAdminController extends BaseController {
 	 * 
 	 * return json; }
 	 */
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/addUserForm", method = RequestMethod.GET)
 	public ModelAndView viewAddUserForm(HttpServletRequest request) {
 
@@ -198,12 +198,12 @@ public class SuperAdminController extends BaseController {
 	
 
 
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchRoles", method = RequestMethod.GET)
 	public List<RoleBean> fetchRoles(HttpServletRequest request) {
 		return superAdminService.fetchRoles();
 	}
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/addUser", method = RequestMethod.POST)
 	public ResponseObject addUser(@RequestBody UserBean userBean, HttpServletRequest request) throws Exception {
 
@@ -221,7 +221,7 @@ public class SuperAdminController extends BaseController {
 		}
 		return response;
 	}
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/editUserForm/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditUserForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -231,7 +231,7 @@ public class SuperAdminController extends BaseController {
 		modelAndView.addObject("loggedInUserName", user.getUsername());
 		return modelAndView;
 	}
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "fetchUserDetails/{id}", method = RequestMethod.GET)
 	public UserBean fetchUserDetails(@PathVariable String id, HttpServletRequest request) {
 
@@ -239,7 +239,7 @@ public class SuperAdminController extends BaseController {
 		logger.info("User - {}, Role - {} - Fetching User data", user.getUsername(), user.getAuthorities());
 		return superAdminService.fetchUserDetails(Long.parseLong(DMSUtil.decryptParam(id)));
 	}
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/editUser", method = RequestMethod.POST)
 	public ResponseObject editUser(@RequestBody UserBean userBean, HttpServletRequest request) throws Exception {
 
@@ -266,8 +266,8 @@ public class SuperAdminController extends BaseController {
 		}
 		return response;
 	}
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU','ROLE_DEPARTMENT')")
-	@RequestMapping(value = "/deleteUser/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
+	@RequestMapping(value = "/deleteUser/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteUser(@PathVariable Long id, HttpServletRequest request) {
 
 		user = DMSUtil.getUserDetail();
@@ -295,7 +295,7 @@ public class SuperAdminController extends BaseController {
 	}
 	
 	
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_SU')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
 	@RequestMapping(value = "/manageAgencyUsers", method = RequestMethod.GET)
 	public ModelAndView manageAgencyUsersView(HttpServletRequest request) {
 

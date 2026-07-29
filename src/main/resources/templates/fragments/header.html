@@ -113,7 +113,7 @@
 							class="icon-settings"></i> Change Password</a>
 						
 						<a class="dropdown-item"
-							onclick="document.forms['logoutForm'].submit(); if (typeof handleLogout === 'function') { handleLogout(); } return false;" href="#"><i
+							onclick="if (typeof handleLogout === 'function') { handleLogout(); } document.forms['logoutForm'].submit(); return false;" href="#"><i
 							class="icon-logout"></i> Logout</a>
 					</div>
 					
