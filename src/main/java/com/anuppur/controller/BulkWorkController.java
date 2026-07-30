@@ -1,13 +1,10 @@
 package com.anuppur.controller;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -29,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.anuppur.bean.BulkUploadResultBean;
+import com.anuppur.security.InvalidFileUploadException;
+import com.anuppur.security.SecureFileUploadPolicy;
 import com.anuppur.service.BulkWorkService;
 import com.anuppur.util.DMSUtil;
 
@@ -99,36 +98,27 @@ public class BulkWorkController extends BaseController {
     @PostMapping("/uploadTsDocument")
     public ResponseEntity<Map<String, String>> uploadTsDocument(
             @RequestParam("file") MultipartFile file) {
-        return saveDocument(file, documentRoot + documentTechnical);
+        return saveDocument(file, Paths.get(documentRoot).resolve(documentTechnical).toString());
     }
 
     /** Upload an Administrative Sanction (AS) document */
     @PostMapping("/uploadAsDocument")
     public ResponseEntity<Map<String, String>> uploadAsDocument(
             @RequestParam("file") MultipartFile file) {
-        return saveDocument(file, documentRoot + documentAdministrator);
+        return saveDocument(file, Paths.get(documentRoot).resolve(documentAdministrator).toString());
     }
 
     private ResponseEntity<Map<String, String>> saveDocument(MultipartFile file, String dirPath) {
         try {
-            String originalName = file.getOriginalFilename();
-            String ext = "";
-            if (originalName != null && originalName.contains(".")) {
-                ext = originalName.substring(originalName.lastIndexOf('.'));
-            }
-            String storedName = UUID.randomUUID().toString() + ext;
-
             Path dir = Paths.get(dirPath);
-            if (!Files.exists(dir)) {
-                Files.createDirectories(dir);
-            }
-
-            Path dest = dir.resolve(storedName);
-            Files.copy(file.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
+            String storedName = SecureFileUploadPolicy.storeDocument(file, dir);
 
             Map<String, String> response = new HashMap<>();
             response.put("fileName", storedName);
             return ResponseEntity.ok(response);
+        } catch (InvalidFileUploadException e) {
+            logger.warn("Rejected unsafe document upload: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (IOException e) {
             logger.error("Failed to upload document to {}: {}", dirPath, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

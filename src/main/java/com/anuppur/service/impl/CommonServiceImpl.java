@@ -129,6 +129,7 @@ import com.anuppur.bean.WorkTypeBean;
 import com.anuppur.bean.YearStatusBean;
 import com.anuppur.bean.departmentbean;
 import com.anuppur.constants.DMSConstants;
+import com.anuppur.security.SecureFileUploadPolicy;
 import com.anuppur.entity.AreaOfficerRecord;
 import com.anuppur.entity.AsGeneratedCount;
 import com.anuppur.entity.Block;
@@ -254,6 +255,7 @@ import com.anuppur.service.AdminService;
 import com.anuppur.service.CommonService;
 import com.anuppur.service.NotificationService;
 import com.anuppur.service.SuperAdminService;
+import com.anuppur.service.WorkDocumentCleanupService;
 import com.anuppur.util.DMSUtil;
 
 import java.text.ParseException;
@@ -483,6 +485,9 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private DepartmentRemarksRepository departmentRemarksRepository;
+
+	@Autowired
+	private WorkDocumentCleanupService workDocumentCleanupService;
 
 //	@Autowired
 //	private CommonService commonService;
@@ -3401,11 +3406,11 @@ public class CommonServiceImpl implements CommonService {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = DMSConstants.AS_SANCTION_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = DMSConstants.AS_SANCTION_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 
@@ -4335,6 +4340,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	@PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	@Transactional
 	public String deleteWork(Long id) {
 
 		try {
@@ -4346,6 +4352,7 @@ public class CommonServiceImpl implements CommonService {
 			CC entity5 = ccRepository.findByWorkId(id);
 
 			if (entity != null) {
+				workDocumentCleanupService.deleteForWork(id);
 				entity.setStatus(DMSConstants.STATUS_DELETED);
 				workRepository.save(entity);
 				/*
@@ -5853,7 +5860,17 @@ public class CommonServiceImpl implements CommonService {
 	public String fetchDownloadFileName(Long documentId) {
 		logger.info("fetchDownloadFileName ");
 		DocumentUpload document = documentRepository.findById(documentId).orElse(null);
+		if (document == null || document.getDocumentName() == null) {
+			return null;
+		}
 		String fileName = document.getDocumentName();
+		String secureStoredPath = locateStoredDocument(fileName, document.getWorkId(), List.of(
+				workTechSanctionDocumentPath, workASSanctionDocumentPath, workTenderSanctionDocumentPath,
+				workWorkProgressDocumentPath, CCDocumentPath, dmAttachment,
+				workRevisedTechSanctionDocumentPath, workASRevisedSanctionDocumentPath));
+		if (secureStoredPath != null) {
+			return secureStoredPath;
+		}
 
 		String compareString = fileName.split("_")[0];
 		String fileWithFullPath = null;
@@ -5900,7 +5917,15 @@ public class CommonServiceImpl implements CommonService {
 	public String fetchDownloadFileNameRevised(Long documentId) {
 		logger.info("fetchDownloadFileName ");
 		DocumentUpload document = documentRepository.findById(documentId).orElse(null);
+		if (document == null || document.getDocumentName() == null) {
+			return null;
+		}
 		String fileName = document.getDocumentName();
+		String secureStoredPath = locateStoredDocument(fileName, document.getWorkId(),
+				List.of(workRevisedTechSanctionDocumentPath, workASRevisedSanctionDocumentPath));
+		if (secureStoredPath != null) {
+			return secureStoredPath;
+		}
 		String compareString = fileName.split("_")[0];
 		String fileWithFullPath = null;
 		logger.info(" fileName= " + compareString);
@@ -5922,6 +5947,33 @@ public class CommonServiceImpl implements CommonService {
 
 		logger.info(" fileWithFullPath = " + fileWithFullPath);
 		return fileWithFullPath;
+	}
+
+	private String locateStoredDocument(String storedName, Long workId, List<String> relativeDirectories) {
+		if (storedName == null || storedName.isBlank() || storedName.contains("/") || storedName.contains("\\")) {
+			logger.warn("Rejected unsafe stored document name: {}", storedName);
+			return null;
+		}
+		Path root = Paths.get(documentRootPath).toAbsolutePath().normalize();
+		for (String relativeDirectory : relativeDirectories) {
+			Path directory = root.resolve(relativeDirectory).normalize();
+			if (!directory.startsWith(root)) {
+				continue;
+			}
+			Path flatCandidate = directory.resolve(storedName).normalize();
+			if (flatCandidate.getParent().equals(directory) && Files.isRegularFile(flatCandidate)) {
+				return flatCandidate.toString();
+			}
+			if (workId != null) {
+				Path workDirectory = directory.resolve(String.valueOf(workId)).normalize();
+				Path workCandidate = workDirectory.resolve(storedName).normalize();
+				if (workDirectory.startsWith(root) && workCandidate.getParent().equals(workDirectory)
+						&& Files.isRegularFile(workCandidate)) {
+					return workCandidate.toString();
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override

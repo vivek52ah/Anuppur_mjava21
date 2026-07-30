@@ -39,4 +39,6 @@ public interface DocumentRepository extends JpaRepository<DocumentUpload, Long> 
     // FIXED
     DocumentUpload findByWorkId(Long id);
 
+    List<DocumentUpload> findAllByWorkId(Long workId);
+
 }

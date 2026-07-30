@@ -18,7 +18,6 @@ import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FilenameUtils;
 import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +35,7 @@ import com.anuppur.entity.DocumentUpload;
 import com.anuppur.entity.DocumentUploadWorkProgress;
 import com.anuppur.exception.DMSBusinessException;
 import com.anuppur.repository.WorkStatusRepository;
+import com.anuppur.security.SecureFileUploadPolicy;
 
 @SuppressWarnings("all")
 public class DMSUtil {
@@ -171,10 +171,10 @@ public class DMSUtil {
 
 	    if (!dir.exists()) {
 	        dir.mkdirs();
-	        createdFileName = DMSConstants.Tender_FILE + System.currentTimeMillis() + "." + fileExtension;
+	        createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 	        serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 	    } else {
-	        createdFileName = DMSConstants.Tender_FILE + System.currentTimeMillis() + "." + fileExtension;
+	        createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 	        serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 	    }
 
@@ -244,10 +244,10 @@ public class DMSUtil {
 
 	    if (!dir.exists()) {
 	        dir.mkdirs();
-	        createdFileName = DMSConstants.Tender_FILE_UPLOAD_LOI + System.currentTimeMillis() + "." + fileExtension;
+	        createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 	        serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 	    } else {
-	        createdFileName = DMSConstants.Tender_FILE_UPLOAD_LOI + System.currentTimeMillis() + "." + fileExtension;
+	        createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 	        serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 	    }
 
@@ -317,10 +317,10 @@ public class DMSUtil {
 
 	    if (!dir.exists()) {
 	        dir.mkdirs();
-	        createdFileName = DMSConstants.Tender_FILE_UPLOAD_AGREEMENT + System.currentTimeMillis() + "." + fileExtension;
+	        createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 	        serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 	    } else {
-	        createdFileName = DMSConstants.Tender_FILE_UPLOAD_AGREEMENT + System.currentTimeMillis() + "." + fileExtension;
+	        createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 	        serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 	    }
 
@@ -404,11 +404,11 @@ public class DMSUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = DMSConstants.CC_FLIE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = DMSConstants.CC_FLIE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 
@@ -452,11 +452,11 @@ public class DMSUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = DMSConstants.AS_SANCTION_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = DMSConstants.AS_SANCTION_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 
@@ -500,11 +500,11 @@ public class DMSUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = DMSConstants.AS_SANCTION_REVISED_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = DMSConstants.AS_SANCTION_REVISED_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 
@@ -548,11 +548,11 @@ public class DMSUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = DMSConstants.WORK_PROGRESS_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = DMSConstants.WORK_PROGRESS_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 
@@ -596,11 +596,11 @@ public class DMSUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = DMSConstants.TECHNICAL_SANCTION_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = DMSConstants.TECHNICAL_SANCTION_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 
@@ -643,11 +643,11 @@ public class DMSUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = DMSConstants.DM_ATTACHMENT_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = DMSConstants.DM_ATTACHMENT_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 
@@ -691,13 +691,11 @@ public class DMSUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = DMSConstants.TECHNICAL_SANCTION_REVISED_FILE + System.currentTimeMillis() + "."
-					+ fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = DMSConstants.TECHNICAL_SANCTION_REVISED_FILE + System.currentTimeMillis() + "."
-					+ fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 
@@ -918,14 +916,12 @@ public class DMSUtil {
 	    }
 
 	    // Generate file name and server file
-	    createdFileName = file.getOriginalFilename();
+	    createdFileName = SecureFileUploadPolicy.createDocumentStorageName(file);
 	    serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 
 	    if (serverFile.exists()) {
 	        // Generate unique file name
-	        String baseName = FilenameUtils.removeExtension(file.getOriginalFilename());
-	        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-	        createdFileName = baseName + "_" + System.currentTimeMillis() + "." + extension;
+	        createdFileName = SecureFileUploadPolicy.createDocumentStorageName(file);
 	        serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 	    }
 
@@ -955,11 +951,11 @@ public class DMSUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = base + count + "_" + strDate + "." + "jpg";
+			createdFileName = SecureFileUploadPolicy.validateImageBytesAndCreateName(decodedImg);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = base + count + "_" + strDate + "." + "jpg";
+			createdFileName = SecureFileUploadPolicy.validateImageBytesAndCreateName(decodedImg);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 
@@ -1026,11 +1022,11 @@ public class DMSUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 
-			createdFileName = DMSConstants.WORK_DRAWING_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		} else {
 
-			createdFileName = DMSConstants.WORK_DRAWING_FILE + System.currentTimeMillis() + "." + fileExtension;
+			createdFileName = SecureFileUploadPolicy.createDocumentStorageName(mpresFile);
 			serverFile = new File(dir.getAbsolutePath() + File.separator + createdFileName);
 		}
 

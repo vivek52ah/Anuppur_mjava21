@@ -5,6 +5,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,6 +89,22 @@ class WorkAuthorizationTest {
     void systemAdminCanAccessAnyExistingWork() {
         authenticate("admin", "ROLE_SYSTEM_ADMIN");
         assertThat(authorization.canAccessWork(999L)).isTrue();
+    }
+
+    @Test
+    void editPageAuthorizationAcceptsPlainAndLegacyEncodedWorkIds() {
+        Users department = scopedUser(null, 20L, 30L, "D30");
+        Work ownWork = scopedWork(100L, 10L, 20L, 30L, "D30");
+        authenticate("department", "ROLE_DEPARTMENT");
+        when(userRepository.findByUsername("department")).thenReturn(department);
+        when(workRepository.findById(100L)).thenReturn(Optional.of(ownWork));
+
+        String encoded = Base64.getUrlEncoder().withoutPadding()
+                .encodeToString("100".getBytes(StandardCharsets.UTF_8));
+
+        assertThat(authorization.canAccessEncryptedWork("100")).isTrue();
+        assertThat(authorization.canAccessEncryptedWork(encoded)).isTrue();
+        assertThat(authorization.canAccessEncryptedWork("not-an-id")).isFalse();
     }
 
     private void authenticate(String username, String authority) {

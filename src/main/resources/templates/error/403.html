@@ -11,7 +11,7 @@
 
     <div class="starter-template">
         <h2 style="color: red;">403 - Access is denied</h2>
-        <div th:inline="text">Hello <b>'[[${#httpServletRequest.remoteUser}]]'</b>,
+        <div>Hello <b th:text="${loggedInUserName}">user</b>,
                 you do not have permission to access this page.</div>
     </div>
 

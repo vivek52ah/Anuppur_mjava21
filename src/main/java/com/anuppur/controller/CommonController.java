@@ -3132,8 +3132,7 @@ public class CommonController extends BaseController {
 					}
 				}
 				response.setContentType(contentType);
-				// Use "inline" so images display directly in <img> tags and modals
-				response.setHeader("Content-Disposition", "inline; filename=\"" + file.getName() + "\"");
+				response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
 				response.setContentLengthLong(file.length());
 
 				// Read from the file and write into the response
@@ -3489,7 +3488,7 @@ public class CommonController extends BaseController {
 
 	            HttpHeaders headers = new HttpHeaders();
 	            headers.setContentType(MediaType.parseMediaType(mimeType));
-	            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"");
+	            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"");
 
 	            return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
 

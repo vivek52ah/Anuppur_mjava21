@@ -62,7 +62,16 @@ public class WorkAuthorization {
 
     public boolean canAccessEncryptedWork(String encryptedWorkId) {
         try {
-            return canAccessWork(Long.valueOf(DMSUtil.decryptParam(encryptedWorkId)));
+            if (!StringUtils.hasText(encryptedWorkId)) {
+                return false;
+            }
+            // The current Angular work table sends a numeric work id, while a few
+            // legacy links still send URL-safe Base64. Support both representations
+            // without treating arbitrary text as an id.
+            String resolvedId = encryptedWorkId.matches("\\d+")
+                    ? encryptedWorkId
+                    : DMSUtil.decryptParam(encryptedWorkId);
+            return canAccessWork(Long.valueOf(resolvedId));
         } catch (NumberFormatException ex) {
             return false;
         }
