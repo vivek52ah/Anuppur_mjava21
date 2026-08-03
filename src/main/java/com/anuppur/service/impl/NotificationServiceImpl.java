@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
 
 import com.anuppur.bean.EmailBean;
 import com.anuppur.bean.SMSBean;
@@ -285,6 +286,31 @@ public class NotificationServiceImpl implements NotificationService {
 
 		getEmailService().sendEmailmessage(emailBean);
 	}
+
+	@Async
+	@Override
+	public void sendPasswordResetOtp(String emailId, String mobileNo, String otp) {
+		try {
+			if (emailId != null && !emailId.isBlank()) {
+				EmailBean emailBean = new EmailBean();
+				emailBean.setRecipients(emailId);
+				emailBean.setSubject("Password reset OTP");
+				emailBean.setBody("Your password reset OTP is " + otp
+						+ ". It expires in 5 minutes and can be used only once.");
+				emailBean.setHTML(false);
+				getEmailService().sendEmailmessage(emailBean);
+			}
+			if (mobileNo != null && !mobileNo.isBlank()) {
+				SMSBean smsBean = new SMSBean();
+				smsBean.setMobileNumber(mobileNo);
+				smsBean.setSmsText("Your Anuppur CWMS password reset OTP is " + otp
+						+ ". It is valid for 5 minutes. Do not share it.");
+				smsUtil.sendSMS(smsBean);
+			}
+		} catch (Exception exception) {
+			logger.error("Unable to send password reset OTP notification", exception);
+		}
+	}
 	
 	@Override
 	public void sendNotificationOnMail(String emailId, UserBean userbean) {
@@ -327,10 +353,8 @@ public class NotificationServiceImpl implements NotificationService {
 		
 		
 
-		emailBean.setBody( " Your account password has changed successfully. Below are your login details:\r\n"
-				+ "Username: "+emailId+"\r\n"
-				+ "Password:"+userbean.getPassword()+"\r\n"
-				+ "Please log in to your account as soon as possible. For your security, we recommend changing your password once you log in.");
+		emailBean.setBody("Your account password has changed successfully. "
+				+ "If you did not make this change, contact the system administrator immediately.");
 		emailBean.setSubject("Notification "
 			);
 		emailBean.setHTML(true);

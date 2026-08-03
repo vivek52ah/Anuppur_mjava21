@@ -118,21 +118,23 @@
 								"bSortable" : false
 							}, {
 								"mData" : "departmentName",
-								 "render": function(data, type, row) {
-								        return row.departmentName == null?"--":row.departmentName;
-								    },
+								"defaultContent" : "--",
+								"render" : $.fn.dataTable.render.text(),
 								"bSortable" : false
 							},{
 							    "mData": null, // You can set it to null since you are using render
 							    "render": function(data, type, row) {
-							        return row.firstName + " " + row.lastName;
+							        return $.fn.dataTable.render.text().display(
+										(row.firstName || "") + " " + (row.lastName || ""));
 							    },
 							    "bSortable": false
 							},{
 								"mData" : "mobileNo",
+								"render" : $.fn.dataTable.render.text(),
 								"bSortable" : false
 							}, {
 								"mData" : "emailId",
+								"render" : $.fn.dataTable.render.text(),
 								"bSortable" : false
 							},
 
@@ -140,6 +142,7 @@
 								"mData" : "role.roleName"
 							},*/ {
 															"mData" : "designationName",
+															"render" : $.fn.dataTable.render.text(),
 															"bSortable" : false
 														} /* , {
 								"mData" : "districtName",
@@ -149,7 +152,8 @@
 															"bSortable" : false
 														} */ 
 							, {
-								"mData" : "status"
+								"mData" : "status",
+								"render" : $.fn.dataTable.render.text()
 							}, {
 								"mData" : null,
 								"bSortable" : false

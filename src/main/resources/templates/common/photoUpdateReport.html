@@ -118,8 +118,8 @@ window.initPhotoUpdateReportSelectpickers = initPhotoUpdateReportSelectpickers;
 									</tr>
 									<tr data-ng-repeat="row in photoUpdateReportRows track by $index">
 										<td>{{$index + 1}}</td>
-										<td>{{row.departmentName}}</td>
-										<td>{{row.workName}}</td>
+										<td data-ng-bind="row.departmentName"></td>
+										<td data-ng-bind="row.workName"></td>
 										<td><a class="count-link" data-ng-href="{{getPhotoUpdateDetailUrl(row)}}">{{row.totalWorks}}</a></td>
 										<td>{{row.areaOfficerName}}</td>
 										<td>{{row.days}}</td>

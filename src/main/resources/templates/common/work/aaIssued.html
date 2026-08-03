@@ -618,9 +618,9 @@ select#financialYear {
 										<tr data-ng-repeat="tender in workTenderDate">
 											<td>{{tender.index}}</td>
 											<td>{{tender.workNo}}</td>
-											<td>{{tender.workName}}</td>
+											<td data-ng-bind="tender.workName"></td>
 											<td>{{tender.financialYear}}</td>
-											<td>{{tender.implementationAgency}}</td>
+											<td data-ng-bind="tender.implementationAgency"></td>
 											<td>{{tender.workStatusNameE}}</td>
 											<td>{{tender.startDate}}</td>
 											<td>{{tender.endDate}}</td>

@@ -118,6 +118,9 @@ import com.anuppur.constants.DMSConstants;
 import com.anuppur.entity.DepartmentMaster;
 import com.anuppur.entity.Users;
 import com.anuppur.entity.Work;
+import com.anuppur.dto.FinancialExpenditureRequest;
+import com.anuppur.dto.WorkImplementationAgencyUpdateRequest;
+import com.anuppur.exception.FinancialValidationException;
 import com.anuppur.json.BlockJson;
 import com.anuppur.json.ExpensesDataJson;
 import com.anuppur.json.HeadJson;
@@ -139,6 +142,7 @@ import com.anuppur.response.ResponseObject;
 import com.anuppur.service.CommonService;
 import com.anuppur.service.SuperAdminService;
 import com.anuppur.service.UserService;
+import com.anuppur.service.WorkSensitiveFieldService;
 import com.anuppur.service.impl.CommonServiceImpl;
 import com.anuppur.util.DMSUtil;
 import com.anuppur.util.SHAHashingUtil;
@@ -200,6 +204,9 @@ public class CommonController extends BaseController {
 
 	@Autowired
 	private SuperAdminService superAdminService;
+
+	@Autowired
+	private WorkSensitiveFieldService workSensitiveFieldService;
 
 //	@RequestMapping(value = "/changepassword", method = RequestMethod.GET)
 //	public ModelAndView viewChangePasswordForm(HttpServletRequest request) {
@@ -1496,6 +1503,8 @@ public class CommonController extends BaseController {
 				response.setErrorMessage(errorMsg);
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (Exception e) {
 			String errorMsg = e.getMessage();
 			response = new ResponseObject();
@@ -1505,6 +1514,7 @@ public class CommonController extends BaseController {
 		return response;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addTSASWorkData", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
 	public ResponseObject addTSASWorkData(TSASWorkBean tsasWorkBean, HttpServletRequest request) throws Exception {
@@ -1532,6 +1542,8 @@ public class CommonController extends BaseController {
 				response.setErrorMessage(errorMsg);
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (Exception e) {
 			String errorMsg = e.getMessage();
 			response = new ResponseObject();
@@ -1542,6 +1554,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add TSAS work data and handle success or error responses.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addTSReviseWorkData", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
 	public ResponseObject addTSReviseWorkData(TSASReviseWorkBean tsasReviseWorkBean, HttpServletRequest request)
@@ -1568,6 +1581,8 @@ public class CommonController extends BaseController {
 				response.setErrorMessage(errorMsg);
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (Exception e) {
 			String errorMsg = e.getMessage();
 			response = new ResponseObject();
@@ -1578,6 +1593,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add or revise work data based on the provided input.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addASReviseWorkData", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
 	public ResponseObject addASReviseWorkData(TSASReviseWorkBean tsasReviseWorkBean, HttpServletRequest request)
@@ -1604,6 +1620,8 @@ public class CommonController extends BaseController {
 				response.setErrorMessage(errorMsg);
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (Exception e) {
 			String errorMsg = e.getMessage();
 			response = new ResponseObject();
@@ -1614,6 +1632,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add work progress data and handle associated response.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addWorkProgress", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
 	public ResponseObject addWorkProgress(WorkProgressBean workProgressBean, HttpServletRequest request)
@@ -1649,6 +1668,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to handle uploading and saving work progress sub-status data.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addWorkProSubStatusUploading", method = RequestMethod.POST, consumes = {
 			"multipart/form-data" })
 	@ResponseBody
@@ -1694,6 +1714,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to handle the uploading of drawing files for work data.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/uploadedDrawingFiles", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
 	public ResponseObject uploadedDrawingFiles(DocumentUploadDrawingDetailBean uploadDrawingDetailBean,
@@ -1731,6 +1752,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add work progress expenses data with error handling and logging.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addWorkProExpensesData", method = RequestMethod.POST, consumes = {
 			"multipart/form-data" })
 	@ResponseBody
@@ -1758,6 +1780,8 @@ public class CommonController extends BaseController {
 				response.setErrorMessage(errorMsg);
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (Exception e) {
 			String errorMsg = e.getMessage();
 			response = new ResponseObject();
@@ -1792,6 +1816,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method for controller to add tender and work agreement.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addTenderWorkAgreement", method = RequestMethod.POST, consumes = {
 			"multipart/form-data" })
 	public ResponseObject addTendorWorkAgreement(WorkTenderBean workTenderbean) {
@@ -1824,6 +1849,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add contractor details and save the data in the system.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addContractorDetails", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseObject addContractorData(ContractorBean contractorBean, HttpServletRequest request)
@@ -1874,6 +1900,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method for controller to get work tender agreement
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "/fetchWorkTenderAgreement/{Id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public WorkTenderBean getWorkTenderAgreement(@PathVariable("Id") Long workId) {
 		user = DMSUtil.getUserDetail();
@@ -1895,6 +1922,7 @@ public class CommonController extends BaseController {
 		return bean;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "fetchContractorDetails/{id}", method = RequestMethod.GET)
 	public ContractorBean fetchContractorWorkDetails(@PathVariable Long id, HttpServletRequest request)
 			throws ParseException {
@@ -1911,6 +1939,7 @@ public class CommonController extends BaseController {
 
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "getCountId/{workId}", method = RequestMethod.GET)
 	public Long getContractorCountByWorkId(@PathVariable Long workId, HttpServletRequest request) {
 		user = DMSUtil.getUserDetail();
@@ -2029,6 +2058,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch and return full work details based on the provided work ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "fetchFullWorkDetails/{id}", method = RequestMethod.GET)
 	public String fetchFullWorkDetails(@PathVariable Long id, HttpServletRequest request) {
 
@@ -2042,6 +2072,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch TSAS work details by ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "fetchTSASDetails/{id}", method = RequestMethod.GET)
 	public TSASWorkBean fetchTSASWorkDetails(@PathVariable Long id, HttpServletRequest request) throws ParseException {
 		user = DMSUtil.getUserDetail();
@@ -2055,6 +2086,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch the work progress data based on the given work ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "fetchWorkProgress/{id}", method = RequestMethod.GET)
 	public WorkProgressBean fetchWorkProgress(@PathVariable Long id, HttpServletRequest request) throws ParseException {
 
@@ -2844,6 +2876,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to download a work document based on the provided document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessWorkDocument(#p0)")
 	@RequestMapping(value = "/downloadWorkDocument/{documentId}", method = RequestMethod.GET)
 	public void downloadEntrepreneurDocument(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -2974,6 +3007,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch CC work details based on the provided ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "fetchCCDetails/{id}", method = RequestMethod.GET)
 	public CCBean fetchCCWorkDetails(@PathVariable Long id, HttpServletRequest request) throws ParseException {
 		user = DMSUtil.getUserDetail();
@@ -2985,6 +3019,7 @@ public class CommonController extends BaseController {
 
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocument/{documentId}", method = RequestMethod.GET)
 	public void downloadImageDocument(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3005,6 +3040,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to handle document download based on the provided document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentTS/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentTS(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3050,6 +3086,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to handle downloading of a revised document by document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentTSRevised/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentTSRevised(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3095,6 +3132,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to handle document download for work sample based on document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessProgressDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentWSPro/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentWSPro(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3155,6 +3193,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to handle downloading of a document based on its document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentAS/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentAS(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3201,6 +3240,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to download a drawing document based on the provided document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessDrawingDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentDW/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentDW(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3244,6 +3284,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to download a tender document based on the provided document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentTender/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentTender(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3289,6 +3330,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to download a progress document based on the provided document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentProgress/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentProgress(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3333,6 +3375,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to download a CC document based on the provided document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentCC/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentCC(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3380,6 +3423,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to add CC (Construction Certificate) data and save it to the system.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addCCData", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
 	public ResponseObject addCCData(CCBean ccBean, HttpServletRequest request) throws Exception {
@@ -3417,6 +3461,7 @@ public class CommonController extends BaseController {
 	public List<LCBean> fetchLCsByDistrictNameC(@PathVariable Long districtId, HttpServletRequest request) {
 		return commonService.fetchLCsByDistrictId(districtId);
 	}
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentRemakrs/{id}", method = RequestMethod.GET)
 	public void downloadDocumentRemarks(@PathVariable Long id, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -3463,6 +3508,7 @@ public class CommonController extends BaseController {
 	}
 	
 	
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@GetMapping("/previewDocumentRemarks/{id}")
 	public ResponseEntity<byte[]> previewDocumentRemarks(@PathVariable Long id) {
 	    logger.info("previewDocument =");
@@ -4073,6 +4119,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to download the document agreement by document ID as a PDF
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentAgreement/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentAgreement(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -4119,6 +4166,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to download a document (LOI) based on the provided document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentLOI/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentLOI(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -4334,6 +4382,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to download a file based on the provided document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadFile/{documentId}", method = RequestMethod.GET)
 	public void downloadFile(@PathVariable Long documentId, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -4378,6 +4427,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to fetch work progress details by document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessProgressDocument(#p0)")
 	@RequestMapping(value = "fetchWorkProgressDocumetnId/{documentId}", method = RequestMethod.GET)
 	public WorkProgressBean fetchWorkProgressDocumetnId(@PathVariable("documentId") Long id, HttpServletRequest request)
 			throws ParseException {
@@ -4716,6 +4766,7 @@ public class CommonController extends BaseController {
 		return response;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p1)")
 	@RequestMapping(value = "/fetchWorkStatusByWorkID/{workId}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchWorkStatusByWorkID(HttpServletRequest request, @PathVariable Long workId) {
 
@@ -4773,6 +4824,7 @@ public class CommonController extends BaseController {
 		return json;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p1)")
 	@RequestMapping(value = "/fetchWorkStatusByWorkIDcc/{workId}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchWorkStatusByWorkIDcc(HttpServletRequest request, @PathVariable Long workId) {
 
@@ -4830,6 +4882,7 @@ public class CommonController extends BaseController {
 		return json;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "getGeoTaggingForWork/{WorkId}", method = RequestMethod.GET)
 	public GeoTaggingBean getGeoTaggingForWork(@PathVariable Long WorkId, HttpServletRequest request) {
 
@@ -4840,6 +4893,7 @@ public class CommonController extends BaseController {
 
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p1)")
 	@RequestMapping(value = "/fetchImagesByDateAndWorkId/{workId}/{createdDate}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public List<DocumentUploadWorkProgressBean> fetchImagesByDateAndWorkId(HttpServletRequest request,
 			@PathVariable Long workId, @PathVariable Date createdDate) {
@@ -4857,6 +4911,7 @@ public class CommonController extends BaseController {
 	@Value("${document.workprogress}")
 	private String workWorkProgressDocumentPath;
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0)")
 	@GetMapping("/downloadDocumentsZip/{workId}")
 	public void downloadDocumentsZip(@PathVariable Long workId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -5578,6 +5633,7 @@ public class CommonController extends BaseController {
 	  
 	  
 	  
+	  @PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0)")
 	  @GetMapping("/fetchFinancialAgency/{workId}")
 	  public ResponseEntity<Map<String, Object>> fetchFinancialAgency(
 	          @PathVariable Long workId,
@@ -5622,35 +5678,21 @@ public class CommonController extends BaseController {
 	  }
 
 
+	  @PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') "
+			  + "and @workAuthorization.canEditFinancialRequests(#p0)")
 	  @PostMapping("/saveFinancialAgencyEnteredCost")
 	  public ResponseEntity<String> saveFinancialAgencyEnteredCost(
-	          @RequestBody List<FinancialAgencyBean> list) {
-
-	      Long workIdForSync = null;
-	      for (FinancialAgencyBean bean : list) {
-
-	          if (bean.getExpenditure() == null || bean.getExpenditure() <= 0) {
-	              continue;
-	          }
-
-	          workIdForSync = bean.getWorkId();
-
-	          String result = commonService.updateFinancialAgencyCost(
-	                  bean.getId(),
-	                  bean.getExpenditure(),
-	                  bean.getWorkId()
-	          );
-
-	          if (!"SUCCESS".equalsIgnoreCase(result)) {
-	              return ResponseEntity.ok(result);
-	          }
-	      }
-
-	      if (workIdForSync != null) {
-	          commonService.syncWorkProgressExpenditureFromFinancialAgency(workIdForSync);
-	      }
-
+	          @RequestBody List<FinancialExpenditureRequest> list) {
+	      commonService.saveFinancialAgencyExpenditures(list);
 	      return ResponseEntity.ok("SUCCESS");
+	  }
+
+	  @PreAuthorize("hasRole('ROLE_SYSTEM_ADMIN')")
+	  @PostMapping("/updateWorkImplementationAgency")
+	  public ResponseEntity<Map<String, String>> updateWorkImplementationAgency(
+			  @RequestBody WorkImplementationAgencyUpdateRequest request) {
+		  workSensitiveFieldService.updateImplementationAgency(request);
+		  return ResponseEntity.ok(Map.of("message", "Implementing agency updated successfully."));
 	  }
 
 
@@ -5661,11 +5703,13 @@ public class CommonController extends BaseController {
 	      
 	  }
 
+	  @PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0)")
 	  @GetMapping("/getFinancingAgencyList/{workId}")
 	  public List<FinancialAgencyBean> getFinancingAgencyList(@PathVariable Long workId) {
 	      return commonService.getFinancialAgenciesByWorkId(workId);
 	  }
 	  
+	  @PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0)")
 	  @GetMapping("/getFinancingAgencyExpenditureList/{workId}")
 	  public List<FinancialAgencyBean> getFinancingAgencyExpenditureList(@PathVariable Long workId) {
 	      return commonService.getFinancialAgenciesExpenditureByWorkId(workId);

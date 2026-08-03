@@ -257,7 +257,7 @@
 									<div class="form-group col-sm-3">
 										<label><span>District </span></label>
 										<p>
-											<span>{{workData.districtName}}</span>
+											<span data-ng-bind="workData.districtName"></span>
 										</p>
 									</div>
 
@@ -265,7 +265,7 @@
 										data-ng-if="workData.blockName">
 										<label><span>Block</span></label>
 										<p>
-											<span>{{workData.blockName}}</span>
+											<span data-ng-bind="workData.blockName"></span>
 										</p>
 									</div>
 
@@ -375,7 +375,7 @@
 									<div class="form-group col-sm-3" data-ng-if="workData.remarks">
 										<label><span>Work Description</span></label>
 										<p>
-											<span>{{workData.remarks}}</span>
+											<span data-ng-bind="workData.remarks"></span>
 										</p>
 									</div>
 								</div>
@@ -1743,7 +1743,7 @@
 										</thead>
 										<tr data-ng-repeat="file in FileData"
 											data-ng-show="FileData.length > 0">
-											<td>{{file.remarks}}</td>
+											<td data-ng-bind="file.remarks"></td>
 											<td>{{file.noOfDocs}}</td>
 											<td>{{file.fillArr.formattedDate}}</td>
 											<td>{{file.fillArr.name}}</td>

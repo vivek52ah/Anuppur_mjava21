@@ -1,94 +1,74 @@
 package com.anuppur.filter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Locale;
+
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.WebAttributes;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.anuppur.constants.DMSConstants;
+import com.anuppur.security.LoginProtectionService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+@Component
+public class CaptchaAuthenticationFilter extends OncePerRequestFilter {
 
-import com.anuppur.constants.DMSConstants;
-import com.anuppur.util.DMSUtil;
+    private final LoginProtectionService loginProtectionService;
 
-/**
- * The filter to verify captcha.
- */
-public class CaptchaAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-
-    private String processUrl;
-
-    public CaptchaAuthenticationFilter(String defaultFilterProcessesUrl, String failureUrl) {
-        super(defaultFilterProcessesUrl);
-        this.processUrl = defaultFilterProcessesUrl;
-        setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler(failureUrl));
+    public CaptchaAuthenticationFilter(LoginProtectionService loginProtectionService) {
+        this.loginProtectionService = loginProtectionService;
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res=(HttpServletResponse)response;
-		/*
-		 * if(processUrl.equals(req.getServletPath()) &&
-		 * "POST".equalsIgnoreCase(req.getMethod())){
-		 * System.err.println("processUrl1111====== " + processUrl); String expect =
-		 * req.getSession().getAttribute(DMSConstants.CAPTCHA_LOGIN)!= null ?
-		 * req.getSession().getAttribute(DMSConstants.CAPTCHA_LOGIN).toString() : "";
-		 * System.err.println("expect====== " + expect); String sessionId =
-		 * req.getSession().getId(); System.err.println("sessionId====== " + sessionId);
-		 * logger.info("Session ID: " + sessionId); //remove from session
-		 * req.getSession().removeAttribute(DMSConstants.CAPTCHA_LOGIN);
-		 * 
-		 * if (expect != null &&
-		 * !expect.equalsIgnoreCase(req.getParameter("captchaText"))){
-		 * unsuccessfulAuthentication(req, res, new
-		 * InsufficientAuthenticationException("Wrong captcha text.")); return; } }
-		 */
-        ((HttpServletResponse) response).setHeader("X-Frame-Options", "DENY");
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return !"POST".equalsIgnoreCase(request.getMethod())
+                || !"/login".equals(request.getServletPath());
+    }
 
-        // Set Content-Security-Policy to block embedding
-    //    ((HttpServletResponse) response).setHeader("Content-Security-Policy", "frame-ancestors 'none';");
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+        try {
+            loginProtectionService.checkLoginAllowed(request.getRemoteAddr(), request.getParameter("username"));
 
-       
-        if (processUrl.equals(req.getServletPath()) && "POST".equalsIgnoreCase(req.getMethod())) {
-        	logger.info("processUrl1111====== " + processUrl);
-
-            // Set a constant value for the expected CAPTCHA
-            String constantCaptcha = "123456"; // Example constant CAPTCHA value
-            logger.info("Constant CAPTCHA: " + constantCaptcha);
-
-            // Get the CAPTCHA from the request
-            String userCaptcha = "123456";
-            logger.info("User CAPTCHA: " + userCaptcha);
-
-            String sessionId = req.getSession().getId();
-            logger.info("Session ID====== " + sessionId);
-            logger.info("Session ID: " + sessionId);
-           //System.err.println( request.get);  ;
-            // Remove from session (if necessary)
-            req.getSession().removeAttribute(DMSConstants.CAPTCHA_LOGIN);
-
-            // Validate CAPTCHA
-            if (!constantCaptcha.equalsIgnoreCase(userCaptcha)) {
-            	logger.info("CAPTCHA validation failed.");
-                unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException("Wrong captcha text."));
+            HttpSession session = request.getSession(false);
+            String expected = session == null ? null : (String) session.getAttribute(DMSConstants.CAPTCHA_LOGIN);
+            if (session != null) {
+                session.removeAttribute(DMSConstants.CAPTCHA_LOGIN);
+            }
+            String submitted = request.getParameter("captchaText");
+            if (!matches(expected, submitted)) {
+                fail(request, response, new InsufficientAuthenticationException("Invalid or expired CAPTCHA."));
                 return;
             }
-
-            logger.info("CAPTCHA validation succeeded.");
+            filterChain.doFilter(request, response);
+        } catch (AuthenticationException exception) {
+            fail(request, response, exception);
         }
-        chain.doFilter(request, response);
     }
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
-        return null;
+    private boolean matches(String expected, String submitted) {
+        if (expected == null || submitted == null) {
+            return false;
+        }
+        byte[] expectedBytes = expected.toUpperCase(Locale.ROOT).getBytes(StandardCharsets.UTF_8);
+        byte[] submittedBytes = submitted.trim().toUpperCase(Locale.ROOT).getBytes(StandardCharsets.UTF_8);
+        return MessageDigest.isEqual(expectedBytes, submittedBytes);
+    }
+
+    private void fail(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException exception) throws IOException {
+        request.getSession(true).setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception);
+        response.sendRedirect(request.getContextPath() + "/login?error");
     }
 }

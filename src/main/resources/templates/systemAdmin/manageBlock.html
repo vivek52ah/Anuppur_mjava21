@@ -105,37 +105,22 @@
 							},{
 								"mData" : "blockName",
 								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var dn=row.blockName
-			  	            		if(null== dn){
-			  	            			dn="-";
-			  	            		}
-			  	            		return dn; 
-			  	            	} 
+								"defaultContent" : "-",
+								"render" : $.fn.dataTable.render.text()
 								
 							},
 							{
 								"mData" : "blockNameH",
 								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var dn=row.blockNameH
-			  	            		if(null== dn){
-			  	            			dn="-";
-			  	            		}
-			  	            		return dn; 
-			  	            	} 
+								"defaultContent" : "-",
+								"render" : $.fn.dataTable.render.text()
 								
 							},
 							{
 								"mData" : "district.districtName",
 								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var dn=row.district.districtName
-			  	            		if(null== dn){
-			  	            			dn="-";
-			  	            		}
-			  	            		return dn; 
-			  	            	} 
+								"defaultContent" : "-",
+								"render" : $.fn.dataTable.render.text()
 								
 							},
 							{

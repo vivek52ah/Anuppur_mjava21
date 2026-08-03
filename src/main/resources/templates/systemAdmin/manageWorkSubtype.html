@@ -101,13 +101,8 @@
 							},{
 								"mData" : "workTypeNameE",
 								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var dn=row.workTypeNameE
-			  	            		if(null== dn){
-			  	            			dn="-";
-			  	            		}
-			  	            		return dn; 
-			  	            	} 
+								"defaultContent" : "-",
+								"render" : $.fn.dataTable.render.text()
 								
 							},
 							{

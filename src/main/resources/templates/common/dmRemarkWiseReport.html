@@ -139,7 +139,7 @@ window.initDmRemarkReportSelectpickers = initDmRemarkReportSelectpickers;
 									<tr data-ng-repeat="row in dmRemarkWiseReportRows track by $index">
 										<td>{{$index + 1}}</td>
 										<td>{{row.issueType}}</td>
-										<td>{{row.departmentNames}}</td>
+										<td data-ng-bind="row.departmentNames"></td>
 										<td><a class="count-link" style="cursor:pointer;" data-ng-click="goToDmRemarkDetail(row)">{{row.totalWorks}}</a></td>
 									</tr>
 								</tbody>

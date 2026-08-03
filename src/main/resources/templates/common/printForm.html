@@ -87,17 +87,17 @@ border:0px
 										<tbody>
 											<tr>
 											<td > <label><span >1. Work Name</span> </label>  </td>
-											<td > <label><span >{{workDataPrint.workBeans.workName}}</span> </label>	</td>
+											<td> <label><span data-ng-bind="workDataPrint.workBeans.workName"></span> </label>	</td>
 									 </tr>
 									 
 									 <tr>
 											<td > <label><span >2. Type of Work</span> </label>  </td>
-											<td >  <label><span > {{workDataPrint.workBeans.workType}}	</span> </label> </td>
+											<td>  <label><span data-ng-bind="workDataPrint.workBeans.workType"></span> </label> </td>
 									 </tr>
 									 
 									  <tr>
 											<td > <label><span>3. Sub Type of Work</span></label>  </td>
-											<td >  <label><span > {{workDataPrint.workBeans.workSubTypeName}}</span> </label>		</td>
+											<td>  <label><span data-ng-bind="workDataPrint.workBeans.workSubTypeName"></span> </label>		</td>
 									 </tr>
 									 
 									 <tr>
@@ -106,7 +106,7 @@ border:0px
 									 </tr>
 									  <tr>
 											<td > <label><span>5. Construction Agency</span> </label>  </td>
-											<td> <label><span >   {{workDataPrint.workBeans.implementationAgency}}		</span> </label></td>
+											<td> <label><span data-ng-bind="workDataPrint.workBeans.implementationAgency"></span> </label></td>
 									 </tr>
 									 <tr>
 											<td > <label><span>5. Scheme</span> </label>  </td>
@@ -146,12 +146,12 @@ border:0px
 									 
 									 <tr>
 											<td > <label><span >2. District</span>  </label>  </td>
-											<td > 	 {{workDataPrint.workBeans.districtName}}  </td>
+											<td data-ng-bind="workDataPrint.workBeans.districtName"></td>
 									 </tr>
 									 
 									  <tr>
 											<td > <label><span>3. Block</span> </label>  </td>
-											<td > 	 {{workDataPrint.workBeans.blockName}}  </td>
+											<td data-ng-bind="workDataPrint.workBeans.blockName"></td>
 									 </tr>
 									
 								</tbody>		 

@@ -109,37 +109,22 @@
 							},{
 								"mData" : "gramPanchayatName",
 								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var dn=row.gramPanchayatName
-			  	            		if(null== dn){
-			  	            			dn="-";
-			  	            		}
-			  	            		return dn; 
-			  	            	} 
+								"defaultContent" : "-",
+								"render" : $.fn.dataTable.render.text()
 								
 							}
 							,{
 								"mData" : "blockName",
 								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var dn=row.blockName
-			  	            		if(null== dn){
-			  	            			dn="-";
-			  	            		}
-			  	            		return dn; 
-			  	            	} 
+								"defaultContent" : "-",
+								"render" : $.fn.dataTable.render.text()
 								
 							}
 							,{
 								"mData" : "districtName",
 								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var dn=row.districtName
-			  	            		if(null== dn){
-			  	            			dn="-";
-			  	            		}
-			  	            		return dn; 
-			  	            	} 
+								"defaultContent" : "-",
+								"render" : $.fn.dataTable.render.text()
 								
 							},
 							{

@@ -5,9 +5,12 @@ package com.anuppur.repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +21,10 @@ import com.anuppur.entity.Work;
 
 
 public interface WorkRepository extends JpaRepository<Work, Long>{
+
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	@Query("SELECT w FROM Work w WHERE w.id = :id")
+	Optional<Work> findByIdForFinancialUpdate(@Param("id") Long id);
 	
 	
 	@Query(value = "SELECT * FROM t_work WHERE work_status != :status", nativeQuery = true)

@@ -56,6 +56,7 @@ import com.anuppur.bean.WorkSubTypeBean;
 import com.anuppur.bean.WorkTenderBean;
 import com.anuppur.bean.WorkTypeBean;
 import com.anuppur.bean.YearStatusBean;
+import com.anuppur.dto.FinancialExpenditureRequest;
 import com.anuppur.bean.departmentbean;
 import com.anuppur.entity.AreaOfficerRecord;
 import com.anuppur.entity.ImplementationAgency;
@@ -441,6 +442,8 @@ public interface CommonService {
 	List<FinancialAgencyBean> fetchFinancialAgencyByWorkId(Long workId);
 
 	String updateFinancialAgencyCost(Long id, Double expenditure, Long workId);
+
+	void saveFinancialAgencyExpenditures(List<FinancialExpenditureRequest> requests);
 
 	Double sumFinancialAgencyExpenditureByWorkId(Long workId);
 

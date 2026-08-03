@@ -111,10 +111,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.annotation.WebServlet;
 
 import com.anuppur.constants.DMSConstants;
 import com.anuppur.util.DMSUtil;
 
+@WebServlet(name = "captchaGenServlet", urlPatterns = "/captcha")
 public class CaptchaGenServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -129,7 +131,7 @@ public class CaptchaGenServlet extends HttpServlet {
         try {
 
             // Generate CAPTCHA text
-            String captchaStr = DMSUtil.generateCaptchaText(4);
+            String captchaStr = DMSUtil.generateCaptchaText(6);
 
             // Create session
             HttpSession session = request.getSession(true);
@@ -238,8 +240,7 @@ public class CaptchaGenServlet extends HttpServlet {
 
         } catch (Exception e) {
 
-            e.printStackTrace();
-
+            log("Captcha generation failed", e);
             response.sendError(
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Captcha generation failed"

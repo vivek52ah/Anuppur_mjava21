@@ -14,6 +14,8 @@ public interface areaofficerrecordRepository extends JpaRepository<AreaOfficerRe
 
 	AreaOfficerRecord findByUserid(Long userid);
 
+	boolean existsByUseridAndWorkId(Long userid, Long workId);
+
 	
 	
 }

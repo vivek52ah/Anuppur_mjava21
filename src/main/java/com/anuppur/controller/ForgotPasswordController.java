@@ -1,173 +1,155 @@
 package com.anuppur.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.anuppur.bean.ForgotPasswordBean;
 import com.anuppur.constants.DMSConstants;
-import com.anuppur.entity.Users;
-import com.anuppur.exception.DMSBusinessException;
-import com.anuppur.repository.UserRepository;
-import com.anuppur.service.UserService;
-import com.anuppur.validator.ForgotPasswordValidator;
+import com.anuppur.security.LoginProtectionService;
+import com.anuppur.security.PasswordResetService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ForgotPasswordController {
 
-	public static final Logger logger = LoggerFactory.getLogger(ForgotPasswordController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordController.class);
+    private static final String RESET_MOBILE = "PASSWORD_RESET_MOBILE";
+    private static final String RESET_TOKEN = "PASSWORD_RESET_TOKEN";
+    private static final String GENERIC_RESPONSE =
+            "If an account matches the supplied details, a password reset OTP has been sent to the registered contact.";
 
-	@Autowired
-	private UserService userService;
-	
-	@Autowired
-	private UserRepository userRepository;
+    private final PasswordResetService passwordResetService;
+    private final LoginProtectionService loginProtectionService;
 
-	@Autowired
-	ForgotPasswordValidator forgotPasswordValidator;
+    public ForgotPasswordController(PasswordResetService passwordResetService,
+            LoginProtectionService loginProtectionService) {
+        this.passwordResetService = passwordResetService;
+        this.loginProtectionService = loginProtectionService;
+    }
 
-	@RequestMapping(value = "/forgotpassword", method = RequestMethod.GET)
-	public String viewForgotPassword(HttpServletRequest request, Model model) {
+    @RequestMapping(value = "/forgotpassword", method = RequestMethod.GET)
+    public String viewForgotPassword(Model model) {
+        model.addAttribute("forgotPasswordBean", new ForgotPasswordBean());
+        return "forgotpassword";
+    }
 
-		logger.info("Displaying Forgot password page");
-		model.addAttribute("forgotPasswordBean", new ForgotPasswordBean());
-		return "forgotpassword";
+    @RequestMapping(value = "/resetpassword", method = RequestMethod.POST)
+    public String requestPasswordReset(@ModelAttribute("forgotPasswordBean") ForgotPasswordBean form,
+            Model model, HttpServletRequest request) {
+        if (!validMobile(form.getMobileNo())) {
+            model.addAttribute("error", "Please enter a valid 10-digit mobile number.");
+            return "forgotpassword";
+        }
+        if (!consumeCaptcha(request, DMSConstants.CAPTCHA_RESET)) {
+            model.addAttribute("error", "Invalid or expired CAPTCHA.");
+            return "forgotpassword";
+        }
 
-	}
+        HttpSession session = request.getSession(true);
+        session.setAttribute(RESET_MOBILE, form.getMobileNo());
+        session.removeAttribute(RESET_TOKEN);
+        if (loginProtectionService.allowPasswordResetRequest(request.getRemoteAddr(), form.getMobileNo())) {
+            passwordResetService.requestReset(form.getMobileNo());
+        }
+        logger.info("Password reset request accepted");
+        return "redirect:/verify-reset-otp";
+    }
 
-	/*
-	 * @RequestMapping(value = "verifyotp", method = RequestMethod.GET) public
-	 * String viewVerifyOtp(HttpServletRequest request, Model model) {
-	 * 
-	 * logger.info("Displaying Verify Otp Page");
-	 * model.addAttribute("forgotPasswordBean", new ForgotPasswordBean()); return
-	 * "verifyotp";
-	 * 
-	 * }
-	 * 
-	 * @RequestMapping(value = "resetpasswordbyotp1", method = RequestMethod.GET)
-	 * public String viewResetPasswordByOtp1(HttpServletRequest request, Model
-	 * model) {
-	 * 
-	 * logger.info("Displaying Forgot password page");
-	 * model.addAttribute("forgotPasswordBean", new ForgotPasswordBean()); return
-	 * "resetpasswordbyotp1";
-	 * 
-	 * }
-	 * 
-	 * @RequestMapping(value = "resetpasswordbyotp", method = RequestMethod.GET)
-	 * public String viewResetPasswordByOtp(HttpServletRequest request, Model model)
-	 * {
-	 * 
-	 * logger.info("Displaying Forgot password page");
-	 * model.addAttribute("forgotPasswordBean", new ForgotPasswordBean()); return
-	 * "resetpasswordbyotp";
-	 * 
-	 * }
-	 * 
-	 */	/*
-	 * @RequestMapping(value = "resetpassword", method = RequestMethod.GET) public
-	 * String resetPassword(@Valid ForgotPasswordBean forgotPasswordBean,
-	 * BindingResult bindingResult, Model model, HttpServletRequest request) throws
-	 * DMSBusinessException {
-	 * 
-	 * logger.info("Resetting password");
-	 * 
-	 * //String captchaText = request.getParameter("captchaText"); String emailId =
-	 * request.getParameter("emailId"); HttpSession session = request.getSession();
-	 * 
-	 * //String captcha = (String) session.getAttribute(DMSConstants.CAPTCHA_RESET);
-	 * 
-	 * 
-	 * if (captcha == null || (captcha != null && !captcha.equals(captchaText))) {
-	 * 
-	 * logger.error("Wrong Captcha Text!"); model.addAttribute("error",
-	 * "Wrong Captcha Text!"); return "forgotpassword"; }
-	 * 
-	 * System.out.println("forgotPasswordBean"+ forgotPasswordBean);
-	 * 
-	 * 
-	 * forgotPasswordValidator.validate(forgotPasswordBean, bindingResult);
-	 * 
-	 * if (bindingResult.hasErrors()) { model.addAttribute("forgotPasswordBean",
-	 * forgotPasswordBean); logger.info("Resetting password binding results");
-	 * return "forgotpassword";
-	 * 
-	 * }
-	 * 
-	 * 
-	 * userService.resetPassword(forgotPasswordBean.getEmailId());
-	 * System.out.println("forgotPasswordBean.getEmailId()"+
-	 * forgotPasswordBean.getEmailId());
-	 * 
-	 * //userService.resetPassword(emailId);
-	 * 
-	 * //return "redirect:/login?resetPassword"; return "redirect:/verifyotp"; }
-	 */
-	
-	@RequestMapping(value = "/resetpassword", method = RequestMethod.POST)
-	public String resetPassword(@Valid @ModelAttribute("forgotPasswordBean")  ForgotPasswordBean forgotPasswordBean, BindingResult bindingResult, Model model,
-			HttpServletRequest request) throws DMSBusinessException {
+    @RequestMapping(value = "/verify-reset-otp", method = RequestMethod.GET)
+    public String viewVerifyOtp(Model model, HttpServletRequest request) {
+        if (request.getSession(false) == null
+                || request.getSession(false).getAttribute(RESET_MOBILE) == null) {
+            return "redirect:/forgotpassword";
+        }
+        model.addAttribute("message", GENERIC_RESPONSE);
+        return "verifyresetotp";
+    }
 
-		logger.info("Resetting password");
-		
-		
+    @RequestMapping(value = "/verify-reset-otp", method = RequestMethod.POST)
+    public String verifyOtp(@RequestParam("otp") String otp, Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String mobileNo = session == null ? null : (String) session.getAttribute(RESET_MOBILE);
+        if (mobileNo == null) {
+            return "redirect:/forgotpassword";
+        }
+        Optional<String> resetToken = passwordResetService.verifyOtpAndIssueToken(mobileNo, otp);
+        if (resetToken.isEmpty()) {
+            model.addAttribute("message", GENERIC_RESPONSE);
+            model.addAttribute("error", "Invalid or expired OTP.");
+            return "verifyresetotp";
+        }
+        session.setAttribute(RESET_TOKEN, resetToken.get());
+        return "redirect:/set-new-password";
+    }
 
-		   // Custom validation
-//	    forgotPasswordValidator.validate(forgotPasswordBean, bindingResult);
+    @RequestMapping(value = "/set-new-password", method = RequestMethod.GET)
+    public String viewSetNewPassword(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String token = session == null ? null : (String) session.getAttribute(RESET_TOKEN);
+        if (token == null) {
+            return "redirect:/forgotpassword";
+        }
+        model.addAttribute("resetToken", token);
+        return "resetpasswordbyotp";
+    }
 
-	    if (bindingResult.hasErrors()) {
-	        model.addAttribute("forgotPasswordBean", forgotPasswordBean);
-	        return "forgotpassword";
-	    }
-		
-		String captchaText = request.getParameter("captchaText");
-		
-		HttpSession session = request.getSession();
+    @RequestMapping(value = "/complete-password-reset", method = RequestMethod.POST)
+    public String completePasswordReset(@RequestParam("resetToken") String submittedToken,
+            @RequestParam("password") String password,
+            @RequestParam("confirmPassword") String confirmPassword,
+            Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String sessionToken = session == null ? null : (String) session.getAttribute(RESET_TOKEN);
+        if (!sameToken(sessionToken, submittedToken)) {
+            return "redirect:/forgotpassword";
+        }
+        if (!password.equals(confirmPassword) || !passwordResetService.isStrongPassword(password)) {
+            model.addAttribute("resetToken", sessionToken);
+            model.addAttribute("error",
+                    "Password must be 8-64 characters and include upper, lower, number and special character.");
+            return "resetpasswordbyotp";
+        }
+        if (!passwordResetService.completeReset(sessionToken, password)) {
+            session.removeAttribute(RESET_TOKEN);
+            model.addAttribute("error", "Reset link expired or already used. Please start again.");
+            model.addAttribute("forgotPasswordBean", new ForgotPasswordBean());
+            return "forgotpassword";
+        }
+        session.removeAttribute(RESET_TOKEN);
+        session.removeAttribute(RESET_MOBILE);
+        return "redirect:/login?passwordResetSuccess";
+    }
 
-		//String captcha = (String) session.getAttribute(DMSConstants.CAPTCHA_RESET);
-		String captcha = "123456";
-		
-		Users userEntity = userRepository.findByMobileNoAndStatusNot(forgotPasswordBean.getMobileNo(), DMSConstants.STATUS_DELETED);
-		if(userEntity == null)
-		{
-			
-			model.addAttribute("error", "Please Enter Registered Mobile No!");
-			model.addAttribute("forgotPasswordBean", forgotPasswordBean);
-			return "forgotpassword";
-			
-		}
+    private boolean consumeCaptcha(HttpServletRequest request, String attribute) {
+        HttpSession session = request.getSession(false);
+        String expected = session == null ? null : (String) session.getAttribute(attribute);
+        if (session != null) {
+            session.removeAttribute(attribute);
+        }
+        String submitted = request.getParameter("captchaText");
+        return expected != null && submitted != null && MessageDigest.isEqual(
+                expected.getBytes(StandardCharsets.UTF_8),
+                submitted.trim().getBytes(StandardCharsets.UTF_8));
+    }
 
-		if (captcha == null || (captcha != null && !captcha.equals(captchaText))) {
+    private boolean validMobile(String mobileNo) {
+        return mobileNo != null && mobileNo.matches("[6-9][0-9]{9}");
+    }
 
-			logger.error("Wrong Captcha Text!");
-			model.addAttribute("error", "Wrong Captcha Text!");
-			return "forgotpassword";
-		}
-		forgotPasswordValidator.validate(forgotPasswordBean, bindingResult);
-
-		/*
-		 * if (bindingResult.hasErrors()) { model.addAttribute("forgotPasswordBean",
-		 * forgotPasswordBean);
-		 * System.out.println(" Manoj tttttttttttt bindingResult.hasErrors()"); return
-		 * "forgotpassword"; }
-		 */
-		//userService.resetPassword(forgotPasswordBean.getEmailId());
-		userService.resetPassword(forgotPasswordBean.getMobileNo());
-		
-		//System.out.println(" Manoj Test forgotPasswordBean.getMobileNo()" + forgotPasswordBean.getMobileNo());
-
-		return "redirect:/login?resetPassword";
-	}
-
+    private boolean sameToken(String expected, String submitted) {
+        return expected != null && submitted != null && MessageDigest.isEqual(
+                expected.getBytes(StandardCharsets.UTF_8), submitted.getBytes(StandardCharsets.UTF_8));
+    }
 }

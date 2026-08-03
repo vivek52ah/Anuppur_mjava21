@@ -32,6 +32,7 @@ public class LoginController {
 			@RequestParam(value = "logout", required = false) String logout,
 			@RequestParam(value = "timeout", required = false) String timeout,
 			@RequestParam(value = "resetPassword", required = false) String resetPassword,
+			@RequestParam(value = "passwordResetSuccess", required = false) String passwordResetSuccess,
 			@RequestParam(value = "register", required = false) String register,
 			@RequestParam(value = "alreadyVerified", required = false) String alreadyVerified,
 			@RequestParam(value = "verificationSuccess", required = false) String verificationSuccess,
@@ -48,7 +49,10 @@ public class LoginController {
 			model.addAttribute("error", "Session expired. Please login again.");
 		}
 		if (resetPassword != null) {
-			model.addAttribute("message", "New password has been sent to your registered mobile no. !");
+			model.addAttribute("message", "If the account exists, reset instructions have been sent.");
+		}
+		if (passwordResetSuccess != null) {
+			model.addAttribute("message", "Password reset successfully. Please sign in.");
 		}
 		if (register != null) {
 			model.addAttribute("message", "Your account has been created. ");

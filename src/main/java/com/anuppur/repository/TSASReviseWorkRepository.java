@@ -1,6 +1,7 @@
 package com.anuppur.repository;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,11 @@ public interface TSASReviseWorkRepository extends JpaRepository<TSASReviseWork, 
 	
 	//TSASReviseWork  findByWorkId(Long id);
 	TSASReviseWork  findByTsAsId(Long id);
+
+	@Query(value = "SELECT rv_amt FROM t_work_ts_revised "
+			+ "WHERE work_id = :workId AND type_doc = :typeDoc "
+			+ "AND ts_as_status = 'Active' ORDER BY id DESC LIMIT 1", nativeQuery = true)
+	BigDecimal findLatestActiveAmount(@Param("workId") Long workId, @Param("typeDoc") String typeDoc);
 	
 	@Query(value = "select * from ("
 			+ "select vx.id,IFNULL(vx.work_id,0)work_id,IFNULL(vx.status,'NA')status,ifnull(vx.doc_type,'NA')doc_type,ifnull(vx.num,0)num,ifnull(vx.date,'NA')date\r\n"

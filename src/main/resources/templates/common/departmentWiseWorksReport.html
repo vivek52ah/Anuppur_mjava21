@@ -139,7 +139,7 @@ window.initDeptWiseReportSelectpickers = initDeptWiseReportSelectpickers;
 									</tr>
 									<tr data-ng-repeat="row in deptWiseReportRows track by $index">
 										<td>{{$index + 1}}</td>
-										<td>{{row.implementationAgencyName || '-'}}</td>
+										<td data-ng-bind="row.implementationAgencyName || '-'"></td>
 										<td>{{row.financialYearName}}</td>
 										<td><a class="count-link" data-ng-href="{{getDeptWiseDetailUrl(row, '')}}">{{row.totalWorks}}</a></td>
 										<td><a class="count-link" data-ng-href="{{getDeptWiseDetailUrl(row, 'COMPLETED')}}">{{row.completedWorks}}</a></td>

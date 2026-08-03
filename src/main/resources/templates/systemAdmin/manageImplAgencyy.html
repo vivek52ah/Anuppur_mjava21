@@ -101,13 +101,8 @@
 							},{
 								"mData" : "implementationAgencyNameE",
 								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var dn=row.implementationAgencyNameE
-			  	            		if(null== dn){
-			  	            			dn="-";
-			  	            		}
-			  	            		return dn; 
-			  	            	} 
+								"defaultContent" : "-",
+								"render" : $.fn.dataTable.render.text()
 								
 							},
 							{

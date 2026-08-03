@@ -14,8 +14,6 @@ public interface UserService {
 	void changePassword(ChangePasswordBean changePassword, String userName)
 			throws DMSBusinessException;
 
-	void resetPassword(String username) throws DMSBusinessException;
-
 	String registerNewAccount(UserBean entrepreneurBean, String verifyServiceUrl) throws DMSBusinessException;
 
 	String verifyEmail(Long id, String verificationStr);

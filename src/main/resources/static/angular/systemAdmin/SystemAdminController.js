@@ -54,7 +54,7 @@ var dms = angular.module('dms');
 			"fnRowCallback": function(nRow, aData, iDataIndex, iDisplayIndexFull) {},
 			"language": { "searchPlaceholder": "Name" },
 			"sAjaxSource": "fetchWorkType",
-			"columns": [{ "data": "Index", "bSortable": false }, { "mData": "workTypeNameE", "bSortable": false, mRender: function(mData, type, row) { var dn = row.workTypeNameE; return dn == null ? "-" : dn; } }, { "mData": null, "bSortable": false }]
+			"columns": [{ "data": "Index", "bSortable": false }, { "mData": "workTypeNameE", "bSortable": false, "defaultContent": "-", "render": $.fn.dataTable.render.text() }, { "mData": null, "bSortable": false }]
 		});
 		attachTableButton('Add Work Type', '#addWorkType');
 	};
@@ -93,7 +93,7 @@ var dms = angular.module('dms');
 			"fnRowCallback": function(nRow, aData, iDataIndex, iDisplayIndexFull) {},
 			"language": { "searchPlaceholder": "Name" },
 			"sAjaxSource": "fetchWorkSubTypes",
-			"columns": [{ "data": "index", "bSortable": false }, { "mData": "workSubTypeNameE", "bSortable": false, mRender: function(mData, type, row) { var dn = row.workSubTypeNameE; return dn == null ? "-" : dn; } }, { "mData": null, "bSortable": false }]
+			"columns": [{ "data": "index", "bSortable": false }, { "mData": "workSubTypeNameE", "bSortable": false, "defaultContent": "-", "render": $.fn.dataTable.render.text() }, { "mData": null, "bSortable": false }]
 		});
 		attachTableButton('Add Sub Work Type', '#addWorkSubTypes');
 	};
@@ -149,7 +149,7 @@ var dms = angular.module('dms');
 			},
 			"language": { "searchPlaceholder": "firstName" },
 			"sAjaxSource": "fetchUserList",
-			"columns": [{ "data": "index", "bSortable": false }, { "mData": "departmentName", "render": function(data, type, row) { return row.departmentName == null ? "--" : row.departmentName; }, "bSortable": false }, { "mData": null, "render": function(data, type, row) { return row.firstName + " " + row.lastName; }, "bSortable": false }, { "mData": "mobileNo", "bSortable": false }, { "mData": "emailId", "bSortable": false }, { "mData": "designationName", "bSortable": false }, { "mData": "status" }, { "mData": null, "bSortable": false }]
+			"columns": [{ "data": "index", "bSortable": false }, { "mData": "departmentName", "defaultContent": "--", "render": $.fn.dataTable.render.text(), "bSortable": false }, { "mData": null, "render": function(data, type, row) { return $.fn.dataTable.render.text().display((row.firstName || "") + " " + (row.lastName || "")); }, "bSortable": false }, { "mData": "mobileNo", "render": $.fn.dataTable.render.text(), "bSortable": false }, { "mData": "emailId", "render": $.fn.dataTable.render.text(), "bSortable": false }, { "mData": "designationName", "render": $.fn.dataTable.render.text(), "bSortable": false }, { "mData": "status", "render": $.fn.dataTable.render.text() }, { "mData": null, "bSortable": false }]
 		});
 	};
 

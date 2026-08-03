@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -182,6 +183,8 @@ import com.anuppur.entity.WorkTender;
 import com.anuppur.entity.WorkTenderCount;
 import com.anuppur.entity.WorkType;
 import com.anuppur.entity.YearStatus;
+import com.anuppur.dto.FinancialExpenditureRequest;
+import com.anuppur.exception.FinancialValidationException;
 import com.anuppur.exception.DMSBusinessException;
 import com.anuppur.json.BlockJson;
 import com.anuppur.json.ExpensesDataJson;
@@ -253,9 +256,11 @@ import com.anuppur.response.ResponseObject;
 import com.anuppur.response.UserDetailResponse;
 import com.anuppur.service.AdminService;
 import com.anuppur.service.CommonService;
+import com.anuppur.service.FinancialValidationService;
 import com.anuppur.service.NotificationService;
 import com.anuppur.service.SuperAdminService;
 import com.anuppur.service.WorkDocumentCleanupService;
+import com.anuppur.service.WorkSensitiveFieldService;
 import com.anuppur.util.DMSUtil;
 
 import java.text.ParseException;
@@ -479,6 +484,12 @@ public class CommonServiceImpl implements CommonService {
 
 	@Autowired
 	private FinancialAgencyRepository financialAgencyRepository;
+
+	@Autowired
+	private FinancialValidationService financialValidationService;
+
+	@Autowired
+	private WorkSensitiveFieldService workSensitiveFieldService;
 
 	@Autowired
 	private DepartmentMasterRepository departmentMasterRepository;
@@ -2664,13 +2675,17 @@ public class CommonServiceImpl implements CommonService {
 			if (bean != null) {
 				Work entity = null;
 				if (null != bean.getId()) {
-					entity = workRepository.findById(bean.getId()).orElse(null);
+					entity = workRepository.findByIdForFinancialUpdate(bean.getId())
+							.orElseThrow(() -> new FinancialValidationException(
+									"Work not found for ID " + bean.getId() + "."));
 
 				} else {
 					entity = new Work();
 					// entity.setWorkStatus("Work Created");
 					entity.setWorkStatus(1L);
 				}
+				financialValidationService.validateWorkFinancials(
+						bean, bean.getId() == null ? null : entity);
 				responseObject = new ResponseObject();
 
 				District district = districtRepository.findByDistrictNameAndEnabled(bean.getDistrictName(),
@@ -2763,8 +2778,15 @@ public class CommonServiceImpl implements CommonService {
 							WorkFinancialAgency wf = null;
 
 							// ?? If ID exists ? fetch and update
-							if (fhBean.getFinancialAgencyId() != null) {
-								wf = financialAgencyRepository.findById(fhBean.getFinancialAgencyId()).orElse(null);
+							Long financialAgencyRowId = fhBean.getFinancialAgencyId() != null
+									? fhBean.getFinancialAgencyId()
+									: fhBean.getId();
+							if (financialAgencyRowId != null) {
+								wf = financialAgencyRepository.findById(financialAgencyRowId).orElse(null);
+								if (wf == null || !Objects.equals(wf.getWorkId(), work.getId())) {
+									throw new FinancialValidationException(
+											"Financial head row does not belong to the supplied work.");
+								}
 							}
 
 							// ?? If no existing row ? create new
@@ -2774,22 +2796,24 @@ public class CommonServiceImpl implements CommonService {
 								wf.setFinancialHeadId(fhBean.getFinancialHeadId());
 								wf.setCost(fhBean.getCost());
 								wf.setTotalCost(fhBean.getTotalCost()); // if bean me ho
-								wf.setExpenditure(fhBean.getExpenditure());
+								wf.setExpenditure(0.0);
 							}
 
 							// ?? COMMON: UPDATE/INSERT ALL FIELDS
 							wf.setFinancialHeadId(fhBean.getFinancialHeadId());
 							wf.setCost(fhBean.getCost());
 							wf.setTotalCost(fhBean.getTotalCost()); // if bean me ho
-							wf.setExpenditure(fhBean.getExpenditure()); // if bean me ho
 							financialAgencyRepository.save(wf);
 						}
 					}
+					financialValidationService.validatePersistedFinancialHeadTotal(work.getId());
 
 				}
 
 			}
 			return responseObject;
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (Exception e) {
 			logger.error("An exception occurred.", e);
 			throw new Exception(DMSConstants.ERROR_SAVING_DATA);
@@ -2892,6 +2916,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	synchronized public ResponseObject addTSASWorkData(TSASWorkBean tsasWorkbean) throws Exception {
 
 		ResponseObject responseObject = new ResponseObject();
@@ -2909,6 +2934,7 @@ public class CommonServiceImpl implements CommonService {
 			if (work == null) {
 				throw new Exception("Work not found for WorkId: " + workId);
 			}
+			financialValidationService.validateTsDoesNotExceedAs(work.getTsAmt(), work.getAsAmt());
 
 			// Check if TSASWork already exists for the given workId
 			TSASWork entity = tsasWorkRepository.findByWorkId(workId);
@@ -2944,6 +2970,8 @@ public class CommonServiceImpl implements CommonService {
 
 			return responseObject;
 
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (IllegalArgumentException e) {
 			logger.error("Invalid input provided.", e);
 			throw e;
@@ -2955,6 +2983,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	// @Transactional
 	synchronized public ResponseObject addTSReviseWorkData(TSASReviseWorkBean tsasReviseWorkBean) throws Exception {
 
@@ -2962,6 +2991,8 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 			if (tsasReviseWorkBean != null) {
+				financialValidationService.validateRevisedTsAs(
+						tsasReviseWorkBean.getWorkId(), tsasReviseWorkBean.getRvAmt(), "TS");
 				TSASReviseWork entity = null;
 				entity = new TSASReviseWork();
 
@@ -2997,6 +3028,8 @@ public class CommonServiceImpl implements CommonService {
 
 			}
 			return responseObject;
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (Exception e) {
 			logger.error("An exception occurred.", e);
 			throw new Exception(DMSConstants.ERROR_SAVING_DATA);
@@ -3005,6 +3038,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	// @Transactional
 	synchronized public ResponseObject addASReviseWorkData(TSASReviseWorkBean tsasReviseWorkBean) throws Exception {
 
@@ -3012,6 +3046,8 @@ public class CommonServiceImpl implements CommonService {
 
 		try {
 			if (tsasReviseWorkBean != null) {
+				financialValidationService.validateRevisedTsAs(
+						tsasReviseWorkBean.getWorkId(), tsasReviseWorkBean.getRvAmt(), "AS");
 				TSASReviseWork entity = null;
 				entity = new TSASReviseWork();
 
@@ -3048,6 +3084,8 @@ public class CommonServiceImpl implements CommonService {
 
 			}
 			return responseObject;
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (Exception e) {
 			logger.error("An exception occurred.", e);
 			throw new Exception(DMSConstants.ERROR_SAVING_DATA);
@@ -3235,6 +3273,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
 	// @Transactional
 	synchronized public ResponseObject addWorkProExpensesData(ExpensesDataBean expensesDataBean) throws Exception {
 
@@ -3257,6 +3296,8 @@ public class CommonServiceImpl implements CommonService {
 				}
 
 				if (expensesDataBean.getWorkId() != null) {
+					BigDecimal validatedCurrentExpense =
+							financialValidationService.validateExpenseRequest(expensesDataBean);
 					List<Long> statusList = new ArrayList<>();
 					statusList.add(status);
 					List<ExpensesData> expensesData = expensesDataRepository
@@ -3267,10 +3308,7 @@ public class CommonServiceImpl implements CommonService {
 					List<ExpensesData> expensesData2 = expensesDataRepository
 							.findByWorkIdAndStatusIn(expensesDataBean.getWorkId(), statusList2);
 
-					BigDecimal expenseCurrentFy = expensesDataBean.getExpensessCurrentFy();
-					if (expenseCurrentFy == null && expensesDataBean.getTotalExpensess() != null) {
-						expenseCurrentFy = expensesDataBean.getTotalExpensess();
-					}
+					BigDecimal expenseCurrentFy = validatedCurrentExpense;
 					BigDecimal expenseUptoMarch = expensesDataBean.getExpensessUptoMarch() != null
 							? expensesDataBean.getExpensessUptoMarch()
 							: BigDecimal.ZERO;
@@ -3370,6 +3408,8 @@ public class CommonServiceImpl implements CommonService {
 					}
 
 					if (entity.getWorkId() != null) {
+						financialValidationService.validateCalculatedExpenseFields(
+								entity.getWorkId(), entity.getExpensessUptoMarch(), entity.getTotalExpensess());
 						expensesDataRepository.save(entity);
 						responseObject.setId(expensesDataBean.getWorkId());
 						responseObject.setSuccessMessage("Expenses saved successfully!");
@@ -3378,6 +3418,8 @@ public class CommonServiceImpl implements CommonService {
 
 			}
 			return responseObject;
+		} catch (FinancialValidationException e) {
+			throw e;
 		} catch (Exception e) {
 			logger.error("An exception occurred.", e);
 			throw new Exception(DMSConstants.ERROR_SAVING_DATA);
@@ -4147,6 +4189,8 @@ public class CommonServiceImpl implements CommonService {
 		entity.setWorkName(bean.getWorkName());
 
 		if (null != bean.getImplementationAgency()) {
+			workSensitiveFieldService.validateNormalEditImplementationAgency(
+					entity, bean.getImplementationAgency());
 			ImplementationAgency implAgency = implAgencyRepository.findById(bean.getImplementationAgency())
 					.orElse(null);
 
@@ -10274,35 +10318,26 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
+	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p2)")
 	public String updateFinancialAgencyCost(Long id, Double expenditure, Long workId) {
-
-		if (expenditure == null) {
-			return "Invalid expenditure amount.";
-		}
-
-		WorkFinancialAgency entity = financialAgencyRepository.findById(id).orElse(null);
-
-		if (entity == null) {
-			return "Financial Agency record not found.";
-		}
-
-		Double dbCost = entity.getCost();
-		Double currentExpenditure = entity.getExpenditure() != null ? entity.getExpenditure() : 0.0;
-
-		Double finalExpenditure = currentExpenditure + expenditure;
-
-		// ? SOFT VALIDATION (NO ERROR)
-		if (finalExpenditure > dbCost) {
-			return "Expenditure cannot be greater than the cost. Remaining allowable amount is "
-					+ (dbCost - currentExpenditure) + ".";
-		}
-
-		entity.setExpenditure(finalExpenditure);
-		financialAgencyRepository.save(entity);
-
-		syncWorkProgressExpenditureFromFinancialAgency(workId);
-
+		FinancialExpenditureRequest request = new FinancialExpenditureRequest();
+		request.setId(id);
+		request.setWorkId(workId);
+		request.setExpenditure(expenditure == null ? null : BigDecimal.valueOf(expenditure));
+		saveFinancialAgencyExpenditures(List.of(request));
 		return "SUCCESS";
+	}
+
+	@Override
+	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') "
+			+ "and @workAuthorization.canEditFinancialRequests(#p0)")
+	public void saveFinancialAgencyExpenditures(List<FinancialExpenditureRequest> requests) {
+		Set<Long> affectedWorkIds = financialValidationService.applyFinancialAgencyExpenditures(requests);
+		for (Long workId : affectedWorkIds) {
+			syncWorkProgressExpenditureFromFinancialAgency(workId);
+		}
 	}
 
 	@Override

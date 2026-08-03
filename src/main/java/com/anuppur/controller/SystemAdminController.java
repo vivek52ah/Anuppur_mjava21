@@ -128,8 +128,6 @@ public class SystemAdminController extends BaseController {
 		Locale updatedLocale = (Locale) request.getSession()
 				.getAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME);
 		model.addAttribute("language", updatedLocale.toString());
-		model.addAttribute("key", "1234567891234567");
-
 		user = DMSUtil.getUserDetail();
 		ModelAndView modelAndView = new ModelAndView("systemAdmin/systemAdminHome");
 

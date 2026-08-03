@@ -1,12 +1,7 @@
 package com.anuppur.bean;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Email;
-
 public class ForgotPasswordBean {
 
-	@NotBlank(message = "Email ID cannot be empty")
-	@Email(message = "Email ID should be valid")
 	private String emailId;
 	
 	private String mobileNo;

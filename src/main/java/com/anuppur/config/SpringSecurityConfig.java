@@ -15,9 +15,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -34,6 +37,7 @@ import com.anuppur.filter.CaptchaAuthenticationFilter;
 import com.anuppur.handler.DMSAuthenticationSuccessHandler;
 import com.anuppur.security.CsrfCookieFilter;
 import com.anuppur.security.DMSPasswordEncoder;
+import com.anuppur.security.LoginAuthenticationFailureHandler;
 import com.anuppur.security.SpaCsrfTokenRequestHandler;
 import com.anuppur.service.impl.UserDetailsServiceImpl;
 import com.anuppur.util.JwtFilter;
@@ -51,11 +55,29 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @SuppressWarnings("all")
 public class SpringSecurityConfig {
 
+    private static final String[] INTERNAL_ADMIN_ENDPOINTS = {
+            "/v2/api-docs", "/v2/api-docs/**", "/swagger-resources/**", "/swagger-ui.html",
+            "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/actuator", "/actuator/**"
+    };
+
+    /* Swagger/Actuator are never public: a system admin must also originate from an internal address. */
+    private static final String INTERNAL_SYSTEM_ADMIN_EXPRESSION =
+            "hasAuthority('ROLE_SYSTEM_ADMIN') and ("
+            + "hasIpAddress('127.0.0.0/8') or hasIpAddress('10.0.0.0/8') or "
+            + "hasIpAddress('172.16.0.0/12') or hasIpAddress('192.168.0.0/16') or "
+            + "hasIpAddress('::1'))";
+
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private DMSAuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @Autowired
+    private CaptchaAuthenticationFilter captchaAuthenticationFilter;
+
+    @Autowired
+    private LoginAuthenticationFailureHandler authenticationFailureHandler;
     
     @Autowired
     private JwtFilter jwtFilter;
@@ -84,10 +106,12 @@ public class SpringSecurityConfig {
         http
             .securityMatcher(PathRequest.toStaticResources().atCommonLocations())
             .authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
+            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
             .csrf(AbstractHttpConfigurer::disable)
             .requestCache(AbstractHttpConfigurer::disable)
             .securityContext(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        configureSecurityHeaders(http);
         return http.build();
     }
 
@@ -105,13 +129,16 @@ public class SpringSecurityConfig {
         
         http
             .authenticationProvider(daoAuthenticationProvider())
+            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository)
                 .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 // Bearer-token mobile calls do not use browser session cookies.
                 .ignoringRequestMatchers("/mobile/**", "/mobilelogin", "/mobilelogin/**"))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/", "/login", "/error", "/captcha", "/forgotpassword", "/resetpassword", "/aboutUs", "/guidelines", "/contactUs",
+                .requestMatchers("/", "/login", "/error", "/captcha", "/forgotpassword", "/resetpassword",
+                    "/verify-reset-otp", "/set-new-password", "/complete-password-reset",
+                    "/aboutUs", "/guidelines", "/contactUs",
                     "/mobilelogin", "/mobilelogin/**").permitAll()
                 .requestMatchers(
                     "/awms.apk", "/awms_production.apk",
@@ -120,13 +147,14 @@ public class SpringSecurityConfig {
                     "/Buttons-1.5.1/**", "/DataTables-1.10.16/**",
                     "/JSZip-2.5.0/**", "/dhs/**", "/webjars/**"
                 ).permitAll()
-                .requestMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers(INTERNAL_ADMIN_ENDPOINTS).access(internalSystemAdminOnly())
                 .requestMatchers("/systemAdmin/**", "/superAdmin/**", "/ceo/**").authenticated()
                 .requestMatchers("/mobile/**").authenticated()
                 .anyRequest().authenticated())
             .formLogin(form -> form
                 .loginPage("/login")
-                .successHandler(authenticationSuccessHandler))
+                .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler))
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                 .invalidateHttpSession(true)
@@ -150,22 +178,49 @@ public class SpringSecurityConfig {
                 .invalidSessionUrl("/login?timeout")
                 .maximumSessions(2)
                 .expiredUrl("/login?timeout"))
-            .headers(headers -> headers
-                .frameOptions(frameOptions -> frameOptions.deny())
-                .httpStrictTransportSecurity()
-                    .includeSubDomains(true)
-                    .maxAgeInSeconds(31536000)
-                .and()
-                .referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.NO_REFERRER_WHEN_DOWNGRADE))
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Type-Options", "nosniff"))
-                .addHeaderWriter(new StaticHeadersWriter("X-XSS-Protection", "1; mode=block")));
+            ;
 
-        http.addFilterBefore(new CaptchaAuthenticationFilter("/login", "/login?error"),
-                UsernamePasswordAuthenticationFilter.class);
+        configureSecurityHeaders(http);
+
+        http.addFilterBefore(captchaAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    private AuthorizationManager<RequestAuthorizationContext> internalSystemAdminOnly() {
+        return new WebExpressionAuthorizationManager(INTERNAL_SYSTEM_ADMIN_EXPRESSION);
+    }
+
+    private void configureSecurityHeaders(HttpSecurity http) throws Exception {
+        http.headers(headers -> {
+            headers.frameOptions(frameOptions -> frameOptions.deny());
+            headers.httpStrictTransportSecurity(hsts -> hsts
+                .includeSubDomains(true)
+                .preload(true)
+                .maxAgeInSeconds(31536000));
+            headers.referrerPolicy(referrer ->
+                referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN));
+            headers.permissionsPolicy(permissions -> permissions.policy(
+                "camera=(), microphone=(), geolocation=(self), payment=(), usb=()"));
+            headers.contentSecurityPolicy(csp -> csp.policyDirectives(
+                "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
+                + "form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' "
+                + "https://maps.googleapis.com https://code.jquery.com https://cdn.datatables.net "
+                + "https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
+                + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.datatables.net "
+                + "https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
+                + "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
+                + "img-src 'self' data: blob: https:; connect-src 'self'; "
+                + "frame-src 'self' https://app.powerbi.com; media-src 'self'; upgrade-insecure-requests"));
+            // Compatibility CSP remains enforced while this stricter policy reports legacy inline/eval usage.
+            headers.addHeaderWriter(new StaticHeadersWriter("Content-Security-Policy-Report-Only",
+                "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
+                + "form-action 'self'; script-src 'self'; style-src 'self'; "
+                + "font-src 'self' data:; img-src 'self' data: blob: https:; "
+                + "connect-src 'self'; frame-src 'self' https://app.powerbi.com"));
+        });
     }
 
     /** Detect mobile API and Angular/jQuery XHR (template + data) requests. */

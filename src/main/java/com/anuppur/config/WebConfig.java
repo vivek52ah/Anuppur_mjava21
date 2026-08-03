@@ -9,14 +9,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 import com.anuppur.security.SecureUploadInterceptor;
+import com.anuppur.security.PlainTextRequestInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
 	private final SecureUploadInterceptor secureUploadInterceptor;
+	private final PlainTextRequestInterceptor plainTextRequestInterceptor;
 
-	public WebConfig(SecureUploadInterceptor secureUploadInterceptor) {
+	public WebConfig(SecureUploadInterceptor secureUploadInterceptor,
+			PlainTextRequestInterceptor plainTextRequestInterceptor) {
 		this.secureUploadInterceptor = secureUploadInterceptor;
+		this.plainTextRequestInterceptor = plainTextRequestInterceptor;
 	}
 
 	@Override
@@ -34,6 +38,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(plainTextRequestInterceptor);
 		registry.addInterceptor(secureUploadInterceptor);
 		registry.addInterceptor(localeChangeInterceptor());
 	}

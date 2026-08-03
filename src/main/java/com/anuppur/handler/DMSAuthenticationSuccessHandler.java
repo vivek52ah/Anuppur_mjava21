@@ -16,6 +16,8 @@ import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.anuppur.security.LoginProtectionService;
+
 @Component
 public class DMSAuthenticationSuccessHandler implements
 AuthenticationSuccessHandler {
@@ -23,12 +25,17 @@ AuthenticationSuccessHandler {
 	public static final Logger logger = LoggerFactory.getLogger(DMSAuthenticationSuccessHandler.class);
 	
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+	private final LoginProtectionService loginProtectionService;
+
+	public DMSAuthenticationSuccessHandler(LoginProtectionService loginProtectionService) {
+		this.loginProtectionService = loginProtectionService;
+	}
 
 	public void onAuthenticationSuccess(HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse,
 			Authentication authentication) throws IOException, ServletException {
-
-	
+		loginProtectionService.recordAuthenticationSuccess(authentication.getName());
+		loginProtectionService.recordAuthenticationSuccess(httpServletRequest.getParameter("username"));
 		
 		String remoteAddr = httpServletRequest.getHeader("X-Forwarded-For");
 		if (remoteAddr == null || "".equals(remoteAddr)) {

@@ -8,9 +8,6 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="referrer" content="no-referrer" />
-	<meta http-equiv="Content-Security-Policy"
-		content="script-src 'self' 'unsafe-inline' 'unsafe-eval'; form-action 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; media-src 'none'; connect-src 'self'" />
-
 	<link rel="shortcut icon" th:href="@{assets/img/favicon.ico}" type="image/x-icon" />
 
 	<link rel="icon" th:href="@{assets/img/favicon.ico}" type="image/x-icon" />
@@ -273,13 +270,10 @@ Mobile Menu
 												placeholder="Password" required="required" maxlength="20"
 												autocomplete="off" />
 										</div>
-										<div class="input-group mb-3">
-													<span class="input-group-prepend"><i
-															class="mdi mdi-pencil"></i></span> <input name="captchaText"
-														id="captchaText" type="hidden" maxlength="4" autocomplete="off"
-														required="required" class="form-control"
-														placeholder="Captcha" value="123456" />
-												</div>
+										<div class="row mb-3 align-items-center">
+											<div class="col-6"><img id="aboutCaptcha" th:src="@{/captcha?type=login}" alt="CAPTCHA" width="120" height="40" /></div>
+											<div class="col-6"><input name="captchaText" type="text" maxlength="6" inputmode="numeric" autocomplete="off" required class="form-control" placeholder="Captcha" /></div>
+										</div>
 										<!--  <div class="row" >
 										
 											<div class="mar_left_captcha grid_set">
@@ -301,7 +295,7 @@ Mobile Menu
 															class="mdi mdi-pencil"></i></span> <input name="captchaText"
 														id="captchaText" type="text" maxlength="4" autocomplete="off"
 														required="required" class="form-control"
-														placeholder="Captcha" value="123456" />
+														placeholder="Captcha" />
 												</div>
 											</div>
 										</div>

@@ -150,67 +150,6 @@ public class UserServiceImpl implements UserService {
 	 * logger.error("An exception occurred.", e); } }
 	 */
 
-	@Override
-	public void resetPassword(String mobileNo) throws DMSBusinessException {
-
-		try {
-			//Users userEntity = userRepository.findByMobileNoAndStatus(emailId, DMSConstants.STATUS_ACTIVE);
-			Users userEntity = userRepository.findByMobileNoAndStatusNot(mobileNo, DMSConstants.STATUS_DELETED);
-			//Users userEntity = userRepository.findByEmailId(emailId);
-		//	System.out.println(userEntity);
-
-			if (userEntity != null) {
-				String password = DMSUtil.generatePassword();
-				PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-				
-				//System.out.println("New password Encoded: " + password);
-
-			     String encodedPassword = passwordEncoder.encode(SHAHashingUtil.encryptPassword(password));
-				 userEntity.setPassword(encodedPassword);
-				
-				userRepository.save(userEntity);
-
-				/*
-				 * notificationService.sendPasswordResetNotificationForMobile(
-				 * userEntity.getMobileNo(), password);				 */
-				// char[] ch = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-			    //    String otp = RandomStringUtils
-			    //.            .random(6, 0, ch.length, false, false, ch);
-
-			        //commonService.saveOrUpdateOtp(emailId, Integer.parseInt(otp));
-			        
-			      //  System.out.println("Manoj Test user Entity not null before send" + userEntity);
-			        
-			       // EmailBean emailBean = new EmailBean();
-			        
-			        UserBean userBean = new UserBean();
-			        userBean.setPassword(password);
-			        userBean.setMobileNo(mobileNo);
-			        
-			        //emailServiceImpl.sendEmailmessage(emailBean);
-			        
-			       // notificationService.sendOtpNotificationEmail(emailId, password);
-			      
-			        //getNotificationService().sendOtpNotificationEmail(emailId, otp);
-			        
-			        
-					/*
-					 * getNotificationService().sendPasswordResetNotification(
-					 * userEntity.getEmailId(), userEntity.getMobileNo(), password);
-					 */
-			        
-			        notificationService.sendUserRegistrationMessage(userBean);
-			       notificationService.sendNotificationOnMailResetPassword(userEntity.getEmailId(), userBean);
-				
-				
-			}
-			else
-				logger.info("Please Enter Registered Mobile No");
-		} catch (Exception e) {
-			logger.error("An exception occurred.", e);
-		}
-	}
-
 	/*
 	 * @Override
 	 * 

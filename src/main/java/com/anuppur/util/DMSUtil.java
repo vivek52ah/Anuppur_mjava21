@@ -895,13 +895,13 @@ public class DMSUtil {
 	public static String decryptParam(String param) {
 
 		if (param == null || param.trim().isEmpty()) {
-			return "0";
+			throw new IllegalArgumentException("Invalid identifier.");
 		}
 		try {
 			byte[] decoded = Base64.getUrlDecoder().decode(param);
 			return new String(decoded, StandardCharsets.UTF_8);
 		} catch (IllegalArgumentException ex) {
-			return "0";
+			throw new IllegalArgumentException("Invalid identifier.");
 		}
 	}
 

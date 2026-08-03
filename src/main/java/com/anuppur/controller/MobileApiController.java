@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -155,6 +156,7 @@ public class MobileApiController extends BaseController {
 
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "/fetchWorkTenderAgreement/{Id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public WorkTenderBean getWorkTenderAgreement(@PathVariable("Id") Long workId) {
 		// user = DMSUtil.getUserDetail();
@@ -180,6 +182,7 @@ public class MobileApiController extends BaseController {
 		return bean;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentAS/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentAS(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -225,6 +228,7 @@ public class MobileApiController extends BaseController {
 		}
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workResourceAuthorization.canAccessUploadedDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentTS/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentTS(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -271,6 +275,7 @@ public class MobileApiController extends BaseController {
 
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "fetchTSASDetails/{id}", method = RequestMethod.GET)
 	public TSASWorkBean fetchTSASWorkDetails(@PathVariable Long id, HttpServletRequest request) throws ParseException {
 		// user = DMSUtil.getUserDetail();
@@ -329,6 +334,7 @@ public class MobileApiController extends BaseController {
 
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "fetchWorkProgress/{id}", method = RequestMethod.GET)
 	public WorkProgressBean fetchWorkProgress(@PathVariable Long id, HttpServletRequest request) throws ParseException {
 
@@ -364,6 +370,7 @@ public class MobileApiController extends BaseController {
 		}
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "saveGeoTaging", method = RequestMethod.POST)
 	public ResponseObject saveGeoTagingData(@RequestBody GeoTaggingBean bean, HttpServletRequest request) {
 
@@ -397,6 +404,7 @@ public class MobileApiController extends BaseController {
 
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0)")
 	@RequestMapping(value = "getGeoTaggingForWork/{WorkId}", method = RequestMethod.GET)
 	public GeoTaggingBean getGeoTaggingForWork(@PathVariable Long WorkId, HttpServletRequest request) {
 
@@ -410,6 +418,7 @@ public class MobileApiController extends BaseController {
 		}
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addWorkProgress", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
 	public ResponseObject addWorkProgressMobileData(WorkProgressBean workProgressBean, HttpServletRequest request)
@@ -445,6 +454,7 @@ public class MobileApiController extends BaseController {
 		return response;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0.workId)")
 	@RequestMapping(value = "/addWorkProgressMoibleData", method = RequestMethod.POST, consumes = {
 			"multipart/form-data" })
 	@ResponseBody
@@ -486,6 +496,7 @@ public class MobileApiController extends BaseController {
 		return response;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p1)")
 	@RequestMapping(value = "/fetchProgressImagesList/{workId}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	public String fetchProgressImagesList(HttpServletRequest request, @PathVariable Long workId) {
 
@@ -538,6 +549,7 @@ public class MobileApiController extends BaseController {
 	}
 
 	// Method to handle document download for work sample based on document ID.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workResourceAuthorization.canAccessProgressDocument(#p0)")
 	@RequestMapping(value = "/downloadDocumentWSPro/{documentId}", method = RequestMethod.GET)
 	public void downloadDocumentWSPro(@PathVariable Long documentId, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {

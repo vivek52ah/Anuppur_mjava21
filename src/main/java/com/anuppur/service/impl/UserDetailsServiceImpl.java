@@ -20,6 +20,7 @@ import com.anuppur.constants.DMSConstants;
 import com.anuppur.entity.Role;
 import com.anuppur.entity.Users;
 import com.anuppur.repository.UserRepository;
+import com.anuppur.security.LoginProtectionService;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService{
@@ -28,10 +29,14 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	
 	@Autowired
     private UserRepository userRepository;
+
+	@Autowired
+	private LoginProtectionService loginProtectionService;
 	
 	@Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		loginProtectionService.assertNotLocked(username);
 		
 		/*if (!isCaptchaSuccess()) {
 

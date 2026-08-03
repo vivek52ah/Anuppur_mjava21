@@ -101,13 +101,8 @@
 							},{
 								"mData" : "districtName",
 								"bSortable" : false,
-								mRender: function (mData, type, row) {
-									var dn=row.districtName
-			  	            		if(null== dn){
-			  	            			dn="-";
-			  	            		}
-			  	            		return dn; 
-			  	            	} 
+								"defaultContent" : "-",
+								"render" : $.fn.dataTable.render.text()
 								
 							},
 							{

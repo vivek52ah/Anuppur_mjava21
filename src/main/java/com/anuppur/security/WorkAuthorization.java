@@ -1,6 +1,7 @@
 package com.anuppur.security;
 
 import java.util.Objects;
+import java.util.List;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.anuppur.bean.WorkBean;
+import com.anuppur.dto.FinancialExpenditureRequest;
 import com.anuppur.entity.DepartmentRemarks;
 import com.anuppur.entity.DmRemarks;
 import com.anuppur.entity.Users;
@@ -16,6 +18,7 @@ import com.anuppur.repository.DepartmentRemarksRepository;
 import com.anuppur.repository.DmRemarksRepository;
 import com.anuppur.repository.UserRepository;
 import com.anuppur.repository.WorkRepository;
+import com.anuppur.repository.areaofficerrecordRepository;
 import com.anuppur.util.DMSUtil;
 
 /**
@@ -31,19 +34,23 @@ public class WorkAuthorization {
     private static final String ROLE_SYSTEM_ADMIN = "ROLE_SYSTEM_ADMIN";
     private static final String ROLE_DM = "ROLE_DM";
     private static final String ROLE_DEPARTMENT = "ROLE_DEPARTMENT";
+    private static final String ROLE_AREA_OFFICER = "ROLE_AREA_OFFICER";
 
     private final UserRepository userRepository;
     private final WorkRepository workRepository;
     private final DmRemarksRepository dmRemarksRepository;
     private final DepartmentRemarksRepository departmentRemarksRepository;
+    private final areaofficerrecordRepository areaOfficerRecordRepository;
 
     public WorkAuthorization(UserRepository userRepository, WorkRepository workRepository,
             DmRemarksRepository dmRemarksRepository,
-            DepartmentRemarksRepository departmentRemarksRepository) {
+            DepartmentRemarksRepository departmentRemarksRepository,
+            areaofficerrecordRepository areaOfficerRecordRepository) {
         this.userRepository = userRepository;
         this.workRepository = workRepository;
         this.dmRemarksRepository = dmRemarksRepository;
         this.departmentRemarksRepository = departmentRemarksRepository;
+        this.areaOfficerRecordRepository = areaOfficerRecordRepository;
     }
 
     public boolean canAccessWork(Long workId) {
@@ -72,9 +79,21 @@ public class WorkAuthorization {
                     ? encryptedWorkId
                     : DMSUtil.decryptParam(encryptedWorkId);
             return canAccessWork(Long.valueOf(resolvedId));
-        } catch (NumberFormatException ex) {
+        } catch (IllegalArgumentException ex) {
             return false;
         }
+    }
+
+    public boolean canEditFinancialRequests(List<FinancialExpenditureRequest> requests) {
+        if (requests == null || requests.isEmpty()) {
+            return true;
+        }
+        for (FinancialExpenditureRequest request : requests) {
+            if (request != null && request.getWorkId() != null && !canAccessWork(request.getWorkId())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean canEditWork(WorkBean bean) {
@@ -139,6 +158,10 @@ public class WorkAuthorization {
     }
 
     private boolean isWithinScope(Authentication authentication, Users user, Work work) {
+		if (hasAuthority(authentication, ROLE_AREA_OFFICER)) {
+			return user.getId() != null
+					&& areaOfficerRecordRepository.existsByUseridAndWorkId(user.getId(), work.getId());
+		}
         if (hasAuthority(authentication, ROLE_DM)) {
             return user.getDistrict() != null && sameDistrict(user, work);
         }

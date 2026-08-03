@@ -25,19 +25,23 @@ import com.anuppur.repository.DepartmentRemarksRepository;
 import com.anuppur.repository.DmRemarksRepository;
 import com.anuppur.repository.UserRepository;
 import com.anuppur.repository.WorkRepository;
+import com.anuppur.repository.areaofficerrecordRepository;
 
 class WorkAuthorizationTest {
 
     private UserRepository userRepository;
     private WorkRepository workRepository;
     private WorkAuthorization authorization;
+    private areaofficerrecordRepository areaOfficerRecordRepository;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         workRepository = mock(WorkRepository.class);
+        areaOfficerRecordRepository = mock(areaofficerrecordRepository.class);
         authorization = new WorkAuthorization(userRepository, workRepository,
-                mock(DmRemarksRepository.class), mock(DepartmentRemarksRepository.class));
+                mock(DmRemarksRepository.class), mock(DepartmentRemarksRepository.class),
+                areaOfficerRecordRepository);
     }
 
     @AfterEach
@@ -89,6 +93,22 @@ class WorkAuthorizationTest {
     void systemAdminCanAccessAnyExistingWork() {
         authenticate("admin", "ROLE_SYSTEM_ADMIN");
         assertThat(authorization.canAccessWork(999L)).isTrue();
+    }
+
+    @Test
+    void areaOfficerCanAccessOnlyAssignedWork() {
+        Users officer = scopedUser(null, null, 30L, "D30");
+        officer.setId(7L);
+        Work work = scopedWork(100L, 10L, 20L, 30L, "D30");
+        authenticate("officer", "ROLE_AREA_OFFICER");
+        when(userRepository.findByUsername("officer")).thenReturn(officer);
+        when(workRepository.findById(100L)).thenReturn(Optional.of(work));
+        when(areaOfficerRecordRepository.existsByUseridAndWorkId(7L, 100L)).thenReturn(true);
+
+        assertThat(authorization.canAccessWork(100L)).isTrue();
+
+        when(areaOfficerRecordRepository.existsByUseridAndWorkId(7L, 100L)).thenReturn(false);
+        assertThat(authorization.canAccessWork(100L)).isFalse();
     }
 
     @Test

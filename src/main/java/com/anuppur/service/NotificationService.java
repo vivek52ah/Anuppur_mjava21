@@ -22,6 +22,8 @@ public interface NotificationService {
 	
 	public void sendOtpNotificationEmail(String emailId, String otp) throws DMSBusinessException;
 
+	void sendPasswordResetOtp(String emailId, String mobileNo, String otp);
+
 	void sendNotificationOnMailResetPassword(String emailId, UserBean userbean);
 
 	

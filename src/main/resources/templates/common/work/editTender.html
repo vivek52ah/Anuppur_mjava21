@@ -1543,9 +1543,11 @@
 								}
 							}, {
 								"mData": "firstName",
+								"render": $.fn.dataTable.render.text(),
 								"bSortable": false
 							}, {
 								"mData": "lastName",
+								"render": $.fn.dataTable.render.text(),
 								"bSortable": false
 							}, {
 								"mData": "mobileNo",
@@ -1565,6 +1567,7 @@
 																"bSortable" : false
 															} */, {
 								"mData": "districtName",
+								"render": $.fn.dataTable.render.text(),
 								"bSortable": false
 							}/* , {
 																"mData" : "subEnggNameAndImplAgency",
@@ -1637,12 +1640,12 @@
 					<tbody>
 						<tr data-ng-repeat="user in useralist">
 							<td>{{ $index + 1 }}</td>
-							<td>{{ user.firstName }}</td>
-							<td>{{ user.lastName }}</td>
+							<td data-ng-bind="user.firstName"></td>
+							<td data-ng-bind="user.lastName"></td>
 							<td>{{ user.role.roleName }}</td>
 							<td>{{ user.mobileNo }}</td>
 							<td>{{ user.emailId}}</td>
-							<td>{{ user.departmentName}}</td>
+							<td data-ng-bind="user.departmentName"></td>
 							<td>{{ user.assignDate|date:'dd-MM-yyyy'}}</td>
 
 							<td>

@@ -202,7 +202,7 @@
 								          <td>{{ $index + 1 }}</td>
 										  <!--<td>{{ remark.createBy}}</td>
 										  <td>{{ remark.role}}</td>-->
-										  <td>{{ remark.departmentName || '-'}}</td>
+										  <td data-ng-bind="remark.departmentName || '-'"></td>
 								          <td>{{ remark.departmentRemarkName || '-'}}</td>
 								         
 								          <td>{{ remark.createdDate | date: 'dd-MM-yyyy hh:mm:ss a' }}</td>
