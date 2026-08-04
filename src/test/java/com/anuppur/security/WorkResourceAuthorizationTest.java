@@ -12,12 +12,17 @@ import org.junit.jupiter.api.Test;
 import com.anuppur.entity.DocumentUpload;
 import com.anuppur.entity.DocumentUploadDrawingDetail;
 import com.anuppur.entity.DocumentUploadWorkProgress;
+import com.anuppur.entity.DepartmentRemarks;
 import com.anuppur.entity.Work;
 import com.anuppur.entity.WorkDocument;
+import com.anuppur.entity.WorkFinancialAgency;
 import com.anuppur.repository.DocumentRepository;
 import com.anuppur.repository.DocumentUploadDrawingDetailRepository;
 import com.anuppur.repository.DocumentUploadWorkProgressRepository;
+import com.anuppur.repository.DepartmentRemarksRepository;
+import com.anuppur.repository.DmRemarksRepository;
 import com.anuppur.repository.WorkDocumentRepository;
+import com.anuppur.repository.FinancialAgencyRepository;
 
 class WorkResourceAuthorizationTest {
 
@@ -27,6 +32,9 @@ class WorkResourceAuthorizationTest {
     private DocumentUploadDrawingDetailRepository drawings;
     private DocumentUploadWorkProgressRepository progressDocuments;
     private WorkResourceAuthorization authorization;
+    private FinancialAgencyRepository financialAgencies;
+    private DepartmentRemarksRepository departmentRemarks;
+    private DmRemarksRepository dmRemarks;
 
     @BeforeEach
     void setUp() {
@@ -35,8 +43,12 @@ class WorkResourceAuthorizationTest {
         documents = mock(DocumentRepository.class);
         drawings = mock(DocumentUploadDrawingDetailRepository.class);
         progressDocuments = mock(DocumentUploadWorkProgressRepository.class);
+        financialAgencies = mock(FinancialAgencyRepository.class);
+        departmentRemarks = mock(DepartmentRemarksRepository.class);
+        dmRemarks = mock(DmRemarksRepository.class);
         authorization = new WorkResourceAuthorization(workAuthorization, workDocuments,
-                documents, drawings, progressDocuments);
+                documents, drawings, progressDocuments, financialAgencies,
+                departmentRemarks, dmRemarks);
     }
 
     @Test
@@ -61,10 +73,15 @@ class WorkResourceAuthorizationTest {
         progress.setWorkId(42L);
         when(progressDocuments.findById(4L)).thenReturn(Optional.of(progress));
 
+        WorkFinancialAgency financialAgency = new WorkFinancialAgency();
+        financialAgency.setWorkId(42L);
+        when(financialAgencies.findById(5L)).thenReturn(Optional.of(financialAgency));
+
         assertThat(authorization.canAccessWorkDocument(1L)).isTrue();
         assertThat(authorization.canAccessUploadedDocument(2L)).isTrue();
         assertThat(authorization.canAccessDrawingDocument(3L)).isTrue();
         assertThat(authorization.canAccessProgressDocument(4L)).isTrue();
+        assertThat(authorization.canAccessFinancialAgency(5L)).isTrue();
     }
 
     @Test
@@ -77,5 +94,33 @@ class WorkResourceAuthorizationTest {
         assertThat(authorization.canAccessUploadedDocument(2L)).isFalse();
         assertThat(authorization.canAccessUploadedDocument(404L)).isFalse();
         assertThat(authorization.canAccessProgressDocument(null)).isFalse();
+    }
+
+    @Test
+    void resolvesLegacyRemarkDocumentsWithoutAStoredWorkId() {
+        DocumentUpload uploaded = new DocumentUpload();
+        uploaded.setDocumentId(6L);
+        when(documents.findById(6L)).thenReturn(Optional.of(uploaded));
+
+        DepartmentRemarks remark = new DepartmentRemarks();
+        remark.setWorkId(42L);
+        when(departmentRemarks.findEnabledByDocumentId(6L)).thenReturn(Optional.of(remark));
+        when(workAuthorization.canAccessWork(42L)).thenReturn(true);
+
+        assertThat(authorization.canAccessUploadedDocument(6L)).isTrue();
+    }
+
+    @Test
+    void workDocumentDeleteRequiresOwnershipInAdditionToWorkScope() {
+        Work work = new Work();
+        work.setId(42L);
+        WorkDocument document = new WorkDocument();
+        document.setWork(work);
+        document.setCreatedBy("department");
+        when(workDocuments.findById(1L)).thenReturn(Optional.of(document));
+        when(workAuthorization.canModifyOwnedResource(42L, document)).thenReturn(false, true);
+
+        assertThat(authorization.canDeleteWorkDocument(1L)).isFalse();
+        assertThat(authorization.canDeleteWorkDocument(1L)).isTrue();
     }
 }

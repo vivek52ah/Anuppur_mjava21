@@ -789,7 +789,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Getting Edit User Form Page
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') or (hasRole('ROLE_DEPARTMENT') and @userAuthorization.canManageEncryptedAreaOfficer(#p0))")
 	@RequestMapping(value = "/editUserForm/{id}", method = RequestMethod.GET)
 	public ModelAndView viewEditUserForm(@PathVariable String id, HttpServletRequest request) {
 
@@ -803,7 +803,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// MEthod For Getting USer Details
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') or (hasRole('ROLE_DEPARTMENT') and @userAuthorization.canManageEncryptedAreaOfficer(#p0))")
 	@RequestMapping(value = "fetchUserDetails/{id}", method = RequestMethod.GET)
 	public UserBean fetchUserDetails(@PathVariable String id, HttpServletRequest request) {
 
@@ -813,7 +813,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Editing User
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') or (hasRole('ROLE_DEPARTMENT') and @userAuthorization.canManageAreaOfficerRequest(#p0))")
 	@RequestMapping(value = "/editUser", method = RequestMethod.POST)
 	public ResponseObject editUser(@RequestBody UserBean userBean, HttpServletRequest request) throws Exception {
 
@@ -842,7 +842,7 @@ public class SystemAdminController extends BaseController {
 	}
 
 	// Method For Deleteing User
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') or (hasRole('ROLE_DEPARTMENT') and @userAuthorization.canManageAreaOfficer(#p0))")
 	@RequestMapping(value = "/deleteUser/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteUser(@PathVariable Long id, HttpServletRequest request) {
 

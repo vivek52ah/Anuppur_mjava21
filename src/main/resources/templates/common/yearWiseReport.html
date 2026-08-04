@@ -457,7 +457,7 @@ select#financialYear {
 			  	            		if(null== contractorName){
 			  	            			contractorName="-";
 			  	            		}
-			  	            		return contractorName; 
+								return $.fn.dataTable.render.text().display(contractorName);
 			  	            	}
 							},{
 								"data" : "sor",

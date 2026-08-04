@@ -6000,20 +6000,31 @@ public class CommonServiceImpl implements CommonService {
 		}
 		Path root = Paths.get(documentRootPath).toAbsolutePath().normalize();
 		for (String relativeDirectory : relativeDirectories) {
-			Path directory = root.resolve(relativeDirectory).normalize();
-			if (!directory.startsWith(root)) {
+			Path relativePath = Paths.get(relativeDirectory).normalize();
+			if (relativePath.isAbsolute() || relativePath.startsWith("..")) {
 				continue;
 			}
-			Path flatCandidate = directory.resolve(storedName).normalize();
-			if (flatCandidate.getParent().equals(directory) && Files.isRegularFile(flatCandidate)) {
-				return flatCandidate.toString();
-			}
-			if (workId != null) {
-				Path workDirectory = directory.resolve(String.valueOf(workId)).normalize();
-				Path workCandidate = workDirectory.resolve(storedName).normalize();
-				if (workDirectory.startsWith(root) && workCandidate.getParent().equals(workDirectory)
-						&& Files.isRegularFile(workCandidate)) {
-					return workCandidate.toString();
+
+			Set<Path> configuredDirectories = new LinkedHashSet<>();
+			configuredDirectories.add(root.resolve(relativePath).normalize());
+			// Older Windows profiles lost backslashes while loading document.root and
+			// wrote files using direct string concatenation. Keep those existing files
+			// readable while still resolving only a trusted configured directory and a
+			// separator-free stored filename.
+			configuredDirectories.add(Paths.get(documentRootPath + relativeDirectory)
+					.toAbsolutePath().normalize());
+
+			for (Path directory : configuredDirectories) {
+				Path flatCandidate = directory.resolve(storedName).normalize();
+				if (flatCandidate.getParent().equals(directory) && Files.isRegularFile(flatCandidate)) {
+					return flatCandidate.toString();
+				}
+				if (workId != null) {
+					Path workDirectory = directory.resolve(String.valueOf(workId)).normalize();
+					Path workCandidate = workDirectory.resolve(storedName).normalize();
+					if (workCandidate.getParent().equals(workDirectory) && Files.isRegularFile(workCandidate)) {
+						return workCandidate.toString();
+					}
 				}
 			}
 		}
@@ -9514,7 +9525,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canEditDmRemark(#p0)")
 	public String addOrUpdateDmRemark(DmRemarksBean bean) {
 		try {
 
@@ -9533,6 +9544,7 @@ public class CommonServiceImpl implements CommonService {
 			if (bean.getDmattachment() != null) {
 				DocumentUpload documentUpload = DMSUtil.uploadDMAttachment(documentRootPath + dmAttachment, "blank",
 						bean.getDmattachment(), null, "blank");
+				documentUpload.setWorkId(bean.getWorkId());
 
 				// documentUpload.setDocumentUploadPath(documentRootPath+dmAttachment+"");
 				documentRepository.save(documentUpload);
@@ -9564,13 +9576,13 @@ public class CommonServiceImpl implements CommonService {
 
 		} catch (Exception e) {
 			logger.error("Error while saving DM Remark: {}", e.getMessage(), e);
-			return "error: " + e.getMessage();
+			return "error: " + DMSConstants.ERROR_SAVING_DATA;
 		}
 
 	}
 
 	@Override
-	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
+	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canEditDepartmentRemark(#p0)")
 	public String addOrUpdateDepartmentRemark(DepartmentRemarksBean bean) {
 		try {
 
@@ -9600,6 +9612,7 @@ public class CommonServiceImpl implements CommonService {
 			if (bean.getDmattachment() != null) {
 				DocumentUpload documentUpload = DMSUtil.uploadDMAttachment(documentRootPath + dmAttachment, "blank",
 						bean.getDmattachment(), null, "blank");
+				documentUpload.setWorkId(bean.getWorkId());
 
 				// documentUpload.setDocumentUploadPath(documentRootPath+dmAttachment+"");
 				documentRepository.save(documentUpload);
@@ -9630,7 +9643,7 @@ public class CommonServiceImpl implements CommonService {
 
 		} catch (Exception e) {
 			logger.error("Error while saving DM Remark: {}", e.getMessage(), e);
-			return "error: " + e.getMessage();
+			return "error: " + DMSConstants.ERROR_SAVING_DATA;
 		}
 
 	}

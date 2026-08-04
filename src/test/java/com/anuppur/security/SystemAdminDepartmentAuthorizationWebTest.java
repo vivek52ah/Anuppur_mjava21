@@ -1,6 +1,7 @@
 package com.anuppur.security;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -24,8 +25,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.util.Optional;
+import java.util.Set;
+
 import com.anuppur.bean.UserBean;
 import com.anuppur.controller.SystemAdminController;
+import com.anuppur.constants.DMSConstants;
+import com.anuppur.entity.District;
+import com.anuppur.entity.Role;
+import com.anuppur.entity.Users;
+import com.anuppur.repository.UserRepository;
 import com.anuppur.repository.WorkRepository;
 import com.anuppur.repository.WorkStatusRepository;
 import com.anuppur.service.CommonService;
@@ -69,6 +78,33 @@ class SystemAdminDepartmentAuthorizationWebTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void departmentCanEditAndDeleteOwnedAreaOfficer() throws Exception {
+        String areaOfficer = "{\"id\":10,\"designationId\":1,"
+                + "\"role\":{\"roleCode\":\"ROLE_AREA_OFFICER\"},"
+                + "\"emailId\":\"officer@example.com\"}";
+
+        mockMvc.perform(post("/systemAdmin/editUser")
+                        .with(user("department").roles("DEPARTMENT"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(areaOfficer))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/systemAdmin/deleteUser/10")
+                        .with(user("department").roles("DEPARTMENT"))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void departmentCannotDeletePrivilegedUser() throws Exception {
+        mockMvc.perform(post("/systemAdmin/deleteUser/11")
+                        .with(user("department").roles("DEPARTMENT"))
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+    }
+
     @Configuration
     @EnableWebMvc
     @EnableWebSecurity
@@ -89,8 +125,30 @@ class SystemAdminDepartmentAuthorizationWebTest {
         }
 
         @Bean
-        UserAuthorization userAuthorization() {
-            return new UserAuthorization();
+        UserAuthorization userAuthorization(UserRepository userRepository) {
+            return new UserAuthorization(userRepository);
+        }
+
+        @Bean
+        UserRepository userRepository() {
+            UserRepository repository = mock(UserRepository.class);
+            Users department = scopedUser(2L, "ROLE_DEPARTMENT");
+            Users areaOfficer = scopedUser(1L, "ROLE_AREA_OFFICER");
+            Users privileged = scopedUser(2L, "ROLE_DEPARTMENT");
+            when(repository.findByUsernameAndStatus("department", DMSConstants.STATUS_ACTIVE))
+                    .thenReturn(department);
+            when(repository.findById(10L)).thenReturn(Optional.of(areaOfficer));
+            when(repository.findById(11L)).thenReturn(Optional.of(privileged));
+            return repository;
+        }
+
+        private static Users scopedUser(Long designationId, String roleCode) {
+            Users user = new Users();
+            user.setDesignationID(designationId);
+            user.setDepartmentName("Roads");
+            user.setDistrict(new District(7L));
+            user.setRoles(Set.of(new Role(roleCode)));
+            return user;
         }
 
         @Bean
@@ -115,6 +173,8 @@ class SystemAdminDepartmentAuthorizationWebTest {
         SuperAdminService superAdminService() {
             SuperAdminService service = mock(SuperAdminService.class);
             when(service.addUser(any(UserBean.class))).thenReturn(null);
+            when(service.editUser(any(UserBean.class), anyString())).thenReturn(null);
+            when(service.deleteUser(any(Long.class))).thenReturn(null);
             return service;
         }
     }

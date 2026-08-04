@@ -8779,7 +8779,6 @@ $scope.loadDepartmentRemarksForWorkId = function(workId) {
 
             remark.createdDateObj = new Date(remark.createdDate);
         }
-$scope.getDepartmentRemarksDetails();
         $loading.finish('sample-1');
     });
 };
@@ -8870,7 +8869,6 @@ $scope.getDepartmentRemarksDetails();
 				$scope.workDataR.depertmentMasterId);
 		}
 
-		formData.append("dmStatus", $scope.workDataR.dmStatus || '');
 		//alert(dmattachment)
 		if (dmattachment) {
 			formData.append("dmattachment", dmattachment);
@@ -8971,7 +8969,7 @@ $scope.getDepartmentRemarksDetails();
 
 		if (dmattachment) {
 			$scope.noFileError = (dmattachment) ? false : true;
-			var maxSizeUpload = 25000000;// in bytes (here 5 MB)
+			var maxSizeUpload = 10 * 1024 * 1024;
 			//var allowedExtensions = ['pdf', 'PDF'];
 			if (dmattachment) {
 				$scope.fileExtentionErrorDM = (dmattachment.size > maxSizeUpload) ? true : false;
@@ -9028,7 +9026,6 @@ $scope.getDepartmentRemarksDetails();
 				$scope.workDataR.depertmentMasterId);
 		}
 
-		formData.append("dmStatus", $scope.workDataR.dmStatus || '');
 		//alert(dmattachment)
 		if (dmattachment) {
 			formData.append("dmattachment", dmattachment);
@@ -9083,9 +9080,17 @@ $scope.getDepartmentRemarksDetails();
 				}
 				$loading.finish('sample-1');
 			});
-			responsePromise.error(function() {
+			responsePromise.error(function(data, status) {
+				var serverMessage = data && typeof data === 'object'
+					? (data.error || data.errorMessage || data.message)
+					: null;
+				var errorMessage = serverMessage
+					|| (status === 400
+						? "Selected attachment is not a valid PDF, JPG or PNG file"
+						: "Some error occurred while saving the data");
 				$rootScope.responseObject = {};
-				$rootScope.responseObject.errorMessage = "Some error occured while saving the data";
+				$rootScope.responseObject.errorMessage = errorMessage;
+				alert(errorMessage);
 				$timeout(function() {
 					$rootScope.responseObject.errorMessage = null;
 				}, 5000);

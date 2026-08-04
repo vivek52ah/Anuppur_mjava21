@@ -394,7 +394,7 @@ public class MobileApiController extends BaseController {
 				// user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			// logger.error("User - " + user.getUsername() + ", Role - " +
@@ -446,7 +446,7 @@ public class MobileApiController extends BaseController {
 				logger.error("Mobile WorkProgress save failed - {}", errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("Mobile WorkProgress save failed", e);
@@ -488,7 +488,7 @@ public class MobileApiController extends BaseController {
 				logger.error("Mobile work progress upload failed - {}", errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("Mobile work progress upload failed", e);

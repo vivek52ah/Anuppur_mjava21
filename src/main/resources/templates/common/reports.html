@@ -959,7 +959,7 @@ ul.dropdown-menu.inner.show li {
                 {data: "divisionName", title: "Division", defaultContent: "-"},
 				{data: "districtName", title: "District", defaultContent: "-"},
 				{data: "workNo", title: "Work Unique ID", defaultContent: "-"},
-				{data: "workName", title: "Work Name", defaultContent: "-"},
+				{data: "workName", title: "Work Name", defaultContent: "-", render: $.fn.dataTable.render.text()},
 				{data: "workType", title: "Work Type", defaultContent: "-"},
 				{data: "financialYearName", title: "FY of Sanction", defaultContent: "-"},
 				
@@ -975,7 +975,7 @@ ul.dropdown-menu.inner.show li {
 				{data: "totalExpeditureTillDate", title: "Total Expenditure (In Lakhs)", defaultContent: "-"},
 				{data: "workStatusName", title: "Physical Status", defaultContent: "-"},
 				{data: "levelOfCompletion", title: "Level of Completion", defaultContent: "-"},
-				{data: "contractorName", title: "Contractor Name", defaultContent: "-"},
+				{data: "contractorName", title: "Contractor Name", defaultContent: "-", render: $.fn.dataTable.render.text()},
 				{data: "sor", title: "SOR Year", defaultContent: "-"},
 				{data: "tenderParcentage", title: "Tender Percentage", defaultContent: "-"},
 				{data: "workPriority", title: "Work Priority", defaultContent: "-"},
@@ -987,11 +987,12 @@ ul.dropdown-menu.inner.show li {
 								    defaultContent: '-',
 								    render: function (data, type, row) {
 								      // get the three pieces (use empty string if any is missing)
-								      const dmRemark  = row.DmRemakrs            || '';
-								      const dmDate    = row.dmAproveRejectDate   || '';
+								      const textRenderer = $.fn.dataTable.render.text();
+								      const dmRemark  = textRenderer.display(row.DmRemakrs || '-');
+								      const dmDate    = textRenderer.display(row.dmAproveRejectDate || '-');
 								      return `
-								        ${dmRemark || '-'}
-								        <br><small><b>DM&nbsp;Date:</b> ${dmDate || '-'}</small>
+								        ${dmRemark}
+								        <br><small><b>DM&nbsp;Date:</b> ${dmDate}</small>
 								      
 								      `;
 								    }

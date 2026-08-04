@@ -27,6 +27,27 @@
 		return $ && $.fn && typeof $.fn.DataTable === 'function';
 	}
 
+	function createDocumentActionButton(title, iconClass, action, documentId) {
+		return $('<button>', {
+			type: 'button',
+			'class': 'btn btn-xs btn-warning',
+			title: title
+		})
+			.attr('data-edit-work-action', action)
+			.attr('data-document-id', Number(documentId))
+			.append($('<i>', { 'class': iconClass }));
+	}
+
+	function getEditWorkScope(selector) {
+		var element = document.querySelector(selector);
+		var scope = element ? angular.element(element).scope() : null;
+		if (scope) {
+			return scope;
+		}
+		var view = document.querySelector('[data-ng-view], [ng-view]');
+		return view ? angular.element(view).scope() : null;
+	}
+
 	window.fetchProgressImagesList = function(workId) {
 		if (!workId || !ensureDataTable()) {
 			console.error('DataTables not available or missing workId for progress list');
@@ -52,22 +73,20 @@
 			pagingType: 'full_numbers',
 			aaSorting: [],
 			fnCreatedRow: function(nRow, aData) {
-				$('td:eq(7)', nRow).html('');
+				var actionCell = $('td:eq(7)', nRow).empty();
 				if (aData.imagepath && aData.imagepath !== '') {
 					var progressLabel = aData.workSubStatusNameE || aData.reasonDelay || '';
 					if (aData.workStatusId == 10) {
-						$('td:eq(7)', nRow).html(
-							'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileWS('
-								+ aData.documentId + ');"><i class="fa fa-download"></i></a>'
-						);
+						actionCell.append(createDocumentActionButton(
+							'Download File', 'fa fa-download', 'download-progress-document', aData.documentId));
 					}
-					$('td:eq(7)', nRow).append(
-						'<button class="btn btn-xs btn-warning" type="button" title="Download File" onclick="return downloadFileWSDocumnt('
-							+ aData.documentId + ',\'' + progressLabel.replace(/'/g, "\\'") + '\')"> <i class="fa fa-eye"></i></button>'
-					);
+					var viewButton = createDocumentActionButton(
+						'View File', 'fa fa-eye', 'view-progress-document', aData.documentId);
+					viewButton.data('progress-label', progressLabel);
+					actionCell.append(viewButton);
 				}
 				if (aData.workStatusId == 9) {
-					$('td:eq(7)', nRow).html('<span>-</span>');
+					actionCell.html('<span>-</span>');
 				}
 			},
 			sAjaxSource: resolveUrl('fetchProgressImagesList/' + workId),
@@ -249,12 +268,39 @@
 	};
 
 	window.downloadFileWS = function(fileId) {
-		return $('#page-wp-div').scope().downloadDocumentWSPro(fileId);
+		var scope = getEditWorkScope('#page-wp-div');
+		if (!scope || typeof scope.downloadDocumentWSPro !== 'function') {
+			console.error('Unable to download progress document: Angular scope not found');
+			return false;
+		}
+		return scope.downloadDocumentWSPro(fileId);
 	};
 
 	window.downloadFileWSDocumnt = function(fileId, workSubStatusNameE) {
-		return $('#page-wp-div').scope().downloadDocumentIdWSPro(fileId, workSubStatusNameE);
+		var scope = getEditWorkScope('#page-wp-div');
+		if (!scope || typeof scope.downloadDocumentIdWSPro !== 'function') {
+			console.error('Unable to view progress document: Angular scope not found');
+			return false;
+		}
+		return scope.downloadDocumentIdWSPro(fileId, workSubStatusNameE);
 	};
+
+	$(document)
+		.off('click.editWorkDocuments', '[data-edit-work-action]')
+		.on('click.editWorkDocuments', '[data-edit-work-action]', function(event) {
+			event.preventDefault();
+			var action = $(this).attr('data-edit-work-action');
+			var documentId = Number($(this).attr('data-document-id'));
+			if (!Number.isFinite(documentId) || documentId <= 0) {
+				console.error('Invalid progress document id');
+				return;
+			}
+			if (action === 'download-progress-document') {
+				window.downloadFileWS(documentId);
+			} else if (action === 'view-progress-document') {
+				window.downloadFileWSDocumnt(documentId, $(this).data('progress-label') || '');
+			}
+		});
 
 	$(document).off('input.editWorkCost', '.cost-input').on('input.editWorkCost', '.cost-input', function() {
 		var newExp = 0;

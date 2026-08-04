@@ -200,7 +200,7 @@ public class WebserviceController {
 
 			map.put("code", "500");
 			map.put("message", "Internal Server Error");
-			map.put("error", e.getMessage());
+			map.put("error", DMSConstants.ERROR_PROCESSING_REQUEST);
 			return map;
 		}
 
@@ -232,8 +232,8 @@ public class WebserviceController {
 
 			loginResponse.setCode("500");
 			loginResponse.setStatus("false");
-			loginResponse.setMessage(e.getMessage());
-			loginResponse.setError(e.getMessage());
+			loginResponse.setMessage(DMSConstants.ERROR_PROCESSING_REQUEST);
+			loginResponse.setError(DMSConstants.ERROR_PROCESSING_REQUEST);
 			logger.error("Error in Fetching Login Details !!" + e.getStackTrace());
 			return loginResponse;
 		}

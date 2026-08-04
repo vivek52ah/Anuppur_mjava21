@@ -116,8 +116,8 @@
 							encryptFunc(aData.id) + '"><i class="fa fa-pencil"></i></a>'
 						);
 						$action.append(
-							'<a onclick="return deleteUser(' + aData.id +
-							');" href="" class="btn btn-xs btn-danger" title="Delete"><i class="fa fa-trash-o"></i></a>'
+							'<button type="button" data-user-action="delete" data-user-id="' + aData.id +
+							'" class="btn btn-xs btn-danger" title="Delete"><i class="fa fa-trash-o"></i></button>'
 						);
 					}
 				}
@@ -135,9 +135,17 @@
 	window.initrrsTable = initrrsTable;
 	window.initManageUsersTable = initrrsTable; // Alias for SystemAdminController compatibility
 
-	function deleteUser(id) {
-		return $('#page-div').scope().deleteUser(id);
-	}
+	$(document).off('click.manageUsersActions', '[data-user-action="delete"]')
+		.on('click.manageUsersActions', '[data-user-action="delete"]', function() {
+			var id = Number($(this).attr('data-user-id'));
+			var scope = angular.element(document.getElementById('page-div')).scope();
+			if (!scope || !Number.isFinite(id)) {
+				return;
+			}
+			scope.$applyAsync(function() {
+				scope.deleteUser(id);
+			});
+		});
 
 	$('#filter-btn').off('click.rrs').on('click.rrs', function() {
 		$('#filters').fadeToggle(300);

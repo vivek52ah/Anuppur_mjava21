@@ -26,7 +26,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
-import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -204,22 +203,7 @@ public class SpringSecurityConfig {
                 referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN));
             headers.permissionsPolicy(permissions -> permissions.policy(
                 "camera=(), microphone=(), geolocation=(self), payment=(), usb=()"));
-            headers.contentSecurityPolicy(csp -> csp.policyDirectives(
-                "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
-                + "form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' "
-                + "https://maps.googleapis.com https://code.jquery.com https://cdn.datatables.net "
-                + "https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
-                + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.datatables.net "
-                + "https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
-                + "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
-                + "img-src 'self' data: blob: https:; connect-src 'self'; "
-                + "frame-src 'self' https://app.powerbi.com; media-src 'self'; upgrade-insecure-requests"));
-            // Compatibility CSP remains enforced while this stricter policy reports legacy inline/eval usage.
-            headers.addHeaderWriter(new StaticHeadersWriter("Content-Security-Policy-Report-Only",
-                "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
-                + "form-action 'self'; script-src 'self'; style-src 'self'; "
-                + "font-src 'self' data:; img-src 'self' data: blob: https:; "
-                + "connect-src 'self'; frame-src 'self' https://app.powerbi.com"));
+            // CSP is emitted once by SecurityResponseHeadersFilter because it needs a per-response nonce.
         });
     }
 

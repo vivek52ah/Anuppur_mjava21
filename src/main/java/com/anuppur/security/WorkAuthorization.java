@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.anuppur.bean.WorkBean;
+import com.anuppur.bean.DepartmentRemarksBean;
+import com.anuppur.bean.DmRemarksBean;
 import com.anuppur.dto.FinancialExpenditureRequest;
+import com.anuppur.entity.Auditable;
 import com.anuppur.entity.DepartmentRemarks;
 import com.anuppur.entity.DmRemarks;
 import com.anuppur.entity.Users;
@@ -96,6 +99,13 @@ public class WorkAuthorization {
         return true;
     }
 
+    public boolean canAccessAllWorks(List<Long> workIds) {
+        if (workIds == null || workIds.isEmpty()) {
+            return false;
+        }
+        return workIds.stream().allMatch(this::canAccessWork);
+    }
+
     public boolean canEditWork(WorkBean bean) {
         Authentication authentication = authentication();
         if (!isAuthenticated(authentication) || bean == null) {
@@ -147,14 +157,65 @@ public class WorkAuthorization {
 
     public boolean canDeleteDmRemark(Long remarkId) {
         DmRemarks remark = remarkId == null ? null : dmRemarksRepository.findById(remarkId).orElse(null);
-        return remark != null && canAccessWork(remark.getWorkId());
+        return remark != null && canModifyOwnedResource(remark.getWorkId(), remark);
     }
 
     public boolean canDeleteDepartmentRemark(Long remarkId) {
         DepartmentRemarks remark = remarkId == null
                 ? null
                 : departmentRemarksRepository.findById(remarkId).orElse(null);
+        return remark != null && canModifyOwnedResource(remark.getWorkId(), remark);
+    }
+
+    public boolean canAccessDmRemark(Long remarkId) {
+        DmRemarks remark = remarkId == null ? null : dmRemarksRepository.findById(remarkId).orElse(null);
         return remark != null && canAccessWork(remark.getWorkId());
+    }
+
+    public boolean canAccessDepartmentRemark(Long remarkId) {
+        DepartmentRemarks remark = remarkId == null
+                ? null
+                : departmentRemarksRepository.findById(remarkId).orElse(null);
+        return remark != null && canAccessWork(remark.getWorkId());
+    }
+
+    public boolean canEditDmRemark(DmRemarksBean bean) {
+        if (bean == null || bean.getWorkId() == null || !canAccessWork(bean.getWorkId())) {
+            return false;
+        }
+        if (bean.getId() == null) {
+            return true;
+        }
+        DmRemarks existing = dmRemarksRepository.findById(bean.getId()).orElse(null);
+        return existing != null
+                && Objects.equals(existing.getWorkId(), bean.getWorkId())
+                && canModifyOwnedResource(existing.getWorkId(), existing);
+    }
+
+    public boolean canEditDepartmentRemark(DepartmentRemarksBean bean) {
+        if (bean == null || bean.getWorkId() == null || !canAccessWork(bean.getWorkId())) {
+            return false;
+        }
+        if (bean.getId() == null) {
+            return true;
+        }
+        DepartmentRemarks existing = departmentRemarksRepository.findById(bean.getId()).orElse(null);
+        return existing != null
+                && Objects.equals(existing.getWorkId(), bean.getWorkId())
+                && canModifyOwnedResource(existing.getWorkId(), existing);
+    }
+
+    public boolean canModifyOwnedResource(Long workId, Auditable resource) {
+        Authentication authentication = authentication();
+        if (!isAuthenticated(authentication) || workId == null || resource == null) {
+            return false;
+        }
+        if (hasAuthority(authentication, ROLE_SYSTEM_ADMIN)) {
+            return true;
+        }
+        return canAccessWork(workId)
+                && StringUtils.hasText(resource.getCreatedBy())
+                && Objects.equals(authentication.getName(), resource.getCreatedBy());
     }
 
     private boolean isWithinScope(Authentication authentication, Users user, Work work) {

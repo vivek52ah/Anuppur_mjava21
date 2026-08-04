@@ -404,7 +404,8 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 				return "Error occurred while saving data";
 			}
 		} catch (Exception e) {
-			return "Error occurred while saving data: " + e.getMessage();
+			logger.error("Error occurred while saving work facility", e);
+			return DMSConstants.ERROR_SAVING_DATA;
 		}
 	}
 
@@ -514,7 +515,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 		} catch (Exception e) {
 
 			logger.error("Error Occurred during saving Data", e);
-			return "Error occurred while saving data: " + e.getMessage();
+			return DMSConstants.ERROR_SAVING_DATA;
 		}
 	}
 
@@ -593,7 +594,8 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 				return "Error occurred while saving data";
 			}
 		} catch (Exception e) {
-			return "Error occurred while saving data: " + e.getMessage();
+			logger.error("Error occurred while saving master data", e);
+			return DMSConstants.ERROR_SAVING_DATA;
 		}
 	}
 
@@ -1266,7 +1268,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 		} catch (Exception e) {
 
 			logger.error("Error Occurred during saving Data", e);
-			return "Error occurred while saving data: " + e.getMessage();
+			return DMSConstants.ERROR_SAVING_DATA;
 		}
 	}
 

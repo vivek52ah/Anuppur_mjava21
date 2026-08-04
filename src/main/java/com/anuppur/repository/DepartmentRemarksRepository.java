@@ -1,6 +1,7 @@
 package com.anuppur.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,9 @@ public interface DepartmentRemarksRepository extends JpaRepository<DepartmentRem
 	List<DepartmentRemarks> findByworkIdAndEnabled(Long long1, short s);
 
 	List<DepartmentRemarks> findByWorkId(Long id);
+
+	@Query(value = "SELECT * FROM department_remarks WHERE document_id = :documentId AND enabled = 1 LIMIT 1", nativeQuery = true)
+	Optional<DepartmentRemarks> findEnabledByDocumentId(@Param("documentId") Long documentId);
 	
 	@Query(value = "SELECT created_time FROM department_remarks WHERE id = :id", nativeQuery = true)
 	String findCreatedDateByWorkId(@Param("id") Long id);

@@ -52,6 +52,8 @@ public interface DMSConstants {
 	public static final String ERROR_SAVING_DATA = "Some error occured while saving the data";
 	
 	public static final String ERROR_DELETING_DATA = "Some error occured while deleting the data";
+	public static final String INVALID_REQUEST = "Invalid request.";
+	public static final String ERROR_PROCESSING_REQUEST = "The request could not be completed.";
 	
 	public static final String DUPLICATE_ENTRY = "Duplicate entry - ";
 	

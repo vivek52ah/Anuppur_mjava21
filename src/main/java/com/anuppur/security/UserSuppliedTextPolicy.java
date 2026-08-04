@@ -70,11 +70,15 @@ public class UserSuppliedTextPolicy {
 
     public void validateParameter(String parameterName, String[] values) {
         String fieldName = leafName(parameterName);
-        if (!isPlainTextField(fieldName) || values == null) {
+        if (values == null) {
             return;
         }
         for (String value : values) {
-            validate(fieldName, value);
+            if (isPlainTextField(fieldName)) {
+                validate(fieldName, value);
+            } else {
+                validateActiveSyntax(fieldName, value);
+            }
         }
     }
 
@@ -92,6 +96,13 @@ public class UserSuppliedTextPolicy {
             throw invalid(fieldName, "must not exceed " + maxLength + " characters");
         }
 
+        validateActiveSyntax(fieldName, value);
+    }
+
+    private void validateActiveSyntax(String fieldName, String value) {
+        if (value == null) {
+            return;
+        }
         String canonical = canonicalize(value);
         if (canonical.indexOf('\0') >= 0 || containsDisallowedControlCharacter(canonical)) {
             throw invalid(fieldName, "contains an invalid control character");
@@ -105,7 +116,14 @@ public class UserSuppliedTextPolicy {
     }
 
     private void validateObject(Object value, IdentityHashMap<Object, Boolean> visited, int depth) {
-        if (value == null || depth > MAX_OBJECT_DEPTH || isSimpleType(value.getClass())) {
+        if (value == null || depth > MAX_OBJECT_DEPTH) {
+            return;
+        }
+        if (value instanceof String text) {
+            validateActiveSyntax("request", text);
+            return;
+        }
+        if (isSimpleType(value.getClass())) {
             return;
         }
         if (visited.put(value, Boolean.TRUE) != null) {
@@ -137,8 +155,12 @@ public class UserSuppliedTextPolicy {
                 try {
                     field.setAccessible(true);
                     Object fieldValue = field.get(value);
-                    if (fieldValue instanceof String text && isPlainTextField(field.getName())) {
-                        validate(field.getName(), text);
+                    if (fieldValue instanceof String text) {
+                        if (isPlainTextField(field.getName())) {
+                            validate(field.getName(), text);
+                        } else {
+                            validateActiveSyntax(field.getName(), text);
+                        }
                     } else {
                         validateObject(fieldValue, visited, depth + 1);
                     }

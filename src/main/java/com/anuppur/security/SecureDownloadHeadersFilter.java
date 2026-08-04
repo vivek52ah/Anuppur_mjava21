@@ -38,7 +38,11 @@ public class SecureDownloadHeadersFilter extends OncePerRequestFilter {
 
             @Override
             public void addHeader(String name, String value) {
-                super.addHeader(name, secureDisposition(name, value));
+                if (CONTENT_DISPOSITION.equalsIgnoreCase(name)) {
+                    super.setHeader(name, secureDisposition(name, value));
+                    return;
+                }
+                super.addHeader(name, value);
             }
 
             private String secureDisposition(String name, String value) {

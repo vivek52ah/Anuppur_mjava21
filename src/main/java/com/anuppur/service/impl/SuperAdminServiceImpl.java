@@ -498,12 +498,23 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 	}
 	
 	@Override
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') or (hasRole('ROLE_DEPARTMENT') and @userAuthorization.canManageAreaOfficerRequest(#p0))")
 	public String editUser(UserBean bean, String websiteURL){
 		
 		try{
 			logger.info("edit me i");
 			Users entity = userRepository.findById(bean.getId()).orElse(null);
+			if (entity == null) {
+				return "User not found";
+			}
+			boolean departmentEditor = DMSUtil.getUserDetail().getAuthorities().stream()
+					.anyMatch(authority -> "ROLE_DEPARTMENT".equals(authority.getAuthority()));
+			String originalEmail = entity.getEmailId();
+			String originalUsername = entity.getUsername();
+			String originalPassword = entity.getPassword();
+			var originalAgency = entity.getImplementationAgency();
+			var originalUserType = entity.getUserType();
+			var originalOfficeType = entity.getOfficeType();
 			if(!entity.getEmailId().equals(bean.getEmailId())){//if EmailId has changed
 				//check whether already exist
 				Users user = userRepository.findByUsernameAndStatusNot(bean.getEmailId(), DMSConstants.STATUS_DELETED);
@@ -523,6 +534,20 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 				}
 			}
 			convertUserBeanToEntity(entity, bean);
+			if (departmentEditor) {
+				Users loggedInUser = userRepository.findByUsernameAndStatus(
+						DMSUtil.getUserDetail().getUsername(), DMSConstants.STATUS_ACTIVE);
+				entity.setEmailId(originalEmail);
+				entity.setUsername(originalUsername);
+				entity.setPassword(originalPassword);
+				entity.setDesignationID(1L);
+				entity.setDepartmentName(loggedInUser.getDepartmentName());
+				entity.setDistrict(loggedInUser.getDistrict());
+				entity.setDivision(loggedInUser.getDivision());
+				entity.setImplementationAgency(originalAgency);
+				entity.setUserType(originalUserType);
+				entity.setOfficeType(originalOfficeType);
+			}
 			
 			Set<Role> roles = new HashSet<>();
 			if(bean.getDesignationId() == 1L) {
@@ -562,7 +587,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 	}
 	
 	@Override
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM') or (hasRole('ROLE_DEPARTMENT') and @userAuthorization.canManageAreaOfficer(#p0))")
 	public String deleteUser(Long id){
 		
 		try{

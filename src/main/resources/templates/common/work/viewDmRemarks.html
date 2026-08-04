@@ -76,9 +76,9 @@
 						</div>
 						<div class="col-sm-4">
 							<label>Uplaod Attachment </label>
-							<input type='file' accept="image/*,.pdf" class="form-control"
+						<input type='file' accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" class="form-control"
 																						 file-model="dmattachment" name="dmremarksAttachment" id="dmremarksAttachment" />
-															<span data-ng-show="workDataR.documentId==null"><b>(pdf file with max size 30 mb)</b></span>
+													<span data-ng-show="workDataR.documentId==null"><b>(PDF/JPG/PNG, max size 10 MB)</b></span>
 												
 												
 															<p class="help-block" style="color: red;"

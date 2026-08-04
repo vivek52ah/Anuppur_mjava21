@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import java.util.Map;
 
 import com.anuppur.bean.UserBean;
 import com.anuppur.bean.WorkBean;
@@ -30,6 +31,8 @@ class UserSuppliedTextPolicyTest {
     void rejectsAngularTemplateExpressions() {
         assertThrows(InvalidPlainTextException.class,
                 () -> policy.validate("contractorName", "{{constructor.constructor('alert(1)')()}}"));
+        assertThrows(InvalidPlainTextException.class,
+                () -> policy.validateParameter("searchBoxVal", new String[] { "{{7*7}}" }));
     }
 
     @Test
@@ -48,7 +51,17 @@ class UserSuppliedTextPolicyTest {
     void validatesMultipartAndFormParameters() {
         assertThrows(InvalidPlainTextException.class,
                 () -> policy.validateParameter("remarks0", new String[] { "<b>unsafe</b>" }));
-        assertDoesNotThrow(() ->
-                policy.validateParameter("unrelatedNumericFilter", new String[] { "<not-a-save-field>" }));
+        assertThrows(InvalidPlainTextException.class, () ->
+                policy.validateParameter("searchBoxVal", new String[] { "<img/src=x/onerror=alert(1)>" }));
+        assertThrows(InvalidPlainTextException.class, () ->
+                policy.validateParameter("searchBoxVal", new String[] { "&lt;svg/onload=alert(1)&gt;" }));
+    }
+
+    @Test
+    void rejectsActiveSyntaxInUnlistedJsonFields() {
+        assertThrows(InvalidPlainTextException.class,
+                () -> policy.validateBody(Map.of("futureField", "{{constructor.constructor(1)()}}")));
+        assertThrows(InvalidPlainTextException.class,
+                () -> policy.validateBody(Map.of("futureField", "<img/src=x/onerror=alert(1)>")));
     }
 }

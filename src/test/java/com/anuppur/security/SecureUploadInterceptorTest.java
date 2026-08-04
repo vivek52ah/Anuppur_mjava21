@@ -1,6 +1,7 @@
 package com.anuppur.security;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.charset.StandardCharsets;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
-import org.springframework.web.server.ResponseStatusException;
 
 class SecureUploadInterceptorTest {
 
@@ -22,7 +22,7 @@ class SecureUploadInterceptorTest {
         request.addFile(new MockMultipartFile("file", "payload.js", "application/javascript",
                 "alert(1)".getBytes(StandardCharsets.UTF_8)));
 
-        assertThrows(ResponseStatusException.class,
+        assertThrows(InvalidFileUploadException.class,
                 () -> interceptor.preHandle(request, new MockHttpServletResponse(), new Object()));
     }
 
@@ -34,5 +34,18 @@ class SecureUploadInterceptorTest {
                 "%PDF-1.7\ncontent".getBytes(StandardCharsets.US_ASCII)));
 
         assertDoesNotThrow(() -> interceptor.preHandle(request, new MockHttpServletResponse(), new Object()));
+    }
+
+    @Test
+    void rejectsNonPdfContentRenamedWithPdfExtensionWithActionableMessage() {
+        MockMultipartHttpServletRequest request = new MockMultipartHttpServletRequest();
+        request.setRequestURI("/systemAdmin/saveOrUpdateDepartment");
+        request.addFile(new MockMultipartFile("dmattachment", "attachment.pdf", "application/pdf",
+                new byte[] { (byte) 0xAC, (byte) 0xED, 0x00, 0x05 }));
+
+        InvalidFileUploadException exception = assertThrows(InvalidFileUploadException.class,
+                () -> interceptor.preHandle(request, new MockHttpServletResponse(), new Object()));
+
+        assertEquals("File content does not match its extension and MIME type.", exception.getMessage());
     }
 }

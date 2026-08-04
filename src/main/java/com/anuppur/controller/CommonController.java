@@ -276,6 +276,7 @@ public class CommonController extends BaseController {
 //
 //	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@RequestMapping(value = "/dochangepassword", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseObject changePassword(
@@ -774,11 +775,11 @@ public class CommonController extends BaseController {
 			return ResponseEntity.ok(result);
 		} catch (NumberFormatException e) {
 			logger.error("Invalid filter parameter: {}", e.getMessage());
-			return ResponseEntity.badRequest().body("{\"errorMessage\": \"Invalid filter parameter: " + e.getMessage() + "\"}");
+			return ResponseEntity.badRequest().body("{\"errorMessage\": \"Invalid filter parameter.\"}");
 		} catch (Exception e) {
 			logger.error("Error fetching department wise report: {}", e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("{\"errorMessage\": \"" + e.getMessage() + "\"}");
+					.body("{\"errorMessage\": \"The request could not be completed.\"}");
 		}
 	}
 
@@ -804,11 +805,11 @@ public class CommonController extends BaseController {
 			return ResponseEntity.ok(result);
 		} catch (NumberFormatException e) {
 			logger.error("Invalid filter parameter: {}", e.getMessage());
-			return ResponseEntity.badRequest().body("{\"errorMessage\": \"Invalid filter parameter: " + e.getMessage() + "\"}");
+			return ResponseEntity.badRequest().body("{\"errorMessage\": \"Invalid filter parameter.\"}");
 		} catch (Exception e) {
 			logger.error("Error fetching photo update report: {}", e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("{\"errorMessage\": \"" + e.getMessage() + "\"}");
+					.body("{\"errorMessage\": \"The request could not be completed.\"}");
 		}
 	}
 
@@ -836,15 +837,16 @@ public class CommonController extends BaseController {
 			return ResponseEntity.ok(result);
 		} catch (NumberFormatException e) {
 			logger.error("Invalid filter parameter: {}", e.getMessage());
-			return ResponseEntity.badRequest().body("{\"errorMessage\": \"Invalid filter parameter: " + e.getMessage() + "\"}");
+			return ResponseEntity.badRequest().body("{\"errorMessage\": \"Invalid filter parameter.\"}");
 		} catch (Exception e) {
 			logger.error("Error fetching DM remark wise report: {}", e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("{\"errorMessage\": \"" + e.getMessage() + "\"}");
+					.body("{\"errorMessage\": \"The request could not be completed.\"}");
 		}
 	}
 
 	// Method to handle uploading of work progress inspection images.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT','ROLE_AREA_OFFICER') and @workAuthorization.canAccessWork(#p0.id)")
 	@RequestMapping(value = "/uploadWorkProgressImages", method = RequestMethod.POST, consumes = {
 			"multipart/form-data" })
 	public ResponseObject uploadInspectionImages(WorkProgressImageListBean workProgressImageListBean,
@@ -866,7 +868,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -1506,7 +1508,7 @@ public class CommonController extends BaseController {
 		} catch (FinancialValidationException e) {
 			throw e;
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -1545,7 +1547,7 @@ public class CommonController extends BaseController {
 		} catch (FinancialValidationException e) {
 			throw e;
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -1584,7 +1586,7 @@ public class CommonController extends BaseController {
 		} catch (FinancialValidationException e) {
 			throw e;
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -1623,7 +1625,7 @@ public class CommonController extends BaseController {
 		} catch (FinancialValidationException e) {
 			throw e;
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -1659,7 +1661,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -1705,7 +1707,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -1743,7 +1745,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -1783,7 +1785,7 @@ public class CommonController extends BaseController {
 		} catch (FinancialValidationException e) {
 			throw e;
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -1890,7 +1892,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -2101,6 +2103,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to edit and update ongoing work data.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canEditWork(#p0)")
 	@RequestMapping(value = "/editOngoingWork", method = RequestMethod.POST)
 	public ResponseObject editOngoingWork(@RequestBody WorkBean workBean, HttpServletRequest request) throws Exception {
 
@@ -2121,7 +2124,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -2941,6 +2944,7 @@ public class CommonController extends BaseController {
 	}
 
 	// Method to handle uploading of other work-related documents.
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.id)")
 	@RequestMapping(value = "/uploadOtherDoc", method = RequestMethod.POST)
 	public ResponseObject uploadOtherDoc(OtherDocListBean otherDocListBean, HttpServletRequest request)
 			throws Exception {
@@ -2963,7 +2967,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -2985,7 +2989,7 @@ public class CommonController extends BaseController {
 	}
 
 	// delete File
-	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT')")
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canDeleteWorkDocument(#p0)")
 	@RequestMapping(value = "/deleteFile/{id}", method = RequestMethod.POST)
 	public ResponseObject deleteFile(@PathVariable Long id, HttpServletRequest request) {
 
@@ -3447,7 +3451,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -4479,7 +4483,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -4517,7 +4521,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -4555,7 +4559,7 @@ public class CommonController extends BaseController {
 				logger.error("User - {}, Role - {} - {}", user.getUsername(), user.getAuthorities(), errorMsg);
 			}
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
+			String errorMsg = DMSConstants.ERROR_PROCESSING_REQUEST;
 			response = new ResponseObject();
 			response.setErrorMessage(errorMsg);
 			logger.error("User - " + user.getUsername() + ", Role - " + user.getAuthorities() + " - " + errorMsg);
@@ -5100,6 +5104,7 @@ public class CommonController extends BaseController {
 
 	
 	
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessAllWorks(#p0)")
 	@RequestMapping(
 	        value = "manageOngoingWorks/downloadAllWorksExcel",
 	        method = RequestMethod.POST
@@ -5411,7 +5416,7 @@ public class CommonController extends BaseController {
 	}
 
 	
-	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canAccessWork(#p0.workId)")
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canEditDmRemark(#p0)")
 	@PostMapping( value="saveOrUpdate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	//@ResponseBody
 	public ResponseObject saveOrUpdateDmRemarks( DmRemarksBean bean) {
@@ -5432,7 +5437,7 @@ public class CommonController extends BaseController {
 	}
 	
 	
-	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0.workId)")
+	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canEditDepartmentRemark(#p0)")
 	@PostMapping( value="saveOrUpdateDepartment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	//@ResponseBody
 	public ResponseObject saveOrUpdateDepartmentRemarks( DepartmentRemarksBean bean) {
@@ -5442,7 +5447,7 @@ public class CommonController extends BaseController {
 	    String result = commonService.addOrUpdateDepartmentRemark(bean);
 
 	    if ("success".equals(result)) {
-	        response.setSuccessMessage("DM Remark saved successfully!");
+	        response.setSuccessMessage("Department Remark saved successfully!");
 	    } else if (result.startsWith("error:")) {
 	        response.setErrorMessage(result.substring(6).trim()); // remove "error:" part
 	    } else {
@@ -5454,49 +5459,52 @@ public class CommonController extends BaseController {
 	
 	
 	
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0)")
 	@GetMapping(value="getDMRemarks/{workid}")
-	public List<DmRemarksBean> getAllDmRemarks(@PathVariable("workid") String workid,HttpServletRequest request ){
+	public List<DmRemarksBean> getAllDmRemarks(@PathVariable("workid") Long workid,HttpServletRequest request ){
 		
-		return commonService.getAllRemarksByWorkID(Long.parseLong(workid));
+		return commonService.getAllRemarksByWorkID(workid);
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessWork(#p0)")
 	@GetMapping(value="getDepartmentRemarks/{workid}")
-	public List<DepartmentRemarksBean> getAllDepartmentRemarks(@PathVariable("workid") String workid,HttpServletRequest request ){
+	public List<DepartmentRemarksBean> getAllDepartmentRemarks(@PathVariable("workid") Long workid,HttpServletRequest request ){
 		
-		return commonService.getAllDepartmentRemarksByWorkID(Long.parseLong(workid));
+		return commonService.getAllDepartmentRemarksByWorkID(workid);
 	}
 	
 	
-	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canDeleteDmRemark(T(Long).valueOf(#p0))")
+	@PreAuthorize("hasRole('ROLE_DM') and @workAuthorization.canDeleteDmRemark(#p0)")
 	@PostMapping(value = "deleteRemarks/{id}")
-	public Boolean deleteRemarks(@PathVariable("id") String id,HttpServletRequest request) {
-		return commonService.deleteRemarks(Long.parseLong(id));
+	public Boolean deleteRemarks(@PathVariable("id") Long id,HttpServletRequest request) {
+		return commonService.deleteRemarks(id);
 	}
 	
-	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canDeleteDepartmentRemark(T(Long).valueOf(#p0))")
+	@PreAuthorize("hasRole('ROLE_DEPARTMENT') and @workAuthorization.canDeleteDepartmentRemark(#p0)")
 	@PostMapping(value = "deleteDepartmentRemarks/{id}")
-	public Boolean deleteDepartmentRemarks(@PathVariable("id") String id,HttpServletRequest request) {
-		return commonService.deleteDepartmentRemarks(Long.parseLong(id));
+	public Boolean deleteDepartmentRemarks(@PathVariable("id") Long id,HttpServletRequest request) {
+		return commonService.deleteDepartmentRemarks(id);
 	}
 	
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessDmRemark(#p0)")
 	@GetMapping(value="getRemarksDetailsById/{id}")
-	public DmRemarksBean  getRemakrsDetails(@PathVariable("id")String id , HttpServletRequest request) {
+	public DmRemarksBean  getRemakrsDetails(@PathVariable("id") Long id , HttpServletRequest request) {
 		 // ✅ SAFETY CHECK (NO LOGIC CHANGE)
-	    if (id == null || id.equalsIgnoreCase("undefined") || id.equalsIgnoreCase("null")) {
+	    if (id == null) {
 	        return null; // or new DepartmentRemarksBean();
 	    }
-		return commonService.getRemakrsDetails(Long.parseLong(id));
+		return commonService.getRemakrsDetails(id);
 
 	}
 	
+	@PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workAuthorization.canAccessDepartmentRemark(#p0)")
 	@GetMapping(value="getDepartmentRemarksDetailsById/{id}")
-	public DepartmentRemarksBean  getDepartmentRemarksDetailsById(@PathVariable("id") String id , HttpServletRequest request) {
+	public DepartmentRemarksBean  getDepartmentRemarksDetailsById(@PathVariable("id") Long id , HttpServletRequest request) {
 		 // ✅ SAFETY CHECK (NO LOGIC CHANGE)
-	    if (id == null || id.equalsIgnoreCase("undefined") || id.equalsIgnoreCase("null")) {
+	    if (id == null) {
 	        return null; // or new DepartmentRemarksBean();
 	    }
-		Long londId = Long.parseLong(id);
-		return commonService.getDepartmentRemarksDetailsById(londId);
+		return commonService.getDepartmentRemarksDetailsById(id);
 
 	}
 	
@@ -5697,6 +5705,7 @@ public class CommonController extends BaseController {
 
 
 	  
+	  @PreAuthorize("hasAnyRole('ROLE_SYSTEM_ADMIN','ROLE_DM','ROLE_DEPARTMENT') and @workResourceAuthorization.canAccessFinancialAgency(#p0)")
 	  @PostMapping("/deleteFinancialAgencyRow")
 	  public String deleteFinancialAgencyRow(@RequestParam Long id) {
 	      return commonService.deleteByFinancailAgencyId(id);
@@ -5777,6 +5786,7 @@ public class CommonController extends BaseController {
 		 	    return new ResponseEntity<>(response, HttpStatus.OK);
 		 	}
 		
+			@PreAuthorize("isAuthenticated()")
 			@RequestMapping(value = "/validateCurrentPassword", method = RequestMethod.POST)
 			public ResponseObject validateCurrentPassword(@RequestBody ChangePasswordBean currentpassword) throws Exception {
 

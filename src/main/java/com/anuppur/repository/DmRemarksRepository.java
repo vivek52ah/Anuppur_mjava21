@@ -1,6 +1,7 @@
 package com.anuppur.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +22,9 @@ public interface DmRemarksRepository extends JpaRepository<DmRemarks, Long>{
 
 
 	List<DmRemarks> findByWorkId(Long valueOf);
+
+	@Query(value = "SELECT * FROM dm_remarks WHERE document_id = :documentId AND enabled = 1 LIMIT 1", nativeQuery = true)
+	Optional<DmRemarks> findEnabledByDocumentId(@Param("documentId") Long documentId);
 
 	List<DmRemarks> findByEnabled(Short enabled);
 

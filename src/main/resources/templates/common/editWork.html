@@ -847,6 +847,17 @@ td {
 	 }
 	 } */
 
+	function createTsAsActionButton(title, iconClass, action, recordId) {
+		return $('<button>', {
+			type: 'button',
+			'class': 'btn btn-xs btn-warning',
+			title: title
+		})
+			.attr('data-edit-ts-action', action)
+			.attr('data-record-id', Number(recordId))
+			.append($('<i>', { 'class': iconClass, 'aria-hidden': 'true' }));
+	}
+
 	 var ts = null;
 	function fetchTSASRevisedList(workId) {
 
@@ -907,66 +918,28 @@ td {
 							
 							/* <i class="fa fa-window-close" aria-hidden="true"></i> */
 							"fnCreatedRow" : function(nRow, aData, iDataIndex) {
-								if(aData.workStatus == "Revised" && (aData.typeDoc == "TS" )){
-									$('td:eq(8)', nRow)
-									.html(
-											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFile('
-													+ (aData.rvFileId)
-													+ '); "><i class="fa fa-download"></i></a>')
-									
-									.append(
-											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="return cancelFileTS('
-													+ (aData.id)
-													+ '); "><i class="fa fa-close" aria-hidden="true"></i></a>');
-									
-					
-		
+								var actionCell = $('td:eq(8)', nRow).empty();
+								if (aData.workStatus == "Revised") {
+									actionCell.append(createTsAsActionButton(
+										"Download File", "fa fa-download", "download-revised", aData.rvFileId));
+									if (aData.typeDoc == "TS") {
+										actionCell.append(createTsAsActionButton(
+											"Cancel", "fa fa-close", "cancel-ts", aData.id));
+									} else if (aData.typeDoc == "AS") {
+										actionCell.append(createTsAsActionButton(
+											"Cancel", "fa fa-close", "cancel-as", aData.id));
+									}
+								} else if (aData.workStatus == "Original") {
+									if (aData.typeDoc == "TS") {
+										actionCell.append(createTsAsActionButton(
+											"Download File", "fa fa-download", "download-original-ts", aData.rvFileId));
+									} else if (aData.typeDoc == "AS") {
+										actionCell.append(createTsAsActionButton(
+											"Download File", "fa fa-download", "download-original-as", aData.rvFileId));
+									}
+									actionCell.append(createTsAsActionButton(
+										"Cancel", "fa fa-close", "cancel-original", aData.workId));
 								}
-								
-								if(aData.workStatus == "Revised" && (aData.typeDoc == "AS")){
-									$('td:eq(8)', nRow)
-									.html(
-											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFile('
-													+ (aData.rvFileId)
-													+ '); "><i class="fa fa-download"></i></a>')
-									
-									.append(
-											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="return cancelFileAS('
-													+ (aData.id)
-													+ '); "><i class="fa fa-close" aria-hidden="true"></i></a>');
-									
-					
-		
-								}
-								
-								if(aData.workStatus == "Original" && (aData.typeDoc == "TS" )){
-									$('td:eq(8)', nRow)
-									.html(
-											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileOriginalTS('
-													+ (aData.rvFileId)
-													+ '); "><i class="fa fa-download"></i></a>')
-									
-									.append(
-											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="return cancelFile('
-													+ (aData.workId)
-													+ '); "><i class="fa fa-close" aria-hidden="true"></i></a>');
-		
-								}
-								
-								if(aData.workStatus == "Original" && (aData.typeDoc == "AS" )){
-									$('td:eq(8)', nRow)
-									.html(
-											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Download File" onclick="return downloadFileOriginalAS('
-													+ (aData.rvFileId)
-													+ '); "><i class="fa fa-download"></i></a>')
-		
-									.append(
-											'<a class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="return cancelFile('
-													+ (aData.workId)
-													+ '); "><i class="fa fa-close" aria-hidden="true"></i></a>');
-								}
-								
-								
 							},
 							"sAjaxSource" : "fetchTSASRevisedList/" + workId,
 
@@ -1007,30 +980,67 @@ td {
 						});
 	}
 
+	function getEditWorkTsScope() {
+		var element = document.getElementById('page-ts-div');
+		var scope = element ? angular.element(element).scope() : null;
+		if (scope) return scope;
+		var view = document.querySelector('[data-ng-view], [ng-view]');
+		return view ? angular.element(view).scope() : null;
+	}
+
+	function invokeTsScope(methodName, recordId) {
+		var scope = getEditWorkTsScope();
+		if (!scope || typeof scope[methodName] !== 'function') {
+			console.error('Unable to run TS/AS document action: Angular scope not found');
+			return false;
+		}
+		return scope[methodName](recordId);
+	}
+
 	function downloadFile(fileId) {
-		return $('#page-ts-div').scope().downloadDocumentTSRevised(fileId);
+		return invokeTsScope('downloadDocumentTSRevised', fileId);
 	}
 	
 	function cancelFile(workId) {
-		return $('#page-ts-div').scope().cancelFile(workId);
+		return invokeTsScope('cancelFile', workId);
 	}
 	
 	function cancelFileTS(Id) {
-		return $('#page-ts-div').scope().cancelFileTS(Id);
+		return invokeTsScope('cancelFileTS', Id);
 	}
 	
 	function cancelFileAS(Id) {
-		return $('#page-ts-div').scope().cancelFileAS(Id);
+		return invokeTsScope('cancelFileAS', Id);
 	}
 	
 	function downloadFileOriginalTS(fileId) {
-		return $('#page-ts-div').scope().downloadDocumentTS(fileId);
+		return invokeTsScope('downloadDocumentTS', fileId);
 	}
 	
 	
 	function downloadFileOriginalAS(fileId) {
-		return $('#page-ts-div').scope().downloadDocumentAS(fileId);
+		return invokeTsScope('downloadDocumentAS', fileId);
 	}
+
+	$(document)
+		.off('click.editWorkTsDocuments', '[data-edit-ts-action]')
+		.on('click.editWorkTsDocuments', '[data-edit-ts-action]', function(event) {
+			event.preventDefault();
+			var action = $(this).attr('data-edit-ts-action');
+			var recordId = Number($(this).attr('data-record-id'));
+			if (!Number.isFinite(recordId) || recordId <= 0) {
+				console.error('Invalid TS/AS document id');
+				return;
+			}
+			switch (action) {
+				case 'download-revised': downloadFile(recordId); break;
+				case 'download-original-ts': downloadFileOriginalTS(recordId); break;
+				case 'download-original-as': downloadFileOriginalAS(recordId); break;
+				case 'cancel-ts': cancelFileTS(recordId); break;
+				case 'cancel-as': cancelFileAS(recordId); break;
+				case 'cancel-original': cancelFile(recordId); break;
+			}
+		});
 	
 	
 

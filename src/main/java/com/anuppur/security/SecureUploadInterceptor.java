@@ -2,11 +2,9 @@ package com.anuppur.security;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,23 +22,19 @@ public class SecureUploadInterceptor implements HandlerInterceptor {
         }
 
         boolean bulkSpreadsheet = request.getRequestURI().endsWith(BULK_UPLOAD_PATH);
-        try {
-            for (List<MultipartFile> files : multipartRequest.getMultiFileMap().values()) {
-                for (MultipartFile file : files) {
-                    // Empty optional file inputs are ignored; mandatory inputs are still checked by controllers.
-                    if (file == null || file.isEmpty()) {
-                        continue;
-                    }
-                    if (bulkSpreadsheet) {
-                        SecureFileUploadPolicy.validateBulkSpreadsheet(file);
-                    } else {
-                        SecureFileUploadPolicy.validateDocument(file);
-                    }
+        for (List<MultipartFile> files : multipartRequest.getMultiFileMap().values()) {
+            for (MultipartFile file : files) {
+                // Empty optional file inputs are ignored; mandatory inputs are still checked by controllers.
+                if (file == null || file.isEmpty()) {
+                    continue;
+                }
+                if (bulkSpreadsheet) {
+                    SecureFileUploadPolicy.validateBulkSpreadsheet(file);
+                } else {
+                    SecureFileUploadPolicy.validateDocument(file);
                 }
             }
-            return true;
-        } catch (InvalidFileUploadException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
+        return true;
     }
 }

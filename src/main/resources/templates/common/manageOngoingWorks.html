@@ -409,7 +409,7 @@
 			padding: 14px !important;
 		}
 
-		#imageModal button[onclick="openZoomOverlay()"] {
+		#imageModal button[data-work-action="open-zoom"] {
 			z-index: 6;
 		}
 		
@@ -1053,8 +1053,8 @@ ul.dropdown-menu.inner.show li {
 
 							<div class="form-group col-sm-12 text-right mt-2">
 								<button type="button" class="btn btn-primary"
-									onclick="window.reloadJqueryDatatables();">Search</button>
-								<button type="button" class="btn btn-secondary" onclick="resetFilters();">Reset</button>
+									data-work-action="search">Search</button>
+								<button type="button" class="btn btn-secondary" data-work-action="reset">Reset</button>
 							</div>
 
 
@@ -1172,6 +1172,28 @@ ul.dropdown-menu.inner.show li {
 
 
 
+function getManageOngoingWorksScope() {
+    var form = document.getElementById('searchForm');
+    var scope = form ? angular.element(form).scope() : null;
+    if (scope) {
+        return scope;
+    }
+    var view = document.querySelector('[data-ng-view], [ng-view]');
+    return view ? angular.element(view).scope() : null;
+}
+
+function applyToManageOngoingWorksScope(scope, callback) {
+    if (!scope || typeof callback !== 'function') {
+        return false;
+    }
+    if (scope.$root && scope.$root.$$phase) {
+        callback();
+    } else {
+        scope.$apply(callback);
+    }
+    return true;
+}
+
 function openDmRemarkModal(workId, dmRemarkId) {
 
     if (!workId) {
@@ -1179,9 +1201,9 @@ function openDmRemarkModal(workId, dmRemarkId) {
         return;
     }
 
-    var scope = angular.element(document.getElementById('dmRemarkModal')).scope();
+    var scope = getManageOngoingWorksScope();
 
-    scope.$apply(function () {
+    if (!applyToManageOngoingWorksScope(scope, function () {
         scope.workId = workId;
 
         if (dmRemarkId) {
@@ -1196,7 +1218,10 @@ function openDmRemarkModal(workId, dmRemarkId) {
 
         scope.loadDmRemarksForWorkId(workId);
 		scope.loadDepartmentRemarksForWorkId(workId);
-    });
+    })) {
+        console.error('Unable to open DM Remark: Angular scope not found');
+        return;
+    }
 
     $('#dmRemarkModal').modal('show');
 }
@@ -1277,7 +1302,7 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 									}
 
 									// 2. Apply to Angular scope
-									const scope = angular.element($('#searchForm')).scope();
+									const scope = getManageOngoingWorksScope();
 									if (scope && shouldRestoreFilters) {
 										scope.$applyAsync(() => {
 											scope.workData = scope.workData || {};
@@ -1421,7 +1446,7 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 											{data: "divisionName", title: "Division", defaultContent: "-"},
 											{data: "districtName", title: "District", defaultContent: "-"},
     										{data: "workNo", title: "Work Unique ID", defaultContent: "-"},
-											{data: "workName", title: "Work Name", defaultContent: "-"},
+											{data: "workName", title: "Work Name", defaultContent: "-", render: $.fn.dataTable.render.text()},
 											{data: "workType", title: "Work Type", defaultContent: "-"},
 											{data: "financialYearName", title: "FY of Sanction", defaultContent: "-"},
 											
@@ -1441,11 +1466,12 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 
 											        // If multiple financing agencies, show View link
 											        return `
-											            <a href="javascript:void(0)"
-											               style="color:#0056b3; font-weight:600; text-decoration:underline;"
-											               onclick="openFinancingAgencyModal(${row.id})">
-											               View
-											            </a>
+							            <button type="button" class="btn btn-link p-0"
+							               style="color:#0056b3; font-weight:600; text-decoration:underline;"
+							               data-work-action="open-financing-agency"
+							               data-work-id="${Number(row.id)}">
+							               View
+							            </button>
 											        `;
 											    }
 											},
@@ -1466,16 +1492,17 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 
 													let displayVal = (data !== null && data !== undefined && data !== '') ? data : '0';
 
-													return `<a href="javascript:void(0)"
-													       style="font-weight:600; color:#333; text-decoration:underline; cursor:pointer;"
-													       onclick="openFinancingAgencyExpenditureModal(${row.id})">${displayVal}</a>`;
+									return `<button type="button" class="btn btn-link p-0"
+									       style="font-weight:600; color:#333; text-decoration:underline; cursor:pointer;"
+									       data-work-action="open-financing-expenditure"
+									       data-work-id="${Number(row.id)}">${displayVal}</button>`;
 												}
 											}
 ,
 											{data: "workStatusName", title: "Physical Status", defaultContent: "-"},
 											{data: "levelOfCompletion", title: "Level of Completion", defaultContent: "-"},
-											{data: "contractorName", title: "Contractor Name", defaultContent: "-"},
-											{data: "departmentRemarks", title: "Department Remarks", defaultContent: "-"},
+											{data: "contractorName", title: "Contractor Name", defaultContent: "-", render: $.fn.dataTable.render.text()},
+											{data: "departmentRemarks", title: "Department Remarks", defaultContent: "-", render: $.fn.dataTable.render.text()},
 										//	{data: "sor", title: "SOR Year", defaultContent: "-"},
 										//	{data: "tenderParcentage", title: "Tender Percentage", defaultContent: "-"},
 										//	{data: "workPriority", title: "Work Priority", defaultContent: "-"},
@@ -1487,24 +1514,26 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 												className: 'text-center',
 												render: function (data, type, row) {
 													console.log("ROW =>", row);
+													const safeRemark = $.fn.dataTable.render.text().display(data || '-');
 													let remark = (data)
-														? `<span style="font-weight:600; margin-right:8px;">${data}</span>`
+														? `<span style="font-weight:600; margin-right:8px;">${safeRemark}</span>`
 														: `<span style="margin-right:8px;">-</span>`;
 
 													//			const dmRemark = row.dmRemakrs || '-';
 													//			const dmDate = row.dmAproveRejectDate || '-';
 													//			const workId = row.workId;
 
-													return `
-													${remark}
+																	return `
+																	${remark}
         
 
                 <br/>   <br/>   <br/>
-                <a href="javascript:void(0)" class="btn btn-xs btn-warning"
-             onclick="openDmRemarkModal(${row.workId} || ${row.dmRemarkId})"
+                <button type="button" class="btn btn-xs btn-warning"
+             data-work-action="open-dm-remark"
+             data-work-id="${Number(row.workId || row.id || row.dmRemarkId)}"
              title="Add / View DM Remark">
              <i class="fa fa-user"></i>
-          </a>
+          </button>
            
         `;
 												}
@@ -1560,12 +1589,13 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 										            // Progress Documents
 										            if (data.progressDocuments && data.progressDocuments.length > 0) {
 
-										                $actionCell.append(`
-										                    <a class="btn btn-xs btn-warning m-1"
-										                       title="View Images"
-										                       onclick="openProgressImages(${rowIdx})">
-										                       <i class="fa fa-eye"></i>
-										                    </a>
+											                $actionCell.append(`
+							                    <button type="button" class="btn btn-xs btn-warning m-1"
+							                       title="View Images"
+							                       data-work-action="open-progress-images"
+							                       data-row-index="${rowIdx}">
+							                       <i class="fa fa-eye"></i>
+							                    </button>
 										                `);
 
 										                window.progressDocsStore = window.progressDocsStore || {};
@@ -1585,7 +1615,7 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 										                $actionCell.append(`
 										                    <a class="btn btn-xs btn-primary m-1"
 										                       title="View"
-										                       href="#viewWork/${data.id}">
+											                       href="#/viewWork/${data.id}">
 										                       <i class="fa fa-pencil"></i>
 										                    </a>
 										                `);
@@ -1834,23 +1864,74 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 								}
 
 								//filter stores
+								// CSP-safe delegated handlers for controls created by DataTables and modal actions.
+								$(document)
+									.off('click.manageOngoingWorksActions', '[data-work-action]')
+									.on('click.manageOngoingWorksActions', '[data-work-action]', function (event) {
+										event.preventDefault();
+
+										const action = $(this).attr('data-work-action');
+										const workId = Number($(this).attr('data-work-id'));
+										const rowIndex = Number($(this).attr('data-row-index'));
+
+										switch (action) {
+											case 'search':
+												window.reloadJqueryDatatables();
+												break;
+											case 'reset':
+												resetFilters();
+												break;
+											case 'open-financing-agency':
+												if (Number.isFinite(workId)) openFinancingAgencyModal(workId);
+												break;
+											case 'open-financing-expenditure':
+												if (Number.isFinite(workId)) openFinancingAgencyExpenditureModal(workId);
+												break;
+											case 'open-dm-remark':
+												if (Number.isFinite(workId)) openDmRemarkModal(workId);
+												break;
+											case 'open-progress-images':
+												if (Number.isInteger(rowIndex) && rowIndex >= 0) window.openProgressImages(rowIndex);
+												break;
+											case 'previous-image':
+												window.showPrevImage();
+												break;
+											case 'next-image':
+												window.showNextImage();
+												break;
+											case 'open-zoom':
+												openZoomOverlay();
+												break;
+											case 'close-zoom':
+												closeZoomOverlay();
+												break;
+											case 'zoom-previous':
+												zoomPrev();
+												break;
+											case 'zoom-next':
+												zoomNext();
+												break;
+										}
+									});
+
 								// 🟩 On Edit Button Click – Save current filters and set restore flag
 								$(document).off('click', '.btn-edit').on('click', '.btn-edit', function () {
 									// Set flag so manageOngoingWorks restores filters when user comes back
 									window._restoreWorkFilters = true;
-									const scope = angular.element($('#searchForm')).scope();
+									const scope = getManageOngoingWorksScope() || {};
+									const workData = scope.workData || {};
 									const filters = {
 										searchBoxVal: $('#searchBoxVal').val() || scope.workNo || '',
 										workNameFilter: $('#workNameFilter').val() || scope.workNameSearch || '',
-										blockId: $('#blockId').val() || scope.workData.blockId || '',
-										financialYear1: $('#financialYear1').val() || scope.workData.financialYear || '',
-										department: $('#department').val() || scope.workData.department || '',
-										workType1: $('#workType1').val() || scope.workData.workType || '',
-										workStatusId: $('#workStatusId').val() || scope.workData.workStatusId || '',
-										implementationAgency: $('#implementationAgency').val() || scope.workData.implementationAgency || '',
-										financialHeadId1: $('#financialHeadId1').val() || scope.workData.financialHeadId || '',
-										vidhanSabhaId1: $('#vidhanSabhaId1').val() || scope.workData.vidhanSabhaId || '',
-										departmentRemark: $('#departmentRemark').val() || scope.workData.departmentRemark || ''
+										blockId: $('#blockId').val() || workData.blockId || '',
+										financialYear1: $('#financialYear1').val() || workData.financialYear || '',
+										department: $('#department').val() || workData.department || '',
+										workType1: $('#workType1').val() || workData.workType || '',
+										workStatusId: $('#workStatusId').val() || workData.workStatusId || '',
+										implementationAgency: $('#implementationAgency').val() || workData.implementationAgency || '',
+										financialHeadId1: $('#financialHeadId1').val() || workData.financialHeadId || '',
+										vidhanSabhaId1: $('#vidhanSabhaId1').val() || workData.vidhanSabhaId || '',
+										departmentRemark: $('#departmentRemark').val() || workData.departmentRemark || ''
 									};
 									localStorage.setItem('work_filters', JSON.stringify(filters));
 
@@ -1939,9 +2020,10 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 							    });
 
 							    // Reset AngularJS model
-							    const scope = angular.element($('#searchForm')).scope();
+							    const scope = getManageOngoingWorksScope();
 							    if (scope) {
 							        scope.$applyAsync(function () {
+							            scope.workData = scope.workData || {};
 
 							            scope.workNo = '';
 							            scope.workNameSearch = '';
@@ -2215,7 +2297,7 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 
     <button type="button"
             class="btn btn-sm btn-dark"
-            onclick="toggleFullScreen()">
+            data-work-action="toggle-full-screen">
         <i class="fa fa-expand"></i>
     </button>
 </div>-->
@@ -2251,16 +2333,16 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 					style="display: flex; justify-content: center; gap: 16px; padding: 24px; background: #f5f5f5;">
 					<button class="newbtn btn btn-secondary buttons-pdf buttons-html5"
 						style="color: #0056b3; border: #0056b3; font-size: 20px;"
-						onclick="showPrevImage()">Previous</button>
+						data-work-action="previous-image">Previous</button>
 					<button class="newbtn btn btn-secondary buttons-pdf buttons-html5"
 						style="color: #0056b3; border: #0056b3; font-size: 20px;"
-						onclick="showNextImage()">Next</button>
+						data-work-action="next-image">Next</button>
 				</div>
 
 
 				<button type="button" style="position: absolute;right: 15px;top: 20%;"
 								           class="btn btn-sm btn-dark"
-								           onclick="openZoomOverlay()">
+								           data-work-action="open-zoom">
 								       <i class="fa fa-expand"></i>
 								   </button>
 
@@ -2271,10 +2353,10 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 
 <!-- Zoom Overlay with Prev/Next -->
 <div id="zoomOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:99999;align-items:center;justify-content:center;">
-    <button onclick="closeZoomOverlay()" style="position:absolute;top:15px;right:20px;background:none;border:none;color:#fff;font-size:32px;cursor:pointer;">&times;</button>
-    <button onclick="zoomPrev()" style="position:absolute;left:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:40px;padding:10px 18px;border-radius:50%;cursor:pointer;">&#8249;</button>
+    <button type="button" data-work-action="close-zoom" style="position:absolute;top:15px;right:20px;background:none;border:none;color:#fff;font-size:32px;cursor:pointer;">&times;</button>
+    <button type="button" data-work-action="zoom-previous" style="position:absolute;left:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:40px;padding:10px 18px;border-radius:50%;cursor:pointer;">&#8249;</button>
     <img id="zoomImage" src="" style="max-width:90%;max-height:90vh;border-radius:6px;box-shadow:0 0 30px rgba(0,0,0,0.5);" />
-    <button onclick="zoomNext()" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:40px;padding:10px 18px;border-radius:50%;cursor:pointer;">&#8250;</button>
+    <button type="button" data-work-action="zoom-next" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:40px;padding:10px 18px;border-radius:50%;cursor:pointer;">&#8250;</button>
     <div style="position:absolute;bottom:20px;color:#fff;font-size:14px;" id="zoomCounter"></div>
 </div>
 
@@ -2650,8 +2732,8 @@ $('#dmRemarkModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
 				var total = window.currentImageList && window.currentImageList.length ? window.currentImageList.length : 1;
 				document.getElementById('imageCounter').innerText = (window.currentImageIndex + 1) + '/' + total;
 
-				const scope = angular.element(document.getElementById('imageModal')).scope();
-				scope.$apply(function () {
+				const scope = getManageOngoingWorksScope();
+				applyToManageOngoingWorksScope(scope, function () {
 					scope.noImageMessage = true;
 				});
 			};
@@ -2678,8 +2760,8 @@ window.openProgressImages = function (rowIndex) {
     window.currentImageIndex = 0;
 
     // AngularJS scope update
-    const scope = angular.element(document.getElementById('imageModal')).scope();
-    scope.$apply(function () {
+    const scope = getManageOngoingWorksScope();
+    applyToManageOngoingWorksScope(scope, function () {
         scope.modalWorkNo = data.workNo;
         scope.levelOfCompletion = data.levelOfCompletion;
         scope.workName = data.workName;
@@ -2718,8 +2800,8 @@ window.openProgressImages = function (rowIndex) {
 
 
 				// AngularJS scope update for createdDate
-				const scope = angular.element(document.getElementById('imageModal')).scope();
-				scope.$apply(function () {
+				const scope = getManageOngoingWorksScope();
+				applyToManageOngoingWorksScope(scope, function () {
 					scope.date = doc.createdDate; // yaha set hoga har image ke hisab se
 					scope.noImageMessage = isPlaceholder;
 				});

@@ -16,11 +16,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.anuppur.bean.WorkBean;
+import com.anuppur.bean.DepartmentRemarksBean;
 import com.anuppur.entity.District;
 import com.anuppur.entity.Division;
 import com.anuppur.entity.ImplementationAgency;
 import com.anuppur.entity.Users;
 import com.anuppur.entity.Work;
+import com.anuppur.entity.DepartmentRemarks;
 import com.anuppur.repository.DepartmentRemarksRepository;
 import com.anuppur.repository.DmRemarksRepository;
 import com.anuppur.repository.UserRepository;
@@ -33,14 +35,16 @@ class WorkAuthorizationTest {
     private WorkRepository workRepository;
     private WorkAuthorization authorization;
     private areaofficerrecordRepository areaOfficerRecordRepository;
+    private DepartmentRemarksRepository departmentRemarksRepository;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         workRepository = mock(WorkRepository.class);
         areaOfficerRecordRepository = mock(areaofficerrecordRepository.class);
+        departmentRemarksRepository = mock(DepartmentRemarksRepository.class);
         authorization = new WorkAuthorization(userRepository, workRepository,
-                mock(DmRemarksRepository.class), mock(DepartmentRemarksRepository.class),
+                mock(DmRemarksRepository.class), departmentRemarksRepository,
                 areaOfficerRecordRepository);
     }
 
@@ -125,6 +129,34 @@ class WorkAuthorizationTest {
         assertThat(authorization.canAccessEncryptedWork("100")).isTrue();
         assertThat(authorization.canAccessEncryptedWork(encoded)).isTrue();
         assertThat(authorization.canAccessEncryptedWork("not-an-id")).isFalse();
+    }
+
+    @Test
+    void departmentCanUpdateOrDeleteOnlyItsOwnRemarkOnTheSameWork() {
+        Users department = scopedUser(10L, 20L, 30L, "D30");
+        Work ownWork = scopedWork(100L, 10L, 20L, 30L, "D30");
+        DepartmentRemarks existing = new DepartmentRemarks();
+        existing.setId(5L);
+        existing.setWorkId(100L);
+        existing.setCreatedBy("other-user");
+        DepartmentRemarksBean request = new DepartmentRemarksBean();
+        request.setId(5L);
+        request.setWorkId(100L);
+
+        authenticate("department", "ROLE_DEPARTMENT");
+        when(userRepository.findByUsername("department")).thenReturn(department);
+        when(workRepository.findById(100L)).thenReturn(Optional.of(ownWork));
+        when(departmentRemarksRepository.findById(5L)).thenReturn(Optional.of(existing));
+
+        assertThat(authorization.canEditDepartmentRemark(request)).isFalse();
+        assertThat(authorization.canDeleteDepartmentRemark(5L)).isFalse();
+
+        existing.setCreatedBy("department");
+        assertThat(authorization.canEditDepartmentRemark(request)).isTrue();
+        assertThat(authorization.canDeleteDepartmentRemark(5L)).isTrue();
+
+        request.setWorkId(101L);
+        assertThat(authorization.canEditDepartmentRemark(request)).isFalse();
     }
 
     private void authenticate(String username, String authority) {
